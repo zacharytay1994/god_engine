@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include <2_Engine/godEngine.h>
+#include <godEngine/godEngine.h>
 
 int main ()
 {
 	std::cout << "Game entry point!" << std::endl;
 
-	god::Engine engine;
+	god::godEngine engine;
 }
