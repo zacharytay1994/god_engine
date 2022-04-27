@@ -20,6 +20,7 @@ namespace god
 		HWND		GODWINDOW_API GetWindowHandle ();
 		uint32_t	GODWINDOW_API GetWindowWidth ();
 		uint32_t	GODWINDOW_API GetWindowHeight ();
+		bool		GODWINDOW_API Resized ();
 
 		// keyboard input
 		bool		GODWINDOW_API KeyIsDown ( UCHAR key ) const;
@@ -45,14 +46,14 @@ namespace god
 		friend LRESULT WINAPI WinProc ( HWND hwnd , UINT msg , WPARAM wParam , LPARAM lParam );
 
 	private:
-		HWND	m_handle		{ nullptr };
+		HWND	m_handle			{ nullptr };
 		MSG		m_message;
-		int		m_window_width	{ 0 };
-		int		m_window_height { 0 };
-		bool	m_resized		{ false };
-		bool	m_minimised		{ false };
-		bool	m_fullscreen	{ false };
-		bool	m_to_close		{ false };
+		int		m_window_width		{ 0 };
+		int		m_window_height		{ 0 };
+		bool	m_resized			{ false };
+		bool	m_minimised			{ false };
+		bool	m_fullscreen		{ false };
+		bool	m_to_close			{ false };
 
 		Input	m_input;
 

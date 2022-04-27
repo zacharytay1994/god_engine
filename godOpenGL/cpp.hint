@@ -1,0 +1,2 @@
+#define GODOPENGL_API __declspec(dllexport)
+#define GODOPENGL_API __declspec(dllimport)

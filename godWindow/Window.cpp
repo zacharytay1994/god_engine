@@ -6,7 +6,7 @@ namespace god
 	// Custom windows procedure
 	LRESULT WINAPI WinProc ( HWND hwnd , UINT msg , WPARAM wParam , LPARAM lParam )
 	{
-		Window* window;
+		Window* window { nullptr };
 		window = ( Window* ) GetWindowLongPtr ( hwnd , GWLP_USERDATA );
 
 		switch ( msg )
@@ -63,6 +63,15 @@ namespace god
 			window->m_input.m_mouse_right_up = true;
 			window->m_input.FillMousePosition ( lParam );
 			return 0;
+			// update width and height of client area upon resize
+		case WM_SIZE:
+			if ( window )
+			{
+				window->m_resized = true;
+				window->m_window_width = LOWORD ( lParam );
+				window->m_window_height = HIWORD ( lParam );
+			}
+			return 0;
 		}
 
 		return DefWindowProc ( hwnd , msg , wParam , lParam );
@@ -101,7 +110,11 @@ namespace god
 
 	void Window::PollEvents ()
 	{
+		// reset window states
 		m_input.EndFrame ();
+		m_resized = false;
+
+		// process messages
 		if ( PeekMessage ( &m_message , NULL , 0 , 0 , PM_REMOVE ) )
 		{
 			TranslateMessage ( &m_message );
@@ -122,6 +135,11 @@ namespace god
 	uint32_t Window::GetWindowHeight ()
 	{
 		return m_window_height;
+	}
+
+	bool Window::Resized ()
+	{
+		return m_resized;
 	}
 
 	bool Window::KeyIsDown ( UCHAR key ) const
@@ -284,7 +302,10 @@ namespace god
 			window_rect.bottom = static_cast< long >( height );
 		}
 
-		AdjustWindowRectEx ( &window_rect , dw_style , FALSE , dw_ex_stye );
+		if ( !AdjustWindowRectEx ( &window_rect , dw_style , FALSE , dw_ex_stye ) )
+		{
+			std::cerr << "Failed to adjust window rect." << std::endl;
+		}
 
 		// create window
 		hWnd = CreateWindowEx
@@ -302,6 +323,12 @@ namespace god
 			, hInstance
 			, nullptr
 		);
+
+		// get window width and height of client area
+		RECT client_rect;
+		GetClientRect ( hWnd , &client_rect );
+		m_window_width = client_rect.right;
+		m_window_height = client_rect.bottom;
 
 		// check if window successfully created
 		if ( !hWnd )

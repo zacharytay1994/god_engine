@@ -2,6 +2,7 @@
 #include "Engine.h"
 
 #include <godWindow/Window.h>
+#include <godOpenGL/OpenGL.h>
 
 namespace god
 {
@@ -14,12 +15,17 @@ namespace god
 	{
 		// create window
 		god::Window window ( 300 , 300 );
+		god::OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
 
 		while ( !window.WindowShouldClose () )
 		{
-			window.PollEvents ();
+			// start frame also resized the viewport 
+			opengl.StartFrame ( window.Resized () , window.GetWindowWidth () , window.GetWindowHeight () );
 
 			// ...
+
+			window.PollEvents ();
+			opengl.EndFrame ();
 		}
 	}
 }
