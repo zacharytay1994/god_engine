@@ -9,6 +9,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1_Game", "1_Game\1_Game.vcx
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "godEngine", "godEngine\godEngine.vcxproj", "{678BE40C-C04A-4FDE-9090-6FCCC9D34915}"
+	ProjectSection(ProjectDependencies) = postProject
+		{02A2996C-3EFB-4182-99E9-4E4138EDBEFE} = {02A2996C-3EFB-4182-99E9-4E4138EDBEFE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "godWindow", "godWindow\godWindow.vcxproj", "{02A2996C-3EFB-4182-99E9-4E4138EDBEFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +35,12 @@ Global
 		{678BE40C-C04A-4FDE-9090-6FCCC9D34915}.Release|x64.ActiveCfg = Release|x64
 		{678BE40C-C04A-4FDE-9090-6FCCC9D34915}.Release|x64.Build.0 = Release|x64
 		{678BE40C-C04A-4FDE-9090-6FCCC9D34915}.Release|x86.ActiveCfg = Release|x64
+		{02A2996C-3EFB-4182-99E9-4E4138EDBEFE}.Debug|x64.ActiveCfg = Debug|x64
+		{02A2996C-3EFB-4182-99E9-4E4138EDBEFE}.Debug|x64.Build.0 = Debug|x64
+		{02A2996C-3EFB-4182-99E9-4E4138EDBEFE}.Debug|x86.ActiveCfg = Debug|x64
+		{02A2996C-3EFB-4182-99E9-4E4138EDBEFE}.Release|x64.ActiveCfg = Release|x64
+		{02A2996C-3EFB-4182-99E9-4E4138EDBEFE}.Release|x64.Build.0 = Release|x64
+		{02A2996C-3EFB-4182-99E9-4E4138EDBEFE}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

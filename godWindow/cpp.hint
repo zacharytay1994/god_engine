@@ -1,0 +1,2 @@
+#define GODWINDOW_API __declspec(dllexport)
+#define GODWINDOW_API __declspec(dllimport)
