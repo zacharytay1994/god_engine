@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Input.h"
 
+#include <windowsx.h>
+
 namespace god
 {
 	Input::Input ()
@@ -36,17 +38,22 @@ namespace god
 		return false;
 	}
 
-	void Input::SetKeyDown ( WPARAM wparam )
+	void Input::SetKeyDown ( WPARAM wParam )
 	{
 		// make sure key code is within buffer range
-		if ( ValidKeyCode ( wparam ) )
+		if ( ValidKeyCode ( wParam ) )
 		{
 			m_state_change = true;
-			m_keys_down[ wparam ] = true;
-			m_keys_pressed[ wparam ] = true;
+			m_keys_down[ wParam ] = true;
+
+			if ( !m_keys_pressed_once[ wParam ] )
+			{
+				m_keys_pressed_once[ wParam ] = true;
+				m_keys_pressed[ wParam ] = true;
+			}
 
 			// additional check for keys with left and right
-			switch ( wparam )
+			switch ( wParam )
 			{
 			case VK_SHIFT:
 				// GetKeyState returns a 8 bit value representing individual key state, 
@@ -75,15 +82,16 @@ namespace god
 		}
 	}
 
-	void Input::SetKeyUp ( WPARAM wparam )
+	void Input::SetKeyUp ( WPARAM wParam )
 	{
-		if ( ValidKeyCode ( wparam ) )
+		if ( ValidKeyCode ( wParam ) )
 		{
 			m_state_change = true;
-			m_keys_down[ wparam ] = false;
-			m_keys_up[ wparam ] = true;
+			m_keys_down[ wParam ] = false;
+			m_keys_up[ wParam ] = true;
+			m_keys_pressed_once[ wParam ] = false;
 
-			switch ( wparam )
+			switch ( wParam )
 			{
 				// weird bug here, if both shifts are down, releasing one does not generate a message?
 				// control works fine with the same method, unsure whats wrong
@@ -107,15 +115,49 @@ namespace god
 					m_keys_down[ VK_RCONTROL ] = false;
 				}
 				// only release main control if both sides are released
-				m_keys_down[ wparam ] = m_keys_down[ VK_LCONTROL ] || m_keys_down[ VK_RCONTROL ] ? true : false;
+				m_keys_down[ wParam ] = m_keys_down[ VK_LCONTROL ] || m_keys_down[ VK_RCONTROL ] ? true : false;
 				break;
 			}
+		}
+	}
+
+	void Input::FillMousePosition ( LPARAM lParam )
+	{
+		m_mouse_x = GET_X_LPARAM ( lParam );
+		m_mouse_y = GET_Y_LPARAM ( lParam );
+	}
+
+	void Input::FillMouseRawPosition ( LPARAM lParam )
+	{
+		// data size
+		UINT dw_size = 40;
+		// data
+		static BYTE lpb[ 40 ];
+
+		GetRawInputData ( ( HRAWINPUT ) lParam , RID_INPUT ,
+			lpb , &dw_size , sizeof ( RAWINPUTHEADER ) );
+
+		RAWINPUT* raw = ( RAWINPUT* ) lpb;
+
+		if ( raw->header.dwType == RIM_TYPEMOUSE )
+		{
+			m_mouse_x = raw->data.mouse.lLastX;
+			m_mouse_y = raw->data.mouse.lLastY;
 		}
 	}
 
 	void Input::EndFrame ()
 	{
 		ClearBuffer ( KEYS_PRESSED | KEYS_UP );
+
+		// reset mouse buttons
+		m_mouse_left_pressed = false;
+		m_mouse_left_up = false;
+		m_mouse_middle_pressed = false;
+		m_mouse_middle_up = false;
+		m_mouse_right_pressed = false;
+		m_mouse_right_up = false;
+
 		m_state_change = false;
 	}
 

@@ -14,7 +14,9 @@ namespace god
 		case WM_CLOSE:
 			window->m_to_close = true;
 			return 0;
-
+		case WM_DESTROY:
+			PostQuitMessage ( 88888 );
+			return 0;
 			// keyboard input
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
@@ -23,6 +25,43 @@ namespace god
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 			window->m_input.SetKeyUp ( wParam );
+			return 0;
+			// mouse input
+		case WM_MOUSEMOVE:
+			window->m_input.FillMousePosition ( lParam );
+			return 0;
+		case WM_INPUT:
+			window->m_input.FillMouseRawPosition ( lParam );
+			return 0;
+		case WM_LBUTTONDOWN:
+			window->m_input.m_mouse_left_down = true;
+			window->m_input.m_mouse_left_pressed = true;
+			window->m_input.FillMousePosition ( lParam );
+			return 0;
+		case WM_LBUTTONUP:
+			window->m_input.m_mouse_left_down = false;
+			window->m_input.m_mouse_left_up = true;
+			window->m_input.FillMousePosition ( lParam );
+			return 0;
+		case WM_MBUTTONDOWN:
+			window->m_input.m_mouse_middle_down = true;
+			window->m_input.m_mouse_middle_pressed = true;
+			window->m_input.FillMousePosition ( lParam );
+			return 0;
+		case WM_MBUTTONUP:
+			window->m_input.m_mouse_middle_down = false;
+			window->m_input.m_mouse_middle_up = true;
+			window->m_input.FillMousePosition ( lParam );
+			return 0;
+		case WM_RBUTTONDOWN:
+			window->m_input.m_mouse_right_down = true;
+			window->m_input.m_mouse_right_pressed = true;
+			window->m_input.FillMousePosition ( lParam );
+			return 0;
+		case WM_RBUTTONUP:
+			window->m_input.m_mouse_right_down = false;
+			window->m_input.m_mouse_right_up = true;
+			window->m_input.FillMousePosition ( lParam );
 			return 0;
 		}
 
@@ -70,6 +109,11 @@ namespace god
 		}
 	}
 
+	HWND Window::GetWindowHandle ()
+	{
+		return m_handle;
+	}
+
 	uint32_t Window::GetWindowWidth ()
 	{
 		return m_window_width;
@@ -93,6 +137,58 @@ namespace god
 	bool Window::KeyUp ( UCHAR key ) const
 	{
 		return m_input.KeyUp ( key );
+	}
+
+	int Window::MouseX ()
+	{
+		return m_input.m_mouse_x;
+	}
+
+	int Window::MouseY ()
+	{
+		return m_input.m_mouse_y;
+	}
+
+	bool Window::MouseLDown ()
+	{
+		return m_input.m_mouse_left_down;
+	}
+
+	bool Window::MouseLPressed ()
+	{
+		return m_input.m_mouse_left_pressed;
+	}
+
+	bool Window::MouseLUp ()
+	{
+		return m_input.m_mouse_left_up;
+	}
+
+	bool Window::MouseMDown ()
+	{
+		return m_input.m_mouse_middle_down;
+	}
+
+	bool Window::MouseMPressed ()
+	{
+		return m_input.m_mouse_middle_pressed;
+	}
+
+	bool Window::MouseMUp ()
+	{
+		return m_input.m_mouse_middle_up;
+	}
+	bool Window::MouseRDown ()
+	{
+		return m_input.m_mouse_right_down;
+	}
+	bool Window::MouseRPressed ()
+	{
+		return m_input.m_mouse_right_pressed;
+	}
+	bool Window::MouseRUp ()
+	{
+		return m_input.m_mouse_right_up;
 	}
 
 	bool Window::CreateWindowClass ( HINSTANCE hInstance , WNDPROC wndProc ) noexcept
