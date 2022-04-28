@@ -136,13 +136,8 @@ namespace god
 		wglDeleteContext ( m_opengl_rendering_context );
 	}
 
-	void OpenGL::FrameBegin ( bool resized , int width , int height ) const
+	void OpenGL::FrameBegin () const
 	{
-		if ( resized )
-		{
-			ResizeViewport ( width , height );
-		}
-
 		glClearColor ( 0.2f , 0.3f , 0.3f , 1.0f );
 		glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	}
@@ -152,9 +147,15 @@ namespace god
 		SwapBuffers ( m_window_device_context );
 	}
 
-	void OpenGL::FrameRender ()
+	void OpenGL::FrameRender ( glm::mat4 const& projection, glm::mat4 const& view )
 	{
 		m_flat_shader.Use ();
+
+		// projection matrix
+		OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uProjection" , projection );
+
+		// view matrix
+		OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uView" , view );
 
 		for ( auto const& data : m_render_data )
 		{
@@ -169,17 +170,6 @@ namespace god
 				model_matrix = glm::rotate ( model_matrix , data.m_rotation.z , glm::vec3 ( 0.0f , 0.0f , 1.0f ) );
 				model_matrix = glm::scale ( model_matrix , data.m_scale );
 				OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uModel" , model_matrix );
-
-				// temp view and projection
-				// projection matrix
-				glm::mat4 projection_matrix = glm::mat4 ( 1.0f );
-				projection_matrix = glm::perspective ( 3.142f / 4.0f , 300.0f / 300.0f , 0.1f , 100.0f );
-				OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uProjection" , projection_matrix );
-
-				// view matrix
-				glm::mat4 view_matrix = glm::mat4 ( 1.0f );
-				view_matrix = glm::lookAt ( glm::vec3 ( 0.0f , 0.0f , 0.0f ) , glm::vec3 ( 0.0f , 0.0f , -1.0f ) , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
-				OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uView" , view_matrix );
 
 				// set uniforms for fragment shader
 				// set view position

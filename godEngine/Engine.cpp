@@ -3,6 +3,7 @@
 
 #include <godWindow/Window.h>
 #include <godOpenGL/OpenGL.h>
+#include <godCamera/Camera.h>
 
 namespace god
 {
@@ -14,8 +15,12 @@ namespace god
 	void godEngine::Update ()
 	{
 		// create window
-		god::Window window ( 300 , 300 );
+		god::Window window ( 800 , 450 );
 		god::OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
+
+		// setup camera
+		god::Camera camera;
+		camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
 
 		// setup scene
 		OGLEntityID c1 = opengl.AddCube ( { 0.0f,0.0f,-10.0f } );
@@ -23,8 +28,16 @@ namespace god
 
 		while ( !window.WindowShouldClose () )
 		{
-			// start frame also resizes the viewport if window size changes
-			opengl.FrameBegin ( window.Resized () , window.GetWindowWidth () , window.GetWindowHeight () );
+			window.PollEvents ();
+
+			// window resize changes
+			if ( window.Resized () )
+			{
+				opengl.ResizeViewport ( window.GetWindowWidth () , window.GetWindowHeight () );
+				camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
+			}
+
+			opengl.FrameBegin ();
 
 			// ...
 			OGLRenderData& cube1 = opengl.GetCube ( c1 );
@@ -35,10 +48,25 @@ namespace god
 			cube2.m_rotation.x += 0.0002f;
 			cube2.m_rotation.y += 0.0002f;
 
-			opengl.FrameRender ();
+			opengl.FrameRender (
+				camera.GetPerpectiveProjectionMatrix () ,
+				camera.GetCameraViewMatrix ()
+			);
 
-			window.PollEvents ();
 			opengl.FrameEnd ();
+
+			// test camera movement
+			camera.FreeCamera ( 0.0002f ,
+				true ,
+				window.KeyIsDown ( 'W' ) ,
+				window.KeyIsDown ( 'S' ) ,
+				window.KeyIsDown ( 'A' ) ,
+				window.KeyIsDown ( 'D' ) ,
+				window.KeyIsDown ( VK_SPACE ) ,
+				window.KeyIsDown ( VK_LSHIFT ) ,
+				window.MouseLDown () ,
+				window.MouseX () ,
+				window.MouseY () );
 		}
 	}
 }

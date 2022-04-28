@@ -33,9 +33,9 @@ namespace god
 		GODOPENGL_API OpenGL ( HWND windowHandle , int width , int height );
 		GODOPENGL_API ~OpenGL ();
 
-		void GODOPENGL_API FrameBegin ( bool resized , int width , int height ) const;
+		void GODOPENGL_API FrameBegin () const;
 		void GODOPENGL_API FrameEnd () const;
-		void GODOPENGL_API FrameRender ();
+		void GODOPENGL_API FrameRender ( glm::mat4 const& projection , glm::mat4 const& view );
 
 		OGLEntityID		GODOPENGL_API	AddCube (
 			glm::vec3 const& position = { 0.0f,0.0f,0.0f } ,

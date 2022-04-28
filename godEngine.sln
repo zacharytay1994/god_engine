@@ -18,6 +18,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "godWindow", "godWindow\godW
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "godOpenGL", "godOpenGL\godOpenGL.vcxproj", "{1E005290-FFE0-46B3-89EF-993BE9EF691A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "godCamera", "godCamera\godCamera.vcxproj", "{7E7C45B6-C7F3-4ED6-BC83-988B06B00E25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -50,6 +52,12 @@ Global
 		{1E005290-FFE0-46B3-89EF-993BE9EF691A}.Release|x64.ActiveCfg = Release|x64
 		{1E005290-FFE0-46B3-89EF-993BE9EF691A}.Release|x64.Build.0 = Release|x64
 		{1E005290-FFE0-46B3-89EF-993BE9EF691A}.Release|x86.ActiveCfg = Release|x64
+		{7E7C45B6-C7F3-4ED6-BC83-988B06B00E25}.Debug|x64.ActiveCfg = Debug|x64
+		{7E7C45B6-C7F3-4ED6-BC83-988B06B00E25}.Debug|x64.Build.0 = Debug|x64
+		{7E7C45B6-C7F3-4ED6-BC83-988B06B00E25}.Debug|x86.ActiveCfg = Debug|x64
+		{7E7C45B6-C7F3-4ED6-BC83-988B06B00E25}.Release|x64.ActiveCfg = Release|x64
+		{7E7C45B6-C7F3-4ED6-BC83-988B06B00E25}.Release|x64.Build.0 = Release|x64
+		{7E7C45B6-C7F3-4ED6-BC83-988B06B00E25}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
