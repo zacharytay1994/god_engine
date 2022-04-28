@@ -30,6 +30,12 @@
     <ClInclude Include="OpenGL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Internal\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal\Primitives.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="godOpenGL.cpp">
@@ -45,6 +51,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OpenGL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Internal\Primitives.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
