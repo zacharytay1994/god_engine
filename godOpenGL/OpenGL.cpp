@@ -147,7 +147,7 @@ namespace god
 		SwapBuffers ( m_window_device_context );
 	}
 
-	void OpenGL::FrameRender ( glm::mat4 const& projection, glm::mat4 const& view )
+	void OpenGL::FrameRender ( glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position )
 	{
 		m_flat_shader.Use ();
 
@@ -173,7 +173,7 @@ namespace god
 
 				// set uniforms for fragment shader
 				// set view position
-				OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uViewPosition" , glm::vec3 ( 0.0f , 0.0f , 0.0f ) );
+				OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uViewPosition" , camera_position );
 
 				// set material
 				OGLMaterial material;
@@ -204,7 +204,7 @@ namespace god
 		if ( m_free_render_data.empty () )
 		{
 			m_render_data.emplace_back ( position , rotation , scale );
-			return m_render_data.size () - 1;
+			return static_cast< OGLEntityID >( m_render_data.size () - 1 );
 		}
 		OGLEntityID free_id = m_free_render_data.top ();
 		m_free_render_data.pop ();

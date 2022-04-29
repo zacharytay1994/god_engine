@@ -50,7 +50,8 @@ namespace god
 
 			opengl.FrameRender (
 				camera.GetPerpectiveProjectionMatrix () ,
-				camera.GetCameraViewMatrix ()
+				camera.GetCameraViewMatrix () ,
+				camera.m_position
 			);
 
 			opengl.FrameEnd ();
@@ -65,8 +66,8 @@ namespace god
 				window.KeyIsDown ( VK_SPACE ) ,
 				window.KeyIsDown ( VK_LSHIFT ) ,
 				window.MouseLDown () ,
-				window.MouseX () ,
-				window.MouseY () );
+				static_cast< float >( window.MouseX () ) ,
+				static_cast< float >( window.MouseY () ) );
 		}
 	}
 }

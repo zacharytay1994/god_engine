@@ -14,16 +14,16 @@ namespace god
 {
 	using OGLEntityID = uint32_t;
 
-	struct GODOPENGL_API OGLRenderData
+	struct OGLRenderData
 	{
 		glm::vec3 m_position { 0.0f,0.0f,0.0f };
 		glm::vec3 m_rotation { 0.0f,0.0f,0.0f };
 		glm::vec3 m_scale { 1.0f,1.0f,1.0f };
 
-		friend class OpenGL;
+		friend struct OpenGL;
 
-		OGLRenderData () = default;
-		OGLRenderData ( glm::vec3 const& position , glm::vec3 const& rotation , glm::vec3 const& scale );
+		GODOPENGL_API OGLRenderData () = default;
+		GODOPENGL_API OGLRenderData ( glm::vec3 const& position , glm::vec3 const& rotation , glm::vec3 const& scale );
 	private:
 		bool m_active { false };
 	};
@@ -35,7 +35,10 @@ namespace god
 
 		void GODOPENGL_API FrameBegin () const;
 		void GODOPENGL_API FrameEnd () const;
-		void GODOPENGL_API FrameRender ( glm::mat4 const& projection , glm::mat4 const& view );
+		void GODOPENGL_API FrameRender (
+			glm::mat4 const& projection ,
+			glm::mat4 const& view ,
+			glm::vec3 const& camera_position );
 
 		OGLEntityID		GODOPENGL_API	AddCube (
 			glm::vec3 const& position = { 0.0f,0.0f,0.0f } ,
@@ -43,7 +46,7 @@ namespace god
 			glm::vec3 const& scale = { 1.0f,1.0f,1.0f } );
 
 		void			GODOPENGL_API	RemoveCube ( OGLEntityID id );
-		OGLRenderData	GODOPENGL_API&	GetCube ( OGLEntityID id );
+		OGLRenderData	GODOPENGL_API& GetCube ( OGLEntityID id );
 
 		void GODOPENGL_API ResizeViewport ( int width , int height ) const;
 

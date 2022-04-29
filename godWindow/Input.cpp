@@ -41,7 +41,7 @@ namespace god
 	void Input::SetKeyDown ( WPARAM wParam )
 	{
 		// make sure key code is within buffer range
-		if ( ValidKeyCode ( wParam ) )
+		if ( ValidKeyCode ( static_cast< UCHAR >( wParam ) ) )
 		{
 			m_state_change = true;
 			m_keys_down[ wParam ] = true;
@@ -84,7 +84,7 @@ namespace god
 
 	void Input::SetKeyUp ( WPARAM wParam )
 	{
-		if ( ValidKeyCode ( wParam ) )
+		if ( ValidKeyCode ( static_cast< UCHAR >( wParam ) ) )
 		{
 			m_state_change = true;
 			m_keys_down[ wParam ] = false;
