@@ -51,6 +51,7 @@ namespace god
 		void GODOPENGL_API ResizeViewport ( int width , int height ) const;
 
 		//void GODOPENGL_API Test ();
+		HGLRC GODOPENGL_API GetOpenGLRenderingContext ();
 
 	private:
 		int m_pixel_format { 0 };

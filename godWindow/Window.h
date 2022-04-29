@@ -12,6 +12,10 @@ namespace god
 	struct Window
 	{
 		GODWINDOW_API Window ( uint32_t width , uint32_t height , bool fullscreen = false );
+		GODWINDOW_API ~Window ();
+
+		void GODWINDOW_API InitializeImGui ( HGLRC hglrc );
+		void GODWINDOW_API TestImgui ();
 
 		bool		GODWINDOW_API WindowShouldClose ();
 		void		GODWINDOW_API PollEvents ();
@@ -59,5 +63,7 @@ namespace god
 
 		bool CreateWindowClass ( HINSTANCE hInstance , WNDPROC wndProc ) noexcept;
 		bool CreateSystemWindow ( HINSTANCE hInstance , HWND& hWnd , bool isFullscreen , int width , int height );
+
+		float m_test { 0.0f };
 	};
 }

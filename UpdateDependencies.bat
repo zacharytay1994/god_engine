@@ -8,6 +8,10 @@ rem glm for math functionality
 rmdir /s /q "%ExternalDependencies%/glm/"
 git clone "https://github.com/g-truc/glm.git" "%ExternalDependencies%/glm/"
 
+rem imgui docking branch for the editor
+rmdir /s /q "%ExternalDependencies%/IMGUI/"
+git clone --single-branch --branch docking "https://github.com/ocornut/imgui.git" "%ExternalDependencies%/IMGUI/"
+
 rem Sol2 for lua scripting
 rmdir /s /q "%ExternalDependencies%/Sol2/"
 git clone "https://github.com/ThePhD/sol2.git" "%ExternalDependencies%/Sol2/"

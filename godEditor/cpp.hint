@@ -1,0 +1,2 @@
+#define GODEDITOR_API __declspec(dllexport)
+#define GODEDITOR_API __declspec(dllimport)

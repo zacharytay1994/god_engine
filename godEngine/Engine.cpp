@@ -4,6 +4,7 @@
 #include <godWindow/Window.h>
 #include <godOpenGL/OpenGL.h>
 #include <godCamera/Camera.h>
+//#include <godEditor/Editor.h>
 
 namespace god
 {
@@ -17,6 +18,9 @@ namespace god
 		// create window
 		god::Window window ( 800 , 450 );
 		god::OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
+		//god::Editor editor ( window.GetWindowHandle () );
+
+		window.InitializeImGui ( opengl.GetOpenGLRenderingContext () );
 
 		// setup camera
 		god::Camera camera;
@@ -39,6 +43,8 @@ namespace god
 
 			opengl.FrameBegin ();
 
+			//editor.Update ();
+
 			// ...
 			OGLRenderData& cube1 = opengl.GetCube ( c1 );
 			OGLRenderData& cube2 = opengl.GetCube ( c2 );
@@ -53,6 +59,8 @@ namespace god
 				camera.GetCameraViewMatrix () ,
 				camera.m_position
 			);
+
+			window.TestImgui ();
 
 			opengl.FrameEnd ();
 

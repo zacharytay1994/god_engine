@@ -1,11 +1,21 @@
 #include "pch.h"
 #include "Window.h"
 
+#include <gl/GL.h>
+
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_opengl3.h"
+#include "ImGui/imgui_impl_win32.h"
+
+extern LRESULT ImGui_ImplWin32_WndProcHandler ( HWND hwnd , UINT msg , WPARAM wParam , LPARAM lParam );
 namespace god
 {
 	// Custom windows procedure
 	LRESULT WINAPI WinProc ( HWND hwnd , UINT msg , WPARAM wParam , LPARAM lParam )
 	{
+		if ( ImGui_ImplWin32_WndProcHandler ( hwnd , msg , wParam , lParam ) )
+			return true;
+
 		Window* window { nullptr };
 		window = ( Window* ) GetWindowLongPtr ( hwnd , GWLP_USERDATA );
 
@@ -101,6 +111,53 @@ namespace god
 		m_resized = false;
 
 		std::cout << "godWindow constructed." << std::endl;
+	}
+
+	Window::~Window ()
+	{
+		ImGui_ImplOpenGL3_Shutdown ();
+		ImGui_ImplWin32_Shutdown ();
+		ImGui::DestroyContext ();
+	}
+
+	void Window::InitializeImGui ( HGLRC hglrc )
+	{
+		ImGui::CreateContext ();
+
+		ImGuiIO& io = ImGui::GetIO (); ( void ) io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+		ImGui_ImplWin32_InitForOpenGL ( m_handle , hglrc );
+		ImGui_ImplOpenGL3_Init ( "#version 430" );
+	}
+
+	void Window::TestImgui ()
+	{
+		// imgui start frame
+		ImGui_ImplOpenGL3_NewFrame ();
+		ImGui_ImplWin32_NewFrame ();
+		ImGui::NewFrame ();
+
+		ImGui::Begin ( "Test" );
+		ImGui::Text ( "Hello world" );
+		ImGui::End ();
+
+		ImGui::Begin ( "Test2" );
+		ImGui::InputFloat ( "testfloat" , &m_test );
+		ImGui::End ();
+
+		ImGui::EndFrame ();
+		ImGui::Render ();
+		ImGui_ImplOpenGL3_RenderDrawData ( ImGui::GetDrawData () );
+
+		ImGuiIO& io = ImGui::GetIO (); ( void ) io;
+		if ( io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
+		{
+			ImGui::UpdatePlatformWindows ();
+			ImGui::RenderPlatformWindowsDefault ();
+		}
 	}
 
 	bool Window::WindowShouldClose ()

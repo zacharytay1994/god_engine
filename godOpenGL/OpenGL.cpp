@@ -236,4 +236,9 @@ namespace god
 		glViewport ( 0 , 0 , width , height );
 		std::cout << "OpenGL viewport resized x:" << width << " y: " << height << std::endl;
 	}
+
+	HGLRC OpenGL::GetOpenGLRenderingContext ()
+	{
+		return m_opengl_rendering_context;
+	}
 }
