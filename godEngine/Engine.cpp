@@ -58,15 +58,21 @@ namespace god
 			// test camera movement
 			camera.FreeCamera ( 0.0002f ,
 				true ,
-				window.KeyDown ( 'W' ) ,
-				window.KeyDown ( 'S' ) ,
-				window.KeyDown ( 'A' ) ,
-				window.KeyDown ( 'D' ) ,
+				window.KeyDown ( GLFW_KEY_W ) ,
+				window.KeyDown ( GLFW_KEY_S ) ,
+				window.KeyDown ( GLFW_KEY_A ) ,
+				window.KeyDown ( GLFW_KEY_D ) ,
 				window.KeyDown ( GLFW_KEY_SPACE ) ,
 				window.KeyDown ( GLFW_KEY_LEFT_SHIFT ) ,
-				window.MouseLDown () ,
+				window.MouseRDown () ,
 				static_cast< float >( window.MouseX () ) ,
-				static_cast< float >( window.MouseY () ) );
+				static_cast< float >( window.MouseY () ) ,
+				window.MouseRDown () ,
+				window.MouseScrollUp () ,
+				window.MouseScrollDown () ,
+				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
+				window.MouseScrollUp () ,
+				window.MouseScrollDown () );
 		}
 	}
 }

@@ -25,8 +25,12 @@ namespace god
 		glm::mat4 GODCAMERA_API GetCameraViewMatrix ();
 
 		// camera modes
+		// free camera
 		float m_free_camera_speed { 1.0f };
 		float m_free_camera_sensitivity { 0.3f };
+		float m_free_camera_scroll_sensitivity { 1000.0f };
+		float m_free_camera_zoom { 1.0f };
+		float m_free_camera_zoom_sensitivity { 0.9f };
 		void GODCAMERA_API FreeCamera (
 			float dt ,
 			bool unlockMovement ,
@@ -38,7 +42,13 @@ namespace god
 			bool down ,
 			bool unlockRotation ,
 			float mouseX ,
-			float mouseY
+			float mouseY ,
+			bool unlockLookatMovement ,
+			bool lookatForward ,
+			bool lookatBackward ,
+			bool unlockZoom ,
+			bool zoomIn ,
+			bool zoomOut
 		);
 
 	private:
