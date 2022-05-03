@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Engine.h"
 
-#include <godWindow/Window.h>
 #include <godOpenGL/OpenGL.h>
+#include <godWindow/GLFWWindow.h>
 #include <godCamera/Camera.h>
 
 namespace god
@@ -15,7 +15,7 @@ namespace god
 	void godEngine::Update ()
 	{
 		// create window
-		god::Window window ( 800 , 450 );
+		god::GLFWWindow window ( 800 , 450 );
 		god::OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
 
 		// setup camera
@@ -29,6 +29,7 @@ namespace god
 		while ( !window.WindowShouldClose () )
 		{
 			window.PollEvents ();
+			window.SwapWindowBuffers ();
 
 			// window resize changes
 			if ( window.Resized () )
@@ -37,7 +38,7 @@ namespace god
 				camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
 			}
 
-			opengl.FrameBegin ();
+			opengl.ClearColour ();
 
 			// ...
 			OGLRenderData& cube1 = opengl.GetCube ( c1 );
@@ -54,17 +55,15 @@ namespace god
 				camera.m_position
 			);
 
-			opengl.FrameEnd ();
-
 			// test camera movement
 			camera.FreeCamera ( 0.0002f ,
 				true ,
-				window.KeyIsDown ( 'W' ) ,
-				window.KeyIsDown ( 'S' ) ,
-				window.KeyIsDown ( 'A' ) ,
-				window.KeyIsDown ( 'D' ) ,
-				window.KeyIsDown ( VK_SPACE ) ,
-				window.KeyIsDown ( VK_LSHIFT ) ,
+				window.KeyDown ( 'W' ) ,
+				window.KeyDown ( 'S' ) ,
+				window.KeyDown ( 'A' ) ,
+				window.KeyDown ( 'D' ) ,
+				window.KeyDown ( GLFW_KEY_SPACE ) ,
+				window.KeyDown ( GLFW_KEY_LEFT_SHIFT ) ,
 				window.MouseLDown () ,
 				static_cast< float >( window.MouseX () ) ,
 				static_cast< float >( window.MouseY () ) );

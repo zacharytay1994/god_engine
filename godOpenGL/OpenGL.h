@@ -33,8 +33,7 @@ namespace god
 		GODOPENGL_API OpenGL ( HWND windowHandle , int width , int height );
 		GODOPENGL_API ~OpenGL ();
 
-		void GODOPENGL_API FrameBegin () const;
-		void GODOPENGL_API FrameEnd () const;
+		void GODOPENGL_API ClearColour () const;
 		void GODOPENGL_API FrameRender (
 			glm::mat4 const& projection ,
 			glm::mat4 const& view ,

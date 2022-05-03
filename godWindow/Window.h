@@ -15,6 +15,7 @@ namespace god
 
 		bool		GODWINDOW_API WindowShouldClose ();
 		void		GODWINDOW_API PollEvents ();
+		void		GODWINDOW_API SwapWindowBuffers ();
 
 		// getters & setters
 		HWND		GODWINDOW_API GetWindowHandle ();
@@ -47,6 +48,7 @@ namespace god
 
 	private:
 		HWND	m_handle			{ nullptr };
+		HDC		m_device_context	{ nullptr };
 		MSG		m_message;
 		int		m_window_width		{ 0 };
 		int		m_window_height		{ 0 };

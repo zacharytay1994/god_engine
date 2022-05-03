@@ -136,15 +136,10 @@ namespace god
 		wglDeleteContext ( m_opengl_rendering_context );
 	}
 
-	void OpenGL::FrameBegin () const
+	void OpenGL::ClearColour () const
 	{
 		glClearColor ( 0.2f , 0.3f , 0.3f , 1.0f );
 		glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	}
-
-	void OpenGL::FrameEnd () const
-	{
-		SwapBuffers ( m_window_device_context );
 	}
 
 	void OpenGL::FrameRender ( glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position )

@@ -122,6 +122,11 @@ namespace god
 		}
 	}
 
+	void Window::SwapWindowBuffers ()
+	{
+		SwapBuffers ( m_device_context );
+	}
+
 	HWND Window::GetWindowHandle ()
 	{
 		return m_handle;
@@ -340,6 +345,8 @@ namespace god
 		ShowWindow ( hWnd , SW_SHOW );
 		SetForegroundWindow ( hWnd );
 		SetFocus ( hWnd );
+
+		m_device_context = GetDC ( hWnd );
 
 		return true;
 	}
