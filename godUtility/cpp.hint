@@ -1,0 +1,2 @@
+#define GODUTILITY_API __declspec(dllexport)
+#define GODUTILITY_API __declspec(dllimport)

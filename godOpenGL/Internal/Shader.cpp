@@ -1,9 +1,6 @@
 #include "../pch.h"
 #include "Shader.h"
-
-#include <assert.h>
-#include <fstream>
-#include <sstream>
+#include "../../godUtility/FileIO.h"
 
 #include <glad/glad.h>
 #include <glm/glm/gtc/matrix_transform.hpp>
@@ -17,65 +14,11 @@ namespace god
 
 	uint32_t OGLShader::InitializeFromFile ( char const* vsPath , char const* fsPath )
 	{
-		// read vertex shader file
-		std::ifstream vs_file ( vsPath );
-		assert ( vs_file );
-		std::stringstream vs_buffer;
-		vs_buffer << vs_file.rdbuf ();
-		std::string vs_string = vs_buffer.str ();
-		vs_file.close ();
+		// read vertex and fragment shader file
+		std::string vs_string = ReadFileToString ( vsPath );
+		std::string fs_string = ReadFileToString ( fsPath );
 
-		// read fragment shader file
-		std::ifstream fs_file ( fsPath );
-		assert ( fs_file );
-		std::stringstream fs_buffer;
-		fs_buffer << fs_file.rdbuf ();
-		std::string fs_string = fs_buffer.str ();
-		fs_file.close ();
-
-		uint32_t vs , fs;
-		vs = glCreateShader ( GL_VERTEX_SHADER );
-		fs = glCreateShader ( GL_FRAGMENT_SHADER );
-
-		int success;
-		char infoLog[ 512 ];
-
-		// compile vertex shader
-		GLchar const* vs_code[] = { vs_string.c_str () };
-		glShaderSource ( vs , 1 , vs_code , NULL );
-		glCompileShader ( vs );
-		glGetShaderiv ( vs , GL_COMPILE_STATUS , &success );
-		if ( !success )
-		{
-			glGetShaderInfoLog ( vs , 512 , NULL , infoLog );
-			printf ( "[FAIL] ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n%s\n" , vsPath , infoLog );
-		}
-
-		// compile fragment shader
-		GLchar const* fs_code[] = { fs_string.c_str () };
-		glShaderSource ( fs , 1 , fs_code , NULL );
-		glCompileShader ( fs );
-		glGetShaderiv ( fs , GL_COMPILE_STATUS , &success );
-		if ( !success )
-		{
-			glGetShaderInfoLog ( fs , 512 , NULL , infoLog );
-			printf ( "[FAIL] ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n%s\n" , fsPath , infoLog );
-		}
-
-		// compile shader program
-		uint32_t shader_program = glCreateProgram ();
-		glAttachShader ( shader_program , vs );
-		glAttachShader ( shader_program , fs );
-		glLinkProgram ( shader_program );
-		glGetProgramiv ( shader_program , GL_LINK_STATUS , &success );
-		if ( !success )
-		{
-			glGetProgramInfoLog ( shader_program , 512 , NULL , infoLog );
-			printf ( "[FAIL] ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n%s\n%s\n%s\n" , vsPath , fsPath , infoLog );
-		}
-
-		m_shader_program = shader_program;
-		return m_shader_program;
+		return InitializeFromCode ( vs_string.c_str () , fs_string.c_str () );
 	}
 
 	uint32_t OGLShader::InitializeFromCode ( char const* vsCode , char const* fsCode )

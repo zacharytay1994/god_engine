@@ -4,6 +4,8 @@
 #include <godOpenGL/OpenGL.h>
 #include <godWindow/GLFWWindow.h>
 #include <godCamera/Camera.h>
+#include <godUtility/Utility.h>
+#include <godUtility/Scene.h>
 
 namespace god
 {
@@ -22,9 +24,17 @@ namespace god
 		god::Camera camera;
 		camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
 
+		// setup resources
+		god::AssimpModelManager model_manager;
+		model_manager.Insert ( "Backpack" , god::LoadModel ( "Assets/GameAssets/Models/Backpack/backpack.obj" ) );
+		model_manager.Insert ( "Skull" , god::LoadModel ( "Assets/GameAssets/Models/Skull/skull.fbx" ) );
+
+		opengl.BuildOGLModels ( model_manager );
+
 		// setup scene
-		OGLEntityID c1 = opengl.AddCube ( { 0.0f,0.0f,-10.0f } );
-		OGLEntityID c2 = opengl.AddCube ( { 0.5f,0.5f,-4.0f } );
+		god::Scene scene;
+		god::SceneObjectID skull = scene.AddSceneObject ( model_manager.GetID ( "Skull" ) , { 0.0f,0.0f,-2.0f } );
+		god::SceneObjectID backpack = scene.AddSceneObject ( model_manager.GetID ( "Backpack" ) , { 5.0f, 0.0f, -2.0f } );
 
 		while ( !window.WindowShouldClose () )
 		{
@@ -40,22 +50,19 @@ namespace god
 
 			opengl.ClearColour ();
 
+			// update scene
 			// ...
-			OGLRenderData& cube1 = opengl.GetCube ( c1 );
-			OGLRenderData& cube2 = opengl.GetCube ( c2 );
+			scene.GetSceneObject ( skull ).m_rotation.y += 0.0002f;
 
-			cube1.m_rotation.x += 0.0002f;
-			cube1.m_rotation.y += 0.0002f;
-			cube2.m_rotation.x += 0.0002f;
-			cube2.m_rotation.y += 0.0002f;
-
-			opengl.FrameRender (
+			// render scene
+			opengl.RenderScene (
+				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,
 				camera.GetCameraViewMatrix () ,
 				camera.m_position
 			);
 
-			// test camera movement
+			// free camera update
 			camera.FreeCamera ( 0.0002f ,
 				true ,
 				window.KeyDown ( GLFW_KEY_W ) ,

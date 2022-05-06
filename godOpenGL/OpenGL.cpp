@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "OpenGL.h"
+#include "../godUtility/Scene.h"
 
 #pragma comment (lib, "opengl32.lib")
 
@@ -12,15 +13,6 @@
 
 namespace god
 {
-	OGLRenderData::OGLRenderData ( glm::vec3 const& position , glm::vec3 const& rotation , glm::vec3 const& scale )
-		:
-		m_position { position } ,
-		m_rotation { rotation } ,
-		m_scale { scale } ,
-		m_active { true }
-	{
-	}
-
 	OpenGL::OpenGL ( HWND windowHandle , int width , int height )
 		:
 		m_window_device_context { GetDC ( windowHandle ) }
@@ -68,62 +60,6 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/flatcolour.vs" ,
 			"Assets/EngineAssets/OpenGLShaders/flatcolour.fs" );
 
-		// initialize cube mesh
-		m_cube.m_vertices = OGLMesh::OGLVertices {
-			// front face
-			{{0.5f, 0.5f, 0.5f},	{0.0f, 0.0f, 1.0f}},
-			{{0.5f, -0.5f, 0.5f},	{0.0f, 0.0f, 1.0f}},
-			{{-0.5f, -0.5f, 0.5f},	{0.0f, 0.0f, 1.0f}},
-			{{-0.5f, 0.5f, 0.5f},	{0.0f, 0.0f, 1.0f}},
-			// back face
-			{{0.5f, 0.5f, -0.5f},	{0.0f, 0.0f, -1.0f}},
-			{{0.5f, -0.5f, -0.5f},	{0.0f, 0.0f, -1.0f}},
-			{{-0.5f, -0.5f, -0.5f},	{0.0f, 0.0f, -1.0f}},
-			{{-0.5f, 0.5f, -0.5f},	{0.0f, 0.0f, -1.0f}},
-			// right face
-			{{0.5f, 0.5f, -0.5f},	{1.0f, 0.0f, 0.0f}}, // 8
-			{{0.5f, -0.5f, -0.5f},	{1.0f, 0.0f, 0.0f}}, // 9
-			{{0.5f, 0.5f, 0.5f},	{1.0f, 0.0f, 0.0f}}, // 10
-			{{0.5f, -0.5f, 0.5f},	{1.0f, 0.0f, 0.0f}}, // 11
-			// left face
-			{{-0.5f, 0.5f, -0.5f},	{-1.0f, 0.0f, 0.0f}}, // 12
-			{{-0.5f, -0.5f, -0.5f},	{-1.0f, 0.0f, 0.0f}}, // 13
-			{{-0.5f, 0.5f, 0.5f},	{-1.0f, 0.0f, 0.0f}}, // 14
-			{{-0.5f, -0.5f, 0.5f},	{-1.0f, 0.0f, 0.0f}}, // 15
-			// bottom face
-			{{0.5f, -0.5f, 0.5f},	{0.0f, -1.0f, 0.0f}}, // 16
-			{{0.5f, -0.5f, -0.5f},	{0.0f, -1.0f, 0.0f}}, // 17
-			{{-0.5f, -0.5f, 0.5f},	{0.0f, -1.0f, 0.0f}}, // 18
-			{{-0.5f, -0.5f, -0.5f},	{0.0f, -1.0f, 0.0f}}, // 19
-			// top face
-			{{0.5f, 0.5f, 0.5f},	{0.0f, 1.0f, 0.0f}}, // 20
-			{{0.5f, 0.5f, -0.5f},	{0.0f, 1.0f, 0.0f}}, // 21
-			{{-0.5f, 0.5f, 0.5f},	{0.0f, 1.0f, 0.0f}}, // 22
-			{{-0.5f, 0.5f, -0.5f},	{0.0f, 1.0f, 0.0f}}, // 23
-		};
-
-		m_cube.m_indices = OGLMesh::OGLIndices {
-			3, 1, 0,
-			3, 2, 1,
-
-			4, 5, 7,
-			5, 6, 7,
-
-			10, 11, 8,
-			11, 9, 8,
-
-			12, 15, 14,
-			12, 13, 15,
-
-			18, 19, 16,
-			19, 17, 16,
-
-			20, 23, 22,
-			20, 21, 23
-		};
-
-		m_cube.Initialize ();
-
 		// opengl settings
 		glEnable ( GL_CULL_FACE );
 		glEnable ( GL_DEPTH_TEST );
@@ -142,7 +78,24 @@ namespace god
 		glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	}
 
-	void OpenGL::FrameRender ( glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position )
+	void OpenGL::BuildOGLModels ( AssimpModelManager const& modelManager )
+	{
+		// clear current mesh list
+		m_models.clear ();
+		
+		// copy meshes
+		for ( auto const& model : modelManager.GetResources() )
+		{
+			m_models.emplace_back ();
+			BuildOGLMeshesFromAssimpMeshes ( m_models.back () , model.m_meshes );
+		}
+
+		// copy mesh ids
+		m_model_ids = modelManager.GetIDs ();
+	}
+
+	void OpenGL::RenderScene ( Scene const& scene ,
+		glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position )
 	{
 		m_flat_shader.Use ();
 
@@ -152,9 +105,9 @@ namespace god
 		// view matrix
 		OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uView" , view );
 
-		for ( auto const& data : m_render_data )
+		for ( auto const& data : scene.m_render_data )
 		{
-			if ( data.m_active )
+			if ( data.Active() )
 			{
 				// set uniforms for vertex shader
 				// model matrix
@@ -185,8 +138,11 @@ namespace god
 				OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uLight.diffuse" , light.m_diffuse );
 				OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uLight.specular" , light.m_specular );
 
-				// draw cube
-				m_cube.Draw ( GL_TRIANGLES );
+				// draw model
+				for ( auto const& mesh : m_models[ data.m_model_id ] )
+				{
+					mesh.Draw ( GL_TRIANGLES );
+				}
 			}
 		}
 
@@ -194,41 +150,40 @@ namespace god
 		OGLShader::UnUse ();
 	}
 
-	OGLEntityID OpenGL::AddCube ( glm::vec3 const& position , glm::vec3 const& rotation , glm::vec3 const& scale )
-	{
-		if ( m_free_render_data.empty () )
-		{
-			m_render_data.emplace_back ( position , rotation , scale );
-			return static_cast< OGLEntityID >( m_render_data.size () - 1 );
-		}
-		OGLEntityID free_id = m_free_render_data.top ();
-		m_free_render_data.pop ();
-
-		m_render_data[ free_id ].m_position = position;
-		m_render_data[ free_id ].m_rotation = rotation;
-		m_render_data[ free_id ].m_scale = scale;
-		m_render_data[ free_id ].m_active = true;
-
-		return free_id;
-	}
-
-	void OpenGL::RemoveCube ( OGLEntityID id )
-	{
-		assert ( id < m_render_data.size () );
-		m_free_render_data.push ( id );
-		m_render_data[ id ].m_active = false;
-	}
-
-	OGLRenderData& OpenGL::GetCube ( OGLEntityID id )
-	{
-		// check if valid id and entity active
-		assert ( id < m_render_data.size () && m_render_data[ id ].m_active );
-		return m_render_data[ id ];
-	}
-
 	void OpenGL::ResizeViewport ( int width , int height ) const
 	{
 		glViewport ( 0 , 0 , width , height );
 		std::cout << "OpenGL viewport resized x:" << width << " y: " << height << std::endl;
+	}
+
+	OGLMesh OpenGL::BuildOGLMeshFromAssimpMesh ( AssimpMesh const& assimpMesh ) const
+	{
+		OGLMesh mesh;
+
+		// copy vertices
+		mesh.m_vertices.resize ( assimpMesh.m_vertices.size () );
+		for ( auto i = 0; i < assimpMesh.m_vertices.size (); ++i )
+		{
+			mesh.m_vertices[ i ].m_position = assimpMesh.m_vertices[ i ].m_position;
+			mesh.m_vertices[ i ].m_uv = assimpMesh.m_vertices[ i ].m_uv;
+			mesh.m_vertices[ i ].m_tangent = assimpMesh.m_vertices[ i ].m_tangent;
+			mesh.m_vertices[ i ].m_normal = assimpMesh.m_vertices[ i ].m_normal;
+			mesh.m_vertices[ i ].m_colour = assimpMesh.m_vertices[ i ].m_colour;
+		}
+
+		// copy indices
+		mesh.m_indices = assimpMesh.m_indices;
+
+		mesh.Initialize ();
+
+		return mesh;
+	}
+
+	void OpenGL::BuildOGLMeshesFromAssimpMeshes ( std::vector<OGLMesh>& oglMeshes , std::vector<AssimpMesh> const& assimpMeshes ) const
+	{
+		for ( auto& assimp_mesh : assimpMeshes )
+		{
+			oglMeshes.emplace_back ( BuildOGLMeshFromAssimpMesh ( assimp_mesh ) );
+		}
 	}
 }

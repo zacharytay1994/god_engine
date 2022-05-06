@@ -3,53 +3,36 @@
 #include "godOpenGL.h"
 #include "Internal/Shader.h"
 #include "Internal/Primitives.h"
+#include "../godUtility/Utility.h"
 
 #include <vector>
 #include <queue>
+#include <unordered_map>
+#include <string>
 
 #include "glad/glad.h"
 #include <glm/glm/glm.hpp>
 
 namespace god
 {
-	using OGLEntityID = uint32_t;
+	using OGLModelID = uint32_t;
 
-	struct OGLRenderData
-	{
-		glm::vec3 m_position { 0.0f,0.0f,0.0f };
-		glm::vec3 m_rotation { 0.0f,0.0f,0.0f };
-		glm::vec3 m_scale { 1.0f,1.0f,1.0f };
-
-		friend struct OpenGL;
-
-		GODOPENGL_API OGLRenderData () = default;
-		GODOPENGL_API OGLRenderData ( glm::vec3 const& position , glm::vec3 const& rotation , glm::vec3 const& scale );
-	private:
-		bool m_active { false };
-	};
-
+	struct Scene;
+	struct AssimpMesh;
 	struct OpenGL
 	{
 		GODOPENGL_API OpenGL ( HWND windowHandle , int width , int height );
 		GODOPENGL_API ~OpenGL ();
 
 		void GODOPENGL_API ClearColour () const;
-		void GODOPENGL_API FrameRender (
-			glm::mat4 const& projection ,
-			glm::mat4 const& view ,
-			glm::vec3 const& camera_position );
 
-		OGLEntityID		GODOPENGL_API	AddCube (
-			glm::vec3 const& position = { 0.0f,0.0f,0.0f } ,
-			glm::vec3 const& rotation = { 0.0f,0.0f,0.0f } ,
-			glm::vec3 const& scale = { 1.0f,1.0f,1.0f } );
-
-		void			GODOPENGL_API	RemoveCube ( OGLEntityID id );
-		OGLRenderData	GODOPENGL_API& GetCube ( OGLEntityID id );
+		// render scene functions
+		// assimp bridge
+		void GODOPENGL_API BuildOGLModels ( AssimpModelManager const& modelManager );
+		void GODOPENGL_API RenderScene ( Scene const& scene ,
+			glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position );
 
 		void GODOPENGL_API ResizeViewport ( int width , int height ) const;
-
-		//void GODOPENGL_API Test ();
 
 	private:
 		int m_pixel_format { 0 };
@@ -59,11 +42,12 @@ namespace god
 		// shaders
 		OGLShader m_flat_shader;
 
-		// models
-		// cube
-		OGLMesh m_cube;
+		// models - vector of vector of OGLMesh because 1 model can consist of more than 1 mesh
+		std::vector<std::vector<OGLMesh>> m_models;
+		std::unordered_map<std::string , OGLModelID> m_model_ids;
 
-		std::vector<OGLRenderData> m_render_data;
-		std::priority_queue<OGLEntityID , std::vector<OGLEntityID> , std::greater<OGLEntityID>> m_free_render_data;
+		// assimp bridge
+		OGLMesh BuildOGLMeshFromAssimpMesh ( AssimpMesh const& assimpMesh ) const;
+		void BuildOGLMeshesFromAssimpMeshes ( std::vector<OGLMesh>& oglMeshes , std::vector<AssimpMesh> const& assimpMeshes ) const;
 	};
 }

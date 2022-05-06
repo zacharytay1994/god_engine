@@ -68,7 +68,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>godWindow.lib;godOpenGL.lib;godCamera.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>godWindow.lib;godOpenGL.lib;godCamera.lib;godUtility.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -90,7 +90,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>godWindow.lib;godOpenGL.lib;godCamera.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>godWindow.lib;godOpenGL.lib;godCamera.lib;godUtility.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

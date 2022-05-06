@@ -9,14 +9,3 @@
 #else
 #define GODOPENGL_API __declspec(dllimport)
 #endif
-
-// This class is exported from the dll
-class GODOPENGL_API CgodOpenGL {
-public:
-	CgodOpenGL(void);
-	// TODO: add your methods here.
-};
-
-extern GODOPENGL_API int ngodOpenGL;
-
-GODOPENGL_API int fngodOpenGL(void);

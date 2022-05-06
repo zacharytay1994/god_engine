@@ -20,13 +20,26 @@ namespace god
 		glBindVertexArray ( m_vao );
 		glBindBuffer ( GL_ARRAY_BUFFER , m_vbo );
 
+		// VERTEX FORMAT 
 		// vertex position
 		glEnableVertexAttribArray ( 0 );
 		glVertexAttribPointer ( 0 , 3 , GL_FLOAT , GL_FALSE , sizeof ( OGLVertex ) , ( void* ) 0 );
 
-		// vertex normals
+		// vertex uv
 		glEnableVertexAttribArray ( 1 );
-		glVertexAttribPointer ( 1 , 3 , GL_FLOAT , GL_FALSE , sizeof ( OGLVertex ) , ( void* ) offsetof ( OGLVertex , m_normal ) );
+		glVertexAttribPointer ( 1 , 2 , GL_FLOAT , GL_FALSE , sizeof ( OGLVertex ) , ( void* ) offsetof ( OGLVertex , m_uv ) );
+
+		// vertex tangent
+		glEnableVertexAttribArray ( 2 );
+		glVertexAttribPointer ( 2 , 3 , GL_FLOAT , GL_FALSE , sizeof ( OGLVertex ) , ( void* ) offsetof ( OGLVertex , m_tangent ) );
+
+		// vertex normals
+		glEnableVertexAttribArray ( 3 );
+		glVertexAttribPointer ( 3 , 3 , GL_FLOAT , GL_FALSE , sizeof ( OGLVertex ) , ( void* ) offsetof ( OGLVertex , m_normal ) );
+
+		// vertex colour
+		glEnableVertexAttribArray ( 4 );
+		glVertexAttribPointer ( 4 , 4 , GL_FLOAT , GL_FALSE , sizeof ( OGLVertex ) , ( void* ) offsetof ( OGLVertex , m_colour ) );
 
 		// create index buffer and bind data
 		glCreateBuffers ( 1 , &m_ebo );
