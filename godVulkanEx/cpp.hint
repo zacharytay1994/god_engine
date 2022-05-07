@@ -1,0 +1,2 @@
+#define GODVULKANEX_API __declspec(dllexport)
+#define GODVULKANEX_API __declspec(dllimport)

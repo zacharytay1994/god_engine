@@ -16,6 +16,10 @@ rem Sol2 for lua scripting
 rmdir /s /q "%ExternalDependencies%/Sol2/"
 git clone "https://github.com/ThePhD/sol2.git" "%ExternalDependencies%/Sol2/"
 
+rem stbimage for loading pngs/jpgs
+rmdir /s /q "%ExternalDependencies%/stb/"
+git clone https://github.com/nothings/stb.git "%ExternalDependencies%/stb/"
+
 rem assimp for model loading, build and copy libraries to libraries directory
 rmdir /s /q "%ExternalDependencies%/assimp"
 git clone https://github.com/assimp/assimp.git "%ExternalDependencies%/assimp/"
