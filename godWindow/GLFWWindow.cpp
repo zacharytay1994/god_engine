@@ -121,6 +121,11 @@ namespace god
 		return glfwGetWin32Window ( m_window );
 	}
 
+	GLFWwindow* GLFWWindow::GetGLFWWindow ()
+	{
+		return m_window;
+	}
+
 	uint32_t GLFWWindow::GetWindowWidth ()
 	{
 		return m_width;

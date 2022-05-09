@@ -18,6 +18,7 @@ namespace god
 
 		// getters & setters
 		HWND		GODWINDOW_API GetWindowHandle ();
+		GLFWwindow	GODWINDOW_API* GetGLFWWindow ();
 		uint32_t	GODWINDOW_API GetWindowWidth ();
 		uint32_t	GODWINDOW_API GetWindowHeight ();
 		bool		GODWINDOW_API Resized ();

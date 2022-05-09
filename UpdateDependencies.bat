@@ -29,4 +29,8 @@ cd "../../"
 robocopy "%ExternalDependencies%/assimp/build/x64/lib/Debug" "%ExternalDependencies%/Libraries"
 robocopy "%ExternalDependencies%/assimp/build/x64/lib/Release" "%ExternalDependencies%/Libraries"
 
+rem imgui clone docking branch
+rmdir /s /q "%ExternalDependencies%/imgui/"
+git clone --single-branch --branch docking https://github.com/ocornut/imgui.git "%ExternalDependencies%/imgui/"
+
 pause

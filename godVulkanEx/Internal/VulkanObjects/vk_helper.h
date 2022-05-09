@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../godVulkanEx.h"
+
 #define VK_USE_PLATFORM_WIN32_KHR 1
 #include <vulkan/vulkan.h>
 #include <optional>
@@ -33,7 +35,7 @@ namespace VK_HELPER
 			}
 		};
 
-		QueueFamilyIndices QueueFamilies (
+		QueueFamilyIndices GODVULKANEX_API QueueFamilies (
 			VkPhysicalDevice	physicalDevice ,
 			VkSurfaceKHR		surface
 		);

@@ -2,6 +2,7 @@
 #include "../godVulkanEx.h"
 #include "../../godUtility/Utility.h"
 
+#include "VulkanObjects/vk_helper.h"
 #include "VulkanObjects/vk_config.h"
 #include "VulkanObjects/vk_vulkan_instance.h"
 #include "VulkanObjects/vk_surface.h"
@@ -23,6 +24,7 @@
 
 namespace god
 {
+	struct Scene;
 	struct VulkanEx
 	{
 		VK_OBJECT::Instance			m_instance;
@@ -70,7 +72,7 @@ namespace god
 
 		void GODVULKANEX_API BindGraphicsPipeline ( std::string const& name );
 
-		void AddModel ( std::string const& name , VK_OBJECT::Vertices const& vertices , VK_OBJECT::Indices const& indices );
+		void AddModel ( VK_OBJECT::Vertices const& vertices , VK_OBJECT::Indices const& indices );
 
 		void GODVULKANEX_API AddImage ( std::string const& name , std::string const& png );
 		void BindImage ( std::string const& name );
@@ -79,6 +81,9 @@ namespace god
 			float x , float y , float z ,
 			float rx = 0.0f , float ry = 0.0f , float rz = 0.0f ,
 			float sx = 1.0f , float sy = 1.0f , float sz = 1.0f );
+
+		void GODVULKANEX_API RenderScene ( Scene const& scene ,
+			glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position );
 
 		void GODVULKANEX_API StartFrame ();
 		void GODVULKANEX_API EndFrame ();
@@ -94,8 +99,8 @@ namespace god
 		std::unordered_map<std::string , VK_OBJECT::GraphicsPipeline>	m_graphics_pipelines;
 
 		// models
-		std::unordered_map<std::string , VK_OBJECT::Model>				m_models;
-		std::unordered_map<std::string , VK_OBJECT::Image>				m_images;
+		std::vector<VK_OBJECT::Model>						m_models;
+		std::unordered_map<std::string , VK_OBJECT::Image>	m_images;
 
 		// sync objects
 		std::vector<VkSemaphore>	m_available_semaphores;

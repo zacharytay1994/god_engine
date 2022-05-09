@@ -1,4 +1,5 @@
 #include "VulkanRenderer.h"
+#include "../../godUtility/Scene.h"
 #include "VulkanObjects/vk_helper.h"
 
 #include <iostream>
@@ -51,18 +52,17 @@ namespace god
 		std::cout << "[SUCCESS] RENDERER::BindGraphicsPipeline - " << name << " pipeline bound!" << std::endl;
 	}
 
-	void VulkanEx::AddModel ( std::string const& name , VK_OBJECT::Vertices const& vertices , VK_OBJECT::Indices const& indices )
+	void VulkanEx::AddModel ( VK_OBJECT::Vertices const& vertices , VK_OBJECT::Indices const& indices )
 	{
-		assert ( m_models.find ( name ) == m_models.end () );
-		m_models.insert ( { name, { m_devices, m_graphics_queue, m_commands.m_command_pool, vertices, indices} } );
+		m_models.emplace_back ( m_devices , m_graphics_queue , m_commands.m_command_pool , vertices , indices );
 
-		if ( m_models[ name ].Success () )
+		if ( m_models.back ().Success () )
 		{
-			std::cout << "[SUCCESS] RENDERER::VulkanEx::AddModel - " << name << " model added successfully." << std::endl;
+			std::cout << "[SUCCESS] RENDERER::VulkanEx::AddModel - (" << m_models.size() << ") model added successfully." << std::endl;
 		}
 		else
 		{
-			std::cout << "[ERROR!] RENDERER::VulkanEx::AddModel - " << name << " model adding failed!" << std::endl;
+			std::cout << "[ERROR!] RENDERER::VulkanEx::AddModel - (" << m_models.size () << ") model adding failed!" << std::endl;
 		}
 	}
 
@@ -79,10 +79,10 @@ namespace god
 
 	void VulkanEx::Draw ( std::string const& model , float x , float y , float z , float rx , float ry , float rz , float sx , float sy , float sz )
 	{
-		assert ( m_models.find ( model ) != m_models.end () );
+		//assert ( m_models.find ( model ) != m_models.end () );
 
 		// bind model
-		m_models[ model ].Bind ( m_commands.m_command_buffers[ m_current_image_index ] );
+		m_models[ 0 ].Bind ( m_commands.m_command_buffers[ m_current_image_index ] );
 
 		// draw model
 		glm::mat4 m_model = glm::mat4 ( 1.0 );
@@ -111,7 +111,45 @@ namespace god
 		vkCmdPushConstants ( m_commands.m_command_buffers[ m_current_image_index ] , m_graphics_pipelines[ m_current_graphics_pipeline ].m_pipeline_layout , VK_SHADER_STAGE_VERTEX_BIT , 0 , sizeof ( VK_OBJECT::Model::PushConstant ) , &constants );
 		vkCmdBindDescriptorSets ( m_commands.m_command_buffers[ m_current_image_index ] , VK_PIPELINE_BIND_POINT_GRAPHICS ,
 			m_graphics_pipelines[ m_current_graphics_pipeline ].m_pipeline_layout , 0 , 1 , &m_descriptor.m_descriptor_sets[ m_current_image_index ] , 0 , nullptr );
-		vkCmdDrawIndexed ( m_commands.m_command_buffers[ m_current_image_index ] , m_models[ model ].m_index_buffer.GetSize () , 1 , 0 , 0 , 0 );
+		vkCmdDrawIndexed ( m_commands.m_command_buffers[ m_current_image_index ] , m_models[ 0 ].m_index_buffer.GetSize () , 1 , 0 , 0 , 0 );
+	}
+
+	void VulkanEx::RenderScene ( Scene const& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position )
+	{
+		for ( auto const& data : scene.m_render_data )
+		{
+			// bind model
+			m_models[ data.m_model_id ].Bind ( m_commands.m_command_buffers[ m_current_image_index ] );
+
+			// draw model
+			glm::mat4 m_model = glm::mat4 ( 1.0 );
+
+			// translate
+			m_model *= glm::translate ( glm::mat4 ( 1.0f ) , data.m_position );
+
+			// rotate
+			m_model *= glm::rotate ( glm::mat4 { 1.0f } , glm::radians ( data.m_rotation.x ) , glm::vec3 ( 1 , 0 , 0 ) );
+			m_model *= glm::rotate ( glm::mat4 { 1.0f } , glm::radians ( data.m_rotation.y ) , glm::vec3 ( 0 , 1 , 0 ) );
+			m_model *= glm::rotate ( glm::mat4 { 1.0f } , glm::radians ( data.m_rotation.z ) , glm::vec3 ( 0 , 0 , 1 ) );
+
+			// scale
+			m_model *= glm::scale ( glm::mat4 ( 1.0f ) , data.m_scale );
+
+
+			// concate transformation matrix
+			glm::mat4 mesh_matrix = projection * view * m_model;
+
+			// set as push constant
+			VK_OBJECT::Model::PushConstant constants;
+			constants.model_matrix_ = m_model;
+			constants.render_matrix_ = mesh_matrix;
+
+			// draw command
+			vkCmdPushConstants ( m_commands.m_command_buffers[ m_current_image_index ] , m_graphics_pipelines[ m_current_graphics_pipeline ].m_pipeline_layout , VK_SHADER_STAGE_VERTEX_BIT , 0 , sizeof ( VK_OBJECT::Model::PushConstant ) , &constants );
+			vkCmdBindDescriptorSets ( m_commands.m_command_buffers[ m_current_image_index ] , VK_PIPELINE_BIND_POINT_GRAPHICS ,
+				m_graphics_pipelines[ m_current_graphics_pipeline ].m_pipeline_layout , 0 , 1 , &m_descriptor.m_descriptor_sets[ m_current_image_index ] , 0 , nullptr );
+			vkCmdDrawIndexed ( m_commands.m_command_buffers[ m_current_image_index ] , m_models[ data.m_model_id ].m_index_buffer.GetSize () , 1 , 0 , 0 , 0 );
+		}
 	}
 
 	void VulkanEx::StartFrame ()
@@ -279,7 +317,7 @@ namespace god
 
 				vertices.push_back ( vk_vertex );
 			}
-			AddModel ( "test" , vertices , model.m_meshes[ 0 ].m_indices );
+			AddModel ( vertices , model.m_meshes[ 0 ].m_indices );
 		}
 	}
 
