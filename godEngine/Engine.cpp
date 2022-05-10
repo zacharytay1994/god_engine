@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "Engine.h"
 
-#include <godOpenGL/OpenGL.h>
-#include <godWindow/GLFWWindow.h>
+#include "OpenGL/OpenGL.h"
+#include "Window/GLFWWindow.h"
+//#include <godOpenGL/OpenGL.h>
+//#include <godWindow/GLFWWindow.h>
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>
 #include <godUtility/Scene.h>

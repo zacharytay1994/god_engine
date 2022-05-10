@@ -1,7 +1,5 @@
 #pragma once
 
-#include "godWindow.h"
-
 #include <GLFW/glfw3.h>
 
 #include <array>
@@ -10,37 +8,37 @@ namespace god
 {
 	struct GLFWWindow
 	{
-		GODWINDOW_API GLFWWindow ( uint32_t width , uint32_t height , bool fullscreen = false );
+		 GLFWWindow ( uint32_t width , uint32_t height , bool fullscreen = false );
 
-		bool		GODWINDOW_API WindowShouldClose ();
+		bool		 WindowShouldClose ();
 		void		 PollEvents ();
-		void		GODWINDOW_API SwapWindowBuffers ();
+		void		 SwapWindowBuffers ();
 
 		// getters & setters
-		HWND		GODWINDOW_API GetWindowHandle ();
-		uint32_t	GODWINDOW_API GetWindowWidth ();
-		uint32_t	GODWINDOW_API GetWindowHeight ();
-		bool		GODWINDOW_API Resized ();
+		HWND		 GetWindowHandle ();
+		uint32_t	 GetWindowWidth ();
+		uint32_t	 GetWindowHeight ();
+		bool		 Resized ();
 
 		// keyboard input
-		bool		GODWINDOW_API KeyDown ( int key );
-		bool		GODWINDOW_API KeyPressed ( int key );
-		bool		GODWINDOW_API KeyUp ( int key );
+		bool		 KeyDown ( int key );
+		bool		 KeyPressed ( int key );
+		bool		 KeyUp ( int key );
 
 		// mouse input
-		int			GODWINDOW_API MouseX ();			// mouse coordinates
-		int			GODWINDOW_API MouseY ();
+		int			 MouseX ();			// mouse coordinates
+		int			 MouseY ();
 
-		bool		GODWINDOW_API MouseLDown ();		// left mouse
-		bool		GODWINDOW_API MouseLPressed ();
-		bool		GODWINDOW_API MouseLUp ();
+		bool		 MouseLDown ();		// left mouse
+		bool		 MouseLPressed ();
+		bool		 MouseLUp ();
 
-		bool		GODWINDOW_API MouseRDown ();		// right mouse
-		bool		GODWINDOW_API MouseRPressed ();
-		bool		GODWINDOW_API MouseRUp ();
+		bool		 MouseRDown ();		// right mouse
+		bool		 MouseRPressed ();
+		bool		 MouseRUp ();
 
-		double		GODWINDOW_API MouseScrollUp ();
-		double		GODWINDOW_API MouseScrollDown ();
+		double		 MouseScrollUp ();
+		double		 MouseScrollDown ();
 
 		friend void GLFWFramebufferSizeCallback ( GLFWwindow* window , int width , int height );
 		friend void GLFWKeyCallback ( GLFWwindow* window , int key , int scancode , int action , int mods );
