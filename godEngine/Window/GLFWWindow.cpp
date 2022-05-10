@@ -8,6 +8,11 @@
 
 namespace god
 {
+	static void glfw_error_callback ( int error , const char* description )
+	{
+		fprintf ( stderr , "Glfw Error %d: %s\n" , error , description );
+	}
+
 	void GLFWFramebufferSizeCallback ( GLFWwindow* window , int width , int height )
 	{
 		GLFWWindow* my_window = reinterpret_cast< GLFWWindow* >( glfwGetWindowUserPointer ( window ) );
@@ -74,6 +79,7 @@ namespace god
 		m_width ( width ) ,
 		m_height ( height )
 	{
+		glfwSetErrorCallback ( glfw_error_callback );
 		glfwInit ();
 		glfwWindowHint ( GLFW_CONTEXT_VERSION_MAJOR , 4 );
 		glfwWindowHint ( GLFW_CONTEXT_VERSION_MINOR , 5 );
@@ -89,7 +95,6 @@ namespace god
 		glfwMakeContextCurrent ( m_window );
 
 		glfwSetWindowUserPointer ( m_window , this );
-
 		glfwSetFramebufferSizeCallback ( m_window , GLFWFramebufferSizeCallback );
 		glfwSetKeyCallback ( m_window , GLFWKeyCallback );
 		glfwSetMouseButtonCallback ( m_window , GLFWMouseCallback );
@@ -121,6 +126,11 @@ namespace god
 	HWND GLFWWindow::GetWindowHandle ()
 	{
 		return glfwGetWin32Window ( m_window );
+	}
+
+	GLFWwindow* GLFWWindow::GetGLFWWindow ()
+	{
+		return m_window;
 	}
 
 	uint32_t GLFWWindow::GetWindowWidth ()

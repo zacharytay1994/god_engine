@@ -17,34 +17,34 @@ namespace god
 		:
 		m_window_device_context { GetDC ( windowHandle ) }
 	{
-		// customize pixel format
-		PIXELFORMATDESCRIPTOR pfd =
-		{
-			sizeof ( PIXELFORMATDESCRIPTOR ),
-			1,
-			PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,	//Flags
-			PFD_TYPE_RGBA,												// The kind of framebuffer. RGBA or palette.
-			32,															// Colordepth of the framebuffer.
-			0, 0, 0, 0, 0, 0,
-			0,
-			0,
-			0,
-			0, 0, 0, 0,
-			24,															// Number of bits for the depthbuffer
-			8,															// Number of bits for the stencilbuffer
-			0,															// Number of Aux buffers in the framebuffer.
-			PFD_MAIN_PLANE,
-			0,
-			0, 0, 0
-		};
+		//// customize pixel format
+		//PIXELFORMATDESCRIPTOR pfd =
+		//{
+		//	sizeof ( PIXELFORMATDESCRIPTOR ),
+		//	1,
+		//	PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,	//Flags
+		//	PFD_TYPE_RGBA,												// The kind of framebuffer. RGBA or palette.
+		//	32,															// Colordepth of the framebuffer.
+		//	0, 0, 0, 0, 0, 0,
+		//	0,
+		//	0,
+		//	0,
+		//	0, 0, 0, 0,
+		//	24,															// Number of bits for the depthbuffer
+		//	8,															// Number of bits for the stencilbuffer
+		//	0,															// Number of Aux buffers in the framebuffer.
+		//	PFD_MAIN_PLANE,
+		//	0,
+		//	0, 0, 0
+		//};
 
-		// select pixel format
-		m_pixel_format = ChoosePixelFormat ( m_window_device_context , &pfd );
-		SetPixelFormat ( m_window_device_context , m_pixel_format , &pfd );
+		//// select pixel format
+		//m_pixel_format = ChoosePixelFormat ( m_window_device_context , &pfd );
+		//SetPixelFormat ( m_window_device_context , m_pixel_format , &pfd );
 
-		// create opengl context
-		m_opengl_rendering_context = wglCreateContext ( m_window_device_context );
-		wglMakeCurrent ( m_window_device_context , m_opengl_rendering_context );
+		//// create opengl context
+		//m_opengl_rendering_context = wglCreateContext ( m_window_device_context );
+		//wglMakeCurrent ( m_window_device_context , m_opengl_rendering_context );
 
 		// load opengl functions with glad
 		if ( !gladLoadGL () )
@@ -69,7 +69,7 @@ namespace god
 
 	OpenGL::~OpenGL ()
 	{
-		wglDeleteContext ( m_opengl_rendering_context );
+		//wglDeleteContext ( m_opengl_rendering_context );
 	}
 
 	void OpenGL::ClearColour () const

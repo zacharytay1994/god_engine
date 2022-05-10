@@ -10,35 +10,36 @@ namespace god
 	{
 		 GLFWWindow ( uint32_t width , uint32_t height , bool fullscreen = false );
 
-		bool		 WindowShouldClose ();
-		void		 PollEvents ();
-		void		 SwapWindowBuffers ();
+		bool			WindowShouldClose ();
+		void			PollEvents ();
+		void			SwapWindowBuffers ();
 
 		// getters & setters
-		HWND		 GetWindowHandle ();
-		uint32_t	 GetWindowWidth ();
-		uint32_t	 GetWindowHeight ();
-		bool		 Resized ();
+		HWND			GetWindowHandle ();
+		GLFWwindow*		GetGLFWWindow ();
+		uint32_t		GetWindowWidth ();
+		uint32_t		GetWindowHeight ();
+		bool			Resized ();
 
 		// keyboard input
-		bool		 KeyDown ( int key );
-		bool		 KeyPressed ( int key );
-		bool		 KeyUp ( int key );
+		bool			KeyDown ( int key );
+		bool			KeyPressed ( int key );
+		bool			KeyUp ( int key );
 
 		// mouse input
-		int			 MouseX ();			// mouse coordinates
-		int			 MouseY ();
+		int				MouseX ();			// mouse coordinates
+		int				MouseY ();
 
-		bool		 MouseLDown ();		// left mouse
-		bool		 MouseLPressed ();
-		bool		 MouseLUp ();
+		bool			MouseLDown ();		// left mouse
+		bool			MouseLPressed ();
+		bool			MouseLUp ();
 
-		bool		 MouseRDown ();		// right mouse
-		bool		 MouseRPressed ();
-		bool		 MouseRUp ();
+		bool			MouseRDown ();		// right mouse
+		bool			MouseRPressed ();
+		bool			MouseRUp ();
 
-		double		 MouseScrollUp ();
-		double		 MouseScrollDown ();
+		double			MouseScrollUp ();
+		double			MouseScrollDown ();
 
 		friend void GLFWFramebufferSizeCallback ( GLFWwindow* window , int width , int height );
 		friend void GLFWKeyCallback ( GLFWwindow* window , int key , int scancode , int action , int mods );

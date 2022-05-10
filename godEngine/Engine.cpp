@@ -3,11 +3,13 @@
 
 #include "OpenGL/OpenGL.h"
 #include "Window/GLFWWindow.h"
-//#include <godOpenGL/OpenGL.h>
-//#include <godWindow/GLFWWindow.h>
+#include "Editor/Editor.h"
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>
 #include <godUtility/Scene.h>
+#include <godUtility/TemplateManipulation.h>
+
+#include <tuple>
 
 namespace god
 {
@@ -28,20 +30,33 @@ namespace god
 
 		// setup resources
 		god::AssimpModelManager model_manager;
-		model_manager.Insert ( "Backpack" , god::LoadModel ( "Assets/GameAssets/Models/Backpack/backpack.obj" ) );
-		model_manager.Insert ( "Skull" , god::LoadModel ( "Assets/GameAssets/Models/Skull/skull.fbx" ) );
+		/*model_manager.Insert ( "Backpack" , god::LoadModel ( "Assets/GameAssets/Models/Backpack/backpack.obj" ) );
+		model_manager.Insert ( "Skull" , god::LoadModel ( "Assets/GameAssets/Models/Skull/skull.fbx" ) );*/
 
 		opengl.BuildOGLModels ( model_manager );
 
 		// setup scene
 		god::Scene scene;
-		god::SceneObjectID skull = scene.AddSceneObject ( model_manager.GetID ( "Skull" ) , { 0.0f,0.0f,-2.0f } );
-		god::SceneObjectID backpack = scene.AddSceneObject ( model_manager.GetID ( "Backpack" ) , { 5.0f, 0.0f, -2.0f } );
+		/*god::SceneObjectID skull = scene.AddSceneObject ( model_manager.GetID ( "Skull" ) , { 0.0f,0.0f,-2.0f } );
+		god::SceneObjectID backpack = scene.AddSceneObject ( model_manager.GetID ( "Backpack" ) , { 5.0f, 0.0f, -2.0f } );*/
+
+		// test
+		god::T_Manip::TYPE_PACK<int , float> type_pack;
+		god::T_Manip::GetType ( type_pack , 1 );
+
+		// opengl editor - needs at least a GLFWWindow to initialize imgui
+		EditorResources<
+			god::GLFWWindow ,
+			god::AssimpModelManager
+		> editor_resources (
+			window ,
+			model_manager
+		);
+		god::ImGuiOpenGLEditor ogl_editor ( editor_resources );
 
 		while ( !window.WindowShouldClose () )
 		{
 			window.PollEvents ();
-			window.SwapWindowBuffers ();
 
 			// window resize changes
 			if ( window.Resized () )
@@ -50,22 +65,29 @@ namespace god
 				camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
 			}
 
+			ogl_editor.BeginFrame ();
+			ogl_editor.Update ( 0.02f );
+			ogl_editor.Render ();
+
 			opengl.ClearColour ();
+
+			ogl_editor.EndFrame ();
 
 			// update scene
 			// ...
-			scene.GetSceneObject ( skull ).m_rotation.y += 0.0002f;
+			//scene.GetSceneObject ( skull ).m_rotation.y += 0.0002f;
 
 			// render scene
-			opengl.RenderScene (
+			/*opengl.RenderScene (
 				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,
 				camera.GetCameraViewMatrix () ,
 				camera.m_position
-			);
+			);*/
 
+			window.SwapWindowBuffers ();
 			// free camera update
-			camera.FreeCamera ( 0.0002f ,
+			/*camera.FreeCamera ( 0.0002f ,
 				true ,
 				window.KeyDown ( GLFW_KEY_W ) ,
 				window.KeyDown ( GLFW_KEY_S ) ,
@@ -81,7 +103,7 @@ namespace god
 				window.MouseScrollDown () ,
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
-				window.MouseScrollDown () );
+				window.MouseScrollDown () );*/
 		}
 	}
 }

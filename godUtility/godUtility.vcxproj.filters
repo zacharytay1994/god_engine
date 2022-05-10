@@ -42,6 +42,12 @@
     <ClInclude Include="FileIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TemplateManipulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
