@@ -7,23 +7,36 @@ namespace god
 	template <typename EDITOR_RESOURCES>
 	struct TestWindow : EditorWindow<EDITOR_RESOURCES>
 	{
-		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override
-		{
-			ImGui::Begin ( "Test Window" );
-			ImGui::Text ( "testing" );
-			ImGui::End ();
-		}
+		bool test { false };
+
+		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override;
 	};
+}
 
+#include "TestWindow2.h"
 
-	template <typename EDITOR_RESOURCES>
-	struct TestWindow2 : EditorWindow<EDITOR_RESOURCES>
+namespace god 
+{
+	template<typename EDITOR_RESOURCES>
+	inline void TestWindow<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
-		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override
+		ImGui::Begin ( "Test Window" );
+		if ( ImGui::Button ( "Activate" ) )
 		{
-			ImGui::Begin ( "Test Window2" );
-			ImGui::Text ( "testing2" );
-			ImGui::End ();
+			//std::dynamic_pointer_cast< TestWindow2<EDITOR_RESOURCES> > ( this->Get ( typeid( TestWindow2 ).name () ) )->test = true;
+			this->Get<TestWindow2> ()->test = true;
+			//Get<TestWindow2> ()->test = true;
 		}
-	};
+		if ( ImGui::Button ( "Activate2" ) )
+		{
+			//std::dynamic_pointer_cast< TestWindow2<EDITOR_RESOURCES> > ( this->Get ( typeid( TestWindow2 ).name () ) )->test = false;
+			//Get<TestWindow2> ()->test = true;
+			this->Get<TestWindow2> ()->test = false;
+		}
+		if ( test )
+		{
+			ImGui::Text ( "Test from window 2" );
+		}
+		ImGui::End ();
+	}
 }

@@ -7,6 +7,7 @@
 #include "Editor/Editor.h"
 #include "Editor/OpenGLEditor.h"
 #include "Editor/Window/TestWindow.h"
+#include "Editor/Window/TestWindow2.h"
 
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>

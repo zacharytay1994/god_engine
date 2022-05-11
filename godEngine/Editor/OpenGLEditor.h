@@ -1,4 +1,5 @@
 #pragma once
+#include "../Window/GLFWWindow.h"
 
 #include <memory>
 
