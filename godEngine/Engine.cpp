@@ -4,6 +4,7 @@
 #include "OpenGL/OpenGL.h"
 #include "Window/GLFWWindow.h"
 
+#include "Editor/Editor.h"
 #include "Editor/OpenGLEditor.h"
 #include "Editor/Window/TestWindow.h"
 
@@ -47,7 +48,10 @@ namespace god
 		god::T_Manip::TYPE_PACK<int , float> type_pack;
 		god::T_Manip::GetType ( type_pack , 1 );
 
-		// opengl editor - needs at least a GLFWWindow to initialize imgui
+		// glfw+opengl imgui setup
+		god::ImGuiOpenGLEditor ogl_editor ( window );
+
+		// imgui editors
 		EditorResources<
 			god::GLFWWindow ,
 			god::AssimpModelManager
@@ -55,9 +59,9 @@ namespace god
 			window ,
 			model_manager
 		);
-		god::ImGuiOpenGLEditor ogl_editor ( editor_resources );
-		ogl_editor.AddWindow<god::TestWindow> ();
-		ogl_editor.AddWindow<god::TestWindow2> ();
+		EditorWindows<decltype( editor_resources )> editor_windows;
+		editor_windows.AddWindow<god::TestWindow> ();
+		editor_windows.AddWindow<god::TestWindow2> ();
 
 		while ( !window.WindowShouldClose () )
 		{
@@ -71,7 +75,9 @@ namespace god
 			}
 
 			ogl_editor.BeginFrame ();
-			ogl_editor.Update ( 0.02f );
+
+			// ... render imgui windows
+			editor_windows.Update ( 0.02f , editor_resources );
 
 			ogl_editor.Render ();
 

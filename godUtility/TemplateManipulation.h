@@ -59,7 +59,7 @@ namespace god
 		struct HasType<T , std::tuple<Us...>> : std::disjunction<std::is_same<T , Us>...> {};
 
 		/*
-			TYPE COLLECTION
+			TYPE COLLECTIONS
 		*/
 		template <template<typename T> class WRAP , typename...TYPES>
 		struct TypeCollection

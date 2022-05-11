@@ -11,14 +11,15 @@
 
 #include <tuple>
 #include <assert.h>
+#include <vector>
+#include <memory>
 
-struct GLFWwindow;
 namespace god
 {
 	/*!
-	 * @brief 
+	 * @brief
 	 * : A collection of reference wrappers of type.
-	 * @tparam ...TYPES 
+	 * @tparam ...TYPES
 	 * : The types that the are contained within.
 	*/
 	template <typename...TYPES>
@@ -29,4 +30,31 @@ namespace god
 	{
 		virtual void Update ( float dt , EDITOR_RESOURCES& editorResources ) = 0;
 	};
+
+	template <typename EDITOR_RESOURCES>
+	struct EditorWindows
+	{
+		template <template<typename T> class WINDOW>
+		void AddWindow ();
+
+		void Update ( float dt , EDITOR_RESOURCES& editorResources );
+	private:
+		std::vector <std::shared_ptr<EditorWindow<EDITOR_RESOURCES>>> m_windows;
+	};
+
+	template<typename EDITOR_RESOURCES>
+	template<template <typename T> class WINDOW>
+	inline void EditorWindows<EDITOR_RESOURCES>::AddWindow ()
+	{
+		m_windows.push_back ( std::make_shared<WINDOW<EDITOR_RESOURCES>> () );
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EditorWindows<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
+	{
+		for ( auto& window : m_windows )
+		{
+			window->Update ( dt , editorResources );
+		}
+	}
 }
