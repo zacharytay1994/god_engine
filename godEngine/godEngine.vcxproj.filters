@@ -72,6 +72,12 @@
     <ClInclude Include="Editor\Editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Editor\OpenGLEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Window\TestWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

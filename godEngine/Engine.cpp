@@ -3,7 +3,10 @@
 
 #include "OpenGL/OpenGL.h"
 #include "Window/GLFWWindow.h"
-#include "Editor/Editor.h"
+
+#include "Editor/OpenGLEditor.h"
+#include "Editor/Window/TestWindow.h"
+
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>
 #include <godUtility/Scene.h>
@@ -53,6 +56,8 @@ namespace god
 			model_manager
 		);
 		god::ImGuiOpenGLEditor ogl_editor ( editor_resources );
+		ogl_editor.AddWindow<god::TestWindow> ();
+		ogl_editor.AddWindow<god::TestWindow2> ();
 
 		while ( !window.WindowShouldClose () )
 		{
@@ -67,6 +72,7 @@ namespace god
 
 			ogl_editor.BeginFrame ();
 			ogl_editor.Update ( 0.02f );
+
 			ogl_editor.Render ();
 
 			opengl.ClearColour ();

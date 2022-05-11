@@ -79,7 +79,7 @@ namespace god
 			}
 
 			template <typename TYPE>
-			constexpr bool Has ()
+			constexpr bool Has () const
 			{
 				return HasType < WRAP<TYPE> , decltype( m_data ) >::value;
 			}

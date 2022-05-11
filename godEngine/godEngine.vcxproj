@@ -98,6 +98,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Editor\Editor.h" />
+    <ClInclude Include="Editor\OpenGLEditor.h" />
+    <ClInclude Include="Editor\Window\TestWindow.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="godEngine.h" />
