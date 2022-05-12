@@ -23,6 +23,9 @@ namespace god
 
 	void GLFWKeyCallback ( GLFWwindow* window , int key , int scancode , int action , int mods )
 	{
+		UNREFERENCED_PARAMETER ( mods );
+		UNREFERENCED_PARAMETER ( scancode );
+
 		GLFWWindow* my_window = reinterpret_cast< GLFWWindow* >( glfwGetWindowUserPointer ( window ) );
 		if ( action == GLFW_PRESS )
 		{
@@ -36,6 +39,8 @@ namespace god
 
 	void GLFWMouseCallback ( GLFWwindow* window , int button , int action , int mods )
 	{
+		UNREFERENCED_PARAMETER ( mods );
+
 		GLFWWindow* my_window = reinterpret_cast< GLFWWindow* >( glfwGetWindowUserPointer ( window ) );
 		if ( button == GLFW_MOUSE_BUTTON_LEFT )
 		{
@@ -63,6 +68,8 @@ namespace god
 
 	void GLFWScrollCallback ( GLFWwindow* window , double xOffset , double yOffset )
 	{
+		UNREFERENCED_PARAMETER ( xOffset );
+
 		GLFWWindow* my_window = reinterpret_cast< GLFWWindow* >( glfwGetWindowUserPointer ( window ) );
 		if ( yOffset > 0.1 )
 		{
@@ -74,7 +81,7 @@ namespace god
 		}
 	}
 
-	GLFWWindow::GLFWWindow ( uint32_t width , uint32_t height , bool fullscreen )
+	GLFWWindow::GLFWWindow ( uint32_t width , uint32_t height )
 		:
 		m_width ( width ) ,
 		m_height ( height )
@@ -163,14 +170,14 @@ namespace god
 		return !m_key_states[ key ] && m_previous_key_states[ key ];
 	}
 
-	int GLFWWindow::MouseX ()
+	double GLFWWindow::MouseX ()
 	{
 		double x , y;
 		glfwGetCursorPos ( m_window , &x , &y );
 		return x;
 	}
 
-	int GLFWWindow::MouseY ()
+	double GLFWWindow::MouseY ()
 	{
 		double x , y;
 		glfwGetCursorPos ( m_window , &x , &y );

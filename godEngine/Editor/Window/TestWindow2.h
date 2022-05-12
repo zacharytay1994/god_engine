@@ -21,6 +21,8 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void TestWindow2<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
+		UNREFERENCED_PARAMETER ( dt );
+
 		ImGui::Begin ( "Test Window2" );
 		if ( test )
 		{

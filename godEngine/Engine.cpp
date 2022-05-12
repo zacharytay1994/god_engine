@@ -8,6 +8,7 @@
 #include "Editor/OpenGLEditor.h"
 #include "Editor/Window/TestWindow.h"
 #include "Editor/Window/TestWindow2.h"
+#include "Editor/Window/MainMenuBar.h"
 
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>
@@ -61,6 +62,7 @@ namespace god
 			model_manager
 		);
 		EditorWindows<decltype( editor_resources )> editor_windows;
+		editor_windows.AddWindow<god::MainMenuBar> ( true );
 		editor_windows.AddWindow<god::TestWindow> ();
 		editor_windows.AddWindow<god::TestWindow2> ();
 
@@ -75,15 +77,12 @@ namespace god
 				camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
 			}
 
-			ogl_editor.BeginFrame ();
-
-			// ... render imgui windows
-			editor_windows.Update ( 0.02f , editor_resources );
-
-			ogl_editor.Render ();
-
 			opengl.ClearColour ();
 
+			// ... render imgui windows
+			ogl_editor.BeginFrame ();
+			editor_windows.Update ( 0.02f , editor_resources );
+			ogl_editor.Render ();
 			ogl_editor.EndFrame ();
 
 			// update scene

@@ -8,7 +8,7 @@ namespace god
 {
 	struct GLFWWindow
 	{
-		 GLFWWindow ( uint32_t width , uint32_t height , bool fullscreen = false );
+		 GLFWWindow ( uint32_t width , uint32_t height );
 
 		bool			WindowShouldClose ();
 		void			PollEvents ();
@@ -27,8 +27,8 @@ namespace god
 		bool			KeyUp ( int key );
 
 		// mouse input
-		int				MouseX ();			// mouse coordinates
-		int				MouseY ();
+		double			MouseX ();			// mouse coordinates
+		double			MouseY ();
 
 		bool			MouseLDown ();		// left mouse
 		bool			MouseLPressed ();
