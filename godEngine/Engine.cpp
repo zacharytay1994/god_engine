@@ -14,6 +14,7 @@
 #include <godUtility/Utility.h>
 #include <godUtility/Scene.h>
 #include <godUtility/TemplateManipulation.h>
+#include <godUtility/FileIO.h>
 
 #include <tuple>
 
@@ -46,10 +47,6 @@ namespace god
 		/*god::SceneObjectID skull = scene.AddSceneObject ( model_manager.GetID ( "Skull" ) , { 0.0f,0.0f,-2.0f } );
 		god::SceneObjectID backpack = scene.AddSceneObject ( model_manager.GetID ( "Backpack" ) , { 5.0f, 0.0f, -2.0f } );*/
 
-		// test
-		god::T_Manip::TYPE_PACK<int , float> type_pack;
-		god::T_Manip::GetType ( type_pack , 1 );
-
 		// glfw+opengl imgui setup
 		god::ImGuiOpenGLEditor ogl_editor ( window );
 
@@ -65,6 +62,25 @@ namespace god
 		editor_windows.AddWindow<god::MainMenuBar> ( true );
 		editor_windows.AddWindow<god::TestWindow> ();
 		editor_windows.AddWindow<god::TestWindow2> ();
+
+		rapidjson::Document document;
+		document.SetObject ();
+		/*rapidjson::Value value ( 10 );
+		document.AddMember ( "test" , value , document.GetAllocator () );
+		rapidjson::Value value2 ( rapidjson::kObjectType );
+		value2.AddMember ( "value2" , "i am string?" , document.GetAllocator () );
+		document.AddMember ( "objectmember" , value2 , document.GetAllocator () );
+		god::WriteJSON ( document , "test.json" );*/
+		RapidJSON::JSONify ( document , "something" , 11 );
+		RapidJSON::JSONify ( document , "something3" , 15.0f );
+		RapidJSON::JSONifyValues ( document , "arraytest" , 1 , 2 , 3 , 4 );
+		god::WriteJSON ( document , "test2.json" );
+
+		/*rapidjson::Document document;
+		god::ReadJSON ( document , "test.json" );
+		rapidjson::Value value ( 11 );
+		document["objectmember"].AddMember ("newvalue" , value , document.GetAllocator ());
+		god::WriteJSON ( document , "test.json" );*/
 
 		while ( !window.WindowShouldClose () )
 		{

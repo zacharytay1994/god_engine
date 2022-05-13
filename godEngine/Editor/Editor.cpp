@@ -22,9 +22,9 @@ namespace god
 
 	EditorStyle::EditorStyle ()
 	{
-		LoadImGuiFont ( m_font_path.c_str () );
+		/*LoadImGuiFont ( m_font_path.c_str () );
 		ImGui::PushFont ( m_font );
-		ImGui::PopFont ();
+		ImGui::PopFont ();*/
 	}
 
 	void EditorStyle::LoadImGuiFont ( char const* font )

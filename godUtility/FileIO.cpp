@@ -28,4 +28,14 @@ namespace god
 
 		return buffer;
 	}
+
+	void ReadJSON ( rapidjson::Document& document , char const* json )
+	{
+		RapidJSON::Read ( document , json );
+	}
+
+	void WriteJSON ( rapidjson::Document const& document , char const* json )
+	{
+		RapidJSON::Write ( document , json );
+	}
 }

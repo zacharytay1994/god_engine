@@ -1,0 +1,10 @@
+{
+    "something": 11,
+    "something3": 15.0,
+    "arraytest": [
+        1,
+        2,
+        3,
+        4
+    ]
+}
