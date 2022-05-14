@@ -34,25 +34,30 @@ namespace god
 		ImVec4 m_color_3 { 0.8f, 0.8f, 0.8f, 1.0f };
 		ImVec4 m_color_4 { 0.9f, 0.9f, 0.9f, 1.0f };
 
-		ImVec4 m_color_button			{ m_color_1 };
-		ImVec4 m_color_button_hover		{ m_color_2 };
-		ImVec4 m_color_bg_menubar		{ m_color_1 };
-		ImVec4 m_color_bg_window		{ m_color_1 };
-		ImVec4 m_color_bg_title			{ m_color_1 };
-		ImVec4 m_color_bg_titleactive	{ m_color_2 };
-		ImVec4 m_color_bg_popup			{ m_color_3 };
-		ImVec4 m_color_bg_frame			{ m_color_4 };
-		ImVec4 m_color_border			{ m_color_1 };
-		ImVec4 m_color_text				{ m_color_0 };
-		ImVec4 m_color_seperator		{ m_color_3 };
+		ImVec4 m_color_button { m_color_2 };
+		ImVec4 m_color_button_hover { m_color_1 };
+		ImVec4 m_color_bg_menubar { m_color_2 };
+		ImVec4 m_color_bg_window { m_color_1 };
+		ImVec4 m_color_bg_title { m_color_2 };
+		ImVec4 m_color_bg_titleactive { m_color_2 };
+		ImVec4 m_color_bg_popup { m_color_3 };
+		ImVec4 m_color_bg_frame { m_color_4 };
+		ImVec4 m_color_border { m_color_1 };
+		ImVec4 m_color_text { m_color_0 };
+		ImVec4 m_color_seperator { m_color_3 };
 
-		std::string m_font_path { "Assets/EngineAssets/ImGuiFonts/arial.ttf" }; // default font
-		ImFont*		m_font;
-		float		m_font_size { 15.0f };
+		std::string m_font_path { "Assets/EngineAssets/Editor/ImGuiFonts/arial.ttf" }; // default font
+		ImFont* m_font { nullptr };
+		float		m_font_size { 20.0f };
 
 		EditorStyle ();
 		void UpdateStyle ();
-		void LoadImGuiFont ( char const* font );
+		void SetImGuiFont ( char const* font );
+		void PushFont ();
+		void PopFont ();
+
+		void JSONify ( std::string const& json );
+		void DeJSONify ( std::string const& json );
 	};
 
 	template <typename EDITOR_RESOURCES>
@@ -77,17 +82,17 @@ namespace god
 	template <typename EDITOR_RESOURCES>
 	struct EditorWindows
 	{
+		EditorStyle m_editor_style;
+
 		EditorWindows ();
 
 		template <template<typename T> class WINDOW>
 		void AddWindow ( bool startOpen = false );
+		std::unordered_map<std::string , std::shared_ptr<EditorWindow<EDITOR_RESOURCES>>> const& GetWindows ();
 
 		void Update ( float dt , EDITOR_RESOURCES& editorResources );
-
-		std::unordered_map<std::string , std::shared_ptr<EditorWindow<EDITOR_RESOURCES>>> const& GetWindows ();
 	private:
 		std::unordered_map<std::string , std::shared_ptr<EditorWindow<EDITOR_RESOURCES>>> m_windows;
-		EditorStyle m_editor_style;
 	};
 
 	template<typename EDITOR_RESOURCES>
@@ -110,7 +115,9 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline EditorWindows<EDITOR_RESOURCES>::EditorWindows ()
 	{
-		m_editor_style.UpdateStyle ();
+		m_editor_style.SetImGuiFont ( m_editor_style.m_font_path.c_str () );
+		//m_editor_style.UpdateStyle ();
+		//m_editor_style.JSONify ( "Assets/EngineAssets/Editor/Themes/et_light.json" );
 	}
 
 	template<typename EDITOR_RESOURCES>
@@ -127,10 +134,15 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EditorWindows<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
+		int i = 0;
+		m_editor_style.PushFont ();
 		for ( auto& window : m_windows )
 		{
+			ImGui::PushID ( i++ );
 			window.second->BaseUpdate ( dt , editorResources );
+			ImGui::PopID ();
 		}
+		m_editor_style.PopFont ();
 	}
 
 	template<typename EDITOR_RESOURCES>

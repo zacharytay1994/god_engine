@@ -6,9 +6,8 @@
 
 #include "Editor/Editor.h"
 #include "Editor/OpenGLEditor.h"
-#include "Editor/Window/TestWindow.h"
-#include "Editor/Window/TestWindow2.h"
-#include "Editor/Window/MainMenuBar.h"
+#include "Editor/Window/EW_MainMenuBar.h"
+#include "Editor/Window/EW_EditorStyles.h"
 
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>
@@ -28,7 +27,7 @@ namespace god
 	void godEngine::Update ()
 	{
 		// create window
-		god::GLFWWindow window ( 800 , 450 );
+		god::GLFWWindow window ( 1200 , 775 );
 		god::OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
 
 		// setup camera
@@ -59,22 +58,21 @@ namespace god
 			model_manager
 		);
 		EditorWindows<decltype( editor_resources )> editor_windows;
-		editor_windows.AddWindow<god::MainMenuBar> ( true );
-		editor_windows.AddWindow<god::TestWindow> ();
-		editor_windows.AddWindow<god::TestWindow2> ();
+		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
+		editor_windows.AddWindow<god::EW_EditorStyles> ();
 
-		rapidjson::Document document;
-		document.SetObject ();
+		/*rapidjson::Document document;
+		document.SetObject ();*/
 		/*rapidjson::Value value ( 10 );
 		document.AddMember ( "test" , value , document.GetAllocator () );
 		rapidjson::Value value2 ( rapidjson::kObjectType );
 		value2.AddMember ( "value2" , "i am string?" , document.GetAllocator () );
 		document.AddMember ( "objectmember" , value2 , document.GetAllocator () );
 		god::WriteJSON ( document , "test.json" );*/
-		RapidJSON::JSONify ( document , "something" , 11 );
+		/*RapidJSON::JSONify ( document , "something" , 11 );
 		RapidJSON::JSONify ( document , "something3" , 15.0f );
-		RapidJSON::JSONifyValues ( document , "arraytest" , 1 , 2 , 3 , 4 );
-		god::WriteJSON ( document , "test2.json" );
+		RapidJSON::JSONifyValues ( document , "arraytest" , "re" , 2 , 3 , 4);
+		god::WriteJSON ( document , "test2.json" );*/
 
 		/*rapidjson::Document document;
 		god::ReadJSON ( document , "test.json" );

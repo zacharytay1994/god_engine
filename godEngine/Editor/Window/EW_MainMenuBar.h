@@ -4,7 +4,7 @@
 namespace god
 {
 	template <typename EDITOR_RESOURCES>
-	struct MainMenuBar : EditorWindow<EDITOR_RESOURCES>
+	struct EW_MainMenuBar : EditorWindow<EDITOR_RESOURCES>
 	{
 		bool popup { false };
 
@@ -12,12 +12,12 @@ namespace god
 	};
 }
 
-#include "TestWindow.h"
+#include "EW_EditorStyles.h"
 
 namespace god
 {
 	template<typename EDITOR_RESOURCES>
-	inline void MainMenuBar<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
+	inline void EW_MainMenuBar<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
 		UNREFERENCED_PARAMETER ( dt );
 		UNREFERENCED_PARAMETER ( editorResources );
@@ -29,9 +29,19 @@ namespace god
 				if ( ImGui::BeginMenu ( "New" ) )
 				{
 					ImGui::MenuItem ( "Texture" , "[CTRL+N+T]" );
+
 					ImGui::EndMenu ();
 				}
 
+				ImGui::EndMenu ();
+			}
+
+			if ( ImGui::BeginMenu ( "View" ) )
+			{
+				if ( ImGui::MenuItem ( "Editor Style" ) )
+				{
+					this->Get<EW_EditorStyles> ()->m_open = true;
+				}
 				ImGui::EndMenu ();
 			}
 

@@ -13,12 +13,12 @@ namespace god
 {
 	namespace RapidJSON
 	{
-		void Read ( rapidjson::Document& document , char const* json )
+		void Read ( rapidjson::Document& document , std::string const& json )
 		{
 			using namespace rapidjson;
 
 			FILE* fp;
-			fopen_s ( &fp , json , "rb" );
+			fopen_s ( &fp , json.c_str() , "rb" );
 			if ( fp )
 			{
 				std::vector<char> read_buffer ( READ_BUFFER_SIZE );
@@ -34,12 +34,12 @@ namespace god
 			}
 		}
 
-		void Write ( rapidjson::Document const& document , char const* json )
+		void Write ( rapidjson::Document const& document , std::string const& json )
 		{
 			using namespace rapidjson;
 
 			FILE* fp;
-			fopen_s ( &fp , json , "wb" );
+			fopen_s ( &fp , json.c_str() , "wb" );
 
 			if ( fp )
 			{

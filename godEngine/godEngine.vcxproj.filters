@@ -81,7 +81,10 @@
     <ClInclude Include="Editor\Window\TestWindow2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\Window\MainMenuBar.h">
+    <ClInclude Include="Editor\Window\EW_MainMenuBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Window\EW_EditorStyles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

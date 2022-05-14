@@ -12,9 +12,9 @@ namespace god
 	{
 		static constexpr uint32_t READ_BUFFER_SIZE = 65536;
 
-		void Read ( rapidjson::Document& document , char const* json );
+		void Read ( rapidjson::Document& document , std::string const& json );
 
-		void Write ( rapidjson::Document const& document , char const* json );
+		void Write ( rapidjson::Document const& document , std::string const& json );
 
 		template <typename OBJECT , typename VALUE>
 		void JSONify ( OBJECT& object , std::string const& key , VALUE const& value )
