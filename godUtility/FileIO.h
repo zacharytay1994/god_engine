@@ -2,7 +2,7 @@
 
 #include "godUtility.h"
 
-#include "Internal/RapidJSONWrapper.h"
+#include <RapidJSON/include/rapidjson/document.h>
 
 #include <string>
 #include <vector>
@@ -13,7 +13,7 @@ namespace god
 
 	std::vector<char> GODUTILITY_API ReadSPVToBuffer ( char const* spv );
 
-	void GODUTILITY_API ReadJSON ( rapidjson::Document& document , char const* json );
+	void GODUTILITY_API ReadJSON ( rapidjson::Document& document , std::string const& json );
 
-	void GODUTILITY_API WriteJSON ( rapidjson::Document const& document , char const* json );
+	void GODUTILITY_API WriteJSON ( rapidjson::Document const& document , std::string const& json );
 }

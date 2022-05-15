@@ -29,7 +29,7 @@ namespace god
 	{
 		// set font
 		m_editor_style.SetImGuiFont ( m_editor_style.m_font_path.c_str () );
-		m_editor_style.DeJSONify ( "Assets/EngineAssets/Editor/Themes/et_light.json" );
+		m_editor_style.DeJSONify ();
 		m_editor_style.UpdateStyle ();
 	}
 
@@ -41,22 +41,50 @@ namespace god
 
 		ImGui::Begin ( "Editor Styles" );
 
-		ColourInput ( "Button"			 , m_editor_style.m_color_button		 );
-		ColourInput ( "Button Hover"	 , m_editor_style.m_color_button_hover	 );
-		ColourInput ( "Menu Bar Bg"		 , m_editor_style.m_color_bg_menubar	 );
-		ColourInput ( "Window Bg"		 , m_editor_style.m_color_bg_window		 );
-		ColourInput ( "Title Bg"		 , m_editor_style.m_color_bg_title		 );
-		ColourInput ( "Title Active Bg"  , m_editor_style.m_color_bg_titleactive );
-		ColourInput ( "Popup Bg"		 , m_editor_style.m_color_bg_popup		 );
-		ColourInput ( "Frame Bg"		 , m_editor_style.m_color_bg_frame		 );
-		ColourInput ( "Border"			 , m_editor_style.m_color_border		 );
-		ColourInput ( "Text"			 , m_editor_style.m_color_text			 );
-		ColourInput ( "Seperator"		 , m_editor_style.m_color_seperator		 );
+		if ( ImGui::BeginPopup ( "Themes" ) )
+		{
+			if ( ImGui::Selectable ( "Custom Theme" ) )
+			{
+				m_editor_style.m_current_theme = "Custom Theme";
+				m_editor_style.DeJSONify ( true );
+				m_editor_style.UpdateStyle ();
+			}
+			if ( ImGui::Selectable ( "Light Theme" ) )
+			{
+				m_editor_style.m_current_theme = "Light Theme";
+				m_editor_style.DeJSONify ( true );
+				m_editor_style.UpdateStyle ();
+			}
+			if ( ImGui::Selectable ( "Dark Theme" ) )
+			{
+				m_editor_style.m_current_theme = "Dark Theme";
+				m_editor_style.DeJSONify ( true );
+				m_editor_style.UpdateStyle ();
+			}
+			ImGui::EndPopup ();
+		}
+
+		if ( ImGui::Button ( m_editor_style.m_current_theme.c_str () ) )
+		{
+			ImGui::OpenPopup ( "Themes" );
+		}
+
+		ColourInput ( "Button"			, m_editor_style.m_color_button			);
+		ColourInput ( "Button Hover"	, m_editor_style.m_color_button_hover	);
+		ColourInput ( "Menu Bar Bg"		, m_editor_style.m_color_bg_menubar		);
+		ColourInput ( "Window Bg"		, m_editor_style.m_color_bg_window		);
+		ColourInput ( "Title Bg"		, m_editor_style.m_color_bg_title		);
+		ColourInput ( "Title Active Bg" , m_editor_style.m_color_bg_titleactive );
+		ColourInput ( "Popup Bg"		, m_editor_style.m_color_bg_popup		);
+		ColourInput ( "Frame Bg"		, m_editor_style.m_color_bg_frame		);
+		ColourInput ( "Border"			, m_editor_style.m_color_border			);
+		ColourInput ( "Text"			, m_editor_style.m_color_text			);
+		ColourInput ( "Seperator"		, m_editor_style.m_color_seperator		);
 
 		if ( ImGui::Button ( "Save and Apply" ) )
 		{
 			m_editor_style.UpdateStyle ();
-			m_editor_style.JSONify ( "Assets/EngineAssets/Editor/Themes/et_light.json" );
+			m_editor_style.JSONify ();
 		}
 
 		if ( ImGui::Button ( "Close" ) )

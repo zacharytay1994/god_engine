@@ -2,6 +2,7 @@
 #include "Editor.h"
 
 #include <godUtility/FileIO.h>
+#include <godUtility/Internal/RapidJSONWrapper.h>
 
 #include <assert.h>
 
@@ -44,35 +45,46 @@ namespace god
 		ImGui::PopFont ();
 	}
 
-	void JSONifyVec4Wrap ( rapidjson::Document& document , char const* name , ImVec4 const& value )
+	void JSONifyVec4Wrap ( rapidjson::Document& document , std::string const& theme , char const* name , ImVec4 const& value )
 	{
-		RapidJSON::JSONifyValues ( document , name , value.x , value.y , value.z , value.w );
+		document[ theme.c_str () ][ name ][ 0 ] = value.x;
+		document[ theme.c_str () ][ name ][ 1 ] = value.y;
+		document[ theme.c_str () ][ name ][ 2 ] = value.z;
+		document[ theme.c_str () ][ name ][ 3 ] = value.w;
 	}
 
-	void EditorStyle::JSONify ( std::string const& json )
+	void EditorStyle::JSONify ()
 	{
-		// should assert if its an editor style json
+		// should assert if its an editor style jsons
 		// assert(es)
 
 		rapidjson::Document document;
 		document.SetObject ();
 
-		JSONifyVec4Wrap ( document , "Button"			, m_color_button			);
-		JSONifyVec4Wrap ( document , "Button Hover"		, m_color_button_hover		);
-		JSONifyVec4Wrap ( document , "Menu Bar Bg"		, m_color_bg_menubar		);
-		JSONifyVec4Wrap ( document , "Window Bg"		, m_color_bg_window			);
-		JSONifyVec4Wrap ( document , "Title Bg"			, m_color_bg_title			);
-		JSONifyVec4Wrap ( document , "Title Active Bg"	, m_color_bg_titleactive	);
-		JSONifyVec4Wrap ( document , "Popup Bg"			, m_color_bg_popup			);
-		JSONifyVec4Wrap ( document , "Frame Bg"			, m_color_bg_frame			);
-		JSONifyVec4Wrap ( document , "Border"			, m_color_border			);
-		JSONifyVec4Wrap ( document , "Text"				, m_color_text				);
-		JSONifyVec4Wrap ( document , "Seperator"		, m_color_seperator			);
+		// open save file
+		god::ReadJSON ( document , m_save_path );
 
-		god::WriteJSON ( document , json.c_str () );
+		// set current theme
+		assert ( document[ "Current Theme" ].IsString () );
+		document[ "Current Theme" ].SetString ( m_current_theme.c_str () , document.GetAllocator () );
+
+		// set theme values
+		JSONifyVec4Wrap ( document , m_current_theme , "Button" , m_color_button );
+		JSONifyVec4Wrap ( document , m_current_theme , "Button Hover" , m_color_button_hover );
+		JSONifyVec4Wrap ( document , m_current_theme , "Menu Bar Bg" , m_color_bg_menubar );
+		JSONifyVec4Wrap ( document , m_current_theme , "Window Bg" , m_color_bg_window );
+		JSONifyVec4Wrap ( document , m_current_theme , "Title Bg" , m_color_bg_title );
+		JSONifyVec4Wrap ( document , m_current_theme , "Title Active Bg" , m_color_bg_titleactive );
+		JSONifyVec4Wrap ( document , m_current_theme , "Popup Bg" , m_color_bg_popup );
+		JSONifyVec4Wrap ( document , m_current_theme , "Frame Bg" , m_color_bg_frame );
+		JSONifyVec4Wrap ( document , m_current_theme , "Border" , m_color_border );
+		JSONifyVec4Wrap ( document , m_current_theme , "Text" , m_color_text );
+		JSONifyVec4Wrap ( document , m_current_theme , "Seperator" , m_color_seperator );
+
+		god::WriteJSON ( document , m_save_path );
 	}
 
-	void DeJSONifyVec4Wrap ( rapidjson::Document& document , char const* name , ImVec4& value )
+	void DeJSONifyVec4Wrap ( rapidjson::Value& document , char const* name , ImVec4& value )
 	{
 		assert ( document[ name ].IsArray () );
 		value = {
@@ -83,23 +95,30 @@ namespace god
 		};
 	}
 
-	void EditorStyle::DeJSONify ( std::string const& json )
+	void EditorStyle::DeJSONify ( bool current )
 	{
 		rapidjson::Document document;
 		document.SetObject ();
 
-		god::ReadJSON ( document , json.c_str () );
+		god::ReadJSON ( document , m_save_path.c_str () );
 
-		DeJSONifyVec4Wrap ( document , "Button"			, m_color_button			);
-		DeJSONifyVec4Wrap ( document , "Button Hover"	, m_color_button_hover		);
-		DeJSONifyVec4Wrap ( document , "Menu Bar Bg"	, m_color_bg_menubar		);
-		DeJSONifyVec4Wrap ( document , "Window Bg"		, m_color_bg_window			);
-		DeJSONifyVec4Wrap ( document , "Title Bg"		, m_color_bg_title			);
-		DeJSONifyVec4Wrap ( document , "Title Active Bg", m_color_bg_titleactive	);
-		DeJSONifyVec4Wrap ( document , "Popup Bg"		, m_color_bg_popup			);
-		DeJSONifyVec4Wrap ( document , "Frame Bg"		, m_color_bg_frame			);
-		DeJSONifyVec4Wrap ( document , "Border"			, m_color_border			);
-		DeJSONifyVec4Wrap ( document , "Text"			, m_color_text				);
-		DeJSONifyVec4Wrap ( document , "Seperator"		, m_color_seperator			);
+		assert ( document[ "Current Theme" ].IsString () );
+
+		if ( !current )
+		{
+			m_current_theme = document[ "Current Theme" ].GetString ();
+		}
+
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Button" , m_color_button );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Button Hover" , m_color_button_hover );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Menu Bar Bg" , m_color_bg_menubar );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Window Bg" , m_color_bg_window );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Title Bg" , m_color_bg_title );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Title Active Bg" , m_color_bg_titleactive );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Popup Bg" , m_color_bg_popup );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Frame Bg" , m_color_bg_frame );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Border" , m_color_border );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Text" , m_color_text );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Seperator" , m_color_seperator );
 	}
 }

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "FileIO.h"
 
+#include "Internal/RapidJSONWrapper.h"
+
 namespace god
 {
 	std::string ReadFileToString ( char const* file )
@@ -29,12 +31,12 @@ namespace god
 		return buffer;
 	}
 
-	void ReadJSON ( rapidjson::Document& document , char const* json )
+	void ReadJSON ( rapidjson::Document& document , std::string const& json )
 	{
 		RapidJSON::Read ( document , json );
 	}
 
-	void WriteJSON ( rapidjson::Document const& document , char const* json )
+	void WriteJSON ( rapidjson::Document const& document , std::string const& json )
 	{
 		RapidJSON::Write ( document , json );
 	}

@@ -16,21 +16,45 @@ namespace god
 
 		void Write ( rapidjson::Document const& document , std::string const& json );
 
-		template <typename OBJECT , typename VALUE>
-		void JSONify ( OBJECT& object , std::string const& key , VALUE const& value )
+		template <typename VALUE>
+		void JSONify ( rapidjson::Document& document , std::string const& key , VALUE& value )
 		{
 			rapidjson::Value rj_value ( value );
-			rapidjson::Value rj_key ( key.c_str () , object.GetAllocator () );
-			object.AddMember ( rj_key , rj_value , object.GetAllocator () );
+			rapidjson::Value rj_key ( key.c_str () , document.GetAllocator () );
+			document.AddMember ( rj_key , rj_value , document.GetAllocator () );
+		}
+	
+		template <>
+		inline void JSONify<rapidjson::Value> ( rapidjson::Document& document , std::string const& key , rapidjson::Value& value )
+		{
+			rapidjson::Value rj_key ( key.c_str () , document.GetAllocator () );
+			document.AddMember ( rj_key , value , document.GetAllocator () );
 		}
 
-		template <typename OBJECT , typename...VALUES>
-		void JSONifyValues ( OBJECT& object , std::string const& key , VALUES&& ... values )
+		template <typename...VALUES>
+		void JSONifyValues ( rapidjson::Document& document , std::string const& key , VALUES&& ... values )
 		{
 			rapidjson::Value rj_value ( rapidjson::kArrayType );
-			rapidjson::Value rj_key ( key.c_str () , object.GetAllocator () );
-			( ( rj_value.PushBack ( values , object.GetAllocator () ) ) , ... );
-			object.AddMember ( rj_key , rj_value , object.GetAllocator () );
+			rapidjson::Value rj_key ( key.c_str () , document.GetAllocator () );
+			( ( rj_value.PushBack ( values , document.GetAllocator () ) ) , ... );
+			document.AddMember ( rj_key , rj_value , document.GetAllocator () );
+		}
+
+		template <typename VALUE>
+		void JSONifyToValue ( rapidjson::Value& rjValue , rapidjson::Document& document , std::string const& key , VALUE const& value )
+		{
+			rapidjson::Value rj_value ( value );
+			rapidjson::Value rj_key ( key.c_str () , document.GetAllocator () );
+			rjValue.AddMember ( rj_key , rj_value , document.GetAllocator () );
+		}
+
+		template <typename...VALUES>
+		void JSONifyValues ( rapidjson::Value& rjValue , rapidjson::Document& document , std::string const& key , VALUES&& ... values )
+		{
+			rapidjson::Value rj_value ( rapidjson::kArrayType );
+			rapidjson::Value rj_key ( key.c_str () , document.GetAllocator () );
+			( ( rj_value.PushBack ( values , document.GetAllocator () ) ) , ... );
+			rjValue.AddMember ( rj_key , rj_value , document.GetAllocator () );
 		}
 	}
 }

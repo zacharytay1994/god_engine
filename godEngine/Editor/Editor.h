@@ -50,14 +50,17 @@ namespace god
 		ImFont* m_font { nullptr };
 		float		m_font_size { 20.0f };
 
+		std::string m_current_theme { "Custom Theme" };
+		std::string m_save_path { "Assets/EngineAssets/Editor/Themes/et_themes.json" };
+
 		EditorStyle ();
 		void UpdateStyle ();
 		void SetImGuiFont ( char const* font );
 		void PushFont ();
 		void PopFont ();
 
-		void JSONify ( std::string const& json );
-		void DeJSONify ( std::string const& json );
+		void JSONify ();
+		void DeJSONify ( bool current = false );
 	};
 
 	template <typename EDITOR_RESOURCES>
