@@ -6,13 +6,12 @@ namespace god
 	template <typename EDITOR_RESOURCES>
 	struct EW_MainMenuBar : EditorWindow<EDITOR_RESOURCES>
 	{
-		bool popup { false };
-
 		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override;
 	};
 }
 
 #include "EW_EditorStyles.h"
+#include "EW_Asset3DImporter.h"
 
 namespace god
 {
@@ -28,7 +27,10 @@ namespace god
 			{
 				if ( ImGui::BeginMenu ( "New" ) )
 				{
-					ImGui::MenuItem ( "Texture" , "[CTRL+N+T]" );
+					if ( ImGui::MenuItem ( "Asset3D" , "[NONE]" ) )
+					{
+						this->Get<EW_Asset3DImporter> ()->m_open = true;
+					}
 
 					ImGui::EndMenu ();
 				}

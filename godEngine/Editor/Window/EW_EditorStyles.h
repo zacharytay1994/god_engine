@@ -48,18 +48,21 @@ namespace god
 				m_editor_style.m_current_theme = "Custom Theme";
 				m_editor_style.DeJSONify ( true );
 				m_editor_style.UpdateStyle ();
+				m_editor_style.JSONify ();
 			}
 			if ( ImGui::Selectable ( "Light Theme" ) )
 			{
 				m_editor_style.m_current_theme = "Light Theme";
 				m_editor_style.DeJSONify ( true );
 				m_editor_style.UpdateStyle ();
+				m_editor_style.JSONify ();
 			}
 			if ( ImGui::Selectable ( "Dark Theme" ) )
 			{
 				m_editor_style.m_current_theme = "Dark Theme";
 				m_editor_style.DeJSONify ( true );
 				m_editor_style.UpdateStyle ();
+				m_editor_style.JSONify ();
 			}
 			ImGui::EndPopup ();
 		}
@@ -71,12 +74,13 @@ namespace god
 
 		ColourInput ( "Button"			, m_editor_style.m_color_button			);
 		ColourInput ( "Button Hover"	, m_editor_style.m_color_button_hover	);
-		ColourInput ( "Menu Bar Bg"		, m_editor_style.m_color_bg_menubar		);
-		ColourInput ( "Window Bg"		, m_editor_style.m_color_bg_window		);
-		ColourInput ( "Title Bg"		, m_editor_style.m_color_bg_title		);
-		ColourInput ( "Title Active Bg" , m_editor_style.m_color_bg_titleactive );
-		ColourInput ( "Popup Bg"		, m_editor_style.m_color_bg_popup		);
-		ColourInput ( "Frame Bg"		, m_editor_style.m_color_bg_frame		);
+		ColourInput ( "Menu Bar"		, m_editor_style.m_color_bg_menubar		);
+		ColourInput ( "Window"			, m_editor_style.m_color_bg_window		);
+		ColourInput ( "Title"			, m_editor_style.m_color_bg_title		);
+		ColourInput ( "Title Active"	, m_editor_style.m_color_bg_titleactive );
+		ColourInput ( "Title Collapsed" , m_editor_style.m_color_seperator );
+		ColourInput ( "Popup"			, m_editor_style.m_color_bg_popup		);
+		ColourInput ( "Frame"			, m_editor_style.m_color_bg_frame		);
 		ColourInput ( "Border"			, m_editor_style.m_color_border			);
 		ColourInput ( "Text"			, m_editor_style.m_color_text			);
 		ColourInput ( "Seperator"		, m_editor_style.m_color_seperator		);
@@ -98,7 +102,7 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EW_EditorStyles<EDITOR_RESOURCES>::ColourInput ( char const* name , ImVec4& colour )
 	{
-		float input_width = ImGui::GetWindowWidth () / 5.0f;
+		float input_width = ImGui::GetWindowWidth () / 6.0f;
 
 		ImGui::SetNextItemWidth ( input_width );
 		std::string label { "##" };
@@ -108,8 +112,11 @@ namespace god
 		ImGui::SetNextItemWidth ( input_width );
 		ImGui::InputFloat ( ( label + "g" ).c_str () , &colour.y );
 		ImGui::SameLine ();
+		ImGui::SetNextItemWidth ( input_width );
+		ImGui::InputFloat ( ( label + "b" ).c_str () , &colour.z );
+		ImGui::SameLine ();
 		label = name;
 		ImGui::SetNextItemWidth ( input_width );
-		ImGui::InputFloat ( ( label + "##b" ).c_str () , &colour.z );
+		ImGui::InputFloat ( ( label + "##a" ).c_str () , &colour.w );
 	}
 }

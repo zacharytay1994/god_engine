@@ -45,24 +45,24 @@ namespace god
 
 	void OpenGL::ClearColour () const
 	{
-		glClearColor ( 0.0f , 0.0f , 0.0f , 1.0f );
+		glClearColor ( 0.2f , 0.2f , 0.2f , 1.0f );
 		glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	}
 
-	void OpenGL::BuildOGLModels ( AssimpModelManager const& modelManager )
+	void OpenGL::BuildOGLModels ( Asset3DManager const& asset3DManager )
 	{
 		// clear current mesh list
 		m_models.clear ();
 		
 		// copy meshes
-		for ( auto const& model : modelManager.GetResources() )
+		for ( auto const& asset : asset3DManager.GetResources() )
 		{
 			m_models.emplace_back ();
-			BuildOGLMeshesFromAssimpMeshes ( m_models.back () , model.m_meshes );
+			BuildOGLMeshesFromAssimpMeshes ( m_models.back () , asset.m_model.m_meshes );
 		}
 
 		// copy mesh ids
-		m_model_ids = modelManager.GetIDs ();
+		m_model_ids = asset3DManager.GetIDs ();
 	}
 
 	void OpenGL::RenderScene ( Scene const& scene ,
@@ -127,34 +127,34 @@ namespace god
 		std::cout << "OpenGL viewport resized x:" << width << " y: " << height << std::endl;
 	}
 
-	OGLMesh OpenGL::BuildOGLMeshFromAssimpMesh ( AssimpMesh const& assimpMesh ) const
+	OGLMesh OpenGL::BuildOGLMeshFromAssimpMesh ( Mesh3D const& mesh3d ) const
 	{
 		OGLMesh mesh;
 
 		// copy vertices
-		mesh.m_vertices.resize ( assimpMesh.m_vertices.size () );
-		for ( auto i = 0; i < assimpMesh.m_vertices.size (); ++i )
+		mesh.m_vertices.resize ( mesh3d.m_vertices.size () );
+		for ( auto i = 0; i < mesh3d.m_vertices.size (); ++i )
 		{
-			mesh.m_vertices[ i ].m_position = assimpMesh.m_vertices[ i ].m_position;
-			mesh.m_vertices[ i ].m_uv = assimpMesh.m_vertices[ i ].m_uv;
-			mesh.m_vertices[ i ].m_tangent = assimpMesh.m_vertices[ i ].m_tangent;
-			mesh.m_vertices[ i ].m_normal = assimpMesh.m_vertices[ i ].m_normal;
-			mesh.m_vertices[ i ].m_colour = assimpMesh.m_vertices[ i ].m_colour;
+			mesh.m_vertices[ i ].m_position = mesh3d.m_vertices[ i ].m_position;
+			mesh.m_vertices[ i ].m_uv = mesh3d.m_vertices[ i ].m_uv;
+			mesh.m_vertices[ i ].m_tangent = mesh3d.m_vertices[ i ].m_tangent;
+			mesh.m_vertices[ i ].m_normal = mesh3d.m_vertices[ i ].m_normal;
+			mesh.m_vertices[ i ].m_colour = mesh3d.m_vertices[ i ].m_colour;
 		}
 
 		// copy indices
-		mesh.m_indices = assimpMesh.m_indices;
+		mesh.m_indices = mesh3d.m_indices;
 
 		mesh.Initialize ();
 
 		return mesh;
 	}
 
-	void OpenGL::BuildOGLMeshesFromAssimpMeshes ( std::vector<OGLMesh>& oglMeshes , std::vector<AssimpMesh> const& assimpMeshes ) const
+	void OpenGL::BuildOGLMeshesFromAssimpMeshes ( std::vector<OGLMesh>& oglMeshes , std::vector<Mesh3D> const& meshes3D ) const
 	{
-		for ( auto& assimp_mesh : assimpMeshes )
+		for ( auto& mesh : meshes3D )
 		{
-			oglMeshes.emplace_back ( BuildOGLMeshFromAssimpMesh ( assimp_mesh ) );
+			oglMeshes.emplace_back ( BuildOGLMeshFromAssimpMesh ( mesh ) );
 		}
 	}
 }

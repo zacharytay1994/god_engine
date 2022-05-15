@@ -8,6 +8,7 @@
 #include "Editor/OpenGLEditor.h"
 #include "Editor/Window/EW_MainMenuBar.h"
 #include "Editor/Window/EW_EditorStyles.h"
+#include "Editor/Window/EW_Asset3DImporter.h"
 
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>
@@ -35,11 +36,11 @@ namespace god
 		camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
 
 		// setup resources
-		god::AssimpModelManager model_manager;
+		god::Asset3DManager assets_3d;
 		/*model_manager.Insert ( "Backpack" , god::LoadModel ( "Assets/GameAssets/Models/Backpack/backpack.obj" ) );
 		model_manager.Insert ( "Skull" , god::LoadModel ( "Assets/GameAssets/Models/Skull/skull.fbx" ) );*/
 
-		opengl.BuildOGLModels ( model_manager );
+		opengl.BuildOGLModels ( assets_3d );
 
 		// setup scene
 		god::Scene scene;
@@ -52,14 +53,15 @@ namespace god
 		// imgui editors
 		EditorResources<
 			god::GLFWWindow ,
-			god::AssimpModelManager
+			god::Asset3DManager
 		> editor_resources (
 			window ,
-			model_manager
+			assets_3d
 		);
 		EditorWindows<decltype( editor_resources )> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
 		editor_windows.AddWindow<god::EW_EditorStyles> ();
+		editor_windows.AddWindow<god::EW_Asset3DImporter> ();
 
 		/*rapidjson::Document document;
 		document.SetObject ();*/

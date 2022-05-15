@@ -23,6 +23,9 @@ namespace god
 		style.Colors[ ImGuiCol_PopupBg ] = m_color_bg_popup;
 		style.Colors[ ImGuiCol_FrameBg ] = m_color_bg_frame;
 		style.Colors[ ImGuiCol_Separator ] = m_color_seperator;
+		style.Colors[ ImGuiCol_TitleBgCollapsed ] = m_color_bg_titlecollapsed;
+
+		style.WindowRounding = m_window_rounding;
 	}
 
 	EditorStyle::EditorStyle ()
@@ -75,6 +78,7 @@ namespace god
 		JSONifyVec4Wrap ( document , m_current_theme , "Window Bg" , m_color_bg_window );
 		JSONifyVec4Wrap ( document , m_current_theme , "Title Bg" , m_color_bg_title );
 		JSONifyVec4Wrap ( document , m_current_theme , "Title Active Bg" , m_color_bg_titleactive );
+		JSONifyVec4Wrap ( document , m_current_theme , "Title Collapsed Bg" , m_color_bg_titlecollapsed );
 		JSONifyVec4Wrap ( document , m_current_theme , "Popup Bg" , m_color_bg_popup );
 		JSONifyVec4Wrap ( document , m_current_theme , "Frame Bg" , m_color_bg_frame );
 		JSONifyVec4Wrap ( document , m_current_theme , "Border" , m_color_border );
@@ -109,16 +113,17 @@ namespace god
 			m_current_theme = document[ "Current Theme" ].GetString ();
 		}
 
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Button" , m_color_button );
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Button Hover" , m_color_button_hover );
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Menu Bar Bg" , m_color_bg_menubar );
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Window Bg" , m_color_bg_window );
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Title Bg" , m_color_bg_title );
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Title Active Bg" , m_color_bg_titleactive );
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Popup Bg" , m_color_bg_popup );
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Frame Bg" , m_color_bg_frame );
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Border" , m_color_border );
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Text" , m_color_text );
-		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str() ] , "Seperator" , m_color_seperator );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Button" , m_color_button );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Button Hover" , m_color_button_hover );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Menu Bar Bg" , m_color_bg_menubar );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Window Bg" , m_color_bg_window );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Title Bg" , m_color_bg_title );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Title Active Bg" , m_color_bg_titleactive );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Title Collapsed Bg" , m_color_bg_titlecollapsed );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Popup Bg" , m_color_bg_popup );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Frame Bg" , m_color_bg_frame );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Border" , m_color_border );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Text" , m_color_text );
+		DeJSONifyVec4Wrap ( document[ m_current_theme.c_str () ] , "Seperator" , m_color_seperator );
 	}
 }

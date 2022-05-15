@@ -40,6 +40,7 @@ namespace god
 		ImVec4 m_color_bg_window { m_color_1 };
 		ImVec4 m_color_bg_title { m_color_2 };
 		ImVec4 m_color_bg_titleactive { m_color_2 };
+		ImVec4 m_color_bg_titlecollapsed { m_color_2 };
 		ImVec4 m_color_bg_popup { m_color_3 };
 		ImVec4 m_color_bg_frame { m_color_4 };
 		ImVec4 m_color_border { m_color_1 };
@@ -47,11 +48,13 @@ namespace god
 		ImVec4 m_color_seperator { m_color_3 };
 
 		std::string m_font_path { "Assets/EngineAssets/Editor/ImGuiFonts/arial.ttf" }; // default font
-		ImFont* m_font { nullptr };
+		ImFont*		m_font { nullptr };
 		float		m_font_size { 20.0f };
 
 		std::string m_current_theme { "Custom Theme" };
 		std::string m_save_path { "Assets/EngineAssets/Editor/Themes/et_themes.json" };
+
+		float m_window_rounding { 10.0f };
 
 		EditorStyle ();
 		void UpdateStyle ();
@@ -119,8 +122,6 @@ namespace god
 	inline EditorWindows<EDITOR_RESOURCES>::EditorWindows ()
 	{
 		m_editor_style.SetImGuiFont ( m_editor_style.m_font_path.c_str () );
-		//m_editor_style.UpdateStyle ();
-		//m_editor_style.JSONify ( "Assets/EngineAssets/Editor/Themes/et_light.json" );
 	}
 
 	template<typename EDITOR_RESOURCES>

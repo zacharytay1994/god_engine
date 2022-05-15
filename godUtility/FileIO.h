@@ -1,6 +1,7 @@
 #pragma once
 
 #include "godUtility.h"
+#include "Internal/WindowsDialog.h"
 
 #include <RapidJSON/include/rapidjson/document.h>
 
@@ -16,4 +17,7 @@ namespace god
 	void GODUTILITY_API ReadJSON ( rapidjson::Document& document , std::string const& json );
 
 	void GODUTILITY_API WriteJSON ( rapidjson::Document const& document , std::string const& json );
+
+	std::string GODUTILITY_API OpenWindowDialog ( wchar_t const* fileType = L"All Files" , wchar_t const* fileExt = L"*.*" ,
+		WindowsDialog::MODE mode = WindowsDialog::MODE::GETPATH , const char* dir = 0 );
 }

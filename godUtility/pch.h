@@ -10,8 +10,15 @@
 // add headers that you want to pre-compile here
 #include "framework.h"
 
+#include <Windows.h>
 #include <assert.h>
 #include <fstream>
 #include <sstream>
+#include <iostream>
+#include <filesystem>
+#include <string>
+#include <ShObjIdl.h>
+#include <iterator>
+#include <algorithm>
 
 #endif //PCH_H

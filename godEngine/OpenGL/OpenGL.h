@@ -27,7 +27,7 @@ namespace god
 
 		// render scene functions
 		// assimp bridge
-		void  BuildOGLModels ( AssimpModelManager const& modelManager );
+		void  BuildOGLModels ( Asset3DManager const& modelManager );
 		void  RenderScene ( Scene const& scene ,
 			glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position );
 
@@ -46,7 +46,7 @@ namespace god
 		std::unordered_map<std::string , OGLModelID> m_model_ids;
 
 		// assimp bridge
-		OGLMesh BuildOGLMeshFromAssimpMesh ( AssimpMesh const& assimpMesh ) const;
-		void BuildOGLMeshesFromAssimpMeshes ( std::vector<OGLMesh>& oglMeshes , std::vector<AssimpMesh> const& assimpMeshes ) const;
+		OGLMesh BuildOGLMeshFromAssimpMesh ( Mesh3D const& mesh3D ) const;
+		void BuildOGLMeshesFromAssimpMeshes ( std::vector<OGLMesh>& oglMeshes , std::vector<Mesh3D> const& meshes3D ) const;
 	};
 }

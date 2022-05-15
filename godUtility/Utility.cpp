@@ -4,8 +4,8 @@
 
 namespace god
 {
-	AssimpModel LoadModel ( char const* modelPath )
+	Model3D LoadModel ( char const* modelPath )
 	{
-		return AssimpModel ( modelPath );
+		return Model3D ( modelPath );
 	}
 }
