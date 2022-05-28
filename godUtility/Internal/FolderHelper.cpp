@@ -42,6 +42,26 @@ namespace god
 			dest << src.rdbuf ();
 		}
 
+		void CopyFileToFolder ( std::string const& filePath , std::string const& folderPath )
+		{
+			if ( !std::filesystem::is_directory ( folderPath ) )
+			{
+				std::filesystem::create_directory ( folderPath );
+			}
+
+			// convert to string and find the name
+			/*std::wstring file { filePath };
+			std::string sfile ( file.begin () , file.end () );*/
+			std::string filename = filePath.substr ( filePath.find_last_of ( '\\' ) + 1 , filePath.size () );
+			/*std::stringstream ss;
+			ss << folderPath << "/" << filename;
+			std::cout << ss.str () << std::endl;*/
+
+			std::ifstream src ( filePath , std::ios::binary );
+			std::ofstream dest ( (folderPath + "/" + filename ).c_str() , std::ios::binary);
+			dest << src.rdbuf ();
+		}
+
 		std::vector<std::string> GetDirectories ( const std::string& s )
 		{
 			std::vector<std::string> r;

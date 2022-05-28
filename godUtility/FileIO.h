@@ -2,6 +2,7 @@
 
 #include "godUtility.h"
 #include "Internal/WindowsDialog.h"
+#include "Internal/FolderHelper.h"
 
 #include <RapidJSON/include/rapidjson/document.h>
 

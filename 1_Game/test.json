@@ -1,8 +1,0 @@
-{
-    "test": 10,
-    "objectmember": {
-        "value2": "i am string?",
-        "newvalue": 11
-    },
-    "newvalue": 11
-}

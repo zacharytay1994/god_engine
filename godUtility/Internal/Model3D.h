@@ -19,7 +19,11 @@ namespace god
 		glm::vec3 m_tangent;
 		glm::vec3 m_normal;
 		glm::vec4 m_colour;
+
+		GODUTILITY_API Vertex3D operator+( Vertex3D const& rhs );
 	};
+
+	using Index3D = uint32_t;
 
 	struct Material
 	{
@@ -37,7 +41,7 @@ namespace god
 	struct Mesh3D
 	{
 		std::vector<Vertex3D>	m_vertices;
-		std::vector<uint32_t>	m_indices;
+		std::vector<Index3D>	m_indices;
 	};
 
 	struct Model3D

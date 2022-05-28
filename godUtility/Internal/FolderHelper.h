@@ -1,4 +1,6 @@
 #pragma once
+#include "../godUtility.h"
+
 #include <string>
 #include <vector>
 
@@ -14,6 +16,8 @@ namespace god
 		bool FileExists ( const char* filename );
 
 		void CopyFileToAssets ( const wchar_t* filepath , const char* dirpath );
+
+		void GODUTILITY_API CopyFileToFolder ( std::string const& filePath , std::string const& folderPath );
 
 		std::vector<std::string> GetDirectories ( const std::string& dir );
 
