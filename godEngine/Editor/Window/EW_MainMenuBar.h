@@ -11,7 +11,7 @@ namespace god
 }
 
 #include "EW_EditorStyles.h"
-#include "EW_Asset3DImporter.h"
+#include "EW_AssetImporter.h"
 
 namespace god
 {
@@ -27,7 +27,7 @@ namespace god
 			{
 				if ( ImGui::BeginMenu ( "New" ) )
 				{
-					if ( ImGui::MenuItem ( "Asset3D" , "[NONE]" ) )
+					if ( ImGui::MenuItem ( "Asset" , "[NONE]" ) )
 					{
 						this->Get<EW_Asset3DImporter> ()->m_open = true;
 					}
@@ -40,10 +40,16 @@ namespace god
 
 			if ( ImGui::BeginMenu ( "View" ) )
 			{
-				if ( ImGui::MenuItem ( "Editor Style" ) )
+				if ( ImGui::MenuItem ( "Editor Style", "[NONE]") )
 				{
 					this->Get<EW_EditorStyles> ()->m_open = true;
 				}
+
+				if ( ImGui::MenuItem ( "Asset Manager" , "[NONE]" ) )
+				{
+					//this->Get<EW_AssetManager> ()->m_open = true;
+				}
+
 				ImGui::EndMenu ();
 			}
 

@@ -67,31 +67,31 @@ namespace god
 			ImGui::EndPopup ();
 		}
 
-		if ( ImGui::Button ( m_editor_style.m_current_theme.c_str () ) )
+		if ( ImGui::Button ( m_editor_style.m_current_theme.c_str () , { ImGui::GetWindowWidth (), 0.0f } ) )
 		{
 			ImGui::OpenPopup ( "Themes" );
 		}
 
-		ColourInput ( "Button"			, m_editor_style.m_color_button			);
-		ColourInput ( "Button Hover"	, m_editor_style.m_color_button_hover	);
-		ColourInput ( "Menu Bar"		, m_editor_style.m_color_bg_menubar		);
-		ColourInput ( "Window"			, m_editor_style.m_color_bg_window		);
-		ColourInput ( "Title"			, m_editor_style.m_color_bg_title		);
-		ColourInput ( "Title Active"	, m_editor_style.m_color_bg_titleactive );
+		ColourInput ( "Button" , m_editor_style.m_color_button );
+		ColourInput ( "Button Hover" , m_editor_style.m_color_button_hover );
+		ColourInput ( "Menu Bar" , m_editor_style.m_color_bg_menubar );
+		ColourInput ( "Window" , m_editor_style.m_color_bg_window );
+		ColourInput ( "Title" , m_editor_style.m_color_bg_title );
+		ColourInput ( "Title Active" , m_editor_style.m_color_bg_titleactive );
 		ColourInput ( "Title Collapsed" , m_editor_style.m_color_seperator );
-		ColourInput ( "Popup"			, m_editor_style.m_color_bg_popup		);
-		ColourInput ( "Frame"			, m_editor_style.m_color_bg_frame		);
-		ColourInput ( "Border"			, m_editor_style.m_color_border			);
-		ColourInput ( "Text"			, m_editor_style.m_color_text			);
-		ColourInput ( "Seperator"		, m_editor_style.m_color_seperator		);
+		ColourInput ( "Popup" , m_editor_style.m_color_bg_popup );
+		ColourInput ( "Frame" , m_editor_style.m_color_bg_frame );
+		ColourInput ( "Border" , m_editor_style.m_color_border );
+		ColourInput ( "Text" , m_editor_style.m_color_text );
+		ColourInput ( "Seperator" , m_editor_style.m_color_seperator );
 
-		if ( ImGui::Button ( "Save and Apply" ) )
+		if ( ImGui::Button ( "Save and Apply" , { ImGui::GetWindowWidth (), 0.0f } ) )
 		{
 			m_editor_style.UpdateStyle ();
 			m_editor_style.JSONify ();
 		}
 
-		if ( ImGui::Button ( "Close" ) )
+		if ( ImGui::Button ( "Close" , { ImGui::GetWindowWidth (), 0.0f } ) )
 		{
 			this->m_open = false;
 		}

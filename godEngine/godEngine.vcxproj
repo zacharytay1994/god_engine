@@ -99,7 +99,8 @@
   <ItemGroup>
     <ClInclude Include="Editor\Editor.h" />
     <ClInclude Include="Editor\OpenGLEditor.h" />
-    <ClInclude Include="Editor\Window\EW_Asset3DImporter.h" />
+    <ClInclude Include="Editor\Window\EW_AssetImporter.h" />
+    <ClInclude Include="Editor\Window\EW_AssetManager.h" />
     <ClInclude Include="Editor\Window\EW_EditorStyles.h" />
     <ClInclude Include="Editor\Window\EW_MainMenuBar.h" />
     <ClInclude Include="Editor\Window\TestWindow.h" />

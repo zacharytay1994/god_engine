@@ -87,10 +87,13 @@
     <ClInclude Include="Editor\Window\EW_EditorStyles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\Window\EW_Asset3DImporter.h">
+    <ClInclude Include="Editor\Window\EW_AssetImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imgui_stdlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Window\EW_AssetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

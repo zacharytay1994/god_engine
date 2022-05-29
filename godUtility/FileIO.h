@@ -21,4 +21,7 @@ namespace god
 
 	std::string GODUTILITY_API OpenWindowDialog ( wchar_t const* fileType = L"All Files" , wchar_t const* fileExt = L"*.*" ,
 		WindowsDialog::MODE mode = WindowsDialog::MODE::GETPATH , const char* dir = 0 );
+
+	std::vector<std::string> GODUTILITY_API OpenWindowDialogMulti ( wchar_t const* fileType = L"All Files" , wchar_t const* fileExt = L"*.*" ,
+		WindowsDialog::MODE mode = WindowsDialog::MODE::GETPATH , const char* dir = 0 );
 }

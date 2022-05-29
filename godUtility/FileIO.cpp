@@ -46,4 +46,10 @@ namespace god
 	{
 		return DialogBoxToDirectory ( fileType , fileExt , mode , dir );
 	}
+
+	std::vector<std::string> OpenWindowDialogMulti ( wchar_t const* fileType , wchar_t const* fileExt ,
+		WindowsDialog::MODE mode , const char* dir )
+	{
+		return DialogBoxToDirectoryMulti ( fileType , fileExt , mode , dir );
+	}
 }

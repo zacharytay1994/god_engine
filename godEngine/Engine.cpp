@@ -8,7 +8,7 @@
 #include "Editor/OpenGLEditor.h"
 #include "Editor/Window/EW_MainMenuBar.h"
 #include "Editor/Window/EW_EditorStyles.h"
-#include "Editor/Window/EW_Asset3DImporter.h"
+#include "Editor/Window/EW_AssetImporter.h"
 
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>

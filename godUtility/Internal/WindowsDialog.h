@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace god
 {
@@ -13,6 +14,9 @@ namespace god
 		};
 
 		std::string DialogBoxToDirectory ( wchar_t const* fileType = L"All Files" , wchar_t const* fileExt = L"*.*" ,
+			MODE mode = MODE::GETPATH , const char* dir = 0 );
+
+		std::vector<std::string> DialogBoxToDirectoryMulti ( wchar_t const* fileType = L"All Files" , wchar_t const* fileExt = L"*.*" ,
 			MODE mode = MODE::GETPATH , const char* dir = 0 );
 	}
 }
