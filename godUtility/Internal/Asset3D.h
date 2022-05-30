@@ -34,7 +34,6 @@ struct std::hash<god::Asset3D>
 	std::size_t operator()( god::Asset3D const& asset ) const noexcept
 	{
 		// calculate average vertex of model
-		glm::vec3 average_vertex_position;
 		size_t seed = 0;
 		for ( auto const& mesh : asset.m_model.m_meshes )
 		{

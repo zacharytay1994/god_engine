@@ -62,7 +62,13 @@ namespace god
 			}
 
 			std::wstring file { ss.str ().c_str () };
-			std::string sfile ( file.begin () , file.end () );
+			std::string sfile;
+			std::transform ( file.begin () , file.end () , std::back_inserter ( sfile ) ,
+				[]( wchar_t c )
+				{
+					return ( char ) c;
+				}
+			);
 			return sfile;
 		}
 
@@ -124,8 +130,15 @@ namespace god
 
 								// convert to string
 								std::wstring file { ss.str ().c_str () };
+								std::string sfile;
+								std::transform ( file.begin () , file.end () , std::back_inserter ( sfile ) ,
+									[]( wchar_t c )
+									{
+										return ( char ) c;
+									}
+								);
 								//std::string sfile ( file.begin () , file.end () );
-								out[ i ] = std::string ( file.begin () , file.end () );
+								out[ i ] = sfile;
 								ss.str ( L"" );
 							}
 						}

@@ -99,6 +99,7 @@
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DateTime.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="godUtility.h" />
     <ClInclude Include="Internal\FolderHelper.h" />
@@ -116,6 +117,7 @@
     <ClInclude Include="Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DateTime.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Internal\Asset3D.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>

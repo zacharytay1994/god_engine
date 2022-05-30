@@ -4,12 +4,15 @@
 #include <godUtility/Utility.h>
 #include <godUtility/FileIO.h>
 #include <godUtility/Internal/RapidJSONWrapper.h>
+#include <godUtility/DateTime.h>
 
 #include "../../imgui/imgui_stdlib.h" 
 
 #include <functional>
 #include <chrono>
 #include <ctime>
+#include <iomanip>
+#include <sstream>
 
 namespace god
 {
@@ -29,13 +32,13 @@ namespace god
 		};
 		AssetType m_asset_type { AssetType::Count };
 
-		uint32_t	MAX_INPUT_LENGTH { 256 };
-		std::string ASSET3D_FOLDER { "Assets/GameAssets/Asset3D/" };
+		//uint32_t	MAX_INPUT_LENGTH { 256 };
+		/*std::string ASSET3D_FOLDER { "Assets/GameAssets/Asset3D/" };
 		std::string RAW_FOLDER { "Raw/" };
 		std::string BUILD_FOLDER { "Build/" };
 		std::string MODEL_FOLDER { "Models/" };
 		std::string TEXTURE_FOLDER { "Textures/" };
-		std::string CONFIG_FILE { "ModelConfig.json" };
+		std::string CONFIG_FILE { "ModelConfig.json" };*/
 
 		std::vector<std::string> m_asset_paths;
 		std::vector<std::string> m_asset_names;
@@ -44,6 +47,9 @@ namespace god
 	};
 }
 
+#include "PathConfig.h"
+#include "EW_AssetManager.h"
+
 namespace god
 {
 	template<typename EDITOR_RESOURCES>
@@ -51,6 +57,8 @@ namespace god
 	{
 		UNREFERENCED_PARAMETER ( dt );
 		UNREFERENCED_PARAMETER ( editorResources );
+
+		using namespace AssetPath;
 
 		ImGui::Begin ( "Asset Importer" );
 
@@ -120,7 +128,7 @@ namespace god
 
 		for ( size_t i = 0; i < m_asset_paths.size (); ++i )
 		{
-			ImGui::PushID ( i );
+			ImGui::PushID ( static_cast< int >( i ) );
 
 			ImGui::Separator ();
 
@@ -158,7 +166,7 @@ namespace god
 			// STEP - Serialze
 			rapidjson::Document document;
 			document.SetObject ();
-			god::ReadJSON ( document , ASSET3D_FOLDER + CONFIG_FILE );
+			god::ReadJSON ( document , File_ModelsConfig );
 
 			// STEP - Create build version of asset
 			switch ( m_asset_type )
@@ -175,7 +183,13 @@ namespace god
 
 					// serialize model file name
 					std::string model_name = model_path.substr ( model_path.find_last_of ( '\\' ) + 1 , model_path.size () );
-					RapidJSON::JSONifyToValue ( value , document , "Raw Model" , model_name );
+					RapidJSON::JSONifyToValue ( value , document , "Raw" , model_name );
+
+					// serialize model path name
+					RapidJSON::JSONifyToValue ( value , document , "Source" , model_path );
+
+					// serialize edit time
+					RapidJSON::JSONifyToValue ( value , document , "Last Edited" , GetDateTimeString () );
 
 					if ( document.HasMember ( asset_name.c_str () ) && document[ asset_name.c_str () ].IsArray () )
 					{
@@ -188,14 +202,17 @@ namespace god
 						RapidJSON::JSONifyValues ( document , asset_name , value );
 					}
 
-					god::WriteJSON ( document , ASSET3D_FOLDER + CONFIG_FILE );
+					god::WriteJSON ( document , File_ModelsConfig );
 
 					// STEP - File Setup
-					god::FolderHelper::CopyFileToFolder ( model_path , ( ASSET3D_FOLDER + RAW_FOLDER + MODEL_FOLDER ).c_str () );
+					god::FolderHelper::CopyFileToFolder ( model_path , Folder_RawModels );
 
+					// STEP - Build custom from raw files
 					Asset3D load_from_raw ( model_path );
-					load_from_raw.Serialize ( ASSET3D_FOLDER + BUILD_FOLDER + MODEL_FOLDER + asset_name );
+					load_from_raw.Serialize ( Folder_BuildModels + asset_name );
 				}
+
+				this->Get<EW_AssetManager> ()->ReloadModelConfig ();
 				break;
 			}
 			case ( AssetType::Texture ):
@@ -223,10 +240,10 @@ namespace god
 						RapidJSON::JSONifyValues ( document , asset_name , value );
 					}
 
-					god::WriteJSON ( document , ASSET3D_FOLDER + CONFIG_FILE );
+					god::WriteJSON ( document , File_ModelsConfig );
 
 					// STEP - File Setup
-					god::FolderHelper::CopyFileToFolder ( asset_path , ( ASSET3D_FOLDER + RAW_FOLDER + TEXTURE_FOLDER ).c_str () );
+					god::FolderHelper::CopyFileToFolder ( asset_path , ( Folder_RawTextures ).c_str () );
 				}
 				break;
 			}

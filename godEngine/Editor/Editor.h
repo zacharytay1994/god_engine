@@ -76,6 +76,10 @@ namespace god
 
 		void BaseUpdate ( float dt , EDITOR_RESOURCES& editorResources );
 		virtual void Update ( float dt , EDITOR_RESOURCES& editorResources ) = 0;
+		void Open ();
+		virtual void OnOpen ();
+		void Close ();
+		virtual void OnClose ();
 
 		friend struct EditorWindows<EDITOR_RESOURCES>;
 	protected:
@@ -108,6 +112,30 @@ namespace god
 		{
 			Update ( dt , editorResources );
 		}
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EditorWindow<EDITOR_RESOURCES>::Open ()
+	{
+		m_open = true;
+		OnOpen ();
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EditorWindow<EDITOR_RESOURCES>::OnOpen ()
+	{
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EditorWindow<EDITOR_RESOURCES>::Close ()
+	{
+		m_open = false;
+		OnClose ();
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EditorWindow<EDITOR_RESOURCES>::OnClose ()
+	{
 	}
 
 	template<typename EDITOR_RESOURCES>

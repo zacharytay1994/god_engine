@@ -103,6 +103,7 @@
     <ClInclude Include="Editor\Window\EW_AssetManager.h" />
     <ClInclude Include="Editor\Window\EW_EditorStyles.h" />
     <ClInclude Include="Editor\Window\EW_MainMenuBar.h" />
+    <ClInclude Include="Editor\Window\PathConfig.h" />
     <ClInclude Include="Editor\Window\TestWindow.h" />
     <ClInclude Include="Editor\Window\TestWindow2.h" />
     <ClInclude Include="Engine.h" />

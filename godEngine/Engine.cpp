@@ -9,6 +9,7 @@
 #include "Editor/Window/EW_MainMenuBar.h"
 #include "Editor/Window/EW_EditorStyles.h"
 #include "Editor/Window/EW_AssetImporter.h"
+#include "Editor/Window/EW_AssetManager.h"
 
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>
@@ -62,6 +63,7 @@ namespace god
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
 		editor_windows.AddWindow<god::EW_EditorStyles> ();
 		editor_windows.AddWindow<god::EW_Asset3DImporter> ();
+		editor_windows.AddWindow<god::EW_AssetManager> ();
 
 		/*rapidjson::Document document;
 		document.SetObject ();*/

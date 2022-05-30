@@ -1,6 +1,8 @@
 #include "../pch.h"
 #include "FolderHelper.h"
 
+#include <locale>
+
 namespace god
 {
 	namespace FolderHelper
@@ -31,7 +33,13 @@ namespace god
 
 			// convert to string and find the name
 			std::wstring file { filepath };
-			std::string sfile ( file.begin () , file.end () );
+			std::string sfile;
+			std::transform ( file.begin () , file.end () , std::back_inserter ( sfile ) , 
+				[]( wchar_t c )
+				{
+					return ( char ) c;
+				} 
+			);
 			sfile = sfile.substr ( sfile.find_last_of ( '\\' ) + 1 , file.size () );
 			std::stringstream ss;
 			ss << dirpath.str () << "/" << sfile;
@@ -58,7 +66,7 @@ namespace god
 			std::cout << ss.str () << std::endl;*/
 
 			std::ifstream src ( filePath , std::ios::binary );
-			std::ofstream dest ( (folderPath + "/" + filename ).c_str() , std::ios::binary);
+			std::ofstream dest ( ( folderPath + "/" + filename ).c_str () , std::ios::binary );
 			dest << src.rdbuf ();
 		}
 
