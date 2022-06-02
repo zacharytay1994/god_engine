@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 
 #include <array>
+#include <chrono>
+#include <ctime>
 
 namespace god
 {

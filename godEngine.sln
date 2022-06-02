@@ -10,6 +10,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1_Game", "1_Game\1_Game.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "godEngine", "godEngine\godEngine.vcxproj", "{678BE40C-C04A-4FDE-9090-6FCCC9D34915}"
 	ProjectSection(ProjectDependencies) = postProject
+		{6D75EE03-7874-4A5A-AEAF-7E28B546017F} = {6D75EE03-7874-4A5A-AEAF-7E28B546017F}
 		{D2DA4F22-6300-43FF-AC3C-E46BC5D73CD7} = {D2DA4F22-6300-43FF-AC3C-E46BC5D73CD7}
 		{7E7C45B6-C7F3-4ED6-BC83-988B06B00E25} = {7E7C45B6-C7F3-4ED6-BC83-988B06B00E25}
 	EndProjectSection
@@ -17,6 +18,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "godCamera", "godCamera\godCamera.vcxproj", "{7E7C45B6-C7F3-4ED6-BC83-988B06B00E25}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "godUtility", "godUtility\godUtility.vcxproj", "{D2DA4F22-6300-43FF-AC3C-E46BC5D73CD7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "godECS", "godECS\godECS.vcxproj", "{6D75EE03-7874-4A5A-AEAF-7E28B546017F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +53,12 @@ Global
 		{D2DA4F22-6300-43FF-AC3C-E46BC5D73CD7}.Release|x64.ActiveCfg = Release|x64
 		{D2DA4F22-6300-43FF-AC3C-E46BC5D73CD7}.Release|x64.Build.0 = Release|x64
 		{D2DA4F22-6300-43FF-AC3C-E46BC5D73CD7}.Release|x86.ActiveCfg = Release|x64
+		{6D75EE03-7874-4A5A-AEAF-7E28B546017F}.Debug|x64.ActiveCfg = Debug|x64
+		{6D75EE03-7874-4A5A-AEAF-7E28B546017F}.Debug|x64.Build.0 = Debug|x64
+		{6D75EE03-7874-4A5A-AEAF-7E28B546017F}.Debug|x86.ActiveCfg = Debug|x64
+		{6D75EE03-7874-4A5A-AEAF-7E28B546017F}.Release|x64.ActiveCfg = Release|x64
+		{6D75EE03-7874-4A5A-AEAF-7E28B546017F}.Release|x64.Build.0 = Release|x64
+		{6D75EE03-7874-4A5A-AEAF-7E28B546017F}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

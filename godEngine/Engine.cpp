@@ -3,6 +3,7 @@
 
 #include "OpenGL/OpenGL.h"
 #include "Window/GLFWWindow.h"
+#include "Window/Time.h"
 
 #include "Editor/Editor.h"
 #include "Editor/OpenGLEditor.h"
@@ -10,6 +11,10 @@
 #include "Editor/Window/EW_EditorStyles.h"
 #include "Editor/Window/EW_AssetImporter.h"
 #include "Editor/Window/EW_AssetManager.h"
+#include "Editor/Window/EW_SceneManager.h"
+
+#include "ECS/ECSManager.h"
+//#include "ECS/Test.h"
 
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>
@@ -17,10 +22,38 @@
 #include <godUtility/TemplateManipulation.h>
 #include <godUtility/FileIO.h>
 
-#include <tuple>
-
 namespace god
 {
+	struct Position
+	{
+		float x , y;
+	};
+
+	struct Velocity
+	{
+		float dx , dy;
+	};
+
+	struct TestStruct2
+	{
+		template<typename T>
+		void operator()( int i );
+	};
+
+	template<typename T>
+	void TestStruct2::operator()( int i )
+	{
+		std::cout << typeid( T ).name () << std::endl;
+	}
+
+	template<typename T>
+	void TestFunc ( int i , float f ) { std::cout << f << typeid( T ).name () << std::endl; }
+
+	void TestSystem ( Position& pos , Velocity& vel )
+	{
+		std::cout << pos.x << "," << pos.y << "v:" << vel.dx << std::endl;
+	}
+
 	GODENGINE_API godEngine::godEngine ()
 	{
 		std::cout << "godEngine constructed." << std::endl;
@@ -51,41 +84,40 @@ namespace god
 		// glfw+opengl imgui setup
 		god::ImGuiOpenGLEditor ogl_editor ( window );
 
+		// ecs manager
+		ECSManager ecs_manager;
+
 		// imgui editors
 		EditorResources<
 			god::GLFWWindow ,
-			god::Asset3DManager
+			god::Asset3DManager ,
+			god::ECSManager
 		> editor_resources (
 			window ,
-			assets_3d
+			assets_3d ,
+			ecs_manager
 		);
 		EditorWindows<decltype( editor_resources )> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
 		editor_windows.AddWindow<god::EW_EditorStyles> ();
 		editor_windows.AddWindow<god::EW_Asset3DImporter> ();
 		editor_windows.AddWindow<god::EW_AssetManager> ();
+		editor_windows.AddWindow<god::EW_SceneManager> ();
 
-		/*rapidjson::Document document;
-		document.SetObject ();*/
-		/*rapidjson::Value value ( 10 );
-		document.AddMember ( "test" , value , document.GetAllocator () );
-		rapidjson::Value value2 ( rapidjson::kObjectType );
-		value2.AddMember ( "value2" , "i am string?" , document.GetAllocator () );
-		document.AddMember ( "objectmember" , value2 , document.GetAllocator () );
-		god::WriteJSON ( document , "test.json" );*/
-		/*RapidJSON::JSONify ( document , "something" , 11 );
-		RapidJSON::JSONify ( document , "something3" , 15.0f );
-		RapidJSON::JSONifyValues ( document , "arraytest" , "re" , 2 , 3 , 4);
-		god::WriteJSON ( document , "test2.json" );*/
+		god::T_Manip::TYPE_PACK<int , float> pack;
+		//god::T_Manip::GetType ( pack , 1 , TestFunc<int> , 0 , 0.2f );
 
-		/*rapidjson::Document document;
-		god::ReadJSON ( document , "test.json" );
-		rapidjson::Value value ( 11 );
-		document["objectmember"].AddMember ("newvalue" , value , document.GetAllocator ());
-		god::WriteJSON ( document , "test.json" );*/
+		for ( int i = 0; i < 2; ++i )
+		{
+			god::T_Manip::GetType ( pack , i , TestStruct2(), 1 );
+		}
+		//god::T_Manip::Testlambdafunction ( TestFunc );
+
+		Time time;
 
 		while ( !window.WindowShouldClose () )
 		{
+			time.StartFrame ();
 			window.PollEvents ();
 
 			// window resize changes
@@ -134,6 +166,8 @@ namespace god
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );*/
+
+			time.EndFrame ();
 		}
 	}
 }

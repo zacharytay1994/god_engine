@@ -68,7 +68,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>godCamera.lib;godUtility.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>godCamera.lib;godUtility.lib;godECS.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -90,19 +90,23 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>godCamera.lib;godUtility.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>godCamera.lib;godUtility.lib;godECS.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ECS\Components\CommonComponents.h" />
+    <ClInclude Include="ECS\ECSManager.h" />
+    <ClInclude Include="ECS\Systems\CommonSystems.h" />
     <ClInclude Include="Editor\Editor.h" />
     <ClInclude Include="Editor\OpenGLEditor.h" />
     <ClInclude Include="Editor\Window\EW_AssetImporter.h" />
     <ClInclude Include="Editor\Window\EW_AssetManager.h" />
     <ClInclude Include="Editor\Window\EW_EditorStyles.h" />
     <ClInclude Include="Editor\Window\EW_MainMenuBar.h" />
+    <ClInclude Include="Editor\Window\EW_SceneManager.h" />
     <ClInclude Include="Editor\Window\PathConfig.h" />
     <ClInclude Include="Editor\Window\TestWindow.h" />
     <ClInclude Include="Editor\Window\TestWindow2.h" />
@@ -124,6 +128,7 @@
     <ClInclude Include="OpenGL\OpenGL.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
+    <ClInclude Include="Window\Time.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\0_InternalDependencies\glad\src\glad.c">
@@ -131,6 +136,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="ECS\ECSManager.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="ECS\Systems\CommonSystems.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="Editor\Editor.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
@@ -189,6 +202,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Window\GLFWWindow.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Window\Time.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>

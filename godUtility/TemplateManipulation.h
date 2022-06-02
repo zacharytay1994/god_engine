@@ -21,32 +21,57 @@ namespace god
 		 * : Index of the type to retrieve.
 		 * @return
 		*/
-		template <typename RETURN , typename...ARGS>
-		using TYPE_FUNCTION = RETURN ( * )( ARGS... );
+		template <typename...ARGS>
+		using TYPE_FUNCTION = void ( * )( ARGS... );
 
-		template < size_t I = 0 , typename...T >
+		//template < size_t I = 0 , typename...T , typename...U >
+		//typename std::enable_if< I == sizeof...( T ) , void >::type
+		//	GetType ( std::tuple< T... > tuple , size_t index , void( *function )( U... ) , U...functionArgs )
+		//{
+		//	( tuple );
+		//	( index );
+		//	std::cerr << "god::T_Manip::GetType - Index out of bound of tuple" << std::endl;
+		//}
+
+		//template < size_t I = 0 , typename...T , typename...U >
+		//typename std::enable_if < I < sizeof...( T ) , void >::type
+		//	GetType ( std::tuple< T... > tuple , size_t index , void( *function )( U... ) , U...functionArgs )
+		//{
+		//	if ( index == I )
+		//	{
+		//		using TYPE = decltype( std::get<I> ( tuple ) );
+
+		//		//... do some logic
+		//		function ( functionArgs... );
+
+		//		return;
+		//	}
+		//	GetType<I + 1> ( tuple , index , function , functionArgs... );
+		//}
+
+		template < size_t I = 0 , typename...T , typename Function , typename...FArgs >
 		typename std::enable_if< I == sizeof...( T ) , void >::type
-			GetType ( std::tuple< T... > tuple , size_t index )
+			GetType ( std::tuple< T... > tuple , size_t index , Function function , FArgs...functionArgs )
 		{
 			( tuple );
 			( index );
 			std::cerr << "god::T_Manip::GetType - Index out of bound of tuple" << std::endl;
 		}
 
-		template < size_t I = 0 , typename...T >
+		template < size_t I = 0 , typename...T , typename Function , typename...FArgs >
 		typename std::enable_if < I < sizeof...( T ) , void >::type
-			GetType ( std::tuple< T... > tuple , size_t index )
+			GetType ( std::tuple< T... > tuple , size_t index , Function function , FArgs...functionArgs )
 		{
 			if ( index == I )
 			{
 				using TYPE = decltype( std::get<I> ( tuple ) );
 
 				//... do some logic
-				std::cout << typeid( std::remove_reference_t<TYPE> ).name () << std::endl;
+				function.operator() < std::remove_reference_t<TYPE> > ( functionArgs... );
 
 				return;
 			}
-			GetType<I + 1> ( tuple , index );
+			GetType<I + 1> ( tuple , index , function, functionArgs... );
 		}
 
 		/*
