@@ -1,0 +1,236 @@
+#include "../pch.h"
+#include "EnttXSol.h"
+
+#include <assert.h>
+#include <fstream>
+
+namespace god
+{
+	EnttXSol::EnttXSol ( std::vector<std::string> scriptFiles )
+	{
+		m_lua.open_libraries ( sol::lib::base );
+		for ( auto file : scriptFiles )
+		{
+			LoadScript ( file );
+		}
+
+		m_lua.set ( "sol_table" , sol::table () );
+		m_lua[ "GetComponent" ] = [this]( entt::entity e , std::string const& s )->sol::table
+		{
+			return GetStorage<sol::table> ( s ).get ( e );
+		};
+	}
+
+	void EnttXSol::Update ()
+	{
+		// for each script in loaded scripts
+		for ( auto const& script : m_scripts )
+		{
+			// run system with views created by their used components,
+			// i.e. process all entities
+			for ( auto const& system : script.second.m_systems )
+			{
+				GetView ( system.second.m_used_components ).each ( m_sol_functions[ system.first ] );
+			}
+		}
+	}
+
+	entt::entity EnttXSol::operator[]( Entity entity )
+	{
+		assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
+		return m_entities[ entity ].value ();
+	}
+
+	entt::entity EnttXSol::GetEntity ( Entity entity )
+	{
+		assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
+		return m_entities[ entity ].value ();
+	}
+
+	EnttXSol::Entity EnttXSol::CreateEntity ( std::string const& name )
+	{
+		if ( m_free_ids.empty () )
+		{
+			m_entities.emplace_back ( m_registry.create () );
+			auto id = static_cast< Entity >( m_entities.size () ) - 1;
+			if ( !name.empty () )
+			{
+				if ( m_entity_names.size () <= id )
+				{
+					m_entity_names.resize ( id + 1 );
+				}
+				m_entity_names[ id ] = name;
+			}
+			return id;
+		}
+		else
+		{
+			auto id = m_free_ids.top ();
+			m_free_ids.pop ();
+			m_entities[ id ] = m_registry.create ();
+			if ( !name.empty () )
+			{
+				if ( m_entity_names.size () <= id )
+				{
+					m_entity_names.resize ( id + 1 );
+				}
+				m_entity_names[ id ] = name;
+			}
+			return id;
+		}
+	}
+
+	void EnttXSol::RemoveEntity ( Entity entity )
+	{
+		assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
+		m_registry.destroy ( GetEntity ( entity ) );
+		m_entities[ entity ].reset ();
+		m_free_ids.push ( entity );
+		if ( entity < m_entity_names.size () )
+		{
+			m_entity_names[ entity ].clear();
+		}
+	}
+
+	void EnttXSol::AttachScript ( Entity entity , std::string const& script )
+	{
+		assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
+		if ( m_scripts.find ( script ) != m_scripts.end () )
+		{
+			// for each system in the script
+			for ( auto const& system : m_scripts.at ( script ).m_systems )
+			{
+				// add all components used by this system to the entity
+				for ( auto const& component : system.second.m_used_components )
+				{
+					AttachComponent ( entity , component );
+				}
+			}
+		}
+		else
+		{
+			std::cerr << "EnttXSol::AttachScript - Script not found " << script << std::endl;
+		}
+	}
+
+	std::vector<std::optional<entt::entity>> const& EnttXSol::GetEntities ()
+	{
+		return m_entities;
+	}
+
+	std::vector<std::string> const& EnttXSol::GetEntityNames ()
+	{
+		return m_entity_names;
+	}
+
+	void EnttXSol::LoadScript ( std::string const& scriptFile )
+	{
+		m_lua.script_file ( scriptFile );
+
+		auto last_slash = scriptFile.find_last_of ( '/' ) + 1;
+		auto last_dot = scriptFile.find_last_of ( '.' );
+		auto script_name = scriptFile.substr ( last_slash , last_dot - last_slash );
+		m_scripts.insert ( { script_name, {} } );
+		auto& script = m_scripts.at ( script_name );
+
+		// process script
+		// read all components
+		std::ifstream file { scriptFile };
+		if ( file )
+		{
+			std::string line;
+			while ( std::getline ( file , line ) )
+			{
+				// next line contains a component
+				if ( line.find ( m_identifier_component ) != std::string::npos )
+				{
+					std::getline ( file , line );
+					std::string component_name;
+					std::stringstream ss;
+					ss.str ( line );
+					ss >> component_name >> component_name;
+					script.m_components.insert ( { component_name.substr ( 0 , component_name.find_first_of ( '(' ) ), {} } );
+				}
+				// if next line contains a system
+				if ( line.find ( m_identifier_system ) != std::string::npos )
+				{
+					std::getline ( file , line );
+					std::string system_name;
+					std::stringstream ss;
+					ss.str ( line );
+					ss >> system_name >> system_name;
+					system_name = system_name.substr ( 0 , system_name.find_first_of ( '(' ) );
+					script.m_systems.insert ( { system_name, {} } );
+					auto& system = script.m_systems.at ( system_name );
+
+					std::string component_name;
+					while ( line.find ( "end" ) != 0 )
+					{
+						// do stuff with function lines
+						if ( line.find ( "GetComponent" ) != std::string::npos )
+						{
+							auto first = line.find_first_of ( '\"' ) + 1;
+							component_name = line.substr ( first , line.find_last_of ( '\"' ) - first );
+							system.m_used_components.push_back ( component_name );
+						}
+
+						// get next line
+						std::getline ( file , line );
+					}
+				}
+			}
+		}
+		else
+		{
+			std::cerr << "EnttXSol::AddScript - Failed to read script." << std::endl;
+		}
+
+		// check if there is a matching component made for this system in the script
+		for ( auto& system : script.m_systems )
+		{
+			if ( auto dash_position = system.first.find_first_of ( '_' ) )
+			{
+				auto const name_to_match = system.first.substr ( dash_position , system.first.length () - dash_position );
+				for ( auto const& component : script.m_components )
+				{
+					if ( component.first.find ( name_to_match ) != std::string::npos )
+					{
+						// add matching component as system required component
+						system.second.m_used_components.push_back ( component.first );
+					}
+				}
+			}
+		}
+
+		// load all systems found in script as a sol::function
+		for ( auto const& system : script.m_systems )
+		{
+			m_sol_functions.insert ( { system.first, m_lua[ system.first ] } );
+		}
+	}
+
+	void EnttXSol::LoadSystem ( std::string const& name )
+	{
+		m_sol_functions.insert ( { name, m_lua[ name ] } );
+	}
+
+	void EnttXSol::AttachComponent ( Entity id , std::string const& name )
+	{
+		sol::function component = m_lua[ name ] ();
+		auto& storage = GetStorage<sol::table> ( name );
+		if ( !storage.contains ( this->operator[]( id ) ) )
+		{
+			storage.emplace ( this->operator[]( id ) ) = component ();
+		}
+	}
+
+	entt::runtime_view EnttXSol::GetView ( std::vector<std::string> const& components )
+	{
+		entt::runtime_view view {};
+		for ( auto component : components )
+		{
+			view.iterate ( GetStorage<sol::table> ( component ) );
+		}
+		return view;
+	}
+}

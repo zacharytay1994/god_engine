@@ -87,5 +87,34 @@ namespace god
 		private:
 			DataType m_data;
 		};
+
+		// template stuff
+		template < typename...T >
+		using TYPE_PACK = std::tuple< T... >;
+
+		template < size_t I = 0 , typename...T , typename Function , typename...FArgs >
+		typename std::enable_if< I == sizeof...( T ) , void >::type
+			GetType ( std::tuple< T... > tuple , size_t index , Function function , FArgs...functionArgs )
+		{
+			( tuple );
+			( index );
+			std::cerr << "god::T_Manip::GetType - Index out of bound of tuple" << std::endl;
+		}
+
+		template < size_t I = 0 , typename...T , typename Function , typename...FArgs >
+		typename std::enable_if < I < sizeof...( T ) , void >::type
+			GetType ( std::tuple< T... > tuple , size_t index , Function function , FArgs...functionArgs )
+		{
+			if ( index == I )
+			{
+				using TYPE = decltype( std::get<I> ( tuple ) );
+
+				//... do some logic
+				function.operator() < std::remove_reference_t<TYPE> > ( functionArgs... );
+
+				return;
+			}
+			GetType<I + 1> ( tuple , index , function , functionArgs... );
+		}
 	}
 }

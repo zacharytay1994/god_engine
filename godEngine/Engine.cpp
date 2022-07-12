@@ -3,6 +3,7 @@
 
 #include "OpenGL/OpenGL.h"
 #include "Window/GLFWWindow.h"
+#include "EnttXSol/EnttXSol.h"
 
 #include "Editor/Editor.h"
 #include "Editor/OpenGLEditor.h"
@@ -10,6 +11,7 @@
 #include "Editor/Window/EW_EditorStyles.h"
 #include "Editor/Window/EW_AssetImporter.h"
 #include "Editor/Window/EW_AssetManager.h"
+#include "Editor/Window/EW_SceneManager.h"
 
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>
@@ -43,6 +45,12 @@ namespace god
 
 		opengl.BuildOGLModels ( assets_3d );
 
+		// setup ecs and scripting
+		god::EnttXSol enttxsol { {"Assets/GameAssets/Scripts/test.lua", "Assets/GameAssets/Scripts/test2.lua"} };
+		/*auto e1 = enttxsol.CreateEntity ();
+		enttxsol.AttachScript ( e1 , "test" );
+		enttxsol.AttachScript ( e1 , "test2" );*/
+
 		// setup scene
 		god::Scene scene;
 		/*god::SceneObjectID skull = scene.AddSceneObject ( model_manager.GetID ( "Skull" ) , { 0.0f,0.0f,-2.0f } );
@@ -54,16 +62,19 @@ namespace god
 		// imgui editors
 		EditorResources<
 			god::GLFWWindow ,
-			god::Asset3DManager
+			god::Asset3DManager ,
+			god::EnttXSol
 		> editor_resources (
 			window ,
-			assets_3d
+			assets_3d ,
+			enttxsol
 		);
 		EditorWindows<decltype( editor_resources )> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
 		editor_windows.AddWindow<god::EW_EditorStyles> ();
 		editor_windows.AddWindow<god::EW_Asset3DImporter> ();
 		editor_windows.AddWindow<god::EW_AssetManager> ();
+		editor_windows.AddWindow<god::EW_SceneManager> ();
 
 		/*rapidjson::Document document;
 		document.SetObject ();*/
@@ -105,6 +116,7 @@ namespace god
 
 			// update scene
 			// ...
+			enttxsol.Update ();
 			//scene.GetSceneObject ( skull ).m_rotation.y += 0.0002f;
 
 			// render scene
