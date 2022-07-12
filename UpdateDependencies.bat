@@ -1,5 +1,8 @@
 rem Path presets
 Set "ExternalDependencies=./0_ExternalDependencies"
+Set "InternalDependencies=./0_InternalDependencies"
+Set "TargetDirDebug=./x64/Debug"
+Set "TargetDirRelease=./x64/Release"
 
 rem Built library paths
 rmdir /s /q "%ExternalDependencies%/Libraries/"
@@ -26,7 +29,17 @@ git clone https://github.com/assimp/assimp.git "%ExternalDependencies%/assimp/"
 cd "%ExternalDependencies%/assimp/"
 call BUILDBINARIES_EXAMPLE.bat
 cd "../../"
+
+rem copy assimp libs
 robocopy "%ExternalDependencies%/assimp/build/x64/lib/Debug" "%ExternalDependencies%/Libraries"
 robocopy "%ExternalDependencies%/assimp/build/x64/lib/Release" "%ExternalDependencies%/Libraries"
+
+rem Copy assimp dlls
+robocopy "%ExternalDependencies%/assimp/build/x64/bin/Debug" "%TargetDirDebug%" "assimp-vc142-mtd.dll"
+robocopy "%ExternalDependencies%/assimp/build/x64/bin/Release" "%TargetDirRelease%" "assimp-vc142-mt.dll"
+
+rem copy lua dlls
+robocopy "%InternalDependencies%/lua" "%TargetDirDebug%" "lua.dll"
+robocopy "%InternalDependencies%/lua" "%TargetDirRelease%" "lua.dll"
 
 pause
