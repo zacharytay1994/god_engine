@@ -11,5 +11,8 @@
 #include "framework.h"
 
 #include <iostream>
+#include <algorithm>
+#include <assert.h>
+#include <fstream>
 
 #endif //PCH_H

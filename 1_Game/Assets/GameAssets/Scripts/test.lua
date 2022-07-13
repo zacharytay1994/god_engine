@@ -1,8 +1,27 @@
 --[IsComponent]
 function C_test1()
     local var = {
+        --[SerializeInt]
         x = 3,
-        y = 1
+        --[SerializeFloat]
+        y = 1,
+        --[SerializeBool]
+        b = true,
+        --[SerializeString]
+        s = "something"
+    };
+    return function()
+        return var
+    end
+end
+
+--[IsComponent]
+function Transform()
+    local var = {
+        --[SerializeInt]
+        x = 5,
+        y = 0,
+        z = 0
     };
     return function()
         return var
@@ -28,28 +47,9 @@ function S_test1(e)
     if (e == 0) then
         c1.x = c1.x + 1
     end
-    print(c1.x)
-    print(c1.y)
-    -- test();
-    -- if (e == 0) then
-    --     c1.x = c1.x + 1;
-    -- end
-    -- print(c1.x)
-
-    -- print("hello")
-    -- print("1:")
-    -- print(e)
-    -- if (e == 0) then
-    --     c1.x = c1.x + 1
-    -- end
-    -- print("2:")
-    -- print(c1.x)
-    -- print("3:")
-    -- print(c2.x)
-    -- print(c1.x)
-    -- print("2:")
-    -- print(c2.x)
-    -- print(c1.x)
-    -- c1.x = c2.x + 1
-    -- print(component.x)
+    -- print("Hi")
+    -- local transform = GetTransform(e)
+    -- transform.x = transform.x + 1
+    GetComponent(e, "Transform")
+    GetPosition(e).x = 2;
 end

@@ -8,7 +8,7 @@ namespace god
 {
 	struct Position
 	{
-		glm::vec3 m_position;
+		float x { 0 };
 	};
 
 	struct Velocity

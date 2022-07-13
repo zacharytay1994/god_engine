@@ -1,8 +1,7 @@
 #include "../pch.h"
 #include "EnttXSol.h"
 
-#include <assert.h>
-#include <fstream>
+#include "../../godUtility/TemplateManipulation.h"
 
 namespace god
 {
@@ -15,10 +14,17 @@ namespace god
 		}
 
 		m_lua.set ( "sol_table" , sol::table () );
-		m_lua[ "GetComponent" ] = [this]( entt::entity e , std::string const& s )->sol::table
+		m_lua[ m_identifier_GetScriptComponent ] = [this]( entt::entity e , std::string const& s )->sol::table
 		{
 			return GetStorage<sol::table> ( s ).get ( e );
 		};
+
+		// register all engine components as lua types and bind their calling functions
+		EngineComponents engine_components;
+		for ( auto i = 0; i < std::tuple_size_v<EngineComponents>; ++i )
+		{
+			T_Manip::RunOnType ( engine_components , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , m_engine_component_names[ i ] );
+		}
 	}
 
 	void EnttXSol::Update ()
@@ -57,7 +63,7 @@ namespace god
 			{
 				if ( m_entity_names.size () <= id )
 				{
-					m_entity_names.resize ( id + 1 );
+					m_entity_names.resize ( static_cast< size_t >( id ) + 1 );
 				}
 				m_entity_names[ id ] = name;
 			}
@@ -72,7 +78,7 @@ namespace god
 			{
 				if ( m_entity_names.size () <= id )
 				{
-					m_entity_names.resize ( id + 1 );
+					m_entity_names.resize ( static_cast< size_t >( id ) + 1 );
 				}
 				m_entity_names[ id ] = name;
 			}
@@ -88,7 +94,70 @@ namespace god
 		m_free_ids.push ( entity );
 		if ( entity < m_entity_names.size () )
 		{
-			m_entity_names[ entity ].clear();
+			m_entity_names[ entity ].clear ();
+		}
+	}
+
+	void EnttXSol::SerializeComponents ( Entity entity ,
+		void( *Header )( std::string const& name ) ,
+		SerializeFunction<bool> SerializeBool ,
+		SerializeFunction<int> SerializeInt ,
+		SerializeFunction<float> SerializeFloat ,
+		SerializeFunction<std::string> SerializeString )
+	{
+		auto entt_id = GetEntity ( entity );
+		for ( auto const& script : m_scripts )
+		{
+			int i { 0 };
+			for ( auto const& component : script.second.m_components )
+			{
+				auto& storage = m_registry.storage<sol::table> ( entt::hashed_string ( component.first.c_str () ) );
+				if ( storage.contains ( entt_id ) )
+				{
+					if ( !component.second.m_serialize_attributes.empty () )
+					{
+						Header ( component.first );
+					}
+					auto& table = storage.get ( entt_id );
+					for ( auto const& attribute : component.second.m_serialize_attributes )
+					{
+						auto name = std::get<0> ( attribute );
+						auto type = std::get<1> ( attribute );
+						switch ( type )
+						{
+						case AttributeTypes::BOOL:
+						{
+							bool val = table.get<bool> ( name );
+							SerializeBool ( val , i , name );
+							table.set ( name , val );
+							break;
+						}
+						case AttributeTypes::INT:
+						{
+							int val = table.get<int> ( name );
+							SerializeInt ( val , i , name );
+							table.set ( name , val );
+							break;
+						}
+						case AttributeTypes::FLOAT:
+						{
+							float val = table.get<float> ( name );
+							SerializeFloat ( val , i , name );
+							table.set ( name , val );
+							break;
+						}
+						case AttributeTypes::STRING:
+						{
+							std::string val = table.get<std::string> ( name );
+							SerializeString ( val , i , name );
+							table.set ( name , val );
+							break;
+						}
+						}
+						++i;
+					}
+				}
+			}
 		}
 	}
 
@@ -113,14 +182,19 @@ namespace god
 		}
 	}
 
-	std::vector<std::optional<entt::entity>> const& EnttXSol::GetEntities ()
+	std::vector<std::optional<entt::entity>> const& EnttXSol::GetEntities ()const
 	{
 		return m_entities;
 	}
 
-	std::vector<std::string> const& EnttXSol::GetEntityNames ()
+	std::vector<std::string> const& EnttXSol::GetEntityNames ()const
 	{
 		return m_entity_names;
+	}
+
+	std::unordered_map<std::string , EnttXSol::Script> const& EnttXSol::GetScripts () const
+	{
+		return m_scripts;
 	}
 
 	void EnttXSol::LoadScript ( std::string const& scriptFile )
@@ -149,7 +223,47 @@ namespace god
 					std::stringstream ss;
 					ss.str ( line );
 					ss >> component_name >> component_name;
-					script.m_components.insert ( { component_name.substr ( 0 , component_name.find_first_of ( '(' ) ), {} } );
+					auto component = script.m_components.insert ( { component_name.substr ( 0 , component_name.find_first_of ( '(' ) ), {} } );
+
+					// loop till end of component
+					while ( line.find ( "end" ) != 0 )
+					{
+						// check if any components need serializing/gui
+						// NOTE: Assumes next line should be the attribute to serialize
+						// serialize bool
+						if ( line.find ( m_identifier_serialize_input_bool ) != std::string::npos )
+						{
+							std::getline ( file , line );
+							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
+							attribute_name.erase ( std::remove ( attribute_name.begin () , attribute_name.end () , ' ' ) , attribute_name.end () );
+							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::BOOL } );
+						}
+						// serialize int
+						else if ( line.find ( m_identifier_serialize_input_int ) != std::string::npos )
+						{
+							std::getline ( file , line );
+							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
+							attribute_name.erase ( std::remove ( attribute_name.begin () , attribute_name.end () , ' ' ) , attribute_name.end () );
+							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::INT } );
+						}
+						// serialize float
+						else if ( line.find ( m_identifier_serialize_input_float ) != std::string::npos )
+						{
+							std::getline ( file , line );
+							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
+							attribute_name.erase ( std::remove ( attribute_name.begin () , attribute_name.end () , ' ' ) , attribute_name.end () );
+							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::FLOAT } );
+						}
+						// serialize string
+						else if ( line.find ( m_identifier_serialize_input_string ) != std::string::npos )
+						{
+							std::getline ( file , line );
+							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
+							attribute_name.erase ( std::remove ( attribute_name.begin () , attribute_name.end () , ' ' ) , attribute_name.end () );
+							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::STRING } );
+						}
+						std::getline ( file , line );
+					}
 				}
 				// if next line contains a system
 				if ( line.find ( m_identifier_system ) != std::string::npos )
@@ -166,12 +280,16 @@ namespace god
 					std::string component_name;
 					while ( line.find ( "end" ) != 0 )
 					{
-						// do stuff with function lines
-						if ( line.find ( "GetComponent" ) != std::string::npos )
+						// do stuff with function lines that are not commented out
+						if ( line.find ( "--" ) == std::string::npos &&
+							line.find ( m_identifier_GetScriptComponent ) != std::string::npos )
 						{
 							auto first = line.find_first_of ( '\"' ) + 1;
 							component_name = line.substr ( first , line.find_last_of ( '\"' ) - first );
-							system.m_used_components.push_back ( component_name );
+							if ( std::find ( system.m_used_components.begin () , system.m_used_components.end () , component_name ) == system.m_used_components.end () )
+							{
+								system.m_used_components.push_back ( component_name );
+							}
 						}
 
 						// get next line
@@ -193,7 +311,8 @@ namespace god
 				auto const name_to_match = system.first.substr ( dash_position , system.first.length () - dash_position );
 				for ( auto const& component : script.m_components )
 				{
-					if ( component.first.find ( name_to_match ) != std::string::npos )
+					if ( component.first.find ( name_to_match ) != std::string::npos &&
+						std::find ( system.second.m_used_components.begin () , system.second.m_used_components.end () , component.first ) == system.second.m_used_components.end () )
 					{
 						// add matching component as system required component
 						system.second.m_used_components.push_back ( component.first );

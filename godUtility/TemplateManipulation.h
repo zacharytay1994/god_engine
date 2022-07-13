@@ -94,7 +94,7 @@ namespace god
 
 		template < size_t I = 0 , typename...T , typename Function , typename...FArgs >
 		typename std::enable_if< I == sizeof...( T ) , void >::type
-			GetType ( std::tuple< T... > tuple , size_t index , Function function , FArgs...functionArgs )
+			RunOnType ( std::tuple< T... > tuple , size_t index , Function function , FArgs...functionArgs )
 		{
 			( tuple );
 			( index );
@@ -103,7 +103,7 @@ namespace god
 
 		template < size_t I = 0 , typename...T , typename Function , typename...FArgs >
 		typename std::enable_if < I < sizeof...( T ) , void >::type
-			GetType ( std::tuple< T... > tuple , size_t index , Function function , FArgs...functionArgs )
+			RunOnType ( std::tuple< T... > tuple , size_t index , Function function , FArgs...functionArgs )
 		{
 			if ( index == I )
 			{
@@ -114,7 +114,7 @@ namespace god
 
 				return;
 			}
-			GetType<I + 1> ( tuple , index , function , functionArgs... );
+			RunOnType<I + 1> ( tuple , index , function , functionArgs... );
 		}
 	}
 }
