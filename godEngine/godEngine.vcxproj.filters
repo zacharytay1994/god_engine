@@ -108,6 +108,12 @@
     <ClInclude Include="EnttXSol\EngineComponents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnttXSol\EngineComponents\EC_All.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -165,9 +171,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EnttXSol\EnttXSol.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EnttXSol\EngineComponents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

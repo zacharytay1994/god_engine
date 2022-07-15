@@ -5,6 +5,8 @@
 #include "Window/GLFWWindow.h"
 #include "EnttXSol/EnttXSol.h"
 
+#include "EnttXSol/EngineComponents/EC_All.h"
+
 #include "Editor/Editor.h"
 #include "Editor/OpenGLEditor.h"
 #include "Editor/Window/EW_MainMenuBar.h"
@@ -47,9 +49,12 @@ namespace god
 
 		// setup ecs and scripting
 		god::EnttXSol enttxsol { {"Assets/GameAssets/Scripts/test.lua", "Assets/GameAssets/Scripts/test2.lua"} };
-		using EngineComponentType = EngineComponents<Position>;
-		EngineComponentType engine_components ( { "Position" } );
+		god::EngineComponentType engine_components ( g_EngineComponents );
 		enttxsol.BindEngineComponents ( engine_components );
+		enttxsol.RegisterLuaType<glm::vec3> ( "vec3" ,
+			"x" , &glm::vec3::x ,
+			"y" , &glm::vec3::y ,
+			"z" , &glm::vec3::z );
 		/*auto e1 = enttxsol.CreateEntity ();
 		enttxsol.AttachScript ( e1 , "test" );
 		enttxsol.AttachScript ( e1 , "test2" );*/

@@ -111,6 +111,8 @@
     <ClInclude Include="Editor\Window\TestWindow2.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="EnttXSol\EngineComponents.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_All.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
     <ClInclude Include="EnttXSol\EnttXSol.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="godEngine.h" />
@@ -145,10 +147,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="EnttXSol\EngineComponents.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="EnttXSol\EnttXSol.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>

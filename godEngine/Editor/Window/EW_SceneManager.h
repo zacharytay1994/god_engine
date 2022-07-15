@@ -85,7 +85,7 @@ namespace god
 							if ( !m_selected_script.empty () )
 							{
 								enttxsol.AttachScript ( m_selected_entity , m_selected_script );
-								enttxsol.AttachComponent<Position> ( m_selected_entity );
+								enttxsol.AttachComponent<Transform> ( m_selected_entity );
 							}
 							m_selected_script.clear ();
 							ImGui::CloseCurrentPopup ();
@@ -98,10 +98,11 @@ namespace god
 				if ( m_selected_entity != EnttXSol::NullEntity )
 				{
 					// display all engine components
-					enttxsol.SerializeEngineComponents ( m_selected_entity , engine_components );
+					int uid { 0 };
+					enttxsol.SerializeEngineComponents ( m_selected_entity , uid , engine_components );
 
 					// display all scripts components
-					enttxsol.SerializeScriptComponents ( m_selected_entity ,
+					enttxsol.SerializeScriptComponents ( m_selected_entity , uid ,
 						[]( std::string const& name )
 						{
 							ImGui::Separator ();

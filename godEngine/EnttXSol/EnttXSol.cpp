@@ -89,7 +89,7 @@ namespace god
 		}
 	}
 
-	void EnttXSol::SerializeScriptComponents ( Entity entity ,
+	void EnttXSol::SerializeScriptComponents ( Entity entity , int imguiUniqueID ,
 		void( *Header )( std::string const& name ) ,
 		SerializeFunction<bool> SerializeBool ,
 		SerializeFunction<int> SerializeInt ,
@@ -99,7 +99,7 @@ namespace god
 		auto entt_id = GetEntity ( entity );
 		for ( auto const& script : m_scripts )
 		{
-			int i { 0 };
+			int i { imguiUniqueID };
 			for ( auto const& component : script.second.m_components )
 			{
 				auto& storage = m_registry.storage<sol::table> ( entt::hashed_string ( component.first.c_str () ) );

@@ -51,6 +51,8 @@ namespace god
 		void Update ();
 		template<typename EngineComponentsType>
 		void BindEngineComponents ( EngineComponentsType const& components );
+		template<typename T , typename ...Args>
+		void RegisterLuaType ( std::string const& name , Args...args );
 
 		entt::entity operator[]( Entity entity );
 		entt::entity GetEntity ( Entity entity );
@@ -58,10 +60,10 @@ namespace god
 		void RemoveEntity ( Entity entity );
 
 		template<typename EngineComponentsType>
-		void SerializeEngineComponents ( Entity entity , EngineComponentsType const& components );
+		void SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EngineComponentsType const& components );
 		template<typename T>
 		using SerializeFunction = void( * )( T& val , int i , std::string const& name );
-		void SerializeScriptComponents ( Entity entity ,
+		void SerializeScriptComponents ( Entity entity , int imguiUniqueID ,
 			void( *Header )( std::string const& name ) ,
 			SerializeFunction<bool> SerializeBool ,
 			SerializeFunction<int> SerializeInt ,
@@ -121,7 +123,7 @@ namespace god
 					[&registry]( entt::entity e )->T&
 				{
 					auto& component = registry.get<T> ( e );
-					std::cout << component.x << std::endl;
+					std::cout << component.m_position.x << std::endl;
 					return registry.get<T> ( e );
 				};
 				std::cout << "Bound " << name << std::endl;
@@ -139,13 +141,19 @@ namespace god
 		}
 	}
 
+	template<typename T , typename ...Args>
+	inline void EnttXSol::RegisterLuaType ( std::string const& name , Args ...args )
+	{
+		m_lua.new_usertype<T> ( name , sol::constructors<T ()> () , args... );
+	}
+
 	template<typename EngineComponentsType>
-	inline void EnttXSol::SerializeEngineComponents ( Entity entity , EngineComponentsType const& components )
+	inline void EnttXSol::SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EngineComponentsType const& components )
 	{
 		// register all engine components as lua types and bind their calling functions
 		for ( auto i = 0; i < std::tuple_size_v<EngineComponentsType::Components>; ++i )
 		{
-			T_Manip::RunOnType ( EngineComponentsType::Components () , i , ComponentInspector () , GetEntity ( entity ) , std::ref ( m_registry ) );
+			T_Manip::RunOnType ( EngineComponentsType::Components () , i , ComponentInspector () , GetEntity ( entity ) , std::ref ( m_registry ) , imguiUniqueID );
 		}
 	}
 
