@@ -1,8 +1,6 @@
 #include "../pch.h"
 #include "EnttXSol.h"
 
-#include "../../godUtility/TemplateManipulation.h"
-
 namespace god
 {
 	EnttXSol::EnttXSol ( std::vector<std::string> scriptFiles )
@@ -18,13 +16,6 @@ namespace god
 		{
 			return GetStorage<sol::table> ( s ).get ( e );
 		};
-
-		// register all engine components as lua types and bind their calling functions
-		EngineComponents engine_components;
-		for ( auto i = 0; i < std::tuple_size_v<EngineComponents>; ++i )
-		{
-			T_Manip::RunOnType ( engine_components , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , m_engine_component_names[ i ] );
-		}
 	}
 
 	void EnttXSol::Update ()
@@ -98,7 +89,7 @@ namespace god
 		}
 	}
 
-	void EnttXSol::SerializeComponents ( Entity entity ,
+	void EnttXSol::SerializeScriptComponents ( Entity entity ,
 		void( *Header )( std::string const& name ) ,
 		SerializeFunction<bool> SerializeBool ,
 		SerializeFunction<int> SerializeInt ,

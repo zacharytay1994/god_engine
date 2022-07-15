@@ -78,6 +78,12 @@ namespace god
 				return std::get<WRAP<TYPE>> ( m_data );
 			}
 
+			template <size_t I>
+			auto& Get ()
+			{
+				return std::get<I> ( m_data );
+			}
+
 			template <typename TYPE>
 			constexpr bool Has () const
 			{

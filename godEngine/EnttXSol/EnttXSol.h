@@ -5,7 +5,8 @@
 #include <entt.hpp>
 #include <sol/sol.hpp>
 
-#include "InBuiltComponents.h"
+#include "../../godUtility/TemplateManipulation.h"
+#include "EngineComponents.h"
 
 #include <string>
 #include <unordered_map>
@@ -48,15 +49,19 @@ namespace god
 	public:
 		EnttXSol ( std::vector<std::string> scriptFiles );
 		void Update ();
+		template<typename EngineComponentsType>
+		void BindEngineComponents ( EngineComponentsType const& components );
 
 		entt::entity operator[]( Entity entity );
 		entt::entity GetEntity ( Entity entity );
 		Entity CreateEntity ( std::string const& name = "" );
 		void RemoveEntity ( Entity entity );
 
+		template<typename EngineComponentsType>
+		void SerializeEngineComponents ( Entity entity , EngineComponentsType const& components );
 		template<typename T>
 		using SerializeFunction = void( * )( T& val , int i , std::string const& name );
-		void SerializeComponents ( Entity entity ,
+		void SerializeScriptComponents ( Entity entity ,
 			void( *Header )( std::string const& name ) ,
 			SerializeFunction<bool> SerializeBool ,
 			SerializeFunction<int> SerializeInt ,
@@ -108,8 +113,8 @@ namespace god
 			void operator()( sol::state& luaState , entt::registry& registry , std::string const& name )
 			{
 				// set the type in lua
-				sol::usertype<T> new_type = luaState.new_usertype<T> ( name , sol::constructors<T ()> () );
-				new_type[ "x" ] = &T::x;
+				NewLuaType<T> ( luaState , name );
+
 				// set the calling function to get the type
 				std::string key { "Get" };
 				luaState[ ( key + name ).c_str () ] =
@@ -122,11 +127,27 @@ namespace god
 				std::cout << "Bound " << name << std::endl;
 			}
 		};
-		using EngineComponents = std::tuple<Position /*, Velocity*/>;
-		std::array<std::string , std::tuple_size_v<EngineComponents>> m_engine_component_names {
-			"Position"/*, "Velocity"*/
-		};
 	};
+
+	template<typename EngineComponentsType>
+	inline void EnttXSol::BindEngineComponents ( EngineComponentsType const& components )
+	{
+		// register all engine components as lua types and bind their calling functions
+		for ( auto i = 0; i < std::tuple_size_v<EngineComponentsType::Components>; ++i )
+		{
+			T_Manip::RunOnType ( EngineComponentsType::Components () , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , components.m_component_names[ i ] );
+		}
+	}
+
+	template<typename EngineComponentsType>
+	inline void EnttXSol::SerializeEngineComponents ( Entity entity , EngineComponentsType const& components )
+	{
+		// register all engine components as lua types and bind their calling functions
+		for ( auto i = 0; i < std::tuple_size_v<EngineComponentsType::Components>; ++i )
+		{
+			T_Manip::RunOnType ( EngineComponentsType::Components () , i , ComponentInspector () , GetEntity ( entity ) , std::ref ( m_registry ) );
+		}
+	}
 
 	template<typename T>
 	inline void EnttXSol::AttachComponent ( Entity id )

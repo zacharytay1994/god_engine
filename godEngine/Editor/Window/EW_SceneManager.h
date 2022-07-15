@@ -27,6 +27,7 @@ namespace god
 		( dt );
 
 		auto& enttxsol = editorResources.Get<EnttXSol> ().get ();
+		auto& engine_components = editorResources.Get<3> ().get ();
 		auto& entity_names = enttxsol.GetEntityNames ();
 
 		ImGui::Begin ( "SceneManager" );
@@ -96,8 +97,11 @@ namespace god
 
 				if ( m_selected_entity != EnttXSol::NullEntity )
 				{
-					// display all scripts/components
-					enttxsol.SerializeComponents ( m_selected_entity ,
+					// display all engine components
+					enttxsol.SerializeEngineComponents ( m_selected_entity , engine_components );
+
+					// display all scripts components
+					enttxsol.SerializeScriptComponents ( m_selected_entity ,
 						[]( std::string const& name )
 						{
 							ImGui::Separator ();

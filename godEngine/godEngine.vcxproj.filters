@@ -102,13 +102,10 @@
     <ClInclude Include="EnttXSol\EnttXSol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EnttXSol\InBuiltComponents.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\Component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Editor\Window\EW_SceneManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnttXSol\EngineComponents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -168,6 +165,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EnttXSol\EnttXSol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EnttXSol\EngineComponents.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

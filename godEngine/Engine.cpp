@@ -47,6 +47,9 @@ namespace god
 
 		// setup ecs and scripting
 		god::EnttXSol enttxsol { {"Assets/GameAssets/Scripts/test.lua", "Assets/GameAssets/Scripts/test2.lua"} };
+		using EngineComponentType = EngineComponents<Position>;
+		EngineComponentType engine_components ( { "Position" } );
+		enttxsol.BindEngineComponents ( engine_components );
 		/*auto e1 = enttxsol.CreateEntity ();
 		enttxsol.AttachScript ( e1 , "test" );
 		enttxsol.AttachScript ( e1 , "test2" );*/
@@ -63,11 +66,13 @@ namespace god
 		EditorResources<
 			god::GLFWWindow ,
 			god::Asset3DManager ,
-			god::EnttXSol
+			god::EnttXSol ,
+			EngineComponentType
 		> editor_resources (
 			window ,
 			assets_3d ,
-			enttxsol
+			enttxsol ,
+			engine_components
 		);
 		EditorWindows<decltype( editor_resources )> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
