@@ -6,6 +6,7 @@
 #include <sol/sol.hpp>
 
 #include "../../godUtility/TemplateManipulation.h"
+//#include "EngineComponents/EC_All.h"
 #include "EngineComponents.h"
 
 #include <string>
@@ -38,7 +39,8 @@ namespace god
 		};
 		struct SystemData
 		{
-			std::vector<std::string> m_used_components;
+			std::vector<std::string> m_used_script_components;
+			std::vector<std::string> m_used_engine_components;
 		};
 		struct Script
 		{
@@ -72,12 +74,19 @@ namespace god
 
 		template<typename T>
 		void AttachComponent ( Entity id );
-		void AttachScript ( Entity entity , std::string const& script );
+		template<typename T>
+		void AttachScript ( Entity entity , std::string const& script , T const& engineComponents );
 
 		std::vector<std::optional<entt::entity>> const& GetEntities () const;
 		std::vector<std::string> const& GetEntityNames () const;
 		std::unordered_map<std::string , Script> const& GetScripts () const;
 
+		// helper functor to attach script components
+		struct AttachEngineComponent
+		{
+			template<typename T>
+			void operator () ( EnttXSol* enttxsol , Entity e );
+		};
 	private:
 		sol::state m_lua;
 		entt::registry m_registry;
@@ -123,7 +132,6 @@ namespace god
 					[&registry]( entt::entity e )->T&
 				{
 					auto& component = registry.get<T> ( e );
-					std::cout << component.m_position.x << std::endl;
 					return registry.get<T> ( e );
 				};
 				std::cout << "Bound " << name << std::endl;
@@ -164,10 +172,49 @@ namespace god
 	}
 
 	template<typename T>
+	inline void EnttXSol::AttachScript ( Entity entity , std::string const& script , T const& engineComponents )
+	{
+		assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
+		if ( m_scripts.find ( script ) != m_scripts.end () )
+		{
+			// for each system in the script
+			for ( auto const& system : m_scripts.at ( script ).m_systems )
+			{
+				// add all script components used by this system to the entity
+				for ( auto const& component : system.second.m_used_script_components )
+				{
+					AttachComponent ( entity , component );
+				}
+				// add all engine components used by this system to the entity
+				auto const& engine_component_names = engineComponents.m_component_names;
+				for ( auto const& component : system.second.m_used_engine_components )
+				{
+					for ( int i = 0; i < engine_component_names.size (); ++i )
+					{
+						if ( engine_component_names[ i ] == component )
+						{
+							T_Manip::RunOnType ( T::Components () , i , AttachEngineComponent () , this , entity );
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			std::cerr << "EnttXSol::AttachScript - Script not found " << script << std::endl;
+		}
+	}
+
+	template<typename T>
 	inline auto&& EnttXSol::GetStorage ( std::string const& name )
 	{
 		return m_registry.storage<T> ( entt::hashed_string ( name.c_str () ) );
 	}
 
 	using Entity = EnttXSol::Entity;
+	template<typename T>
+	inline void EnttXSol::AttachEngineComponent::operator()( EnttXSol* enttxsol , Entity e )
+	{
+		enttxsol->AttachComponent<T> ( e );
+	}
 }

@@ -114,6 +114,12 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_All.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EnttXSol\EngineComponents\EC_Kinematics3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

@@ -27,7 +27,7 @@ namespace god
 			// i.e. process all entities
 			for ( auto const& system : script.second.m_systems )
 			{
-				GetView ( system.second.m_used_components ).each ( m_sol_functions[ system.first ] );
+				GetView ( system.second.m_used_script_components ).each ( m_sol_functions[ system.first ] );
 			}
 		}
 	}
@@ -152,26 +152,31 @@ namespace god
 		}
 	}
 
-	void EnttXSol::AttachScript ( Entity entity , std::string const& script )
-	{
-		assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
-		if ( m_scripts.find ( script ) != m_scripts.end () )
-		{
-			// for each system in the script
-			for ( auto const& system : m_scripts.at ( script ).m_systems )
-			{
-				// add all components used by this system to the entity
-				for ( auto const& component : system.second.m_used_components )
-				{
-					AttachComponent ( entity , component );
-				}
-			}
-		}
-		else
-		{
-			std::cerr << "EnttXSol::AttachScript - Script not found " << script << std::endl;
-		}
-	}
+	//void EnttXSol::AttachScript ( Entity entity , std::string const& script )
+	//{
+	//	assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
+	//	if ( m_scripts.find ( script ) != m_scripts.end () )
+	//	{
+	//		// for each system in the script
+	//		for ( auto const& system : m_scripts.at ( script ).m_systems )
+	//		{
+	//			// add all script components used by this system to the entity
+	//			for ( auto const& component : system.second.m_used_script_components )
+	//			{
+	//				AttachComponent ( entity , component );
+	//			}
+	//			// add all engine components used by this system to the entity
+	//			for ( auto const& component : system.second.m_used_engine_components )
+	//			{
+	//				
+	//			}
+	//		}
+	//	}
+	//	else
+	//	{
+	//		std::cerr << "EnttXSol::AttachScript - Script not found " << script << std::endl;
+	//	}
+	//}
 
 	std::vector<std::optional<entt::entity>> const& EnttXSol::GetEntities ()const
 	{
@@ -272,14 +277,31 @@ namespace god
 					while ( line.find ( "end" ) != 0 )
 					{
 						// do stuff with function lines that are not commented out
-						if ( line.find ( "--" ) == std::string::npos &&
-							line.find ( m_identifier_GetScriptComponent ) != std::string::npos )
+						if ( line.find ( "--" ) == std::string::npos )
 						{
-							auto first = line.find_first_of ( '\"' ) + 1;
-							component_name = line.substr ( first , line.find_last_of ( '\"' ) - first );
-							if ( std::find ( system.m_used_components.begin () , system.m_used_components.end () , component_name ) == system.m_used_components.end () )
+							// find GetScriptComponent lines
+							if ( line.find ( m_identifier_GetScriptComponent ) != std::string::npos )
 							{
-								system.m_used_components.push_back ( component_name );
+								auto first = line.find_first_of ( '\"' ) + 1;
+								component_name = line.substr ( first , line.find_last_of ( '\"' ) - first );
+								if ( std::find ( system.m_used_script_components.begin () , system.m_used_script_components.end () , component_name ) == system.m_used_script_components.end () )
+								{
+									system.m_used_script_components.push_back ( component_name );
+								}
+							}
+							// find Get... engine component lines
+							// identified with a "Get" and no "", more robust test might be neededs
+							std::string get_key { "Get" };
+							if ( line.find ( get_key ) != std::string::npos &&
+								line.find ( "\"" ) == std::string::npos )
+							{
+								auto get = line.find ( get_key );
+								auto ss = line.substr ( get , line.size () - get );
+								ss = ss.substr ( get_key.length () , ss.find_first_of ( "(" ) - get_key.length () );
+								if ( std::find ( system.m_used_engine_components.begin () , system.m_used_engine_components.end () , ss ) == system.m_used_engine_components.end () )
+								{
+									system.m_used_engine_components.push_back ( ss );
+								}
 							}
 						}
 
@@ -303,10 +325,10 @@ namespace god
 				for ( auto const& component : script.m_components )
 				{
 					if ( component.first.find ( name_to_match ) != std::string::npos &&
-						std::find ( system.second.m_used_components.begin () , system.second.m_used_components.end () , component.first ) == system.second.m_used_components.end () )
+						std::find ( system.second.m_used_script_components.begin () , system.second.m_used_script_components.end () , component.first ) == system.second.m_used_script_components.end () )
 					{
 						// add matching component as system required component
-						system.second.m_used_components.push_back ( component.first );
+						system.second.m_used_script_components.push_back ( component.first );
 					}
 				}
 			}

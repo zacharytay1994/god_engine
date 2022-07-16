@@ -84,8 +84,7 @@ namespace god
 						{
 							if ( !m_selected_script.empty () )
 							{
-								enttxsol.AttachScript ( m_selected_entity , m_selected_script );
-								enttxsol.AttachComponent<Transform> ( m_selected_entity );
+								enttxsol.AttachScript ( m_selected_entity , m_selected_script , engine_components );
 							}
 							m_selected_script.clear ();
 							ImGui::CloseCurrentPopup ();
