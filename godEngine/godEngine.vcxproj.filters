@@ -105,7 +105,7 @@
     <ClInclude Include="Editor\Window\EW_SceneManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EnttXSol\EngineComponents.h">
+    <ClInclude Include="EnttXSol\EngineComponents\EngineComponents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h">
@@ -118,6 +118,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnttXSol\EngineSystems\ES_All.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

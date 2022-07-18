@@ -41,7 +41,6 @@ namespace god
 					ImGui::InputText ( "##EntityName" , &m_create_entity_name );
 					if ( ImGui::Button ( "Create With Name" ) )
 					{
-						//enttxsol.AttachComponent<Transform> ( enttxsol.CreateEntity ( m_create_entity_name ) );
 						enttxsol.CreateEntity ( m_create_entity_name );
 						m_create_entity_name = { "no_name" };
 					}

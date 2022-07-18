@@ -104,6 +104,8 @@ namespace god
 		{
 			( tuple );
 			( index );
+			( function );
+			( functionArgs , ... );
 			std::cerr << "god::T_Manip::GetType - Index out of bound of tuple" << std::endl;
 		}
 

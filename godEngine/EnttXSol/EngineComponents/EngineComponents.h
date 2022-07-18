@@ -3,8 +3,8 @@
 #define SOL_ALL_SAFETIES_ON 1
 #include <sol/sol.hpp>
 #include <entt.hpp>
-#include "../imgui/imgui.h"
-#include "../imgui/imgui_stdlib.h"
+#include "../../imgui/imgui.h"
+#include "../../imgui/imgui_stdlib.h"
 
 #include <tuple>
 #include <string>

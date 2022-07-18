@@ -20,6 +20,12 @@ namespace god
 
 	void EnttXSol::Update ()
 	{
+		// update engine systems
+		if ( m_engine_update )
+		{
+			m_engine_update ( *this );
+		}
+		// update script systems
 		// for each script in loaded scripts
 		for ( auto const& script : m_scripts )
 		{
@@ -30,6 +36,11 @@ namespace god
 				GetView ( system.second.m_used_script_components ).each ( m_sol_functions[ system.first ] );
 			}
 		}
+	}
+
+	void EnttXSol::BindEngineSystemUpdate ( void( *update )( EnttXSol& ) )
+	{
+		m_engine_update = update;
 	}
 
 	entt::entity EnttXSol::operator[]( Entity entity )
@@ -296,11 +307,11 @@ namespace god
 								line.find ( "\"" ) == std::string::npos )
 							{
 								auto get = line.find ( get_key );
-								auto ss = line.substr ( get , line.size () - get );
-								ss = ss.substr ( get_key.length () , ss.find_first_of ( "(" ) - get_key.length () );
-								if ( std::find ( system.m_used_engine_components.begin () , system.m_used_engine_components.end () , ss ) == system.m_used_engine_components.end () )
+								auto engine_component_name = line.substr ( get , line.size () - get );
+								engine_component_name = engine_component_name.substr ( get_key.length () , engine_component_name.find_first_of ( "(" ) - get_key.length () );
+								if ( std::find ( system.m_used_engine_components.begin () , system.m_used_engine_components.end () , engine_component_name ) == system.m_used_engine_components.end () )
 								{
-									system.m_used_engine_components.push_back ( ss );
+									system.m_used_engine_components.push_back ( engine_component_name );
 								}
 							}
 						}

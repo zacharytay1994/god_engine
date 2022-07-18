@@ -6,8 +6,7 @@
 #include <sol/sol.hpp>
 
 #include "../../godUtility/TemplateManipulation.h"
-//#include "EngineComponents/EC_All.h"
-#include "EngineComponents.h"
+#include "EngineComponents/EngineComponents.h"
 
 #include <string>
 #include <unordered_map>
@@ -55,6 +54,9 @@ namespace god
 		void BindEngineComponents ( EngineComponentsType const& components );
 		template<typename T , typename ...Args>
 		void RegisterLuaType ( std::string const& name , Args...args );
+		template<typename ...T>
+		void RunEngineSystem ( void( *system )( T... ) );
+		void BindEngineSystemUpdate ( void( *update )( EnttXSol& ) );
 
 		entt::entity operator[]( Entity entity );
 		entt::entity GetEntity ( Entity entity );
@@ -109,6 +111,8 @@ namespace god
 
 		std::unordered_map<std::string , Script> m_scripts;
 		std::unordered_map<std::string , sol::function> m_sol_functions;
+		
+		void( *m_engine_update )( EnttXSol& ) = nullptr;
 
 		void LoadScript ( std::string const& scriptFile );
 		void LoadSystem ( std::string const& name );
@@ -131,7 +135,6 @@ namespace god
 				luaState[ ( key + name ).c_str () ] =
 					[&registry]( entt::entity e )->T&
 				{
-					auto& component = registry.get<T> ( e );
 					return registry.get<T> ( e );
 				};
 				std::cout << "Bound " << name << std::endl;
@@ -155,9 +158,17 @@ namespace god
 		m_lua.new_usertype<T> ( name , sol::constructors<T ()> () , args... );
 	}
 
+	template<typename ...T>
+	inline void EnttXSol::RunEngineSystem ( void( *system )( T... ) )
+	{
+		auto view = m_registry.view<std::remove_reference<T>::type...> ();
+		view.each ( system );
+	}
+
 	template<typename EngineComponentsType>
 	inline void EnttXSol::SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EngineComponentsType const& components )
 	{
+		( components );
 		// register all engine components as lua types and bind their calling functions
 		for ( auto i = 0; i < std::tuple_size_v<EngineComponentsType::Components>; ++i )
 		{

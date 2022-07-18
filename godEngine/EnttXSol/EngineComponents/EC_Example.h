@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../EngineComponents.h"
+#include "EngineComponents.h"
 
 namespace god
 {
@@ -25,6 +25,8 @@ namespace god
 		RegisterInspector<ExampleComponent> ( entity , registry , imguiUniqueID ,
 			[]( ExampleComponent& component )
 			{
+				ImGui::Text ( "Example Component" );
+				ImGui::Separator ();
 				ImGui::Text ( "This is an example engine component" );
 				ImGui::InputFloat ( "a float" , &component.f );
 				ImGui::InputText ( "a string" , &component.s );

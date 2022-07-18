@@ -6,6 +6,7 @@
 #include "EnttXSol/EnttXSol.h"
 
 #include "EnttXSol/EngineComponents/EC_All.h"
+#include "EnttXSol/EngineSystems/ES_All.h"
 
 #include "Editor/Editor.h"
 #include "Editor/OpenGLEditor.h"
@@ -51,6 +52,7 @@ namespace god
 		god::EnttXSol enttxsol { {"Assets/GameAssets/Scripts/test.lua", "Assets/GameAssets/Scripts/test2.lua"} };
 		god::EngineComponentType engine_components ( g_EngineComponents );
 		enttxsol.BindEngineComponents ( engine_components );
+		enttxsol.BindEngineSystemUpdate ( EngineSystems );
 		enttxsol.RegisterLuaType<glm::vec3> ( "vec3" ,
 			"x" , &glm::vec3::x ,
 			"y" , &glm::vec3::y ,

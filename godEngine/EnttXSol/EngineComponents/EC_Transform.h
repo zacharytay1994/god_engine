@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../EngineComponents.h"
+#include "EngineComponents.h"
+
+#include <glm/glm/glm.hpp>
 
 namespace god
 {
@@ -25,6 +27,8 @@ namespace god
 		RegisterInspector<Transform> ( entity , registry , imguiUniqueID ,
 			[]( Transform& component )
 			{
+				ImGui::Text ( "Transform" );
+				ImGui::Separator ();
 				auto width = ImGui::GetWindowWidth ();
 				ImGui::SetNextItemWidth ( width / 4 );
 				ImGui::InputFloat ( "##x" , &component.m_position.x );

@@ -52,10 +52,10 @@ function S_test1(e)
     -- transform.x = transform.x + 1
     -- GetComponent(e, "Transform")
     local p = GetTransform(e)
-    p.position.x = 2
+    -- p.position.x = 2
     p.position.y = 3
     p.scale.y = 5.6
 
     local eg = GetExampleComponent(e)
-    print(eg.s)
+    -- print(eg.s)
 end
