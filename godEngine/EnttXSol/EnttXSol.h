@@ -51,7 +51,9 @@ namespace god
 		EnttXSol ( std::vector<std::string> scriptFiles );
 		void Update ();
 		template<typename EngineComponentsType>
-		void BindEngineComponents ( EngineComponentsType const& components );
+		void BindEngineComponents ();
+		//template<typename EngineComponentsType>
+		//void BindEngineComponents ( EngineComponentsType const& components );
 		template<typename T , typename ...Args>
 		void RegisterLuaType ( std::string const& name , Args...args );
 		template<typename ...T>
@@ -63,8 +65,8 @@ namespace god
 		Entity CreateEntity ( std::string const& name = "" );
 		void RemoveEntity ( Entity entity );
 
-		template<typename EngineComponentsType>
-		void SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EngineComponentsType const& components );
+		template<typename EngineComponentsType , typename EDITOR_RESOURCES>
+		void SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EDITOR_RESOURCES& resources );
 		template<typename T>
 		using SerializeFunction = void( * )( T& val , int i , std::string const& name );
 		void SerializeScriptComponents ( Entity entity , int imguiUniqueID ,
@@ -77,11 +79,17 @@ namespace god
 		template<typename T>
 		void AttachComponent ( Entity id );
 		template<typename T>
-		void AttachScript ( Entity entity , std::string const& script , T const& engineComponents );
+		void AttachScript ( Entity entity , std::string const& script );
+		template<typename T>
+		void AttachScriptSystem ( Entity entity , std::string const& scriptSystem );
 
 		std::vector<std::optional<entt::entity>> const& GetEntities () const;
 		std::vector<std::string> const& GetEntityNames () const;
 		std::unordered_map<std::string , Script> const& GetScripts () const;
+
+		// S = scene, T = transform, R = renderable
+		template <typename S , typename T , typename R>
+		void PopulateScene ( S& scene );
 
 		// helper functor to attach script components
 		struct AttachEngineComponent
@@ -111,7 +119,7 @@ namespace god
 
 		std::unordered_map<std::string , Script> m_scripts;
 		std::unordered_map<std::string , sol::function> m_sol_functions;
-		
+
 		void( *m_engine_update )( EnttXSol& ) = nullptr;
 
 		void LoadScript ( std::string const& scriptFile );
@@ -143,14 +151,24 @@ namespace god
 	};
 
 	template<typename EngineComponentsType>
-	inline void EnttXSol::BindEngineComponents ( EngineComponentsType const& components )
+	inline void EnttXSol::BindEngineComponents ()
 	{
 		// register all engine components as lua types and bind their calling functions
 		for ( auto i = 0; i < std::tuple_size_v<EngineComponentsType::Components>; ++i )
 		{
-			T_Manip::RunOnType ( EngineComponentsType::Components () , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , components.m_component_names[ i ] );
+			T_Manip::RunOnType ( EngineComponentsType::Components () , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , EngineComponentsType::m_component_names[ i ] );
 		}
 	}
+
+	//template<typename EngineComponentsType>
+	//inline void EnttXSol::BindEngineComponents ( EngineComponentsType const& components )
+	//{
+	//	// register all engine components as lua types and bind their calling functions
+	//	for ( auto i = 0; i < std::tuple_size_v<EngineComponentsType::Components>; ++i )
+	//	{
+	//		T_Manip::RunOnType ( EngineComponentsType::Components () , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , components.m_component_names[ i ] );
+	//	}
+	//}
 
 	template<typename T , typename ...Args>
 	inline void EnttXSol::RegisterLuaType ( std::string const& name , Args ...args )
@@ -165,14 +183,13 @@ namespace god
 		view.each ( system );
 	}
 
-	template<typename EngineComponentsType>
-	inline void EnttXSol::SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EngineComponentsType const& components )
+	template<typename EngineComponentsType , typename EDITOR_RESOURCES>
+	inline void EnttXSol::SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EDITOR_RESOURCES& editorResources )
 	{
-		( components );
 		// register all engine components as lua types and bind their calling functions
 		for ( auto i = 0; i < std::tuple_size_v<EngineComponentsType::Components>; ++i )
 		{
-			T_Manip::RunOnType ( EngineComponentsType::Components () , i , ComponentInspector () , GetEntity ( entity ) , std::ref ( m_registry ) , imguiUniqueID );
+			T_Manip::RunOnType ( EngineComponentsType::Components () , i , ComponentInspector () , GetEntity ( entity ) , std::ref ( m_registry ) , imguiUniqueID , editorResources );
 		}
 	}
 
@@ -183,9 +200,10 @@ namespace god
 	}
 
 	template<typename T>
-	inline void EnttXSol::AttachScript ( Entity entity , std::string const& script , T const& engineComponents )
+	inline void EnttXSol::AttachScript ( Entity entity , std::string const& script )
 	{
 		assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
+
 		if ( m_scripts.find ( script ) != m_scripts.end () )
 		{
 			// for each system in the script
@@ -197,12 +215,12 @@ namespace god
 					AttachComponent ( entity , component );
 				}
 				// add all engine components used by this system to the entity
-				auto const& engine_component_names = engineComponents.m_component_names;
+				//auto const& engine_component_names = engineComponents.m_component_names;
 				for ( auto const& component : system.second.m_used_engine_components )
 				{
-					for ( int i = 0; i < engine_component_names.size (); ++i )
+					for ( int i = 0; i < T::m_component_names.size (); ++i )
 					{
-						if ( engine_component_names[ i ] == component )
+						if ( T::m_component_names[ i ] == component )
 						{
 							T_Manip::RunOnType ( T::Components () , i , AttachEngineComponent () , this , entity );
 						}
@@ -214,6 +232,54 @@ namespace god
 		{
 			std::cerr << "EnttXSol::AttachScript - Script not found " << script << std::endl;
 		}
+	}
+
+	template<typename T>
+	inline void EnttXSol::AttachScriptSystem ( Entity entity , std::string const& scriptSystem )
+	{
+		assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
+
+		for ( auto const& script : m_scripts )
+		{
+			// for each system in the script
+			for ( auto const& system : script.second.m_systems )
+			{
+				if ( scriptSystem == system.first )
+				{
+					// add all script components used by this system to the entity
+					for ( auto const& component : system.second.m_used_script_components )
+					{
+						AttachComponent ( entity , component );
+					}
+					// add all engine components used by this system to the entity
+					//auto const& engine_component_names = engineComponents.m_component_names;
+					for ( auto const& component : system.second.m_used_engine_components )
+					{
+						for ( int i = 0; i < T::m_component_names.size (); ++i )
+						{
+							if ( T::m_component_names[ i ] == component )
+							{
+								T_Manip::RunOnType ( T::Components () , i , AttachEngineComponent () , this , entity );
+							}
+						}
+					}
+					return;
+				}
+			}
+		}
+		std::cerr << "EnttXSol::AttachScriptSystem - System not found " << system << std::endl;
+	}
+
+	template<typename S , typename T , typename R>
+	inline void EnttXSol::PopulateScene ( S& scene )
+	{
+		scene.ClearScene ();
+		auto view = m_registry.view<T , R> ();
+		view.each ( [&scene]( auto& transform , auto& renderable )
+			{
+				scene.AddSceneObject ( renderable.m_model_id , transform.m_position );
+			} );
+
 	}
 
 	template<typename T>

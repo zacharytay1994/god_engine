@@ -7,6 +7,6 @@ namespace god
 {
 	void EngineSystems ( EnttXSol& enttxsol )
 	{
-		enttxsol.RunEngineSystem ( ExampleSystem );
+		//enttxsol.RunEngineSystem ( ExampleSystem );
 	}
 }

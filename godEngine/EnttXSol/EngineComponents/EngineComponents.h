@@ -6,6 +6,8 @@
 #include "../../imgui/imgui.h"
 #include "../../imgui/imgui_stdlib.h"
 
+#include "../../Editor/EditorResourcesDefinition.h"
+
 #include <tuple>
 #include <string>
 #include <array>
@@ -18,24 +20,30 @@ namespace god
 	struct ComponentInspector
 	{
 		template<typename T>
-		void operator()( entt::entity entity , entt::registry& registry , int& imguiUniqueID ) {}
+		void operator()( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EditorResourcesDef& editorResources ) {}
 	};
 
-	template <typename T>
+	/*template <typename T>
 	struct EngineComponents
 	{
 		using Components = T;
 		EngineComponents ( std::array<std::string , std::tuple_size_v<Components>> const& componentNames );
 		Components const m_components;
 		std::array<std::string , std::tuple_size_v<Components>> const m_component_names;
-	};
+	};*/
 
-	template<typename T>
+	/*template <typename Resource>
+	Resource& GetEditorResource ()
+	{
+
+	}*/
+
+	/*template<typename T>
 	inline EngineComponents<T>::EngineComponents ( std::array<std::string , std::tuple_size_v<Components>> const& componentNames )
 		:
 		m_component_names ( componentNames )
 	{
-	}
+	}*/
 
 	template<typename T , typename ...Args>
 	void RegisterLuaType ( sol::state& luaState , std::string const& name , Args... args )
@@ -43,14 +51,14 @@ namespace god
 		luaState.new_usertype<T> ( name , sol::constructors<T ()> () , args... );
 	}
 
-	template<typename T>
-	void RegisterInspector ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , void( *gui )( T& ) )
+	template<typename T , typename U>
+	void RegisterInspector ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , U& editorResources , void( *gui )( T& , U& ) )
 	{
 		if ( registry.any_of<T> ( entity ) )
 		{
 			ImGui::PushID ( imguiUniqueID++ );
 			auto& component = registry.get<T> ( entity );
-			gui ( component );
+			gui ( component , editorResources );
 			ImGui::PopID ();
 		}
 	}

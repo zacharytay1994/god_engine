@@ -5,15 +5,21 @@ namespace god
 {
 	const std::string Asset3D::m_extension { ".god3d" };
 
-	Asset3D::Asset3D ( std::string const& modelRaw )
-		:
-		m_model ( modelRaw )
+	Asset3D::Asset3D ( std::string const& assetPath , bool custom )
 	{
+		if ( custom )
+		{
+			Deserialize ( assetPath );
+		}
+		else
+		{
+			m_model.LoadFromFile ( assetPath );
+		}
 	}
 
 	void Asset3D::Serialize ( std::string const& path )
 	{
-		std::ofstream os ( path + m_extension , std::ios::binary);
+		std::ofstream os ( path + m_extension , std::ios::binary );
 
 		// serialize meshes size
 		size_t mesh_size = m_model.m_meshes.size ();
@@ -25,7 +31,7 @@ namespace god
 			// vertices
 			size_t vertices_size = mesh.m_vertices.size ();
 			os.write ( ( char* ) &vertices_size , sizeof ( vertices_size ) );
-			os.write ( ( char* ) mesh.m_vertices.data() , vertices_size * sizeof ( Vertex3D ) );
+			os.write ( ( char* ) mesh.m_vertices.data () , vertices_size * sizeof ( Vertex3D ) );
 
 			// indices
 			size_t indices_size = mesh.m_indices.size ();
@@ -51,7 +57,7 @@ namespace god
 			// read vertices
 			is.read ( ( char* ) &vertices_size , sizeof ( vertices_size ) );
 			m_model.m_meshes.back ().m_vertices.resize ( vertices_size );
-			is.read ( ( char* ) m_model.m_meshes.back ().m_vertices.data() , vertices_size * sizeof ( Vertex3D ) );
+			is.read ( ( char* ) m_model.m_meshes.back ().m_vertices.data () , vertices_size * sizeof ( Vertex3D ) );
 
 			// read indices
 			is.read ( ( char* ) &indices_size , sizeof ( indices_size ) );

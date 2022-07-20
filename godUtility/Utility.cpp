@@ -4,8 +4,8 @@
 
 namespace god
 {
-	Model3D LoadModel ( char const* modelPath )
+	Asset3D LoadAsset3D ( char const* assetPath , bool custom )
 	{
-		return Model3D ( modelPath );
+		return Asset3D ( assetPath , custom );
 	}
 }

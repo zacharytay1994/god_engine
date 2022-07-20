@@ -20,10 +20,10 @@ namespace god
 			"s" , &ExampleComponent::s );
 	}
 	template<>
-	void ComponentInspector::operator() < ExampleComponent > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID )
+	inline void ComponentInspector::operator() < ExampleComponent > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EditorResourcesDef& editorResources )
 	{
-		RegisterInspector<ExampleComponent> ( entity , registry , imguiUniqueID ,
-			[]( ExampleComponent& component )
+		RegisterInspector<ExampleComponent , EditorResourcesDef> ( entity , registry , imguiUniqueID , editorResources ,
+			[]( ExampleComponent& component , EditorResourcesDef& resources )
 			{
 				ImGui::Text ( "Example Component" );
 				ImGui::Separator ();

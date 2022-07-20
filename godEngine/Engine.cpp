@@ -3,18 +3,20 @@
 
 #include "OpenGL/OpenGL.h"
 #include "Window/GLFWWindow.h"
-#include "EnttXSol/EnttXSol.h"
 
 #include "EnttXSol/EngineComponents/EC_All.h"
 #include "EnttXSol/EngineSystems/ES_All.h"
+#include "EnttXSol/EnttXSol.h"
 
 #include "Editor/Editor.h"
+#include "Editor/EditorResourcesDefinition.h"
 #include "Editor/OpenGLEditor.h"
 #include "Editor/Window/EW_MainMenuBar.h"
 #include "Editor/Window/EW_EditorStyles.h"
 #include "Editor/Window/EW_AssetImporter.h"
 #include "Editor/Window/EW_AssetManager.h"
 #include "Editor/Window/EW_SceneManager.h"
+#include "Editor/Editor.h"
 
 #include <godCamera/Camera.h>
 #include <godUtility/Utility.h>
@@ -43,15 +45,20 @@ namespace god
 
 		// setup resources
 		god::Asset3DManager assets_3d;
-		/*model_manager.Insert ( "Backpack" , god::LoadModel ( "Assets/GameAssets/Models/Backpack/backpack.obj" ) );
-		model_manager.Insert ( "Skull" , god::LoadModel ( "Assets/GameAssets/Models/Skull/skull.fbx" ) );*/
+		assets_3d.Insert ( "Backpack" , god::LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/backpack" , true ) );
+		assets_3d.Insert ( "Skull" , god::LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/skull" , true ) );
 
 		opengl.BuildOGLModels ( assets_3d );
 
 		// setup ecs and scripting
-		god::EnttXSol enttxsol { {"Assets/GameAssets/Scripts/test.lua", "Assets/GameAssets/Scripts/test2.lua"} };
-		god::EngineComponentType engine_components ( g_EngineComponents );
-		enttxsol.BindEngineComponents ( engine_components );
+		god::EnttXSol enttxsol { {
+				"Assets/GameAssets/Scripts/test.lua",
+				"Assets/GameAssets/Scripts/test2.lua",
+				"Assets/GameAssets/Scripts/ExampleScript.lua"} };
+		//god::EngineComponentType engine_components ( g_EngineComponents );
+		god::EngineComponentDefinitions engine_component_definitions;
+		enttxsol.BindEngineComponents< EngineComponentDefinitions> ();
+		//enttxsol.BindEngineComponents ( engine_components );
 		enttxsol.BindEngineSystemUpdate ( EngineSystems );
 		enttxsol.RegisterLuaType<glm::vec3> ( "vec3" ,
 			"x" , &glm::vec3::x ,
@@ -63,30 +70,23 @@ namespace god
 
 		// setup scene
 		god::Scene scene;
-		/*god::SceneObjectID skull = scene.AddSceneObject ( model_manager.GetID ( "Skull" ) , { 0.0f,0.0f,-2.0f } );
-		god::SceneObjectID backpack = scene.AddSceneObject ( model_manager.GetID ( "Backpack" ) , { 5.0f, 0.0f, -2.0f } );*/
+		//god::SceneObjectID skull = scene.AddSceneObject ( assets_3d.GetID ( "Skull" ) , { 0.0f,0.0f,-2.0f } );
+		god::SceneObjectID backpack = scene.AddSceneObject ( assets_3d.GetID ( "Backpack" ) , { 0.0f, 0.0f, -5.0f } );
 
 		// glfw+opengl imgui setup
 		god::ImGuiOpenGLEditor ogl_editor ( window );
 
-		// imgui editors
-		EditorResources<
-			god::GLFWWindow ,
-			god::Asset3DManager ,
-			god::EnttXSol ,
-			EngineComponentType
-		> editor_resources (
+		// imgui editors : EditorResourcesDef is defined in EditorResourcesDefinition.h
+		god::EditorResourcesDef editor_resources (
 			window ,
-			assets_3d ,
-			enttxsol ,
-			engine_components
+			assets_3d
 		);
 		EditorWindows<decltype( editor_resources )> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
-		editor_windows.AddWindow<god::EW_EditorStyles> ();
-		editor_windows.AddWindow<god::EW_Asset3DImporter> ();
-		editor_windows.AddWindow<god::EW_AssetManager> ();
-		editor_windows.AddWindow<god::EW_SceneManager> ();
+		editor_windows.AddWindow<god::EW_EditorStyles> ( false );
+		editor_windows.AddWindow<god::EW_Asset3DImporter> ( false );
+		editor_windows.AddWindow<god::EW_AssetManager> ( false );
+		editor_windows.AddWindow<god::EW_SceneManager> ( false , std::ref ( enttxsol ) );
 
 		/*rapidjson::Document document;
 		document.SetObject ();*/
@@ -120,28 +120,29 @@ namespace god
 
 			opengl.ClearColour ();
 
+			// update scene
+			// ...
+			enttxsol.Update ();
+			enttxsol.PopulateScene<god::Scene , god::Transform , god::Renderable3D> ( scene );
+			//scene.GetSceneObject ( skull ).m_rotation.y += 0.0002f;
+
+			// render scene
+			opengl.RenderScene (
+				scene ,
+				camera.GetPerpectiveProjectionMatrix () ,
+				camera.GetCameraViewMatrix () ,
+				camera.m_position
+			);
+
 			// ... render imgui windows
 			ogl_editor.BeginFrame ();
 			editor_windows.Update ( 0.02f , editor_resources );
 			ogl_editor.Render ();
 			ogl_editor.EndFrame ();
 
-			// update scene
-			// ...
-			enttxsol.Update ();
-			//scene.GetSceneObject ( skull ).m_rotation.y += 0.0002f;
-
-			// render scene
-			/*opengl.RenderScene (
-				scene ,
-				camera.GetPerpectiveProjectionMatrix () ,
-				camera.GetCameraViewMatrix () ,
-				camera.m_position
-			);*/
-
 			window.SwapWindowBuffers ();
 			// free camera update
-			/*camera.FreeCamera ( 0.0002f ,
+			camera.FreeCamera ( 0.02f ,
 				true ,
 				window.KeyDown ( GLFW_KEY_W ) ,
 				window.KeyDown ( GLFW_KEY_S ) ,
@@ -157,7 +158,7 @@ namespace god
 				window.MouseScrollDown () ,
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
-				window.MouseScrollDown () );*/
+				window.MouseScrollDown () );
 		}
 	}
 }

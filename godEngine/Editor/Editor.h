@@ -1,5 +1,4 @@
 #pragma once
-#include <godUtility/Structures.h>
 
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_glfw.h"
@@ -17,15 +16,6 @@
 
 namespace god
 {
-	/*!
-	 * @brief
-	 * : A collection of reference wrappers of type.
-	 * @tparam ...TYPES
-	 * : The types that the are contained within.
-	*/
-	template <typename...TYPES>
-	using EditorResources = god::ReferenceWrapperCollection<TYPES...>;
-
 	struct EditorStyle
 	{
 		ImVec4 m_color_0 { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -48,7 +38,7 @@ namespace god
 		ImVec4 m_color_seperator { m_color_3 };
 
 		std::string m_font_path { "Assets/EngineAssets/Editor/ImGuiFonts/arial.ttf" }; // default font
-		ImFont*		m_font { nullptr };
+		ImFont* m_font { nullptr };
 		float		m_font_size { 20.0f };
 
 		std::string m_current_theme { "Custom Theme" };
@@ -96,8 +86,8 @@ namespace god
 
 		EditorWindows ();
 
-		template <template<typename T> class WINDOW>
-		void AddWindow ( bool startOpen = false );
+		template <template<typename T> class WINDOW , typename...CONSTRUCTOR_ARGS>
+		void AddWindow ( bool startOpen , CONSTRUCTOR_ARGS ...args );
 		std::unordered_map<std::string , std::shared_ptr<EditorWindow<EDITOR_RESOURCES>>> const& GetWindows ();
 
 		void Update ( float dt , EDITOR_RESOURCES& editorResources );
@@ -153,11 +143,11 @@ namespace god
 	}
 
 	template<typename EDITOR_RESOURCES>
-	template<template <typename T> class WINDOW>
-	inline void EditorWindows<EDITOR_RESOURCES>::AddWindow ( bool startOpen )
+	template<template <typename T> class WINDOW , typename...CONSTRUCTOR_ARGS>
+	inline void EditorWindows<EDITOR_RESOURCES>::AddWindow ( bool startOpen , CONSTRUCTOR_ARGS ...args )
 	{
 		std::string name { typeid( WINDOW ).name () };
-		m_windows.insert ( { name , std::make_shared<WINDOW<EDITOR_RESOURCES>> () } );
+		m_windows.insert ( { name , std::make_shared<WINDOW<EDITOR_RESOURCES>> ( args ... ) } );
 		m_windows.at ( name )->m_editor_windows = this;
 		m_windows.at ( name )->m_name = name;
 		m_windows.at ( name )->m_open = startOpen;

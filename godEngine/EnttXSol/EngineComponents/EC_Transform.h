@@ -22,10 +22,10 @@ namespace god
 			"scale" , &Transform::m_scale );
 	}
 	template<>
-	void ComponentInspector::operator() < Transform > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID )
+	inline void ComponentInspector::operator() < Transform > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EditorResourcesDef& editorResources )
 	{
-		RegisterInspector<Transform> ( entity , registry , imguiUniqueID ,
-			[]( Transform& component )
+		RegisterInspector<Transform , EditorResourcesDef> ( entity , registry , imguiUniqueID , editorResources ,
+			[]( Transform& component , EditorResourcesDef& resources )
 			{
 				ImGui::Text ( "Transform" );
 				ImGui::Separator ();

@@ -11,10 +11,10 @@ namespace god
 {
 	using Asset3DManager = ResourceManager<Asset3D>;
 
-	GODUTILITY_API Model3D LoadModel ( char const* modelPath );
+	GODUTILITY_API Asset3D LoadAsset3D ( char const* assetPath , bool custom = false );
 
 	struct Utility
 	{
-		
+
 	};
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "../Editor.h"
+#include "../../EnttXSol/EnttXSol.h"
 
 #include "../../imgui/imgui_stdlib.h" 
 
@@ -8,27 +9,37 @@ namespace god
 	template <typename EDITOR_RESOURCES>
 	struct EW_SceneManager : EditorWindow<EDITOR_RESOURCES>
 	{
+		EW_SceneManager ( EnttXSol& enttxsol );
 		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override;
 
 	private:
 		Entity m_selected_entity { EnttXSol::NullEntity };
 		std::string m_create_entity_name { "no_name" };
 		std::string m_selected_script { "" };
+		std::string m_selected_system { "" };
+
+		EnttXSol& m_enttxsol;
 	};
 }
 
-#include "../../EnttXSol/EnttXSol.h"
+#include "../../EnttXSol/EngineComponents/EC_All.h"
 
 namespace god
 {
+	template<typename EDITOR_RESOURCES>
+	inline EW_SceneManager<EDITOR_RESOURCES>::EW_SceneManager ( EnttXSol& enttxsol )
+		:
+		m_enttxsol { enttxsol }
+	{
+	}
+
 	template<typename EDITOR_RESOURCES>
 	inline void EW_SceneManager<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
 		( dt );
 
-		auto& enttxsol = editorResources.Get<EnttXSol> ().get ();
-		auto& engine_components = editorResources.Get<3> ().get ();
-		auto& entity_names = enttxsol.GetEntityNames ();
+		//auto& enttxsol = editorResources.Get<EnttXSol> ().get ();
+		auto& entity_names = m_enttxsol.GetEntityNames ();
 
 		ImGui::Begin ( "SceneManager" );
 
@@ -41,7 +52,7 @@ namespace god
 					ImGui::InputText ( "##EntityName" , &m_create_entity_name );
 					if ( ImGui::Button ( "Create With Name" ) )
 					{
-						enttxsol.CreateEntity ( m_create_entity_name );
+						m_enttxsol.CreateEntity ( m_create_entity_name );
 						m_create_entity_name = { "no_name" };
 					}
 					ImGui::EndPopup ();
@@ -69,7 +80,7 @@ namespace god
 					if ( ImGui::BeginListBox ( "##Scripts" ) )
 					{
 						auto i { 0 };
-						for ( auto const& script : enttxsol.GetScripts () )
+						for ( auto const& script : m_enttxsol.GetScripts () )
 						{
 							ImGui::PushID ( i );
 							if ( ImGui::Selectable ( script.first.c_str () , m_selected_script == script.first ) )
@@ -83,9 +94,41 @@ namespace god
 						{
 							if ( !m_selected_script.empty () )
 							{
-								enttxsol.AttachScript ( m_selected_entity , m_selected_script , engine_components );
+								m_enttxsol.AttachScript<EngineComponentDefinitions> ( m_selected_entity , m_selected_script );
 							}
 							m_selected_script.clear ();
+							ImGui::CloseCurrentPopup ();
+						}
+						ImGui::EndListBox ();
+					}
+					ImGui::EndPopup ();
+				}
+
+				if ( ImGui::BeginPopup ( "Attach Script System" ) )
+				{
+					if ( ImGui::BeginListBox ( "##Systems" ) )
+					{
+						auto i { 0 };
+						for ( auto const& script : m_enttxsol.GetScripts () )
+						{
+							for ( auto const& system : script.second.m_systems )
+							{
+								ImGui::PushID ( i );
+								if ( ImGui::Selectable ( system.first.c_str () , m_selected_system == system.first ) )
+								{
+									m_selected_system = system.first;
+								}
+								ImGui::PopID ();
+								++i;
+							}
+						}
+						if ( ImGui::Button ( "Attach System" ) )
+						{
+							if ( !m_selected_system.empty () )
+							{
+								m_enttxsol.AttachScriptSystem< EngineComponentDefinitions > ( m_selected_entity , m_selected_system );
+							}
+							m_selected_system.clear ();
 							ImGui::CloseCurrentPopup ();
 						}
 						ImGui::EndListBox ();
@@ -97,10 +140,10 @@ namespace god
 				{
 					// display all engine components
 					int uid { 0 };
-					enttxsol.SerializeEngineComponents ( m_selected_entity , uid , engine_components );
+					m_enttxsol.SerializeEngineComponents< EngineComponentDefinitions , EDITOR_RESOURCES > ( m_selected_entity , uid , editorResources );
 
 					// display all scripts components
-					enttxsol.SerializeScriptComponents ( m_selected_entity , uid ,
+					m_enttxsol.SerializeScriptComponents ( m_selected_entity , uid ,
 						[]( std::string const& name )
 						{
 							ImGui::Separator ();
@@ -137,6 +180,11 @@ namespace god
 					if ( ImGui::Button ( "Attach Script" , { ImGui::GetWindowWidth () , 0.0f } ) )
 					{
 						ImGui::OpenPopup ( "Attach Script" );
+					}
+					// attach script system
+					if ( ImGui::Button ( "Attach Script System" , { ImGui::GetWindowWidth (), 0.0f } ) )
+					{
+						ImGui::OpenPopup ( "Attach Script System" );
 					}
 				}
 				ImGui::EndTabItem ();

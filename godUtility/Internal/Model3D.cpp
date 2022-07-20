@@ -30,7 +30,7 @@ namespace god
 	Mesh3D ProcessMesh ( aiMesh* mesh , aiScene const* scene );
 	std::vector<Material::Texture> LoadMaterialTextures ( aiMaterial* mat , aiTextureType type , std::string typeName );
 
-	Model3D::Model3D ( std::string const& fbx )
+	Model3D::Model3D ( std::string const& modelFile )
 	{
 		Assimp::Importer importer;
 
@@ -38,7 +38,24 @@ namespace god
 		auto process_flags = aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_FlipUVs | aiProcess_CalcTangentSpace;
 
 		// read into scene
-		const aiScene* scene = importer.ReadFile ( fbx.c_str () , process_flags );
+		const aiScene* scene = importer.ReadFile ( modelFile.c_str () , process_flags );
+		if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode )
+		{
+			throw std::runtime_error ( importer.GetErrorString () );
+		}
+
+		ProcessNode ( scene->mRootNode , scene , m_meshes );
+	}
+
+	void Model3D::LoadFromFile ( std::string const& modelFile )
+	{
+		Assimp::Importer importer;
+
+		importer.SetPropertyBool ( AI_CONFIG_PP_PTV_NORMALIZE , true );
+		auto process_flags = aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_FlipUVs | aiProcess_CalcTangentSpace;
+
+		// read into scene
+		const aiScene* scene = importer.ReadFile ( modelFile.c_str () , process_flags );
 		if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode )
 		{
 			throw std::runtime_error ( importer.GetErrorString () );

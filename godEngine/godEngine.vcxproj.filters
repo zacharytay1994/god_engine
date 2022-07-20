@@ -114,9 +114,6 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_All.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EnttXSol\EngineComponents\EC_Kinematics3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -124,6 +121,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EnttXSol\EngineSystems\ES_All.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnttXSol\EngineComponents\EC_Renderable3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\EditorResourcesDefinition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -183,6 +186,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EnttXSol\EnttXSol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EnttXSol\EngineComponents\EC_All.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

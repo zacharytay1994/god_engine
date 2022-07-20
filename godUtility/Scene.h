@@ -31,7 +31,8 @@ namespace god
 		};
 
 		std::vector<RenderData> m_render_data;
-		std::priority_queue<SceneObjectID , std::vector<SceneObjectID> , std::greater<SceneObjectID>> m_free_render_data;
+		using PQueue = std::priority_queue<SceneObjectID , std::vector<SceneObjectID> , std::greater<SceneObjectID>>;
+		PQueue m_free_render_data;
 
 		GODUTILITY_API					Scene ();
 		SceneObjectID GODUTILITY_API	AddSceneObject (
@@ -41,6 +42,7 @@ namespace god
 			glm::vec3 const& scale = { 1.0f,1.0f,1.0f } );
 
 		void GODUTILITY_API				RemoveSceneObject ( SceneObjectID id );
+		void GODUTILITY_API				ClearScene ();
 		RenderData GODUTILITY_API&		GetSceneObject ( SceneObjectID id );
 	};
 }

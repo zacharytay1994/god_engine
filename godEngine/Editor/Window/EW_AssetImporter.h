@@ -84,7 +84,6 @@ namespace god
 						size_t last_slash = m_asset_paths[ i ].find_last_of ( '\\' ) + 1;
 						size_t last_dot = m_asset_paths[ i ].find_last_of ( '.' );
 						m_asset_names[ i ] = m_asset_paths[ i ].substr ( last_slash , last_dot - last_slash );
-
 					}
 				}
 
@@ -110,7 +109,6 @@ namespace god
 						size_t last_slash = m_asset_paths[ i ].find_last_of ( '\\' ) + 1;
 						size_t last_dot = m_asset_paths[ i ].find_last_of ( '.' );
 						m_asset_names[ i ] = m_asset_paths[ i ].substr ( last_slash , last_dot - last_slash );
-
 					}
 				}
 

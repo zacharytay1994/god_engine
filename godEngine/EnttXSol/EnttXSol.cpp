@@ -1,5 +1,7 @@
 #include "../pch.h"
 #include "EnttXSol.h"
+#include "EngineComponents/EC_All.h"
+#include "../Editor/EditorResourcesDefinition.h"
 
 namespace god
 {
@@ -37,6 +39,15 @@ namespace god
 			}
 		}
 	}
+
+	/*void EnttXSol::BindEngineComponents ()
+	{
+		 register all engine components as lua types and bind their calling functions
+		for ( auto i = 0; i < std::tuple_size_v<EngineComponentDefinitions::Components>; ++i )
+		{
+			T_Manip::RunOnType ( EngineComponentDefinitions::Components () , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , EngineComponentDefinitions::m_component_names[ i ] );
+		}
+	}*/
 
 	void EnttXSol::BindEngineSystemUpdate ( void( *update )( EnttXSol& ) )
 	{
@@ -100,6 +111,16 @@ namespace god
 		}
 	}
 
+	//template<typename EngineComponentsType , typename EDITOR_RESOURCES>
+	//void EnttXSol::SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EditorResourcesDef& editorResources )
+	//{
+	//	// register all engine components as lua types and bind their calling functions
+	//	for ( auto i = 0; i < std::tuple_size_v<EngineComponentDefinitions::Components>; ++i )
+	//	{
+	//		T_Manip::RunOnType ( EngineComponentDefinitions::Components () , i , ComponentInspector () , GetEntity ( entity ) , std::ref ( m_registry ) , imguiUniqueID , editorResources );
+	//	}
+	//}
+
 	void EnttXSol::SerializeScriptComponents ( Entity entity , int imguiUniqueID ,
 		void( *Header )( std::string const& name ) ,
 		SerializeFunction<bool> SerializeBool ,
@@ -108,9 +129,9 @@ namespace god
 		SerializeFunction<std::string> SerializeString )
 	{
 		auto entt_id = GetEntity ( entity );
+		int i { imguiUniqueID };
 		for ( auto const& script : m_scripts )
 		{
-			int i { imguiUniqueID };
 			for ( auto const& component : script.second.m_components )
 			{
 				auto& storage = m_registry.storage<sol::table> ( entt::hashed_string ( component.first.c_str () ) );
@@ -162,32 +183,6 @@ namespace god
 			}
 		}
 	}
-
-	//void EnttXSol::AttachScript ( Entity entity , std::string const& script )
-	//{
-	//	assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
-	//	if ( m_scripts.find ( script ) != m_scripts.end () )
-	//	{
-	//		// for each system in the script
-	//		for ( auto const& system : m_scripts.at ( script ).m_systems )
-	//		{
-	//			// add all script components used by this system to the entity
-	//			for ( auto const& component : system.second.m_used_script_components )
-	//			{
-	//				AttachComponent ( entity , component );
-	//			}
-	//			// add all engine components used by this system to the entity
-	//			for ( auto const& component : system.second.m_used_engine_components )
-	//			{
-	//				
-	//			}
-	//		}
-	//	}
-	//	else
-	//	{
-	//		std::cerr << "EnttXSol::AttachScript - Script not found " << script << std::endl;
-	//	}
-	//}
 
 	std::vector<std::optional<entt::entity>> const& EnttXSol::GetEntities ()const
 	{

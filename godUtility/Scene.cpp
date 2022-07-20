@@ -50,6 +50,12 @@ namespace god
 		m_render_data[ id ].m_active = false;
 	}
 
+	void Scene::ClearScene ()
+	{
+		m_free_render_data = PQueue ();
+		m_render_data.resize ( 0 );
+	}
+
 	Scene::RenderData& Scene::GetSceneObject ( SceneObjectID id )
 	{
 		// check if valid id and entity active

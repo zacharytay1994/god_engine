@@ -19,7 +19,7 @@ namespace god
 		Model3D m_model;
 
 		GODUTILITY_API Asset3D () = default;
-		GODUTILITY_API Asset3D ( std::string const& modelRaw );
+		GODUTILITY_API Asset3D ( std::string const& assetPath , bool custom = false );
 
 		void GODUTILITY_API Serialize ( std::string const& path );
 		void GODUTILITY_API Deserialize ( std::string const& path );
@@ -39,7 +39,7 @@ struct std::hash<god::Asset3D>
 		{
 			god::Vertex3D vertex_sum = std::accumulate ( mesh.m_vertices.begin () , mesh.m_vertices.end () , god::Vertex3D () );
 			god::Index3D index_sum = std::accumulate ( mesh.m_indices.begin () , mesh.m_indices.end () , god::Index3D () );
-			
+
 			god::HashCombine ( seed , vertex_sum.m_position.x + vertex_sum.m_position.y + vertex_sum.m_position.z );
 			god::HashCombine ( seed , vertex_sum.m_uv.x + vertex_sum.m_uv.y );
 			god::HashCombine ( seed , vertex_sum.m_tangent.x + vertex_sum.m_tangent.y + vertex_sum.m_tangent.z );
