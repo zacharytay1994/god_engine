@@ -16,12 +16,16 @@ namespace god
 			"model_id" , &Renderable3D::m_model_id );
 	}
 	template<>
-	inline void ComponentInspector::operator() < Renderable3D > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EditorResourcesDef& editorResources )
+	inline void ComponentInspector::operator() < Renderable3D > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
 	{
-		RegisterInspector<Renderable3D , EditorResourcesDef> ( entity , registry , imguiUniqueID , editorResources ,
-			[]( Renderable3D& component , EditorResourcesDef& resources )
+		RegisterInspector<Renderable3D , EngineResources> ( entity , registry , imguiUniqueID , editorResources ,
+			[]( Renderable3D& component , EngineResources& resources )
 			{
 				auto& asset_manager = resources.Get<Asset3DManager> ();
+
+				ImGui::Separator ();
+				ImGui::Text ( "Renderable3D" );
+				ImGui::Separator ();
 
 				if ( ImGui::BeginPopup ( "Model Select" ) )
 				{

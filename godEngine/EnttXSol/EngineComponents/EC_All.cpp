@@ -3,7 +3,7 @@
 
 namespace god
 {
-	std::array<std::string , std::tuple_size_v<EngineComponentDefinitions::Components>> EngineComponentDefinitions::m_component_names
+	std::array<std::string , std::tuple_size_v<EngineComponents::Components>> EngineComponents::m_component_names
 	{
 		"ExampleComponent",
 		"Transform",

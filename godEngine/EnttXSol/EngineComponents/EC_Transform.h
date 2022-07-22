@@ -22,13 +22,15 @@ namespace god
 			"scale" , &Transform::m_scale );
 	}
 	template<>
-	inline void ComponentInspector::operator() < Transform > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EditorResourcesDef& editorResources )
+	inline void ComponentInspector::operator() < Transform > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
 	{
-		RegisterInspector<Transform , EditorResourcesDef> ( entity , registry , imguiUniqueID , editorResources ,
-			[]( Transform& component , EditorResourcesDef& resources )
+		RegisterInspector<Transform , EngineResources> ( entity , registry , imguiUniqueID , editorResources ,
+			[]( Transform& component , EngineResources& resources )
 			{
+				ImGui::Separator ();
 				ImGui::Text ( "Transform" );
 				ImGui::Separator ();
+
 				auto width = ImGui::GetWindowWidth ();
 				ImGui::SetNextItemWidth ( width / 4 );
 				ImGui::InputFloat ( "##x" , &component.m_position.x );

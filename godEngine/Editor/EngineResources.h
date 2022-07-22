@@ -13,9 +13,9 @@ namespace god
 	 * : The types that the are contained within.
 	*/
 	template <typename...TYPES>
-	using EditorResources = god::ReferenceWrapperCollection<TYPES...>;
+	using Resources = god::ReferenceWrapperCollection<TYPES...>;
 
-	using EditorResourcesDef = EditorResources<
+	using EngineResources = Resources<
 		GLFWWindow ,
 		Asset3DManager 
 	>;

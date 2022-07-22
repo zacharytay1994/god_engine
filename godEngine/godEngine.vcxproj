@@ -100,7 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Editor\Editor.h" />
-    <ClInclude Include="Editor\EditorResourcesDefinition.h" />
+    <ClInclude Include="Editor\EngineResources.h" />
     <ClInclude Include="Editor\OpenGLEditor.h" />
     <ClInclude Include="Editor\Window\EW_AssetImporter.h" />
     <ClInclude Include="Editor\Window\EW_AssetManager.h" />

@@ -1,7 +1,6 @@
 #include "../pch.h"
 #include "EnttXSol.h"
 #include "EngineComponents/EC_All.h"
-#include "../Editor/EditorResourcesDefinition.h"
 
 namespace god
 {
@@ -39,15 +38,6 @@ namespace god
 			}
 		}
 	}
-
-	/*void EnttXSol::BindEngineComponents ()
-	{
-		 register all engine components as lua types and bind their calling functions
-		for ( auto i = 0; i < std::tuple_size_v<EngineComponentDefinitions::Components>; ++i )
-		{
-			T_Manip::RunOnType ( EngineComponentDefinitions::Components () , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , EngineComponentDefinitions::m_component_names[ i ] );
-		}
-	}*/
 
 	void EnttXSol::BindEngineSystemUpdate ( void( *update )( EnttXSol& ) )
 	{
@@ -110,16 +100,6 @@ namespace god
 			m_entity_names[ entity ].clear ();
 		}
 	}
-
-	//template<typename EngineComponentsType , typename EDITOR_RESOURCES>
-	//void EnttXSol::SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EditorResourcesDef& editorResources )
-	//{
-	//	// register all engine components as lua types and bind their calling functions
-	//	for ( auto i = 0; i < std::tuple_size_v<EngineComponentDefinitions::Components>; ++i )
-	//	{
-	//		T_Manip::RunOnType ( EngineComponentDefinitions::Components () , i , ComponentInspector () , GetEntity ( entity ) , std::ref ( m_registry ) , imguiUniqueID , editorResources );
-	//	}
-	//}
 
 	void EnttXSol::SerializeScriptComponents ( Entity entity , int imguiUniqueID ,
 		void( *Header )( std::string const& name ) ,

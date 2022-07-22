@@ -9,7 +9,7 @@
 #include "EnttXSol/EnttXSol.h"
 
 #include "Editor/Editor.h"
-#include "Editor/EditorResourcesDefinition.h"
+#include "Editor/EngineResources.h"
 #include "Editor/OpenGLEditor.h"
 #include "Editor/Window/EW_MainMenuBar.h"
 #include "Editor/Window/EW_EditorStyles.h"
@@ -36,28 +36,27 @@ namespace god
 	void godEngine::Update ()
 	{
 		// create window
-		god::GLFWWindow window ( 1200 , 775 );
-		god::OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
+		GLFWWindow window ( 1200 , 775 );
+		OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
 
 		// setup camera
-		god::Camera camera;
+		Camera camera;
 		camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
 
 		// setup resources
-		god::Asset3DManager assets_3d;
-		assets_3d.Insert ( "Backpack" , god::LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/backpack" , true ) );
-		assets_3d.Insert ( "Skull" , god::LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/skull" , true ) );
+		Asset3DManager assets_3d;
+		assets_3d.Insert ( "Backpack" , LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/backpack" , true ) );
+		assets_3d.Insert ( "Skull" , LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/skull" , true ) );
 
 		opengl.BuildOGLModels ( assets_3d );
 
 		// setup ecs and scripting
-		god::EnttXSol enttxsol { {
+		EnttXSol enttxsol { {
 				"Assets/GameAssets/Scripts/test.lua",
 				"Assets/GameAssets/Scripts/test2.lua",
 				"Assets/GameAssets/Scripts/ExampleScript.lua"} };
 		//god::EngineComponentType engine_components ( g_EngineComponents );
-		god::EngineComponentDefinitions engine_component_definitions;
-		enttxsol.BindEngineComponents< EngineComponentDefinitions> ();
+		enttxsol.BindEngineComponents< EngineComponents > ();
 		//enttxsol.BindEngineComponents ( engine_components );
 		enttxsol.BindEngineSystemUpdate ( EngineSystems );
 		enttxsol.RegisterLuaType<glm::vec3> ( "vec3" ,
@@ -69,19 +68,19 @@ namespace god
 		enttxsol.AttachScript ( e1 , "test2" );*/
 
 		// setup scene
-		god::Scene scene;
+		Scene scene;
 		//god::SceneObjectID skull = scene.AddSceneObject ( assets_3d.GetID ( "Skull" ) , { 0.0f,0.0f,-2.0f } );
-		god::SceneObjectID backpack = scene.AddSceneObject ( assets_3d.GetID ( "Backpack" ) , { 0.0f, 0.0f, -5.0f } );
+		SceneObjectID backpack = scene.AddSceneObject ( assets_3d.GetID ( "Backpack" ) , { 0.0f, 0.0f, -5.0f } );
 
 		// glfw+opengl imgui setup
-		god::ImGuiOpenGLEditor ogl_editor ( window );
+		ImGuiOpenGLEditor ogl_editor ( window );
 
 		// imgui editors : EditorResourcesDef is defined in EditorResourcesDefinition.h
-		god::EditorResourcesDef editor_resources (
+		EngineResources engine_resources (
 			window ,
 			assets_3d
 		);
-		EditorWindows<decltype( editor_resources )> editor_windows;
+		EditorWindows<decltype( engine_resources )> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
 		editor_windows.AddWindow<god::EW_EditorStyles> ( false );
 		editor_windows.AddWindow<god::EW_Asset3DImporter> ( false );
@@ -123,7 +122,7 @@ namespace god
 			// update scene
 			// ...
 			enttxsol.Update ();
-			enttxsol.PopulateScene<god::Scene , god::Transform , god::Renderable3D> ( scene );
+			enttxsol.PopulateScene<Scene , Transform , Renderable3D> ( scene );
 			//scene.GetSceneObject ( skull ).m_rotation.y += 0.0002f;
 
 			// render scene
@@ -136,7 +135,7 @@ namespace god
 
 			// ... render imgui windows
 			ogl_editor.BeginFrame ();
-			editor_windows.Update ( 0.02f , editor_resources );
+			editor_windows.Update ( 0.02f , engine_resources );
 			ogl_editor.Render ();
 			ogl_editor.EndFrame ();
 

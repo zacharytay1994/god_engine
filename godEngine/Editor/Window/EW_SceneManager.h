@@ -94,7 +94,7 @@ namespace god
 						{
 							if ( !m_selected_script.empty () )
 							{
-								m_enttxsol.AttachScript<EngineComponentDefinitions> ( m_selected_entity , m_selected_script );
+								m_enttxsol.AttachScript< EngineComponents > ( m_selected_entity , m_selected_script );
 							}
 							m_selected_script.clear ();
 							ImGui::CloseCurrentPopup ();
@@ -126,7 +126,7 @@ namespace god
 						{
 							if ( !m_selected_system.empty () )
 							{
-								m_enttxsol.AttachScriptSystem< EngineComponentDefinitions > ( m_selected_entity , m_selected_system );
+								m_enttxsol.AttachScriptSystem< EngineComponents > ( m_selected_entity , m_selected_system );
 							}
 							m_selected_system.clear ();
 							ImGui::CloseCurrentPopup ();
@@ -135,12 +135,12 @@ namespace god
 					}
 					ImGui::EndPopup ();
 				}
-
+				
 				if ( m_selected_entity != EnttXSol::NullEntity )
 				{
 					// display all engine components
 					int uid { 0 };
-					m_enttxsol.SerializeEngineComponents< EngineComponentDefinitions , EDITOR_RESOURCES > ( m_selected_entity , uid , editorResources );
+					m_enttxsol.SerializeEngineComponents< EngineComponents , EDITOR_RESOURCES > ( m_selected_entity , uid , editorResources );
 
 					// display all scripts components
 					m_enttxsol.SerializeScriptComponents ( m_selected_entity , uid ,

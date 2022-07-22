@@ -6,7 +6,7 @@
 #include "../../imgui/imgui.h"
 #include "../../imgui/imgui_stdlib.h"
 
-#include "../../Editor/EditorResourcesDefinition.h"
+#include "../../Editor/EngineResources.h"
 
 #include <tuple>
 #include <string>
@@ -20,30 +20,8 @@ namespace god
 	struct ComponentInspector
 	{
 		template<typename T>
-		void operator()( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EditorResourcesDef& editorResources ) {}
+		void operator()( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources ) {}
 	};
-
-	/*template <typename T>
-	struct EngineComponents
-	{
-		using Components = T;
-		EngineComponents ( std::array<std::string , std::tuple_size_v<Components>> const& componentNames );
-		Components const m_components;
-		std::array<std::string , std::tuple_size_v<Components>> const m_component_names;
-	};*/
-
-	/*template <typename Resource>
-	Resource& GetEditorResource ()
-	{
-
-	}*/
-
-	/*template<typename T>
-	inline EngineComponents<T>::EngineComponents ( std::array<std::string , std::tuple_size_v<Components>> const& componentNames )
-		:
-		m_component_names ( componentNames )
-	{
-	}*/
 
 	template<typename T , typename ...Args>
 	void RegisterLuaType ( sol::state& luaState , std::string const& name , Args... args )

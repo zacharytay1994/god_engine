@@ -50,12 +50,10 @@ namespace god
 	public:
 		EnttXSol ( std::vector<std::string> scriptFiles );
 		void Update ();
-		template<typename EngineComponentsType>
+		template<typename ENGINE_COMPONENTS>
 		void BindEngineComponents ();
-		//template<typename EngineComponentsType>
-		//void BindEngineComponents ( EngineComponentsType const& components );
-		template<typename T , typename ...Args>
-		void RegisterLuaType ( std::string const& name , Args...args );
+		template<typename T , typename ...ARGS>
+		void RegisterLuaType ( std::string const& name , ARGS...args );
 		template<typename ...T>
 		void RunEngineSystem ( void( *system )( T... ) );
 		void BindEngineSystemUpdate ( void( *update )( EnttXSol& ) );
@@ -65,7 +63,7 @@ namespace god
 		Entity CreateEntity ( std::string const& name = "" );
 		void RemoveEntity ( Entity entity );
 
-		template<typename EngineComponentsType , typename EDITOR_RESOURCES>
+		template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
 		void SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EDITOR_RESOURCES& resources );
 		template<typename T>
 		using SerializeFunction = void( * )( T& val , int i , std::string const& name );
@@ -150,28 +148,18 @@ namespace god
 		};
 	};
 
-	template<typename EngineComponentsType>
+	template<typename ENGINE_COMPONENTS>
 	inline void EnttXSol::BindEngineComponents ()
 	{
 		// register all engine components as lua types and bind their calling functions
-		for ( auto i = 0; i < std::tuple_size_v<EngineComponentsType::Components>; ++i )
+		for ( auto i = 0; i < std::tuple_size_v<ENGINE_COMPONENTS::Components>; ++i )
 		{
-			T_Manip::RunOnType ( EngineComponentsType::Components () , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , EngineComponentsType::m_component_names[ i ] );
+			T_Manip::RunOnType ( ENGINE_COMPONENTS::Components () , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , ENGINE_COMPONENTS::m_component_names[ i ] );
 		}
 	}
 
-	//template<typename EngineComponentsType>
-	//inline void EnttXSol::BindEngineComponents ( EngineComponentsType const& components )
-	//{
-	//	// register all engine components as lua types and bind their calling functions
-	//	for ( auto i = 0; i < std::tuple_size_v<EngineComponentsType::Components>; ++i )
-	//	{
-	//		T_Manip::RunOnType ( EngineComponentsType::Components () , i , BindCTypeToLua () , std::ref ( m_lua ) , std::ref ( m_registry ) , components.m_component_names[ i ] );
-	//	}
-	//}
-
-	template<typename T , typename ...Args>
-	inline void EnttXSol::RegisterLuaType ( std::string const& name , Args ...args )
+	template<typename T , typename ...ARGS>
+	inline void EnttXSol::RegisterLuaType ( std::string const& name , ARGS ...args )
 	{
 		m_lua.new_usertype<T> ( name , sol::constructors<T ()> () , args... );
 	}
@@ -183,13 +171,13 @@ namespace god
 		view.each ( system );
 	}
 
-	template<typename EngineComponentsType , typename EDITOR_RESOURCES>
+	template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
 	inline void EnttXSol::SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EDITOR_RESOURCES& editorResources )
 	{
 		// register all engine components as lua types and bind their calling functions
-		for ( auto i = 0; i < std::tuple_size_v<EngineComponentsType::Components>; ++i )
+		for ( auto i = 0; i < std::tuple_size_v<ENGINE_COMPONENTS::Components>; ++i )
 		{
-			T_Manip::RunOnType ( EngineComponentsType::Components () , i , ComponentInspector () , GetEntity ( entity ) , std::ref ( m_registry ) , imguiUniqueID , editorResources );
+			T_Manip::RunOnType ( ENGINE_COMPONENTS::Components () , i , ComponentInspector () , GetEntity ( entity ) , std::ref ( m_registry ) , imguiUniqueID , editorResources );
 		}
 	}
 

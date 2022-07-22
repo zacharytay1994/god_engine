@@ -10,20 +10,7 @@
 
 namespace god
 {
-	/*using EngineComponentsTuple = std::tuple<
-		ExampleComponent ,
-		Transform ,
-		Renderable3D
-	>;
-	static std::array<std::string , std::tuple_size_v<EngineComponentsTuple>> g_EngineComponents
-	{
-		"ExampleComponent",
-		"Transform",
-		"Renderable3D"
-	};
-	using EngineComponentType = EngineComponents<EngineComponentsTuple>;*/
-
-	struct EngineComponentDefinitions
+	struct EngineComponents
 	{
 		using Components = std::tuple<
 			ExampleComponent ,

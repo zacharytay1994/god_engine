@@ -126,7 +126,7 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_Renderable3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\EditorResourcesDefinition.h">
+    <ClInclude Include="Editor\EngineResources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
