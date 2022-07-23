@@ -22,14 +22,18 @@ namespace god
 	template <typename EDITOR_RESOURCES>
 	struct EW_AssetManager : EditorWindow<EDITOR_RESOURCES>
 	{
+		EW_AssetManager ();
+
 		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override;
 		void OnOpen () override;
 
-		void ReloadModelConfig ();
+		void ReloadConfig ();
 
 	private:
 		rapidjson::Document m_document_models;
-		std::string m_selected_asset { "" };
+		rapidjson::Document m_document_textures;
+		std::string m_selected_model { "" };
+		std::string m_selected_texture { "" };
 		std::string m_to_delete { "" };
 
 		// model editing
@@ -38,7 +42,8 @@ namespace god
 		std::string m_edit_src { "" };
 		bool m_edit_new_src { false };
 
-		rapidjson::Value& GetDocumentValue ( char const* key );
+		rapidjson::Value& GetModelDocumentValue ( char const* key );
+		rapidjson::Value& GetTextureDocumentValue ( char const* key );
 	};
 }
 
@@ -46,6 +51,12 @@ namespace god
 
 namespace god
 {
+	template<typename EDITOR_RESOURCES>
+	inline EW_AssetManager<EDITOR_RESOURCES>::EW_AssetManager ()
+	{
+		ReloadConfig ();
+	}
+
 	template<typename EDITOR_RESOURCES>
 	inline void EW_AssetManager<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
@@ -69,9 +80,9 @@ namespace god
 					{
 						for ( auto& model : m_document_models.GetObject () )
 						{
-							if ( m_selected_asset.empty () || ImGui::Selectable ( model.name.GetString () , m_selected_asset == model.name.GetString () ) )
+							if ( m_selected_model.empty () || ImGui::Selectable ( model.name.GetString () , m_selected_model == model.name.GetString () ) )
 							{
-								m_selected_asset = model.name.GetString ();
+								m_selected_model = model.name.GetString ();
 							}
 						}
 					}
@@ -80,16 +91,16 @@ namespace god
 
 				ImGui::Separator ();
 				ImGui::Text ( "Properties: " );
-				if ( m_selected_asset.empty () )
+				if ( m_selected_model.empty () )
 				{
 					ImGui::Text ( "No asset selected." );
 				}
 				else
 				{
 					ImGui::BeginChild ( "ModelProperties" , { ImGui::GetWindowWidth () - 20, 150 } , true , ImGuiWindowFlags_HorizontalScrollbar );
-					ImGui::Text ( "Model Name : %s" , m_selected_asset.c_str () );
+					ImGui::Text ( "Model Name : %s" , m_selected_model.c_str () );
 
-					for ( auto& m : m_document_models[ m_selected_asset.c_str () ].GetArray ()[ 0 ].GetObject () )
+					for ( auto& m : m_document_models[ m_selected_model.c_str () ].GetArray ()[ 0 ].GetObject () )
 					{
 						ImGui::Text ( "%s : %s" , m.name.GetString () , m.value.GetString () );
 					}
@@ -127,27 +138,30 @@ namespace god
 
 					if ( ImGui::Button ( "Apply" , { popup_width, 0.0f } ) )
 					{
-						if ( m_document_models.HasMember ( m_selected_asset.c_str () ) )
+						if ( m_document_models.HasMember ( m_selected_model.c_str () ) )
 						{
 							// set new name
-							rapidjson::Value::MemberIterator value = m_document_models.FindMember ( m_selected_asset.c_str () );
+							rapidjson::Value::MemberIterator value = m_document_models.FindMember ( m_selected_model.c_str () );
 							value->name.SetString ( m_edit_name.c_str () , m_document_models.GetAllocator () );
-							m_selected_asset = m_edit_name;
+							m_selected_model = m_edit_name;
 
 							// if diff source, set new raw and source and rebuild model
 							if ( m_edit_new_src )
 							{
-								GetDocumentValue ( "Raw" ).SetString ( m_edit_raw.c_str () , m_document_models.GetAllocator () );
-								GetDocumentValue ( "Source" ).SetString ( m_edit_src.c_str () , m_document_models.GetAllocator () );
-
 								Asset3D load_from_raw ( m_edit_src );
-								load_from_raw.Serialize ( AssetPath::Folder_BuildModels + m_edit_name );
+								if ( load_from_raw.GetSuccessState () )
+								{
+									GetModelDocumentValue ( "Raw" ).SetString ( m_edit_raw.c_str () , m_document_models.GetAllocator () );
+									GetModelDocumentValue ( "Source" ).SetString ( m_edit_src.c_str () , m_document_models.GetAllocator () );
+
+									// serialize to config and copy to raw models folder
+									load_from_raw.Serialize ( AssetPath::Folder_BuildModels + m_edit_name );
+									god::FolderHelper::CopyFileToFolder ( m_edit_src , AssetPath::Folder_RawModels );
+								}
 							}
 
 							// update last edited date and time
-							GetDocumentValue ( "Last Edited" ).SetString ( GetDateTimeString ().c_str () , m_document_models.GetAllocator () );
-
-							god::FolderHelper::CopyFileToFolder ( m_edit_src , AssetPath::Folder_RawModels );
+							GetModelDocumentValue ( "Last Edited" ).SetString ( GetDateTimeString ().c_str () , m_document_models.GetAllocator () );
 
 							// update json
 							god::WriteJSON ( m_document_models , AssetPath::File_ModelsConfig );
@@ -160,29 +174,29 @@ namespace god
 				}
 
 				if ( ImGui::Button ( "Edit" , { ImGui::GetWindowWidth (), 0.0f } )
-					&& !m_selected_asset.empty () )
+					&& !m_selected_model.empty () )
 				{
-					m_edit_name = m_selected_asset;
-					m_edit_raw = GetDocumentValue ( "Raw" ).GetString ();
-					m_edit_src = GetDocumentValue ( "Source" ).GetString ();
+					m_edit_name = m_selected_model;
+					m_edit_raw = GetModelDocumentValue ( "Raw" ).GetString ();
+					m_edit_src = GetModelDocumentValue ( "Source" ).GetString ();
 					m_edit_new_src = false;
 					ImGui::OpenPopup ( "EditModel" );
 				}
 
 				if ( ImGui::BeginPopup ( "ModelConfirmDelete" ) )
 				{
-					ImGui::Text ( "Delete %s?" , m_selected_asset.c_str () );
+					ImGui::Text ( "Delete %s?" , m_selected_model.c_str () );
 					if ( ImGui::Button ( "Yes" , { 200.0f, 0.0f } ) )
 					{
-						m_document_models.RemoveMember ( m_document_models.FindMember ( m_selected_asset.c_str () ) );
+						m_document_models.RemoveMember ( m_document_models.FindMember ( m_selected_model.c_str () ) );
 						god::WriteJSON ( m_document_models , AssetPath::File_ModelsConfig );
-						ReloadModelConfig ();
-						m_selected_asset = { "" };
+						ReloadConfig ();
+						m_selected_model = { "" };
 					}
 					ImGui::EndPopup ();
 				}
 
-				if ( !m_selected_asset.empty () && ImGui::Button ( "Delete" , { ImGui::GetWindowWidth (), 0.0f } ) )
+				if ( !m_selected_model.empty () && ImGui::Button ( "Delete" , { ImGui::GetWindowWidth (), 0.0f } ) )
 				{
 					ImGui::OpenPopup ( "ModelConfirmDelete" );
 				}
@@ -197,6 +211,128 @@ namespace god
 
 			if ( ImGui::BeginTabItem ( "Textures" ) )
 			{
+				// display models config in a list view
+				if ( ImGui::BeginListBox ( "##Textures" , { ImGui::GetWindowWidth (), 100.0f } ) )
+				{
+					if ( m_document_textures.IsObject () )
+					{
+						for ( auto& textures : m_document_textures.GetObject () )
+						{
+							if ( m_selected_texture.empty () || ImGui::Selectable ( textures.name.GetString () , m_selected_texture == textures.name.GetString () ) )
+							{
+								m_selected_texture = textures.name.GetString ();
+							}
+						}
+					}
+					ImGui::EndListBox ();
+				}
+
+
+				ImGui::Separator ();
+				ImGui::Text ( "Properties: " );
+				if ( m_selected_texture.empty () )
+				{
+					ImGui::Text ( "No asset selected." );
+				}
+				else
+				{
+					ImGui::BeginChild ( "TextureProperties" , { ImGui::GetWindowWidth () - 20, 150 } , true , ImGuiWindowFlags_HorizontalScrollbar );
+					ImGui::Text ( "Texture Name : %s" , m_selected_texture.c_str () );
+
+					for ( auto& m : m_document_textures[ m_selected_texture.c_str () ].GetArray ()[ 0 ].GetObject () )
+					{
+						ImGui::Text ( "%s : %s" , m.name.GetString () , m.value.GetString () );
+					}
+					ImGui::EndChild ();
+				}
+
+				float popup_width { 400.0f };
+				float popup_height { 400.0f };
+				ImGui::SetNextWindowSize ( { popup_width, 400.0f } );
+				if ( ImGui::BeginPopup ( "EditTexture" ) )
+				{
+					ImGui::BeginChild ( "New Properties" , { ImGui::GetWindowWidth () - 15.0f, popup_height - 100.0f } , true , ImGuiWindowFlags_HorizontalScrollbar );
+
+					ImGui::Text ( "New Properties" );
+					ImGui::Text ( "Name:" );
+					ImGui::SetNextItemWidth ( popup_width - 30.0f );
+					ImGui::InputText ( "##TextureEditName" , &m_edit_name );
+
+					ImGui::Text ( "Raw:" );
+					ImGui::Text ( m_edit_raw.c_str () );
+
+					if ( ImGui::Button ( "Edit Raw" , { popup_width - 30.0f, 0.0f } ) )
+					{
+
+						std::string new_src = god::OpenWindowDialog ( L"Texture Files" , L"*.png;*.jpg" );
+						if ( !new_src.empty () )
+						{
+							m_edit_src = new_src;
+							m_edit_raw = m_edit_src.substr ( m_edit_src.find_last_of ( '\\' ) + 1 , m_edit_src.size () );
+							m_edit_new_src = true;
+						}
+					}
+
+					ImGui::EndChild ();
+
+					if ( ImGui::Button ( "Apply" , { popup_width, 0.0f } ) )
+					{
+						if ( m_document_textures.HasMember ( m_selected_texture.c_str () ) )
+						{
+							// set new name
+							rapidjson::Value::MemberIterator value = m_document_textures.FindMember ( m_selected_texture.c_str () );
+							value->name.SetString ( m_edit_name.c_str () , m_document_textures.GetAllocator () );
+							m_selected_texture = m_edit_name;
+
+							// if diff source, set new raw and source and rebuild model
+							if ( m_edit_new_src )
+							{
+								GetTextureDocumentValue ( "Raw" ).SetString ( m_edit_raw.c_str () , m_document_textures.GetAllocator () );
+								GetTextureDocumentValue ( "Source" ).SetString ( m_edit_src.c_str () , m_document_textures.GetAllocator () );
+							}
+
+							// update last edited date and time
+							GetTextureDocumentValue ( "Last Edited" ).SetString ( GetDateTimeString ().c_str () , m_document_textures.GetAllocator () );
+
+							god::FolderHelper::CopyFileToFolder ( m_edit_src , AssetPath::Folder_RawTextures );
+
+							// update json
+							god::WriteJSON ( m_document_textures , AssetPath::File_TexturesConfig );
+						}
+
+						ImGui::CloseCurrentPopup ();
+
+					}
+					ImGui::EndPopup ();
+				}
+
+				if ( ImGui::Button ( "Edit" , { ImGui::GetWindowWidth (), 0.0f } )
+					&& !m_selected_texture.empty () )
+				{
+					m_edit_name = m_selected_texture;
+					m_edit_raw = GetTextureDocumentValue ( "Raw" ).GetString ();
+					m_edit_src = GetTextureDocumentValue ( "Source" ).GetString ();
+					m_edit_new_src = false;
+					ImGui::OpenPopup ( "EditTexture" );
+				}
+
+				if ( ImGui::BeginPopup ( "TextureConfirmDelete" ) )
+				{
+					ImGui::Text ( "Delete %s?" , m_selected_texture.c_str () );
+					if ( ImGui::Button ( "Yes" , { 200.0f, 0.0f } ) )
+					{
+						m_document_textures.RemoveMember ( m_document_textures.FindMember ( m_selected_texture.c_str () ) );
+						god::WriteJSON ( m_document_textures , AssetPath::File_TexturesConfig );
+						ReloadConfig ();
+						m_selected_texture = { "" };
+					}
+					ImGui::EndPopup ();
+				}
+
+				if ( !m_selected_texture.empty () && ImGui::Button ( "Delete" , { ImGui::GetWindowWidth (), 0.0f } ) )
+				{
+					ImGui::OpenPopup ( "TextureConfirmDelete" );
+				}
 				ImGui::EndTabItem ();
 			}
 
@@ -205,7 +341,7 @@ namespace god
 
 		if ( ImGui::Button ( "Refresh" , { ImGui::GetWindowWidth (), 0.0f } ) )
 		{
-			ReloadModelConfig ();
+			ReloadConfig ();
 		}
 
 		if ( ImGui::Button ( "Close" , { ImGui::GetWindowWidth (), 0.0f } ) )
@@ -218,31 +354,50 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EW_AssetManager<EDITOR_RESOURCES>::OnOpen ()
 	{
-		m_selected_asset = { "" };
-		ReloadModelConfig ();
+		m_selected_model = { "" };
+		ReloadConfig ();
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline void EW_AssetManager<EDITOR_RESOURCES>::ReloadModelConfig ()
+	inline void EW_AssetManager<EDITOR_RESOURCES>::ReloadConfig ()
 	{
 		m_document_models.SetObject ();
 		god::ReadJSON ( m_document_models , AssetPath::File_ModelsConfig );
+		m_document_textures.SetObject ();
+		god::ReadJSON ( m_document_textures , AssetPath::File_TexturesConfig );
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline rapidjson::Value& EW_AssetManager<EDITOR_RESOURCES>::GetDocumentValue ( char const* key )
+	inline rapidjson::Value& EW_AssetManager<EDITOR_RESOURCES>::GetModelDocumentValue ( char const* key )
 	{
-		assert ( ( m_document_models.IsObject () && !m_selected_asset.empty () ) 
-			&& "EW_AssetManager::GetDocumentValue - INVALID QUERY, m_document_models not object or m_selected_asset.empty!" );
+		assert ( ( m_document_models.IsObject () && !m_selected_model.empty () ) 
+			&& "EW_AssetManager::GetModelDocumentValue - INVALID QUERY, m_document_models not object or m_selected_model.empty!" );
 
-		if ( m_document_models[ m_selected_asset.c_str () ].GetArray ()[ 0 ].HasMember ( key ) )
+		if ( m_document_models[ m_selected_model.c_str () ].GetArray ()[ 0 ].HasMember ( key ) )
 		{
-			return m_document_models[ m_selected_asset.c_str () ].GetArray ()[ 0 ][ key ];
+			return m_document_models[ m_selected_model.c_str () ].GetArray ()[ 0 ][ key ];
 		}
 		else
 		{
-			RapidJSON::JSONifyToValue ( m_document_models[ m_selected_asset.c_str () ].GetArray ()[ 0 ] , m_document_models , key , std::string ( "" ) );
-			return m_document_models[ m_selected_asset.c_str () ].GetArray ()[ 0 ][ key ];
+			RapidJSON::JSONifyToValue ( m_document_models[ m_selected_model.c_str () ].GetArray ()[ 0 ] , m_document_models , key , std::string ( "" ) );
+			return m_document_models[ m_selected_model.c_str () ].GetArray ()[ 0 ][ key ];
+		}
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline rapidjson::Value& EW_AssetManager<EDITOR_RESOURCES>::GetTextureDocumentValue ( char const* key )
+	{
+		assert ( ( m_document_textures.IsObject () && !m_selected_texture.empty () )
+			&& "EW_AssetManager::GetTextureDocumentValue - INVALID QUERY, m_document_models not object or m_selected_model.empty!" );
+
+		if ( m_document_textures[ m_selected_texture.c_str () ].GetArray ()[ 0 ].HasMember ( key ) )
+		{
+			return m_document_textures[ m_selected_texture.c_str () ].GetArray ()[ 0 ][ key ];
+		}
+		else
+		{
+			RapidJSON::JSONifyToValue ( m_document_textures[ m_selected_texture.c_str () ].GetArray ()[ 0 ] , m_document_textures , key , std::string ( "" ) );
+			return m_document_textures[ m_selected_texture.c_str () ].GetArray ()[ 0 ][ key ];
 		}
 	}
 }

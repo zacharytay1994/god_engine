@@ -265,7 +265,11 @@ namespace god
 		auto view = m_registry.view<T , R> ();
 		view.each ( [&scene]( auto& transform , auto& renderable )
 			{
-				scene.AddSceneObject ( renderable.m_model_id , transform.m_position );
+				// temporary
+				if ( renderable.m_model_id != -1 )
+				{
+					scene.AddSceneObject ( renderable.m_model_id , transform.m_position );
+				}
 			} );
 
 	}

@@ -3,6 +3,7 @@
 #include <godUtility/Structures.h>
 #include <godUtility/Utility.h>
 #include "../Window/GLFWWindow.h"
+#include "../OpenGL/OpenGL.h"
 
 namespace god
 {
@@ -17,6 +18,7 @@ namespace god
 
 	using EngineResources = Resources<
 		GLFWWindow ,
-		Asset3DManager 
+		OpenGL ,
+		Asset3DManager
 	>;
 }

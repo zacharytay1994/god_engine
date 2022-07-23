@@ -9,6 +9,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <unordered_map>
+#include <iostream>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -47,7 +48,7 @@ namespace god
 		ProcessNode ( scene->mRootNode , scene , m_meshes );
 	}
 
-	void Model3D::LoadFromFile ( std::string const& modelFile )
+	bool Model3D::LoadFromFile ( std::string const& modelFile )
 	{
 		Assimp::Importer importer;
 
@@ -58,10 +59,13 @@ namespace god
 		const aiScene* scene = importer.ReadFile ( modelFile.c_str () , process_flags );
 		if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode )
 		{
-			throw std::runtime_error ( importer.GetErrorString () );
+			std::cerr << "Asset3D:: - " << modelFile << " is unsupported." << std::endl;
+			std::cerr << importer.GetErrorString () << std::endl;
+			return false;
 		}
 
 		ProcessNode ( scene->mRootNode , scene , m_meshes );
+		return true;
 	}
 
 	std::vector<char> Model3D::ReadFile ( std::string const& filename )
@@ -113,9 +117,12 @@ namespace god
 			vector.z = mesh->mVertices[ i ].z;
 			vertex.m_position = vector;
 
-			vertex.m_normal.x = mesh->mNormals[ i ].x;
-			vertex.m_normal.y = mesh->mNormals[ i ].y;
-			vertex.m_normal.z = mesh->mNormals[ i ].z;
+			if ( mesh->mNormals )
+			{
+				vertex.m_normal.x = mesh->mNormals[ i ].x;
+				vertex.m_normal.y = mesh->mNormals[ i ].y;
+				vertex.m_normal.z = mesh->mNormals[ i ].z;
+			}
 
 			if ( mesh->mTangents )
 			{
@@ -165,6 +172,25 @@ namespace god
 				indices.push_back ( face.mIndices[ k ] );
 			}
 
+		}
+
+		// if no normals, generate some
+		if ( !mesh->mNormals )
+		{
+			for ( int i = 0; i < indices.size (); i += 3 )
+			{
+				auto& v1 = vertices[ indices[ i ] ];
+				auto& v2 = vertices[ indices[ i + 1 ] ];
+				auto& v3 = vertices[ indices[ i + 2 ] ];
+
+				auto edge1 = v1.m_position - v2.m_position;
+				auto edge2 = v3.m_position - v2.m_position;
+
+				auto normal = glm::cross ( edge2 , edge1 );
+				v1.m_normal = normal;
+				v2.m_normal = normal;
+				v3.m_normal = normal;
+			}
 		}
 
 		return { vertices, indices };

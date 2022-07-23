@@ -23,6 +23,8 @@ namespace god
 		std::vector<T> const& GetResources () const;
 		std::unordered_map<std::string , ResourceID> const& GetIDs () const;
 
+		bool Has ( std::string const& name ) const;
+
 	private:
 		std::vector<T> m_resources;
 		std::unordered_map<std::string , ResourceID> m_resource_ids;
@@ -88,5 +90,11 @@ namespace god
 	std::unordered_map<std::string , ResourceID> const& ResourceManager<T>::GetIDs () const
 	{
 		return m_resource_ids;
+	}
+
+	template<typename T>
+	bool ResourceManager<T>::Has ( std::string const& name ) const
+	{
+		return m_resource_ids.find ( name ) != m_resource_ids.end ();
 	}
 }

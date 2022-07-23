@@ -16,7 +16,8 @@
 #include "Editor/Window/EW_EditorStyles.h"
 #include "Editor/Window/EW_AssetImporter.h"
 #include "Editor/Window/EW_AssetManager.h"
-#include "Editor/Window/EW_SceneManager.h"
+#include "Editor/Window/EW_SceneTree.h"
+#include "Editor/Window/EW_EntityEditor.h"
 #include "Editor/Window/EW_SceneView.h"
 #include "Editor/Editor.h"
 
@@ -48,8 +49,9 @@ namespace god
 
 		// setup resources
 		Asset3DManager assets_3d;
-		assets_3d.Insert ( "Backpack" , LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/backpack" , true ) );
-		assets_3d.Insert ( "Skull" , LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/skull" , true ) );
+		InsertAllAsset3DsFromConfig ( AssetPath::File_ModelsConfig , AssetPath::Folder_BuildModels , assets_3d );
+		/*assets_3d.Insert ( "Backpack" , LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/backpack" , true ) );
+		assets_3d.Insert ( "Skull" , LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/skull" , true ) );*/
 
 		opengl.BuildOGLModels ( assets_3d );
 
@@ -73,7 +75,7 @@ namespace god
 		// setup scene
 		Scene scene;
 		//god::SceneObjectID skull = scene.AddSceneObject ( assets_3d.GetID ( "Skull" ) , { 0.0f,0.0f,-2.0f } );
-		SceneObjectID backpack = scene.AddSceneObject ( assets_3d.GetID ( "Backpack" ) , { 0.0f, 0.0f, -5.0f } );
+		//SceneObjectID backpack = scene.AddSceneObject ( assets_3d.GetID ( "Backpack" ) , { 0.0f, 0.0f, -5.0f } );
 
 		// glfw+opengl imgui setup
 		ImGuiOpenGLEditor ogl_editor ( window );
@@ -81,6 +83,7 @@ namespace god
 		// imgui editors : EditorResourcesDef is defined in EditorResourcesDefinition.h
 		EngineResources engine_resources (
 			window ,
+			opengl ,
 			assets_3d
 		);
 		EditorWindows<EngineResources> editor_windows;
@@ -88,7 +91,8 @@ namespace god
 		editor_windows.AddWindow<god::EW_EditorStyles> ( false );
 		editor_windows.AddWindow<god::EW_Asset3DImporter> ( true );
 		editor_windows.AddWindow<god::EW_AssetManager> ( true );
-		editor_windows.AddWindow<god::EW_SceneManager> ( true , std::ref ( enttxsol ) );
+		editor_windows.AddWindow<god::EW_SceneTree> ( true , std::ref ( enttxsol ) );
+		editor_windows.AddWindow<god::EW_EntityEditor> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_SceneView> ( true , camera.m_aspect_ratio );
 
 		/*rapidjson::Document document;

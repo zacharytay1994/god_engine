@@ -7,7 +7,7 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct Renderable3D
 	{
-		int m_model_id { 0 };
+		int m_model_id { -1 };
 	};
 	template <>
 	inline void NewLuaType<Renderable3D> ( sol::state& luaState , std::string const& name )

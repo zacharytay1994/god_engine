@@ -12,6 +12,8 @@ namespace god
 	{
 		ImGuiStyle& style = ImGui::GetStyle ();
 
+		ImGui::StyleColorsLight ();
+
 		style.Colors[ ImGuiCol_Button ] = m_color_button;
 		style.Colors[ ImGuiCol_MenuBarBg ] = m_color_bg_menubar;
 		style.Colors[ ImGuiCol_ButtonHovered ] = m_color_button_hover;

@@ -13,7 +13,10 @@ namespace god
 		}
 		else
 		{
-			m_model.LoadFromFile ( assetPath );
+			if ( !m_model.LoadFromFile ( assetPath ) )
+			{
+				m_success_state = false;
+			}
 		}
 	}
 
@@ -64,5 +67,10 @@ namespace god
 			m_model.m_meshes.back ().m_indices.resize ( indices_size );
 			is.read ( ( char* ) m_model.m_meshes.back ().m_indices.data () , indices_size * sizeof ( Index3D ) );
 		}
+	}
+
+	bool Asset3D::GetSuccessState ()
+	{
+		return m_success_state;
 	}
 }

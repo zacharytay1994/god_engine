@@ -57,7 +57,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;GODENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;GODENGINE_EXPORTS;_WINDOWS;_USRDLL;GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -106,7 +106,8 @@
     <ClInclude Include="Editor\Window\EW_AssetManager.h" />
     <ClInclude Include="Editor\Window\EW_EditorStyles.h" />
     <ClInclude Include="Editor\Window\EW_MainMenuBar.h" />
-    <ClInclude Include="Editor\Window\EW_SceneManager.h" />
+    <ClInclude Include="Editor\Window\EW_EntityEditor.h" />
+    <ClInclude Include="Editor\Window\EW_SceneTree.h" />
     <ClInclude Include="Editor\Window\EW_SceneView.h" />
     <ClInclude Include="Editor\Window\PathConfig.h" />
     <ClInclude Include="Editor\Window\TestWindow.h" />

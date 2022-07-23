@@ -25,6 +25,11 @@ namespace god
 		void GODUTILITY_API Deserialize ( std::string const& path );
 
 		GODUTILITY_API static const std::string m_extension;
+
+		GODUTILITY_API bool GetSuccessState ();
+
+	private:
+		bool m_success_state { true };
 	};
 }
 

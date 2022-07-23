@@ -49,6 +49,7 @@ namespace god
 
 #include "PathConfig.h"
 #include "EW_AssetManager.h"
+#include "../../OpenGL/OpenGL.h"
 
 namespace god
 {
@@ -161,16 +162,16 @@ namespace god
 
 		if ( ImGui::Button ( "Import" , { ImGui::GetWindowWidth () , 0.0f } ) )
 		{
-			// STEP - Serialze
-			rapidjson::Document document;
-			document.SetObject ();
-			god::ReadJSON ( document , File_ModelsConfig );
-
 			// STEP - Create build version of asset
 			switch ( m_asset_type )
 			{
 			case ( AssetType::Model ):
 			{
+				// STEP - Serialize
+				rapidjson::Document document;
+				document.SetObject ();
+				god::ReadJSON ( document , File_ModelsConfig );
+
 				for ( size_t i = 0; i < m_asset_paths.size (); ++i )
 				{
 					rapidjson::Value value;
@@ -178,6 +179,12 @@ namespace god
 
 					std::string model_path = m_asset_paths[ i ];
 					std::string asset_name = m_asset_names[ i ];
+
+					Asset3D load_from_raw ( model_path );
+					if ( !load_from_raw.GetSuccessState () )
+					{
+						continue;
+					}
 
 					// serialize model file name
 					std::string model_name = model_path.substr ( model_path.find_last_of ( '\\' ) + 1 , model_path.size () );
@@ -206,26 +213,43 @@ namespace god
 					god::FolderHelper::CopyFileToFolder ( model_path , Folder_RawModels );
 
 					// STEP - Build custom from raw files
-					Asset3D load_from_raw ( model_path );
 					load_from_raw.Serialize ( Folder_BuildModels + asset_name );
 				}
 
-				this->Get<EW_AssetManager> ()->ReloadModelConfig ();
+				this->Get<EW_AssetManager> ()->ReloadConfig ();
+
+				auto& asset_3d = editorResources.Get< Asset3DManager > ().get ();
+				auto& opengl = editorResources.Get< OpenGL > ().get ();
+
+				InsertAllAsset3DsFromConfig ( File_ModelsConfig , Folder_BuildModels , asset_3d );
+				opengl.BuildOGLModels ( asset_3d );
+
 				break;
 			}
 			case ( AssetType::Texture ):
 			{
+				// STEP - Serialze
+				rapidjson::Document document;
+				document.SetObject ();
+				god::ReadJSON ( document , File_TexturesConfig );
+
 				for ( size_t i = 0; i < m_asset_paths.size (); ++i )
 				{
 					rapidjson::Value value;
 					value.SetObject ();
 
-					std::string asset_path = m_asset_paths[ i ];
+					std::string texture_path = m_asset_paths[ i ];
 					std::string asset_name = m_asset_names[ i ];
 
 					// serialize model file name
-					std::string texture_name = asset_path.substr ( asset_path.find_last_of ( '\\' ) + 1 , asset_path.size () );
-					RapidJSON::JSONifyToValue ( value , document , "Raw Texture" , texture_name );
+					std::string texture_name = texture_path.substr ( texture_path.find_last_of ( '\\' ) + 1 , texture_path.size () );
+					RapidJSON::JSONifyToValue ( value , document , "Raw" , texture_name );
+
+					// serialize model path name
+					RapidJSON::JSONifyToValue ( value , document , "Source" , texture_path );
+
+					// serialize edit time
+					RapidJSON::JSONifyToValue ( value , document , "Last Edited" , GetDateTimeString () );
 
 					if ( document.HasMember ( asset_name.c_str () ) && document[ asset_name.c_str () ].IsArray () )
 					{
@@ -238,10 +262,10 @@ namespace god
 						RapidJSON::JSONifyValues ( document , asset_name , value );
 					}
 
-					god::WriteJSON ( document , File_ModelsConfig );
+					god::WriteJSON ( document , File_TexturesConfig );
 
 					// STEP - File Setup
-					god::FolderHelper::CopyFileToFolder ( asset_path , ( Folder_RawTextures ).c_str () );
+					god::FolderHelper::CopyFileToFolder ( texture_path , ( Folder_RawTextures ).c_str () );
 				}
 				break;
 			}

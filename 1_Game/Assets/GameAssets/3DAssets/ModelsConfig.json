@@ -1,1 +1,37 @@
-{"backpackpacked":[{"Raw":"backpack.obj","Source":"C:\\Users\\zacha\\Documents\\GitHub\\god_engine\\1_Game\\Assets\\GameAssets\\Models\\Backpack\\backpack.obj","Last Edited":"18-07-2022 15-45-14"}],"skull":[{"Raw":"skull.fbx","Source":"C:\\Users\\zacha\\Documents\\GitHub\\god_engine\\1_Game\\Assets\\GameAssets\\Models\\Backpack\\skull.fbx","Last Edited":"21-07-2022 01-48-12"}]}
+{
+    "bunny": [
+        {
+            "Raw": "bunny.obj",
+            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\bunny.obj",
+            "Last Edited": "24-07-2022 00-41-57"
+        }
+    ],
+    "LucyPrinceton": [
+        {
+            "Raw": "lucy_princeton.obj",
+            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\lucy_princeton.obj",
+            "Last Edited": "24-07-2022 02-21-22"
+        }
+    ],
+    "4Sphere": [
+        {
+            "Raw": "4Sphere.obj",
+            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\4Sphere.obj",
+            "Last Edited": "24-07-2022 01-27-46"
+        }
+    ],
+    "Cube": [
+        {
+            "Raw": "cube.obj",
+            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\cube.obj",
+            "Last Edited": "24-07-2022 02-14-45"
+        }
+    ],
+    "Spaceship": [
+        {
+            "Raw": "starwars1.obj",
+            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\starwars1.obj",
+            "Last Edited": "24-07-2022 02-16-07"
+        }
+    ]
+}

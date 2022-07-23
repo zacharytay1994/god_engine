@@ -102,7 +102,7 @@
     <ClInclude Include="EnttXSol\EnttXSol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\Window\EW_SceneManager.h">
+    <ClInclude Include="Editor\Window\EW_EntityEditor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EnttXSol\EngineComponents\EngineComponents.h">
@@ -133,6 +133,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Editor\Window\EW_SceneView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Window\EW_SceneTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
