@@ -2,6 +2,7 @@
 #include "Engine.h"
 
 #include "OpenGL/OpenGL.h"
+#include "OpenGL/Internal/RenderPass.h"
 #include "Window/GLFWWindow.h"
 
 #include "EnttXSol/EngineComponents/EC_All.h"
@@ -16,6 +17,7 @@
 #include "Editor/Window/EW_AssetImporter.h"
 #include "Editor/Window/EW_AssetManager.h"
 #include "Editor/Window/EW_SceneManager.h"
+#include "Editor/Window/EW_SceneView.h"
 #include "Editor/Editor.h"
 
 #include <godCamera/Camera.h>
@@ -36,8 +38,9 @@ namespace god
 	void godEngine::Update ()
 	{
 		// create window
-		GLFWWindow window ( 1200 , 775 );
+		GLFWWindow window ( 1920 , 1080 );
 		OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
+		OGLRenderPass first_renderpass ( window.GetWindowWidth () , window.GetWindowHeight () );
 
 		// setup camera
 		Camera camera;
@@ -80,12 +83,13 @@ namespace god
 			window ,
 			assets_3d
 		);
-		EditorWindows<decltype( engine_resources )> editor_windows;
+		EditorWindows<EngineResources> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
 		editor_windows.AddWindow<god::EW_EditorStyles> ( false );
-		editor_windows.AddWindow<god::EW_Asset3DImporter> ( false );
-		editor_windows.AddWindow<god::EW_AssetManager> ( false );
-		editor_windows.AddWindow<god::EW_SceneManager> ( false , std::ref ( enttxsol ) );
+		editor_windows.AddWindow<god::EW_Asset3DImporter> ( true );
+		editor_windows.AddWindow<god::EW_AssetManager> ( true );
+		editor_windows.AddWindow<god::EW_SceneManager> ( true , std::ref ( enttxsol ) );
+		editor_windows.AddWindow<god::EW_SceneView> ( true , camera.m_aspect_ratio );
 
 		/*rapidjson::Document document;
 		document.SetObject ();*/
@@ -115,6 +119,7 @@ namespace god
 			{
 				opengl.ResizeViewport ( window.GetWindowWidth () , window.GetWindowHeight () );
 				camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
+				first_renderpass.UpdateWidth ( window.GetWindowWidth () , window.GetWindowHeight () );
 			}
 
 			opengl.ClearColour ();
@@ -126,15 +131,19 @@ namespace god
 			//scene.GetSceneObject ( skull ).m_rotation.y += 0.0002f;
 
 			// render scene
+			first_renderpass.Bind ();
 			opengl.RenderScene (
 				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,
 				camera.GetCameraViewMatrix () ,
 				camera.m_position
 			);
+			first_renderpass.UnBind ();
 
 			// ... render imgui windows
 			ogl_editor.BeginFrame ();
+			// pass scene view the renderpass texture
+			editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( first_renderpass.GetTexture () );
 			editor_windows.Update ( 0.02f , engine_resources );
 			ogl_editor.Render ();
 			ogl_editor.EndFrame ();

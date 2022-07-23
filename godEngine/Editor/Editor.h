@@ -14,6 +14,8 @@
 #include <memory>
 #include <assert.h>
 
+#include "../Window/GLFWWindow.h"
+
 namespace god
 {
 	struct EditorStyle
@@ -56,30 +58,30 @@ namespace god
 		void DeJSONify ( bool current = false );
 	};
 
-	template <typename EDITOR_RESOURCES>
+	template <typename ENGINE_RESOURCES>
 	struct EditorWindows;
 
-	template <typename EDITOR_RESOURCES>
+	template <typename ENGINE_RESOURCES>
 	struct EditorWindow
 	{
 		bool m_open { true };
 
-		void BaseUpdate ( float dt , EDITOR_RESOURCES& editorResources );
-		virtual void Update ( float dt , EDITOR_RESOURCES& editorResources ) = 0;
+		void BaseUpdate ( float dt , ENGINE_RESOURCES& engineResources );
+		virtual void Update ( float dt , ENGINE_RESOURCES& editorResources ) = 0;
 		void Open ();
 		virtual void OnOpen ();
 		void Close ();
 		virtual void OnClose ();
 
-		friend struct EditorWindows<EDITOR_RESOURCES>;
+		friend struct EditorWindows<ENGINE_RESOURCES>;
 	protected:
 		std::string m_name { "" };
-		EditorWindows<EDITOR_RESOURCES>* m_editor_windows { nullptr };
+		EditorWindows<ENGINE_RESOURCES>* m_editor_windows { nullptr };
 		template <template <typename T> class WINDOW>
-		std::shared_ptr<WINDOW<EDITOR_RESOURCES>> Get ();
+		std::shared_ptr<WINDOW<ENGINE_RESOURCES>> Get ();
 	};
 
-	template <typename EDITOR_RESOURCES>
+	template <typename ENGINE_RESOURCES>
 	struct EditorWindows
 	{
 		EditorStyle m_editor_style;
@@ -88,74 +90,85 @@ namespace god
 
 		template <template<typename T> class WINDOW , typename...CONSTRUCTOR_ARGS>
 		void AddWindow ( bool startOpen , CONSTRUCTOR_ARGS ...args );
-		std::unordered_map<std::string , std::shared_ptr<EditorWindow<EDITOR_RESOURCES>>> const& GetWindows ();
+		template <template<typename T> class WINDOW>
+		std::shared_ptr<WINDOW<ENGINE_RESOURCES>> GetWindow ();
+		std::unordered_map<std::string , std::shared_ptr<EditorWindow<ENGINE_RESOURCES>>> const& GetWindows ();
 
-		void Update ( float dt , EDITOR_RESOURCES& editorResources );
+		void Update ( float dt , ENGINE_RESOURCES& editorResources );
 	private:
-		std::unordered_map<std::string , std::shared_ptr<EditorWindow<EDITOR_RESOURCES>>> m_windows;
+		std::unordered_map<std::string , std::shared_ptr<EditorWindow<ENGINE_RESOURCES>>> m_windows;
 	};
 
-	template<typename EDITOR_RESOURCES>
-	inline void EditorWindow<EDITOR_RESOURCES>::BaseUpdate ( float dt , EDITOR_RESOURCES& editorResources )
+	template<typename ENGINE_RESOURCES>
+	inline void EditorWindow<ENGINE_RESOURCES>::BaseUpdate ( float dt , ENGINE_RESOURCES& engineResources )
 	{
 		if ( m_open )
 		{
-			Update ( dt , editorResources );
+			Update ( dt , engineResources );
 		}
 	}
 
-	template<typename EDITOR_RESOURCES>
-	inline void EditorWindow<EDITOR_RESOURCES>::Open ()
+	template<typename ENGINE_RESOURCES>
+	inline void EditorWindow<ENGINE_RESOURCES>::Open ()
 	{
 		m_open = true;
 		OnOpen ();
 	}
 
-	template<typename EDITOR_RESOURCES>
-	inline void EditorWindow<EDITOR_RESOURCES>::OnOpen ()
+	template<typename ENGINE_RESOURCES>
+	inline void EditorWindow<ENGINE_RESOURCES>::OnOpen ()
 	{
 	}
 
-	template<typename EDITOR_RESOURCES>
-	inline void EditorWindow<EDITOR_RESOURCES>::Close ()
+	template<typename ENGINE_RESOURCES>
+	inline void EditorWindow<ENGINE_RESOURCES>::Close ()
 	{
 		m_open = false;
 		OnClose ();
 	}
 
-	template<typename EDITOR_RESOURCES>
-	inline void EditorWindow<EDITOR_RESOURCES>::OnClose ()
+	template<typename ENGINE_RESOURCES>
+	inline void EditorWindow<ENGINE_RESOURCES>::OnClose ()
 	{
 	}
 
-	template<typename EDITOR_RESOURCES>
+	template<typename ENGINE_RESOURCES>
 	template <template <typename T> class WINDOW>
-	inline std::shared_ptr<WINDOW<EDITOR_RESOURCES>> EditorWindow<EDITOR_RESOURCES>::Get ()
+	inline std::shared_ptr<WINDOW<ENGINE_RESOURCES>> EditorWindow<ENGINE_RESOURCES>::Get ()
 	{
 		assert ( m_editor_windows->GetWindows ().find ( typeid( WINDOW ).name () ) != m_editor_windows->GetWindows ().end () );
-		return std::dynamic_pointer_cast< WINDOW<EDITOR_RESOURCES> >( m_editor_windows->GetWindows ().at ( typeid( WINDOW ).name () ) );
+		return std::dynamic_pointer_cast< WINDOW<ENGINE_RESOURCES> >( m_editor_windows->GetWindows ().at ( typeid( WINDOW ).name () ) );
 	}
 
-	template<typename EDITOR_RESOURCES>
-	inline EditorWindows<EDITOR_RESOURCES>::EditorWindows ()
+	template<typename ENGINE_RESOURCES>
+	inline EditorWindows<ENGINE_RESOURCES>::EditorWindows ()
 	{
 		m_editor_style.SetImGuiFont ( m_editor_style.m_font_path.c_str () );
 	}
 
-	template<typename EDITOR_RESOURCES>
+	template<typename ENGINE_RESOURCES>
 	template<template <typename T> class WINDOW , typename...CONSTRUCTOR_ARGS>
-	inline void EditorWindows<EDITOR_RESOURCES>::AddWindow ( bool startOpen , CONSTRUCTOR_ARGS ...args )
+	inline void EditorWindows<ENGINE_RESOURCES>::AddWindow ( bool startOpen , CONSTRUCTOR_ARGS ...args )
 	{
 		std::string name { typeid( WINDOW ).name () };
-		m_windows.insert ( { name , std::make_shared<WINDOW<EDITOR_RESOURCES>> ( args ... ) } );
+		m_windows.insert ( { name , std::make_shared<WINDOW<ENGINE_RESOURCES>> ( args ... ) } );
 		m_windows.at ( name )->m_editor_windows = this;
 		m_windows.at ( name )->m_name = name;
 		m_windows.at ( name )->m_open = startOpen;
 	}
 
-	template<typename EDITOR_RESOURCES>
-	inline void EditorWindows<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
+	template<typename ENGINE_RESOURCES>
+	template<template <typename T> class WINDOW>
+	inline std::shared_ptr<WINDOW<ENGINE_RESOURCES>> EditorWindows<ENGINE_RESOURCES>::GetWindow ()
 	{
+		assert ( m_windows.find ( typeid( WINDOW ).name () ) != m_windows.end () );
+		return std::dynamic_pointer_cast< WINDOW<ENGINE_RESOURCES> >( m_windows.at ( typeid( WINDOW ).name () ) );
+	}
+
+	template<typename ENGINE_RESOURCES>
+	inline void EditorWindows<ENGINE_RESOURCES>::Update ( float dt , ENGINE_RESOURCES& editorResources )
+	{
+		ImGui::DockSpaceOverViewport ( ImGui::GetMainViewport () );
 		int i = 0;
 		m_editor_style.PushFont ();
 		for ( auto& window : m_windows )
@@ -167,8 +180,8 @@ namespace god
 		m_editor_style.PopFont ();
 	}
 
-	template<typename EDITOR_RESOURCES>
-	inline std::unordered_map<std::string , std::shared_ptr<EditorWindow<EDITOR_RESOURCES>>> const& EditorWindows<EDITOR_RESOURCES>::GetWindows ()
+	template<typename ENGINE_RESOURCES>
+	inline std::unordered_map<std::string , std::shared_ptr<EditorWindow<ENGINE_RESOURCES>>> const& EditorWindows<ENGINE_RESOURCES>::GetWindows ()
 	{
 		return m_windows;
 	}

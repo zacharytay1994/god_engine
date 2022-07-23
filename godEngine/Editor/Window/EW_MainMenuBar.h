@@ -14,6 +14,7 @@ namespace god
 #include "EW_AssetImporter.h"
 #include "EW_AssetManager.h"
 #include "EW_SceneManager.h"
+#include "EW_SceneView.h"
 
 namespace god
 {
@@ -55,6 +56,11 @@ namespace god
 				if ( ImGui::MenuItem ( "Scene Manager" , "[NONE]" ) )
 				{
 					this->Get<EW_SceneManager> ()->Open ();
+				}
+
+				if ( ImGui::MenuItem ( "Scene View" , "[NONE]" ) )
+				{
+					this->Get<EW_SceneView> ()->Open ();
 				}
 
 				ImGui::EndMenu ();
