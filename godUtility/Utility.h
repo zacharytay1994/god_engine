@@ -17,9 +17,4 @@ namespace god
 	GODUTILITY_API void InsertAsset3DFromPath ( std::string const& assetName , std::string const& assetFolderPath , Asset3DManager& manager );
 
 	GODUTILITY_API void InsertAllAsset3DsFromConfig ( std::string const& configPath , std::string const& assetFolderPath , Asset3DManager& manager );
-
-	struct Utility
-	{
-
-	};
 }

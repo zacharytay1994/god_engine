@@ -89,8 +89,8 @@ namespace god
 		EditorWindows<EngineResources> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
 		editor_windows.AddWindow<god::EW_EditorStyles> ( false );
-		editor_windows.AddWindow<god::EW_Asset3DImporter> ( true );
 		editor_windows.AddWindow<god::EW_AssetManager> ( true );
+		editor_windows.AddWindow<god::EW_Asset3DImporter> ( true );
 		editor_windows.AddWindow<god::EW_SceneTree> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_EntityEditor> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_SceneView> ( true , camera.m_aspect_ratio );

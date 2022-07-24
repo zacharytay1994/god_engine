@@ -268,7 +268,7 @@ namespace god
 				// temporary
 				if ( renderable.m_model_id != -1 )
 				{
-					scene.AddSceneObject ( renderable.m_model_id , transform.m_position );
+					scene.AddSceneObject ( renderable.m_model_id , transform.m_position , transform.m_rotation , transform.m_scale );
 				}
 			} );
 

@@ -32,14 +32,6 @@ namespace god
 		};
 		AssetType m_asset_type { AssetType::Count };
 
-		//uint32_t	MAX_INPUT_LENGTH { 256 };
-		/*std::string ASSET3D_FOLDER { "Assets/GameAssets/Asset3D/" };
-		std::string RAW_FOLDER { "Raw/" };
-		std::string BUILD_FOLDER { "Build/" };
-		std::string MODEL_FOLDER { "Models/" };
-		std::string TEXTURE_FOLDER { "Textures/" };
-		std::string CONFIG_FILE { "ModelConfig.json" };*/
-
 		std::vector<std::string> m_asset_paths;
 		std::vector<std::string> m_asset_names;
 
@@ -75,7 +67,6 @@ namespace god
 
 				if ( ImGui::Button ( "Browse Models" , { ImGui::GetWindowWidth () , 0.0f } ) )
 				{
-					//m_model_path = OpenWindowDialog ( L"Model Files" , L"*.obj;*.fbx" );
 					m_asset_paths = OpenWindowDialogMulti ( L"Model Files" , L"*.obj;*.fbx" );
 
 					// default asset names
@@ -140,26 +131,6 @@ namespace god
 			ImGui::PopID ();
 		}
 
-		/*ImGui::InputText ( "Asset Name" , &m_asset_name );
-		ImGui::SameLine ();*/
-		/*switch ( m_asset_type )
-		{
-		case ( AssetType::Model ):
-			ImGui::Text ( ( std::string ( "(" ) + Asset3D::m_extension + ")" ).c_str () );
-			break;
-		}*/
-
-		/*ImGui::PushStyleColor ( ImGuiCol_Text , { 1.0f, 0.0f, 0.0f, 1.0f } );
-		if ( m_model_path.empty () )
-		{
-			ImGui::Text ( "Select a model with browse." );
-		}
-		if ( m_asset_name.empty () )
-		{
-			ImGui::Text ( "Give the asset a name." );
-		}
-		ImGui::PopStyleColor ();*/
-
 		if ( ImGui::Button ( "Import" , { ImGui::GetWindowWidth () , 0.0f } ) )
 		{
 			// STEP - Create build version of asset
@@ -195,6 +166,11 @@ namespace god
 
 					// serialize edit time
 					RapidJSON::JSONifyToValue ( value , document , "Last Edited" , GetDateTimeString () );
+
+					// generate uid at time of creation
+					auto ms_since_epoch = std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::system_clock::now ().time_since_epoch () ).count () + i;
+					auto uid = std::hash<unsigned long long> {} ( ms_since_epoch );
+					RapidJSON::JSONifyToValue ( value , document , "UID" , static_cast< uint32_t >( uid ) );
 
 					if ( document.HasMember ( asset_name.c_str () ) && document[ asset_name.c_str () ].IsArray () )
 					{

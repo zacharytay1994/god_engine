@@ -11,7 +11,7 @@ namespace god
 	{
 		glm::vec3 m_position;
 		glm::vec3 m_rotation;
-		glm::vec3 m_scale;
+		glm::vec3 m_scale { 1.0f, 1.0f,1.0f };
 	};
 	template <>
 	inline void NewLuaType<Transform> ( sol::state& luaState , std::string const& name )

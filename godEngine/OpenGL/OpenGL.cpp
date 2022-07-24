@@ -65,6 +65,14 @@ namespace god
 		m_model_ids = asset3DManager.GetIDs ();
 	}
 
+	void OpenGL::UpdateOGLModel ( ResourceID id , Asset3DManager const& asset3DManager )
+	{
+		m_models[ id ].clear ();
+		BuildOGLMeshesFromAssimpMeshes ( m_models[ id ] , asset3DManager.Get ( id ).m_model.m_meshes );
+		// copy mesh ids
+		m_model_ids = asset3DManager.GetIDs ();
+	}
+
 	void OpenGL::RenderScene ( Scene const& scene ,
 		glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position )
 	{

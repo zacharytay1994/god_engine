@@ -11,6 +11,7 @@
 #include <string>
 #include <iostream>
 #include <assert.h>
+#include <cstdio>
 
 // to bypass windows.h GetObject() macro definition
 #ifdef _MSC_VER
@@ -102,7 +103,14 @@ namespace god
 
 					for ( auto& m : m_document_models[ m_selected_model.c_str () ].GetArray ()[ 0 ].GetObject () )
 					{
-						ImGui::Text ( "%s : %s" , m.name.GetString () , m.value.GetString () );
+						if ( m.value.IsString () )
+						{
+							ImGui::Text ( "%s : %s" , m.name.GetString () , m.value.GetString () );
+						}
+						else if ( m.value.IsNumber () )
+						{
+							ImGui::Text ( "%s : %u" , m.name.GetString () , static_cast< unsigned long long >( m.value.GetUint () ) );
+						}
 					}
 					ImGui::EndChild ();
 				}
@@ -138,37 +146,67 @@ namespace god
 
 					if ( ImGui::Button ( "Apply" , { popup_width, 0.0f } ) )
 					{
-						if ( m_document_models.HasMember ( m_selected_model.c_str () ) )
+						// if new name already exists in config, i.e. representing another model
+						if ( m_edit_name != m_selected_model && m_document_models.FindMember ( m_edit_name.c_str () ) != m_document_models.MemberEnd () )
 						{
-							// set new name
-							rapidjson::Value::MemberIterator value = m_document_models.FindMember ( m_selected_model.c_str () );
-							value->name.SetString ( m_edit_name.c_str () , m_document_models.GetAllocator () );
-							m_selected_model = m_edit_name;
-
-							// if diff source, set new raw and source and rebuild model
-							if ( m_edit_new_src )
+							// print something to the error line ... TBD
+						}
+						else
+						{
+							if ( m_document_models.HasMember ( m_selected_model.c_str () ) )
 							{
-								Asset3D load_from_raw ( m_edit_src );
-								if ( load_from_raw.GetSuccessState () )
-								{
-									GetModelDocumentValue ( "Raw" ).SetString ( m_edit_raw.c_str () , m_document_models.GetAllocator () );
-									GetModelDocumentValue ( "Source" ).SetString ( m_edit_src.c_str () , m_document_models.GetAllocator () );
+								// set new name
+								rapidjson::Value::MemberIterator value = m_document_models.FindMember ( m_selected_model.c_str () );
+								value->name.SetString ( m_edit_name.c_str () , m_document_models.GetAllocator () );
+								// update custom model file with new name
+								std::rename ( ( AssetPath::Folder_BuildModels + m_selected_model + Asset3D::m_extension ).c_str () ,
+									( AssetPath::Folder_BuildModels + m_edit_name + Asset3D::m_extension ).c_str () );
+								std::string old_name { m_selected_model };
+								m_selected_model = m_edit_name;
 
-									// serialize to config and copy to raw models folder
-									load_from_raw.Serialize ( AssetPath::Folder_BuildModels + m_edit_name );
-									god::FolderHelper::CopyFileToFolder ( m_edit_src , AssetPath::Folder_RawModels );
+								// if diff source, set new raw and source and rebuild model
+								bool new_raw { false };
+								if ( m_edit_new_src )
+								{
+									Asset3D load_from_raw ( m_edit_src );
+									if ( load_from_raw.GetSuccessState () )
+									{
+										GetModelDocumentValue ( "Raw" ).SetString ( m_edit_raw.c_str () , m_document_models.GetAllocator () );
+										GetModelDocumentValue ( "Source" ).SetString ( m_edit_src.c_str () , m_document_models.GetAllocator () );
+
+										// serialize to config and copy to raw models folder
+										load_from_raw.Serialize ( AssetPath::Folder_BuildModels + m_edit_name );
+										god::FolderHelper::CopyFileToFolder ( m_edit_src , AssetPath::Folder_RawModels );
+										new_raw = true;
+									}
+								}
+
+								// update last edited date and time
+								GetModelDocumentValue ( "Last Edited" ).SetString ( GetDateTimeString ().c_str () , m_document_models.GetAllocator () );
+
+								// update json
+								god::WriteJSON ( m_document_models , AssetPath::File_ModelsConfig );
+
+								// update asset3d resource maager 
+								// insert to asset3dmanager edited model
+								auto& asset_3d = editorResources.Get<Asset3DManager> ().get ();
+								// check if it was already loaded before
+								if ( asset_3d.Has ( old_name ) )
+								{
+									// update with new name
+									asset_3d.UpdateName ( old_name , m_edit_name , asset_3d.GetID ( old_name ) );
+
+									// check if it has new raw 
+									if ( new_raw )
+									{
+										asset_3d.SetResource ( asset_3d.GetID ( m_edit_name ) , LoadAsset3D ( AssetPath::Folder_BuildModels + m_edit_name , true ) );
+										editorResources.Get<OpenGL> ().get ().UpdateOGLModel ( asset_3d.GetID ( m_edit_name ) , asset_3d );
+									}
 								}
 							}
 
-							// update last edited date and time
-							GetModelDocumentValue ( "Last Edited" ).SetString ( GetDateTimeString ().c_str () , m_document_models.GetAllocator () );
-
-							// update json
-							god::WriteJSON ( m_document_models , AssetPath::File_ModelsConfig );
+							ImGui::CloseCurrentPopup ();
 						}
-
-						ImGui::CloseCurrentPopup ();
-
 					}
 					ImGui::EndPopup ();
 				}
@@ -370,7 +408,7 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline rapidjson::Value& EW_AssetManager<EDITOR_RESOURCES>::GetModelDocumentValue ( char const* key )
 	{
-		assert ( ( m_document_models.IsObject () && !m_selected_model.empty () ) 
+		assert ( ( m_document_models.IsObject () && !m_selected_model.empty () )
 			&& "EW_AssetManager::GetModelDocumentValue - INVALID QUERY, m_document_models not object or m_selected_model.empty!" );
 
 		if ( m_document_models[ m_selected_model.c_str () ].GetArray ()[ 0 ].HasMember ( key ) )

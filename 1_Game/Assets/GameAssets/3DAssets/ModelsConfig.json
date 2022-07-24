@@ -1,37 +1,18 @@
 {
-    "bunny": [
-        {
-            "Raw": "bunny.obj",
-            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\bunny.obj",
-            "Last Edited": "24-07-2022 00-41-57"
-        }
-    ],
     "LucyPrinceton": [
         {
             "Raw": "lucy_princeton.obj",
             "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\lucy_princeton.obj",
-            "Last Edited": "24-07-2022 02-21-22"
+            "Last Edited": "25-07-2022 00-03-35",
+            "UID": 2942613155
         }
     ],
     "4Sphere": [
         {
             "Raw": "4Sphere.obj",
             "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\4Sphere.obj",
-            "Last Edited": "24-07-2022 01-27-46"
-        }
-    ],
-    "Cube": [
-        {
-            "Raw": "cube.obj",
-            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\cube.obj",
-            "Last Edited": "24-07-2022 02-14-45"
-        }
-    ],
-    "Spaceship": [
-        {
-            "Raw": "starwars1.obj",
-            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\starwars1.obj",
-            "Last Edited": "24-07-2022 02-16-07"
+            "Last Edited": "25-07-2022 00-03-57",
+            "UID": 2163941415
         }
     ]
 }

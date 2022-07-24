@@ -27,7 +27,8 @@ namespace god
 
 		// render scene functions
 		// assimp bridge
-		void  BuildOGLModels ( Asset3DManager const& modelManager );
+		void  BuildOGLModels ( Asset3DManager const& asset3DManager );
+		void  UpdateOGLModel ( ResourceID id , Asset3DManager const& asset3DManager );
 		void  RenderScene ( Scene const& scene ,
 			glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position );
 

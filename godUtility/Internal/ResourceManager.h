@@ -16,12 +16,16 @@ namespace god
 		ResourceID Insert ( std::string const& name , T const& resource );
 		T& Get ( std::string const& name );
 		T& Get ( ResourceID id );
+		T const& Get ( ResourceID id ) const;
 
 		std::string GetName ( ResourceID id ) const;
 		ResourceID	GetID ( std::string const& name ) const;
 
 		std::vector<T> const& GetResources () const;
 		std::unordered_map<std::string , ResourceID> const& GetIDs () const;
+
+		void SetResource ( ResourceID id , T const& resource );
+		void UpdateName ( std::string const& oldName , std::string const& newName , ResourceID id );
 
 		bool Has ( std::string const& name ) const;
 
@@ -61,6 +65,13 @@ namespace god
 	}
 
 	template<typename T>
+	T const& ResourceManager<T>::Get ( ResourceID id ) const
+	{
+		assert ( id < static_cast< ResourceID >( m_resources.size () ) );
+		return m_resources.at ( id );
+	}
+
+	template<typename T>
 	std::string ResourceManager<T>::GetName ( ResourceID id ) const
 	{
 		for ( auto const& resource : m_resource_ids )
@@ -90,6 +101,22 @@ namespace god
 	std::unordered_map<std::string , ResourceID> const& ResourceManager<T>::GetIDs () const
 	{
 		return m_resource_ids;
+	}
+
+	template<typename T>
+	inline void ResourceManager<T>::SetResource ( ResourceID id , T const& resource )
+	{
+		assert ( id < m_resources.size () );
+		m_resources[ id ] = resource;
+	}
+
+	template<typename T>
+	inline void ResourceManager<T>::UpdateName ( std::string const& oldName , std::string const& newName , ResourceID id )
+	{
+		// remove old name
+		m_resource_ids.erase ( oldName );
+		// insert new name
+		m_resource_ids.insert ( { newName, id } );
 	}
 
 	template<typename T>
