@@ -36,6 +36,8 @@ namespace god
 		std::vector<std::string> m_asset_names;
 
 		std::string m_error_message { "" };
+
+		bool m_flip_model_UVs { true };
 	};
 }
 
@@ -116,22 +118,37 @@ namespace god
 			ImGui::Text ( "- Nothing Selected -" );
 		}
 
+		auto asset_manager = this->Get<EW_AssetManager> ();
+		bool importable { true };
+
+		ImGui::BeginChild ( "Paths" , { ImGui::GetWindowWidth () - 20, ImGui::GetWindowHeight () - 190 } , false , ImGuiWindowFlags_HorizontalScrollbar );
 		for ( size_t i = 0; i < m_asset_paths.size (); ++i )
 		{
 			ImGui::PushID ( static_cast< int >( i ) );
 
 			ImGui::Separator ();
 
-			ImGui::BeginChild ( "Paths" , { ImGui::GetWindowWidth () - 20, 75 } , false , ImGuiWindowFlags_HorizontalScrollbar );
 			ImGui::Text ( "%d. %s" , i + 1 , m_asset_paths[ i ].c_str () );
 
+			if ( asset_manager->ModelNameExists ( m_asset_names[ i ] ) )
+			{
+				importable = false;
+				ImGui::PushStyleColor ( ImGuiCol_Text , { 1.0f, 0.0f, 0.0f, 1.0f } );
+				ImGui::Text ( "** Name already used!" );
+				ImGui::PopStyleColor ();
+			}
+
 			ImGui::InputText ( ":Name" , &m_asset_names[ i ] );
-			ImGui::EndChild ();
 
 			ImGui::PopID ();
 		}
+		ImGui::EndChild ();
 
-		if ( ImGui::Button ( "Import" , { ImGui::GetWindowWidth () , 0.0f } ) )
+		ImGui::Text ( "Flip UVs :" );
+		ImGui::SameLine ();
+		ImGui::Checkbox ( "##flipuvs" , &m_flip_model_UVs );
+
+		if ( ImGui::Button ( "Import" , { ImGui::GetWindowWidth () , 0.0f } ) && importable )
 		{
 			// STEP - Create build version of asset
 			switch ( m_asset_type )
@@ -151,7 +168,7 @@ namespace god
 					std::string model_path = m_asset_paths[ i ];
 					std::string asset_name = m_asset_names[ i ];
 
-					Asset3D load_from_raw ( model_path );
+					Asset3D load_from_raw ( model_path , false , m_flip_model_UVs );
 					if ( !load_from_raw.GetSuccessState () )
 					{
 						continue;
@@ -227,6 +244,11 @@ namespace god
 					// serialize edit time
 					RapidJSON::JSONifyToValue ( value , document , "Last Edited" , GetDateTimeString () );
 
+					// generate uid at time of creation
+					auto ms_since_epoch = std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::system_clock::now ().time_since_epoch () ).count () + i;
+					auto uid = std::hash<unsigned long long> {} ( ms_since_epoch );
+					RapidJSON::JSONifyToValue ( value , document , "UID" , static_cast< uint32_t >( uid ) );
+
 					if ( document.HasMember ( asset_name.c_str () ) && document[ asset_name.c_str () ].IsArray () )
 					{
 						// for unique id implementation next time
@@ -243,10 +265,14 @@ namespace god
 					// STEP - File Setup
 					god::FolderHelper::CopyFileToFolder ( texture_path , ( Folder_RawTextures ).c_str () );
 				}
+
+				InsertAllOGLTexturesFromConfig ( AssetPath::File_TexturesConfig , AssetPath::Folder_RawTextures , editorResources.Get< OGLTextureManager > ().get () );
+
 				break;
 			}
 			}
 
+			m_flip_model_UVs = true;
 			Clear ();
 		}
 

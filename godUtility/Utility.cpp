@@ -12,9 +12,9 @@
 
 namespace god
 {
-	Asset3D LoadAsset3D ( std::string const& assetPath , bool custom )
+	Asset3D LoadAsset3D ( std::string const& assetPath , bool custom , bool flipUVs )
 	{
-		return Asset3D ( assetPath , custom );
+		return Asset3D ( assetPath , custom , flipUVs );
 	}
 
 	void InsertAsset3DFromPath ( std::string const& assetName , std::string const& assetFolderPath , Asset3DManager& manager )

@@ -8,5 +8,6 @@ namespace god
 	{
 		// some code here ...
 		//std::cout << transform.m_position.x << std::endl;
+		transform.m_rotation.y += 0.002f;
 	}
 }

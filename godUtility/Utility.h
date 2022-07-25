@@ -12,7 +12,7 @@ namespace god
 {
 	using Asset3DManager = ResourceManager<Asset3D>;
 
-	GODUTILITY_API Asset3D LoadAsset3D ( std::string const& assetPath , bool custom = false );
+	GODUTILITY_API Asset3D LoadAsset3D ( std::string const& assetPath , bool custom , bool flipUVs = true );
 
 	GODUTILITY_API void InsertAsset3DFromPath ( std::string const& assetName , std::string const& assetFolderPath , Asset3DManager& manager );
 

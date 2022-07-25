@@ -2,6 +2,7 @@
 
 #include "Internal/Shader.h"
 #include "Internal/Primitives.h"
+#include "Internal/OGLTexture.h"
 #include "../godUtility/Utility.h"
 
 #include <vector>
@@ -30,7 +31,7 @@ namespace god
 		void  BuildOGLModels ( Asset3DManager const& asset3DManager );
 		void  UpdateOGLModel ( ResourceID id , Asset3DManager const& asset3DManager );
 		void  RenderScene ( Scene const& scene ,
-			glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position );
+			glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures );
 
 		void  ResizeViewport ( int width , int height ) const;
 
@@ -41,6 +42,7 @@ namespace god
 
 		// shaders
 		OGLShader m_flat_shader;
+		OGLShader m_textured_shader;
 
 		// models - vector of vector of OGLMesh because 1 model can consist of more than 1 mesh
 		std::vector<std::vector<OGLMesh>> m_models;

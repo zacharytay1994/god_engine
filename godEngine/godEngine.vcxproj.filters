@@ -138,6 +138,9 @@
     <ClInclude Include="Editor\Window\EW_SceneTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OpenGL\Internal\OGLTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -201,6 +204,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OpenGL\Internal\RenderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Internal\OGLTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

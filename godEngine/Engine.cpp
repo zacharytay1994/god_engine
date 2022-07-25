@@ -3,6 +3,8 @@
 
 #include "OpenGL/OpenGL.h"
 #include "OpenGL/Internal/RenderPass.h"
+#include "OpenGL/Internal/OGLTexture.h"
+
 #include "Window/GLFWWindow.h"
 
 #include "EnttXSol/EngineComponents/EC_All.h"
@@ -50,8 +52,9 @@ namespace god
 		// setup resources
 		Asset3DManager assets_3d;
 		InsertAllAsset3DsFromConfig ( AssetPath::File_ModelsConfig , AssetPath::Folder_BuildModels , assets_3d );
-		/*assets_3d.Insert ( "Backpack" , LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/backpack" , true ) );
-		assets_3d.Insert ( "Skull" , LoadAsset3D ( "Assets/GameAssets/3DAssets/Build/Models/skull" , true ) );*/
+		OGLTextureManager ogl_textures;
+		InsertEngineOGLTextures ( ogl_textures ); // temp solution to insert engine textures, might change
+		InsertAllOGLTexturesFromConfig ( AssetPath::File_TexturesConfig , AssetPath::Folder_RawTextures , ogl_textures );
 
 		opengl.BuildOGLModels ( assets_3d );
 
@@ -84,7 +87,8 @@ namespace god
 		EngineResources engine_resources (
 			window ,
 			opengl ,
-			assets_3d
+			assets_3d ,
+			ogl_textures
 		);
 		EditorWindows<EngineResources> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
@@ -140,7 +144,8 @@ namespace god
 				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,
 				camera.GetCameraViewMatrix () ,
-				camera.m_position
+				camera.m_position ,
+				ogl_textures
 			);
 			first_renderpass.UnBind ();
 

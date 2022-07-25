@@ -5,7 +5,7 @@ namespace god
 {
 	const std::string Asset3D::m_extension { ".god3d" };
 
-	Asset3D::Asset3D ( std::string const& assetPath , bool custom )
+	Asset3D::Asset3D ( std::string const& assetPath , bool custom , bool flipUVs )
 	{
 		if ( custom )
 		{
@@ -13,7 +13,7 @@ namespace god
 		}
 		else
 		{
-			if ( !m_model.LoadFromFile ( assetPath ) )
+			if ( !m_model.LoadFromFile ( assetPath , flipUVs ) )
 			{
 				m_success_state = false;
 			}

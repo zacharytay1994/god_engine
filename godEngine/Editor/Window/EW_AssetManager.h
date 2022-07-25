@@ -30,6 +30,8 @@ namespace god
 
 		void ReloadConfig ();
 
+		bool ModelNameExists ( std::string const& name );
+
 	private:
 		rapidjson::Document m_document_models;
 		rapidjson::Document m_document_textures;
@@ -39,9 +41,11 @@ namespace god
 
 		// model editing
 		std::string m_edit_name { "" };
+		std::string m_edit_current_raw { "" };
 		std::string m_edit_raw { "" };
 		std::string m_edit_src { "" };
 		bool m_edit_new_src { false };
+		bool m_flip_model_UVs { true };
 
 		rapidjson::Value& GetModelDocumentValue ( char const* key );
 		rapidjson::Value& GetTextureDocumentValue ( char const* key );
@@ -125,14 +129,22 @@ namespace god
 					ImGui::Text ( "New Properties" );
 					ImGui::Text ( "Name:" );
 					ImGui::SetNextItemWidth ( popup_width - 30.0f );
+
+					bool editable { true };
+					if ( m_edit_name != m_selected_model && ModelNameExists ( m_edit_name ) )
+					{
+						editable = false;
+						ImGui::PushStyleColor ( ImGuiCol_Text , { 1.0f, 0.0f, 0.0f, 1.0f } );
+						ImGui::Text ( "** Name already used!" );
+						ImGui::PopStyleColor ();
+					}
 					ImGui::InputText ( "##ModelEditName" , &m_edit_name );
 
-					ImGui::Text ( "Raw:" );
-					ImGui::Text ( m_edit_raw.c_str () );
+					ImGui::Text ( "Current Raw:" );
+					ImGui::Text ( m_edit_current_raw.c_str () );
 
 					if ( ImGui::Button ( "Edit Raw" , { popup_width - 30.0f, 0.0f } ) )
 					{
-
 						std::string new_src = god::OpenWindowDialog ( L"Model Files" , L"*.obj;*.fbx" );
 						if ( !new_src.empty () )
 						{
@@ -142,16 +154,26 @@ namespace god
 						}
 					}
 
+					ImGui::Text ( "New Raw:" );
+					if ( m_edit_new_src )
+					{
+						ImGui::Text ( m_edit_src.c_str() );
+					}
+					else
+					{
+						ImGui::Text ( "- None -" );
+					}
+
 					ImGui::EndChild ();
+
+					ImGui::Text ( "Flip UVs :" );
+					ImGui::SameLine ();
+					ImGui::Checkbox ( "##flipuvs" , &m_flip_model_UVs );
 
 					if ( ImGui::Button ( "Apply" , { popup_width, 0.0f } ) )
 					{
 						// if new name already exists in config, i.e. representing another model
-						if ( m_edit_name != m_selected_model && m_document_models.FindMember ( m_edit_name.c_str () ) != m_document_models.MemberEnd () )
-						{
-							// print something to the error line ... TBD
-						}
-						else
+						if ( editable )
 						{
 							if ( m_document_models.HasMember ( m_selected_model.c_str () ) )
 							{
@@ -168,7 +190,7 @@ namespace god
 								bool new_raw { false };
 								if ( m_edit_new_src )
 								{
-									Asset3D load_from_raw ( m_edit_src );
+									Asset3D load_from_raw ( m_edit_src , false , m_flip_model_UVs );
 									if ( load_from_raw.GetSuccessState () )
 									{
 										GetModelDocumentValue ( "Raw" ).SetString ( m_edit_raw.c_str () , m_document_models.GetAllocator () );
@@ -216,8 +238,10 @@ namespace god
 				{
 					m_edit_name = m_selected_model;
 					m_edit_raw = GetModelDocumentValue ( "Raw" ).GetString ();
+					m_edit_current_raw = m_edit_raw;
 					m_edit_src = GetModelDocumentValue ( "Source" ).GetString ();
 					m_edit_new_src = false;
+					m_flip_model_UVs = true;
 					ImGui::OpenPopup ( "EditModel" );
 				}
 
@@ -279,7 +303,14 @@ namespace god
 
 					for ( auto& m : m_document_textures[ m_selected_texture.c_str () ].GetArray ()[ 0 ].GetObject () )
 					{
-						ImGui::Text ( "%s : %s" , m.name.GetString () , m.value.GetString () );
+						if ( m.value.IsString () )
+						{
+							ImGui::Text ( "%s : %s" , m.name.GetString () , m.value.GetString () );
+						}
+						else if ( m.value.IsNumber () )
+						{
+							ImGui::Text ( "%s : %u" , m.name.GetString () , static_cast< unsigned long long >( m.value.GetUint () ) );
+						}
 					}
 					ImGui::EndChild ();
 				}
@@ -296,12 +327,11 @@ namespace god
 					ImGui::SetNextItemWidth ( popup_width - 30.0f );
 					ImGui::InputText ( "##TextureEditName" , &m_edit_name );
 
-					ImGui::Text ( "Raw:" );
-					ImGui::Text ( m_edit_raw.c_str () );
+					ImGui::Text ( "Current Raw:" );
+					ImGui::Text ( m_edit_current_raw.c_str () );
 
 					if ( ImGui::Button ( "Edit Raw" , { popup_width - 30.0f, 0.0f } ) )
 					{
-
 						std::string new_src = god::OpenWindowDialog ( L"Texture Files" , L"*.png;*.jpg" );
 						if ( !new_src.empty () )
 						{
@@ -311,22 +341,48 @@ namespace god
 						}
 					}
 
+					ImGui::Text ( "New Raw:" );
+					if ( m_edit_new_src )
+					{
+						ImGui::Text ( m_edit_src.c_str () );
+					}
+					else
+					{
+						ImGui::Text ( "- None -" );
+					}
+
 					ImGui::EndChild ();
 
 					if ( ImGui::Button ( "Apply" , { popup_width, 0.0f } ) )
 					{
 						if ( m_document_textures.HasMember ( m_selected_texture.c_str () ) )
 						{
+							auto& ogl_textures = editorResources.Get<OGLTextureManager> ().get ();
+
 							// set new name
 							rapidjson::Value::MemberIterator value = m_document_textures.FindMember ( m_selected_texture.c_str () );
 							value->name.SetString ( m_edit_name.c_str () , m_document_textures.GetAllocator () );
+
+							// update name in loaded resource
+							if ( ogl_textures.Has ( m_selected_texture ) )
+							{
+								ogl_textures.UpdateName ( m_selected_texture , m_edit_name , ogl_textures.GetID ( m_selected_texture ) );
+							}
+
 							m_selected_texture = m_edit_name;
+
 
 							// if diff source, set new raw and source and rebuild model
 							if ( m_edit_new_src )
 							{
 								GetTextureDocumentValue ( "Raw" ).SetString ( m_edit_raw.c_str () , m_document_textures.GetAllocator () );
 								GetTextureDocumentValue ( "Source" ).SetString ( m_edit_src.c_str () , m_document_textures.GetAllocator () );
+
+								if ( ogl_textures.Has ( m_selected_texture ) )
+								{
+									ogl_textures.Get ( m_edit_name ).Free ();
+									ogl_textures.SetResource ( ogl_textures.GetID ( m_edit_name ) , OGLTexture ( AssetPath::Folder_RawTextures + m_edit_raw ) );
+								}
 							}
 
 							// update last edited date and time
@@ -349,6 +405,7 @@ namespace god
 				{
 					m_edit_name = m_selected_texture;
 					m_edit_raw = GetTextureDocumentValue ( "Raw" ).GetString ();
+					m_edit_current_raw = m_edit_raw;
 					m_edit_src = GetTextureDocumentValue ( "Source" ).GetString ();
 					m_edit_new_src = false;
 					ImGui::OpenPopup ( "EditTexture" );
@@ -393,6 +450,7 @@ namespace god
 	inline void EW_AssetManager<EDITOR_RESOURCES>::OnOpen ()
 	{
 		m_selected_model = { "" };
+		m_selected_texture = { "" };
 		ReloadConfig ();
 	}
 
@@ -403,6 +461,19 @@ namespace god
 		god::ReadJSON ( m_document_models , AssetPath::File_ModelsConfig );
 		m_document_textures.SetObject ();
 		god::ReadJSON ( m_document_textures , AssetPath::File_TexturesConfig );
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline bool EW_AssetManager<EDITOR_RESOURCES>::ModelNameExists ( std::string const& name )
+	{
+		if ( m_document_models.IsObject () )
+		{
+			if ( m_document_models.FindMember ( name.c_str () ) != m_document_models.MemberEnd () )
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	template<typename EDITOR_RESOURCES>

@@ -268,10 +268,13 @@ namespace god
 				// temporary
 				if ( renderable.m_model_id != -1 )
 				{
-					scene.AddSceneObject ( renderable.m_model_id , transform.m_position , transform.m_rotation , transform.m_scale );
+					auto& object = scene.GetSceneObject (
+						scene.AddSceneObject ( renderable.m_model_id , transform.m_position , transform.m_rotation , transform.m_scale ) );
+					object.m_diffuse_id = renderable.m_diffuse_id;
+					object.m_specular_id = renderable.m_specular_id;
+					object.m_shininess = renderable.m_shininess;
 				}
 			} );
-
 	}
 
 	template<typename T>

@@ -109,6 +109,7 @@
     <ClInclude Include="Internal\Asset3D.h" />
     <ClInclude Include="Internal\RapidJSONWrapper.h" />
     <ClInclude Include="Internal\ResourceManager.h" />
+    <ClInclude Include="Internal\TextureData.h" />
     <ClInclude Include="Internal\WindowsDialog.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Scene.h" />
@@ -133,6 +134,10 @@
     </ClCompile>
     <ClCompile Include="FileIO.cpp" />
     <ClCompile Include="Internal\RapidJSONWrapper.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Internal\TextureData.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>

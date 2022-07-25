@@ -19,6 +19,11 @@ namespace god
 			glm::vec3	m_rotation { 0.0f,0.0f,0.0f };
 			glm::vec3	m_scale { 1.0f,1.0f,1.0f };
 
+			// material data
+			uint32_t	m_diffuse_id { 0 };
+			uint32_t	m_specular_id { 0 };
+			float		m_shininess { 0.0f };
+
 			GODUTILITY_API RenderData () = default;
 			GODUTILITY_API RenderData ( uint32_t model , glm::vec3 const& position , glm::vec3 const& rotation , glm::vec3 const& scale );
 

@@ -4,6 +4,7 @@
 #include <godUtility/Utility.h>
 #include "../Window/GLFWWindow.h"
 #include "../OpenGL/OpenGL.h"
+#include "../OpenGL/Internal/OGLTexture.h"
 
 namespace god
 {
@@ -19,6 +20,7 @@ namespace god
 	using EngineResources = Resources<
 		GLFWWindow ,
 		OpenGL ,
-		Asset3DManager
+		Asset3DManager ,
+		OGLTextureManager
 	>;
 }

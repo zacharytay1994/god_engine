@@ -49,8 +49,8 @@ namespace god
 		std::vector<Mesh3D> m_meshes;
 
 		GODUTILITY_API Model3D() = default;
-		GODUTILITY_API Model3D ( std::string const& modelFile );
-		GODUTILITY_API bool LoadFromFile ( std::string const& modelFile );
+		GODUTILITY_API Model3D ( std::string const& modelFile , bool flipUVs = true );
+		GODUTILITY_API bool LoadFromFile ( std::string const& modelFile , bool flipUVs = true );
 	private:
 		std::vector<char> ReadFile ( std::string const& filename );
 		void ProcessNode ( aiNode* node , const aiScene* scene , std::vector<Mesh3D>& meshes );

@@ -31,12 +31,16 @@ namespace god
 	Mesh3D ProcessMesh ( aiMesh* mesh , aiScene const* scene );
 	std::vector<Material::Texture> LoadMaterialTextures ( aiMaterial* mat , aiTextureType type , std::string typeName );
 
-	Model3D::Model3D ( std::string const& modelFile )
+	Model3D::Model3D ( std::string const& modelFile, bool flipUVs )
 	{
 		Assimp::Importer importer;
 
 		importer.SetPropertyBool ( AI_CONFIG_PP_PTV_NORMALIZE , true );
-		auto process_flags = aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_FlipUVs | aiProcess_CalcTangentSpace;
+		auto process_flags = aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_CalcTangentSpace;
+		if ( flipUVs )
+		{
+			process_flags |= aiProcess_FlipUVs;
+		}
 
 		// read into scene
 		const aiScene* scene = importer.ReadFile ( modelFile.c_str () , process_flags );
@@ -48,12 +52,16 @@ namespace god
 		ProcessNode ( scene->mRootNode , scene , m_meshes );
 	}
 
-	bool Model3D::LoadFromFile ( std::string const& modelFile )
+	bool Model3D::LoadFromFile ( std::string const& modelFile , bool flipUVs )
 	{
 		Assimp::Importer importer;
 
 		importer.SetPropertyBool ( AI_CONFIG_PP_PTV_NORMALIZE , true );
-		auto process_flags = aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_FlipUVs | aiProcess_CalcTangentSpace;
+		auto process_flags = aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_CalcTangentSpace;
+		if ( flipUVs )
+		{
+			process_flags |= aiProcess_FlipUVs;
+		}
 
 		// read into scene
 		const aiScene* scene = importer.ReadFile ( modelFile.c_str () , process_flags );

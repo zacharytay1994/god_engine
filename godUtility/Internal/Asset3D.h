@@ -19,7 +19,7 @@ namespace god
 		Model3D m_model;
 
 		GODUTILITY_API Asset3D () = default;
-		GODUTILITY_API Asset3D ( std::string const& assetPath , bool custom = false );
+		GODUTILITY_API Asset3D ( std::string const& assetPath , bool custom , bool flipUVs );
 
 		void GODUTILITY_API Serialize ( std::string const& path );
 		void GODUTILITY_API Deserialize ( std::string const& path );

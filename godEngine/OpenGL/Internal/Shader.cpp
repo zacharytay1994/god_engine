@@ -63,6 +63,10 @@ namespace god
 		}
 
 		m_shader_program = shader_program;
+
+		glDeleteShader ( vs );
+		glDeleteShader ( fs );
+
 		return m_shader_program;
 	}
 
@@ -94,8 +98,8 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
-		}
 	}
+}
 
 	void OGLShader::SetUniform ( uint32_t ShaderProgram , char const* name , int val )
 	{
@@ -110,8 +114,8 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
-		}
 	}
+		}
 
 	void OGLShader::SetUniform ( uint32_t ShaderProgram , char const* name , float val )
 	{
@@ -126,8 +130,8 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
-		}
 	}
+		}
 
 	void OGLShader::SetUniform ( uint32_t ShaderProgram , char const* name , float x , float y )
 	{
@@ -142,8 +146,8 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
-		}
 	}
+		}
 
 	void OGLShader::SetUniform ( uint32_t ShaderProgram , char const* name , float x , float y , float z )
 	{
@@ -158,8 +162,8 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
-		}
 	}
+		}
 
 	void OGLShader::SetUniform ( uint32_t ShaderProgram , char const* name , float x , float y , float z , float w )
 	{
@@ -174,8 +178,8 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
-		}
 	}
+		}
 
 	void OGLShader::SetUniform ( uint32_t ShaderProgram , char const* name , glm::vec2 const& val )
 	{
@@ -190,8 +194,8 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
-		}
 	}
+		}
 
 	void OGLShader::SetUniform ( uint32_t ShaderProgram , char const* name , glm::vec3 const& val )
 	{
@@ -206,8 +210,8 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
-		}
 	}
+		}
 
 	void OGLShader::SetUniform ( uint32_t ShaderProgram , char const* name , glm::vec4 const& val )
 	{
@@ -222,8 +226,8 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
-		}
 	}
+		}
 
 	void OGLShader::SetUniform ( uint32_t ShaderProgram , char const* name , glm::mat3 const& val )
 	{
@@ -238,8 +242,8 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
-		}
 	}
+		}
 
 	void OGLShader::SetUniform ( uint32_t ShaderProgram , char const* name , glm::mat4 const& val )
 	{
@@ -254,6 +258,6 @@ namespace god
 #ifdef SHADER_DEBUG
 			printf ( "Uniform variable %s doesn't exist.\n" , name );
 #endif
+	}
 		}
 	}
-}

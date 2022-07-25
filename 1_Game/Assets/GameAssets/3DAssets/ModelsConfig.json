@@ -1,18 +1,18 @@
 {
-    "LucyPrinceton": [
+    "Backpack": [
         {
-            "Raw": "lucy_princeton.obj",
-            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\lucy_princeton.obj",
-            "Last Edited": "25-07-2022 00-03-35",
-            "UID": 2942613155
+            "Raw": "backpack.obj",
+            "Source": "C:\\Users\\zacha\\Downloads\\backpack\\backpack.obj",
+            "Last Edited": "25-07-2022 22-12-32",
+            "UID": 1068777295
         }
     ],
-    "4Sphere": [
+    "Flamethrower": [
         {
-            "Raw": "4Sphere.obj",
-            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\CSD3150_Assignment1\\Assets\\Models\\4Sphere.obj",
-            "Last Edited": "25-07-2022 00-03-57",
-            "UID": 2163941415
+            "Raw": "salam.fbx",
+            "Source": "C:\\Users\\zacha\\Downloads\\cso-salamander-flamethrower\\source\\pawipiw\\salam.fbx",
+            "Last Edited": "25-07-2022 22-36-57",
+            "UID": 1420722900
         }
     ]
 }
