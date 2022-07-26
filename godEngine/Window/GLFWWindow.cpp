@@ -108,6 +108,12 @@ namespace god
 		glfwSetScrollCallback ( m_window , GLFWScrollCallback );
 	}
 
+	GLFWWindow::~GLFWWindow ()
+	{
+		glfwDestroyWindow ( m_window );
+		glfwTerminate ();
+	}
+
 	bool GLFWWindow::WindowShouldClose ()
 	{
 		return glfwWindowShouldClose ( m_window );

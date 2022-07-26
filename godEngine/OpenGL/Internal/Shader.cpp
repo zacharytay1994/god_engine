@@ -3,8 +3,10 @@
 #include <godUtility/FileIO.h>
 
 #include <glad/glad.h>
+#pragma warning(disable: 4201)
 #include <glm/glm/gtc/matrix_transform.hpp>
 #include <glm/glm/gtc/type_ptr.hpp>
+#pragma warning(default: 4201)
 
 namespace god
 {

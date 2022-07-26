@@ -2,7 +2,10 @@
 #include "TextureData.h"
 
 #define STB_IMAGE_IMPLEMENTATION
+
+#pragma warning(disable: 26451)
 #include <stb_image/stb_image.h>
+#pragma warning(default: 26451)
 
 namespace god
 {

@@ -33,6 +33,8 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EW_SceneTree<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
+		( dt );
+		( editorResources );
 		auto& entity_names = m_enttxsol.GetEntityNames ();
 
 		ImGui::Begin ( "Scene Tree" );

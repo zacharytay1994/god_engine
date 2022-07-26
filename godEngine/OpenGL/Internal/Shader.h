@@ -1,6 +1,8 @@
 #pragma once
 
+#pragma warning(disable: 4201)
 #include <glm/glm/glm.hpp>
+#pragma warning(default: 4201)
 
 #include <cstdint>
 

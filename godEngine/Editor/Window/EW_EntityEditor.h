@@ -38,8 +38,6 @@ namespace god
 	inline void EW_EntityEditor<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
 		( dt );
-
-		auto& entity_names = m_enttxsol.GetEntityNames ();
 		auto scene_tree = this->Get<EW_SceneTree> ();
 
 		ImGui::Begin ("Entity Editor");

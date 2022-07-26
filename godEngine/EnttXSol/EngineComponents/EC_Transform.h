@@ -27,6 +27,7 @@ namespace god
 		RegisterInspector<Transform , EngineResources> ( entity , registry , imguiUniqueID , editorResources ,
 			[]( Transform& component , EngineResources& resources )
 			{
+				( resources );
 				ImGui::Separator ();
 				ImGui::Text ( "Transform" );
 				ImGui::Separator ();

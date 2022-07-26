@@ -25,6 +25,7 @@ namespace god
 		RegisterInspector<ExampleComponent , EngineResources> ( entity , registry , imguiUniqueID , editorResources ,
 			[]( ExampleComponent& component , EngineResources& resources )
 			{
+				( resources );
 				ImGui::Separator ();
 				ImGui::Text ( "Example Component" );
 				ImGui::Separator ();

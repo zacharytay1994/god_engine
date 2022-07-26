@@ -31,6 +31,7 @@ namespace god
 		void ReloadConfig ();
 
 		bool ModelNameExists ( std::string const& name );
+		bool TextureNameExists ( std::string const& name );
 
 	private:
 		rapidjson::Document m_document_models;
@@ -325,6 +326,16 @@ namespace god
 					ImGui::Text ( "New Properties" );
 					ImGui::Text ( "Name:" );
 					ImGui::SetNextItemWidth ( popup_width - 30.0f );
+
+					bool editable { true };
+					if ( m_edit_name != m_selected_texture && TextureNameExists ( m_edit_name ) )
+					{
+						editable = false;
+						ImGui::PushStyleColor ( ImGuiCol_Text , { 1.0f, 0.0f, 0.0f, 1.0f } );
+						ImGui::Text ( "** Name already used!" );
+						ImGui::PopStyleColor ();
+					}
+
 					ImGui::InputText ( "##TextureEditName" , &m_edit_name );
 
 					ImGui::Text ( "Current Raw:" );
@@ -353,7 +364,7 @@ namespace god
 
 					ImGui::EndChild ();
 
-					if ( ImGui::Button ( "Apply" , { popup_width, 0.0f } ) )
+					if ( ImGui::Button ( "Apply" , { popup_width, 0.0f } ) && editable )
 					{
 						if ( m_document_textures.HasMember ( m_selected_texture.c_str () ) )
 						{
@@ -469,6 +480,19 @@ namespace god
 		if ( m_document_models.IsObject () )
 		{
 			if ( m_document_models.FindMember ( name.c_str () ) != m_document_models.MemberEnd () )
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline bool EW_AssetManager<EDITOR_RESOURCES>::TextureNameExists ( std::string const& name )
+	{
+		if ( m_document_textures.IsObject () )
+		{
+			if ( m_document_textures.FindMember ( name.c_str () ) != m_document_textures.MemberEnd () )
 			{
 				return true;
 			}

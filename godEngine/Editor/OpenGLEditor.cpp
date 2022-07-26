@@ -37,6 +37,13 @@ namespace god
 		ImGui_ImplOpenGL3_Init ( glsl_version );
 	}
 
+	ImGuiOpenGLEditor::~ImGuiOpenGLEditor ()
+	{
+		ImGui_ImplOpenGL3_Shutdown ();
+		ImGui_ImplGlfw_Shutdown ();
+		ImGui::DestroyContext ();
+	}
+
 	void ImGuiOpenGLEditor::BeginFrame ()
 	{
 		ImGui_ImplOpenGL3_NewFrame ();

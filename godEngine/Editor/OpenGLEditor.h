@@ -12,6 +12,7 @@ namespace god
 	struct ImGuiOpenGLEditor
 	{
 		ImGuiOpenGLEditor ( GLFWWindow& glfwWindow );
+		~ImGuiOpenGLEditor ();
 
 		void BeginFrame ();
 		void Render ();

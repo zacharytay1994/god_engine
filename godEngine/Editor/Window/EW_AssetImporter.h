@@ -57,6 +57,9 @@ namespace god
 
 		ImGui::Begin ( "Asset Importer" );
 
+		auto asset_manager = this->Get<EW_AssetManager> ();
+		bool importable { true };
+
 		if ( ImGui::BeginTabBar ( "Asset Type" ) )
 		{
 			if ( ImGui::BeginTabItem ( "Models" ) )
@@ -80,6 +83,33 @@ namespace god
 						m_asset_names[ i ] = m_asset_paths[ i ].substr ( last_slash , last_dot - last_slash );
 					}
 				}
+
+				ImGui::BeginChild ( "Paths" , { ImGui::GetWindowWidth () - 20, ImGui::GetWindowHeight () - 190 } , false , ImGuiWindowFlags_HorizontalScrollbar );
+				for ( size_t i = 0; i < m_asset_paths.size (); ++i )
+				{
+					ImGui::PushID ( static_cast< int >( i ) );
+
+					ImGui::Separator ();
+
+					ImGui::Text ( "%d. %s" , i + 1 , m_asset_paths[ i ].c_str () );
+
+					if ( asset_manager->ModelNameExists ( m_asset_names[ i ] ) )
+					{
+						importable = false;
+						ImGui::PushStyleColor ( ImGuiCol_Text , { 1.0f, 0.0f, 0.0f, 1.0f } );
+						ImGui::Text ( "** Name already used!" );
+						ImGui::PopStyleColor ();
+					}
+
+					ImGui::InputText ( ":Name" , &m_asset_names[ i ] );
+
+					ImGui::PopID ();
+				}
+				ImGui::EndChild ();
+
+				ImGui::Text ( "Flip UVs :" );
+				ImGui::SameLine ();
+				ImGui::Checkbox ( "##flipuvs" , &m_flip_model_UVs );
 
 				ImGui::EndTabItem ();
 			}
@@ -106,6 +136,29 @@ namespace god
 					}
 				}
 
+				ImGui::BeginChild ( "Paths" , { ImGui::GetWindowWidth () - 20, ImGui::GetWindowHeight () - 190 } , false , ImGuiWindowFlags_HorizontalScrollbar );
+				for ( size_t i = 0; i < m_asset_paths.size (); ++i )
+				{
+					ImGui::PushID ( static_cast< int >( i ) );
+
+					ImGui::Separator ();
+
+					ImGui::Text ( "%d. %s" , i + 1 , m_asset_paths[ i ].c_str () );
+
+					if ( asset_manager->TextureNameExists ( m_asset_names[ i ] ) )
+					{
+						importable = false;
+						ImGui::PushStyleColor ( ImGuiCol_Text , { 1.0f, 0.0f, 0.0f, 1.0f } );
+						ImGui::Text ( "** Name already used!" );
+						ImGui::PopStyleColor ();
+					}
+
+					ImGui::InputText ( ":Name" , &m_asset_names[ i ] );
+
+					ImGui::PopID ();
+				}
+				ImGui::EndChild ();
+
 				ImGui::EndTabItem ();
 			}
 
@@ -118,7 +171,7 @@ namespace god
 			ImGui::Text ( "- Nothing Selected -" );
 		}
 
-		auto asset_manager = this->Get<EW_AssetManager> ();
+		/*auto asset_manager = this->Get<EW_AssetManager> ();
 		bool importable { true };
 
 		ImGui::BeginChild ( "Paths" , { ImGui::GetWindowWidth () - 20, ImGui::GetWindowHeight () - 190 } , false , ImGuiWindowFlags_HorizontalScrollbar );
@@ -146,7 +199,7 @@ namespace god
 
 		ImGui::Text ( "Flip UVs :" );
 		ImGui::SameLine ();
-		ImGui::Checkbox ( "##flipuvs" , &m_flip_model_UVs );
+		ImGui::Checkbox ( "##flipuvs" , &m_flip_model_UVs );*/
 
 		if ( ImGui::Button ( "Import" , { ImGui::GetWindowWidth () , 0.0f } ) && importable )
 		{

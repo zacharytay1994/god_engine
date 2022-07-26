@@ -34,6 +34,8 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EW_SceneView<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
+		( dt );
+		( editorResources );
 		ImGui::Begin ( "Scene View" );
 		if ( m_renderpass_texture != NO_TEXTURE )
 		{
@@ -49,7 +51,7 @@ namespace god
 				viewport_size = { window_size.x, window_size.x * ( 1.0f / m_aspect_ratio ) };
 				ImGui::SetCursorPosY ( ( ImGui::GetWindowHeight () - viewport_size.y ) / 2.0f );
 			}
-			ImGui::Image ( ( void* ) m_renderpass_texture , viewport_size , { 0,1 } , { 1,0 } );
+			ImGui::Image ( ( void* ) ( static_cast< uint64_t >( m_renderpass_texture ) ) , viewport_size , { 0,1 } , { 1,0 } );
 		}
 		ImGui::End ();
 	}

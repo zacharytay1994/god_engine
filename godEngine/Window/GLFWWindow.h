@@ -9,6 +9,7 @@ namespace god
 	struct GLFWWindow
 	{
 		 GLFWWindow ( uint32_t width , uint32_t height );
+		 ~GLFWWindow ();
 
 		bool			WindowShouldClose ();
 		void			PollEvents ();
