@@ -1,5 +1,5 @@
 #include "../../pch.h"
-#include "Primitives.h"
+#include "OGLPrimitives.h"
 
 #pragma comment (lib, "opengl32.lib")
 

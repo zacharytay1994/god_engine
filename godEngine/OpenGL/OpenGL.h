@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Internal/Shader.h"
-#include "Internal/Primitives.h"
+#include "Internal/OGLShader.h"
+#include "Internal/OGLPrimitives.h"
 #include "Internal/OGLTexture.h"
 #include "../godUtility/Utility.h"
 

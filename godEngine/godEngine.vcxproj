@@ -134,9 +134,9 @@
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="OpenGL\Internal\OGLTexture.h" />
-    <ClInclude Include="OpenGL\Internal\Primitives.h" />
-    <ClInclude Include="OpenGL\Internal\RenderPass.h" />
-    <ClInclude Include="OpenGL\Internal\Shader.h" />
+    <ClInclude Include="OpenGL\Internal\OGLPrimitives.h" />
+    <ClInclude Include="OpenGL\Internal\OGLRenderPass.h" />
+    <ClInclude Include="OpenGL\Internal\OGLShader.h" />
     <ClInclude Include="OpenGL\OpenGL.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
@@ -200,15 +200,15 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="OpenGL\Internal\Primitives.cpp">
+    <ClCompile Include="OpenGL\Internal\OGLPrimitives.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="OpenGL\Internal\RenderPass.cpp">
+    <ClCompile Include="OpenGL\Internal\OGLRenderPass.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="OpenGL\Internal\Shader.cpp">
+    <ClCompile Include="OpenGL\Internal\OGLShader.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
     </ClCompile>

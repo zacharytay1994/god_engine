@@ -49,8 +49,6 @@ namespace god
 			glTextureStorage2D ( m_texture_id , 1 , internal_format , texture.GetWidth () , texture.GetHeight () );
 			glTextureSubImage2D ( m_texture_id , 0 , 0 , 0 , texture.GetWidth () , texture.GetHeight () , data_format , GL_UNSIGNED_BYTE , texture.GetData () );
 			glGenerateMipmap ( GL_TEXTURE_2D );
-
-			std::cout << "Texture load success " << texturePath << std::endl;
 		}
 		else
 		{
@@ -72,8 +70,9 @@ namespace god
 		glBindTexture ( GL_TEXTURE_2D , m_texture_id );
 	}
 
-	void OGLTexture::UnBind () const
+	void OGLTexture::UnBind ( uint32_t location ) const
 	{
+		glActiveTexture ( GL_TEXTURE0 + location );
 		glBindTexture ( GL_TEXTURE_2D , 0 );
 	}
 

@@ -104,6 +104,18 @@ namespace god
 			ImGui::EndPopup ();
 		}
 
+		if ( ImGui::BeginPopup ( "Attach Engine Component" ) )
+		{
+			for ( auto i = 0; i < EngineComponents::m_component_names.size (); ++i )
+			{
+				if ( ImGui::Selectable ( EngineComponents::m_component_names.at ( i ).c_str () ) )
+				{
+					m_enttxsol.AttachEngineComponent ( scene_tree->GetSelectedEntity () , i );
+				}
+			}
+			ImGui::EndPopup ();
+		}
+
 		if ( scene_tree->GetSelectedEntity () != EnttXSol::NullEntity )
 		{
 			// display all engine components
@@ -153,6 +165,12 @@ namespace god
 			if ( ImGui::Button ( "Attach Script System" , { ImGui::GetWindowWidth (), 0.0f } ) )
 			{
 				ImGui::OpenPopup ( "Attach Script System" );
+			}
+
+			// attach engine components
+			if ( ImGui::Button ( "Attach Engine Component" , { ImGui::GetWindowWidth (), 0.0f } ) )
+			{
+				ImGui::OpenPopup ( "Attach Engine Component" );
 			}
 		}
 

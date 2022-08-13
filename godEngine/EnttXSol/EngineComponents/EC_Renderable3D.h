@@ -19,9 +19,9 @@ namespace god
 			"model_id" , &Renderable3D::m_model_id );
 	}
 	template<>
-	inline void ComponentInspector::operator() < Renderable3D > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
+	inline void ComponentInspector::operator() < Renderable3D > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& engineResources )
 	{
-		RegisterInspector<Renderable3D , EngineResources> ( entity , registry , imguiUniqueID , editorResources ,
+		RegisterInspector<Renderable3D , EngineResources> ( entity , registry , imguiUniqueID , engineResources ,
 			[]( Renderable3D& component , EngineResources& resources )
 			{
 				auto& models = resources.Get<Asset3DManager> ();

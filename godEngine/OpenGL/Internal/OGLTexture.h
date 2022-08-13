@@ -12,7 +12,7 @@ namespace god
 		void Free ();
 
 		void Bind ( uint32_t location ) const;
-		void UnBind () const;
+		void UnBind ( uint32_t location ) const;
 
 	private:
 		uint32_t m_texture_id;

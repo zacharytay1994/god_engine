@@ -56,19 +56,29 @@ namespace god
 		return m_entities[ entity ].value ();
 	}
 
-	EnttXSol::Entity EnttXSol::CreateEntity ( std::string const& name )
+	EnttXSol::Entity EnttXSol::CreateEntity ( std::string const& name , Entity parent )
 	{
+		// check if parent exists and is a valid entity
+		if ( parent != NullEntity )
+		{
+			assert ( parent < m_entities.size () && m_entities[ parent ].has_value () );
+		}
 		if ( m_free_ids.empty () )
 		{
 			m_entities.emplace_back ( m_registry.create () );
 			auto id = static_cast< Entity >( m_entities.size () ) - 1;
 			if ( !name.empty () )
 			{
-				if ( m_entity_names.size () <= id )
+				if ( m_entity_data.size () <= id )
 				{
-					m_entity_names.resize ( static_cast< size_t >( id ) + 1 );
+					m_entity_data.resize ( static_cast< size_t >( id ) + 1 );
 				}
-				m_entity_names[ id ] = name;
+				m_entity_data[ id ] = { name , parent };
+			}
+			// assign parent newly created child if there is parent
+			if ( parent != NullEntity )
+			{
+				m_entity_data[ parent ].m_children.push_back ( id );
 			}
 			return id;
 		}
@@ -79,11 +89,16 @@ namespace god
 			m_entities[ id ] = m_registry.create ();
 			if ( !name.empty () )
 			{
-				if ( m_entity_names.size () <= id )
+				if ( m_entity_data.size () <= id )
 				{
-					m_entity_names.resize ( static_cast< size_t >( id ) + 1 );
+					m_entity_data.resize ( static_cast< size_t >( id ) + 1 );
 				}
-				m_entity_names[ id ] = name;
+				m_entity_data[ id ] = { name , parent };
+			}
+			// assign parent newly created child
+			if ( parent != NullEntity )
+			{
+				m_entity_data[ parent ].m_children.push_back ( id );
 			}
 			return id;
 		}
@@ -95,9 +110,9 @@ namespace god
 		m_registry.destroy ( GetEntity ( entity ) );
 		m_entities[ entity ].reset ();
 		m_free_ids.push ( entity );
-		if ( entity < m_entity_names.size () )
+		if ( entity < m_entity_data.size () )
 		{
-			m_entity_names[ entity ].clear ();
+			m_entity_data[ entity ] = EntityData ();
 		}
 	}
 
@@ -164,14 +179,19 @@ namespace god
 		}
 	}
 
+	void EnttXSol::AttachEngineComponent ( Entity entity , uint32_t componentID )
+	{
+		T_Manip::RunOnType ( EngineComponents::Components () , componentID , AttachEngineComponentFunctor () , this , entity );
+	}
+
 	std::vector<std::optional<entt::entity>> const& EnttXSol::GetEntities ()const
 	{
 		return m_entities;
 	}
 
-	std::vector<std::string> const& EnttXSol::GetEntityNames ()const
+	std::vector<EnttXSol::EntityData> const& EnttXSol::GetEntityData ()const
 	{
-		return m_entity_names;
+		return m_entity_data;
 	}
 
 	std::unordered_map<std::string , EnttXSol::Script> const& EnttXSol::GetScripts () const

@@ -1,5 +1,5 @@
 #include "../../pch.h"
-#include "Shader.h"
+#include "OGLShader.h"
 #include <godUtility/FileIO.h>
 
 #include <glad/glad.h>

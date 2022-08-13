@@ -36,10 +36,10 @@
     <ClInclude Include="Window\GLFWWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGL\Internal\Primitives.h">
+    <ClInclude Include="OpenGL\Internal\OGLPrimitives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGL\Internal\Shader.h">
+    <ClInclude Include="OpenGL\Internal\OGLShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imconfig.h">
@@ -129,7 +129,7 @@
     <ClInclude Include="Editor\EngineResources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGL\Internal\RenderPass.h">
+    <ClInclude Include="OpenGL\Internal\OGLRenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Editor\Window\EW_SceneView.h">
@@ -158,10 +158,10 @@
     <ClCompile Include="Window\GLFWWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OpenGL\Internal\Primitives.cpp">
+    <ClCompile Include="OpenGL\Internal\OGLPrimitives.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OpenGL\Internal\Shader.cpp">
+    <ClCompile Include="OpenGL\Internal\OGLShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\0_InternalDependencies\glad\src\glad.c">
@@ -203,7 +203,7 @@
     <ClCompile Include="EnttXSol\EngineComponents\EC_All.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OpenGL\Internal\RenderPass.cpp">
+    <ClCompile Include="OpenGL\Internal\OGLRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OpenGL\Internal\OGLTexture.cpp">

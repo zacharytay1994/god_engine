@@ -1,5 +1,5 @@
 #include "../../pch.h"
-#include "RenderPass.h"
+#include "OGLRenderPass.h"
 
 #include <glad/glad.h>
 #pragma comment (lib, "opengl32.lib")

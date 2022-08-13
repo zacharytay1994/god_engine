@@ -2,7 +2,7 @@
 #include "Engine.h"
 
 #include "OpenGL/OpenGL.h"
-#include "OpenGL/Internal/RenderPass.h"
+#include "OpenGL/Internal/OGLRenderPass.h"
 #include "OpenGL/Internal/OGLTexture.h"
 
 #include "Window/GLFWWindow.h"

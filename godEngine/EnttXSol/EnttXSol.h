@@ -60,7 +60,7 @@ namespace god
 
 		entt::entity operator[]( Entity entity );
 		entt::entity GetEntity ( Entity entity );
-		Entity CreateEntity ( std::string const& name = "" );
+		Entity CreateEntity ( std::string const& name = "" , Entity parent = NullEntity );
 		void RemoveEntity ( Entity entity );
 
 		template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
@@ -80,9 +80,18 @@ namespace god
 		void AttachScript ( Entity entity , std::string const& script );
 		template<typename T>
 		void AttachScriptSystem ( Entity entity , std::string const& scriptSystem );
+		void AttachEngineComponent ( Entity entity , uint32_t componentID );
 
 		std::vector<std::optional<entt::entity>> const& GetEntities () const;
-		std::vector<std::string> const& GetEntityNames () const;
+
+		struct EntityData
+		{
+			std::string m_name { "" };
+			Entity m_parent { NullEntity };
+			std::vector<Entity> m_children;
+		};
+		std::vector<EntityData> const& GetEntityData () const;
+
 		std::unordered_map<std::string , Script> const& GetScripts () const;
 
 		// S = scene, T = transform, R = renderable
@@ -90,7 +99,7 @@ namespace god
 		void PopulateScene ( S& scene );
 
 		// helper functor to attach script components
-		struct AttachEngineComponent
+		struct AttachEngineComponentFunctor
 		{
 			template<typename T>
 			void operator () ( EnttXSol* enttxsol , Entity e );
@@ -100,7 +109,7 @@ namespace god
 		entt::registry m_registry;
 
 		std::vector<std::optional<entt::entity>> m_entities;
-		std::vector<std::string> m_entity_names;
+		std::vector<EntityData> m_entity_data;
 		std::stack<Entity> m_free_ids;
 
 		// script identifiers
@@ -127,7 +136,7 @@ namespace god
 		auto&& GetStorage ( std::string const& name );
 		entt::runtime_view GetView ( std::vector<std::string> const& components );
 
-		// engine components
+		// register engine components with lua
 		struct BindCTypeToLua
 		{
 			template <typename T>
@@ -184,7 +193,10 @@ namespace god
 	template<typename T>
 	inline void EnttXSol::AttachComponent ( Entity id )
 	{
-		m_registry.emplace<T> ( GetEntity ( id ) );
+		if ( !m_registry.all_of<T> ( GetEntity ( id ) ) )
+		{
+			m_registry.emplace<T> ( GetEntity ( id ) );
+		}
 	}
 
 	template<typename T>
@@ -210,7 +222,7 @@ namespace god
 					{
 						if ( T::m_component_names[ i ] == component )
 						{
-							T_Manip::RunOnType ( T::Components () , i , AttachEngineComponent () , this , entity );
+							T_Manip::RunOnType ( T::Components () , i , AttachEngineComponentFunctor () , this , entity );
 						}
 					}
 				}
@@ -247,7 +259,7 @@ namespace god
 						{
 							if ( T::m_component_names[ i ] == component )
 							{
-								T_Manip::RunOnType ( T::Components () , i , AttachEngineComponent () , this , entity );
+								T_Manip::RunOnType ( T::Components () , i , AttachEngineComponentFunctor () , this , entity );
 							}
 						}
 					}
@@ -285,7 +297,7 @@ namespace god
 
 	using Entity = EnttXSol::Entity;
 	template<typename T>
-	inline void EnttXSol::AttachEngineComponent::operator()( EnttXSol* enttxsol , Entity e )
+	inline void EnttXSol::AttachEngineComponentFunctor::operator()( EnttXSol* enttxsol , Entity e )
 	{
 		enttxsol->AttachComponent<T> ( e );
 	}
