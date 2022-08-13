@@ -61,7 +61,7 @@ namespace god
 		entt::entity operator[]( Entity entity );
 		entt::entity GetEntity ( Entity entity );
 		Entity CreateEntity ( std::string const& name = "" , Entity parent = NullEntity );
-		void RemoveEntity ( Entity entity );
+		void RemoveEntity ( Entity entity , uint32_t childIndex = NullEntity );
 
 		template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
 		void SerializeEngineComponents ( Entity entity , int& imguiUniqueID , EDITOR_RESOURCES& resources );

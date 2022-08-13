@@ -15,13 +15,16 @@ namespace god
 		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override;
 		Entity GetSelectedEntity ();
 	private:
-		Entity m_selected_entity { EnttXSol::NullEntity };
 		std::string m_create_entity_name { "no_name" };
+		Entity m_selected_entity { EnttXSol::NullEntity };
 		Entity m_selected_parent { EnttXSol::NullEntity };
 		Entity m_selected_parent_temp { m_selected_parent };
+		Entity m_selected_remove { EnttXSol::NullEntity };
+		Entity m_selected_child_index { EnttXSol::NullEntity }; // index representing position in the children container of its parent
+
 		EnttXSol& m_enttxsol;
 
-		void RecursivelyDisplaySceneHierarchy ( Entity entity , std::vector<EnttXSol::EntityData> const& entityData );
+		void RecursivelyDisplaySceneHierarchy ( Entity entity , std::vector<EnttXSol::EntityData> const& entityData , uint32_t childIndex = EnttXSol::NullEntity );
 	};
 }
 
@@ -39,6 +42,7 @@ namespace god
 	{
 		( dt );
 		( editorResources );
+		auto& entities = m_enttxsol.GetEntities ();
 		auto& entity_data = m_enttxsol.GetEntityData ();
 
 		ImGui::Begin ( "Scene Tree" );
@@ -66,19 +70,30 @@ namespace god
 			}
 			ImGui::EndPopup ();
 		}
+		// adding to root
 		if ( ImGui::Button ( "Add Entity" , { ImGui::GetWindowWidth () , 0.0f } ) )
 		{
 			ImGui::OpenPopup ( "Create Entity" );
 		}
+		// adding child
 		if ( m_selected_parent != EnttXSol::NullEntity )
 		{
 			ImGui::OpenPopup ( "Create Child Entity" );
 			m_selected_parent_temp = m_selected_parent;
 			m_selected_parent = EnttXSol::NullEntity;
 		}
-		for ( auto i = 0; i < entity_data.size (); ++i )
+		// removing entity
+		if ( m_selected_remove != EnttXSol::NullEntity )
 		{
-			if ( entity_data[ i ].m_parent == EnttXSol::NullEntity )
+			m_enttxsol.RemoveEntity ( m_selected_remove , m_selected_child_index );
+			m_selected_entity = EnttXSol::NullEntity;
+			m_selected_remove = EnttXSol::NullEntity;
+			m_selected_child_index = EnttXSol::NullEntity;
+		}
+		// render scene hierarchy
+		for ( auto i = 0; i < entities.size (); ++i )
+		{
+			if ( entities[i].has_value() && entity_data[ i ].m_parent == EnttXSol::NullEntity )
 			{
 				RecursivelyDisplaySceneHierarchy ( i , entity_data );
 			}
@@ -93,7 +108,7 @@ namespace god
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline void EW_SceneTree<EDITOR_RESOURCES>::RecursivelyDisplaySceneHierarchy ( Entity entity , std::vector<EnttXSol::EntityData> const& entityData )
+	inline void EW_SceneTree<EDITOR_RESOURCES>::RecursivelyDisplaySceneHierarchy ( Entity entity , std::vector<EnttXSol::EntityData> const& entityData , uint32_t childIndex )
 	{
 		ImGui::PushID ( entity );
 		auto& data = entityData[ entity ];
@@ -113,6 +128,11 @@ namespace god
 			{
 				m_selected_parent = entity;
 			}
+			if ( ImGui::Selectable ( "Remove" ) )
+			{
+				m_selected_remove = entity;
+				m_selected_child_index = childIndex;
+			}
 			ImGui::EndPopup ();
 		}
 		if ( open )
@@ -120,7 +140,7 @@ namespace god
 			// Creating parent as child of entity
 			for ( auto i = 0; i < data.m_children.size (); ++i )
 			{
-				RecursivelyDisplaySceneHierarchy ( data.m_children[ i ] , entityData );
+				RecursivelyDisplaySceneHierarchy ( data.m_children[ i ] , entityData , i );
 			}
 			ImGui::TreePop ();
 		}

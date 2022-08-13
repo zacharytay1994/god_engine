@@ -104,16 +104,26 @@ namespace god
 		}
 	}
 
-	void EnttXSol::RemoveEntity ( Entity entity )
+	void EnttXSol::RemoveEntity ( Entity entity , uint32_t childIndex )
 	{
 		assert ( entity < m_entities.size () && m_entities[ entity ].has_value () );
 		m_registry.destroy ( GetEntity ( entity ) );
 		m_entities[ entity ].reset ();
 		m_free_ids.push ( entity );
-		if ( entity < m_entity_data.size () )
+
+		// remove all children
+		auto& entity_data = m_entity_data[ entity ];
+		for ( auto const& child : entity_data.m_children )
 		{
-			m_entity_data[ entity ] = EntityData ();
+			RemoveEntity ( child );
 		}
+		// remove as child from parent if exists
+		if ( entity_data.m_parent != NullEntity && childIndex != NullEntity )
+		{
+			m_entity_data[ entity_data.m_parent ].m_children.erase ( m_entity_data[ entity_data.m_parent ].m_children.begin () + childIndex );
+		}
+		// remove entity
+		m_entity_data[ entity ] = EntityData ();
 	}
 
 	void EnttXSol::SerializeScriptComponents ( Entity entity , int imguiUniqueID ,
