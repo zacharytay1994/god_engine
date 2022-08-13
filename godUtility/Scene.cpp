@@ -15,6 +15,14 @@ namespace god
 	{
 	}
 
+	Scene::RenderData::RenderData ( uint32_t model , glm::mat4 modelTransform )
+		:
+		m_model_id { model } ,
+		m_model_transform { modelTransform } ,
+		m_active { true }
+	{
+	}
+
 	bool Scene::RenderData::Active () const
 	{
 		return m_active;
@@ -38,6 +46,23 @@ namespace god
 		m_render_data[ free_id ].m_position = position;
 		m_render_data[ free_id ].m_rotation = rotation;
 		m_render_data[ free_id ].m_scale = scale;
+		m_render_data[ free_id ].m_active = true;
+
+		return free_id;
+	}
+
+	SceneObjectID Scene::AddSceneObject ( uint32_t model , glm::mat4 const& transform )
+	{
+		if ( m_free_render_data.empty () )
+		{
+			m_render_data.emplace_back ( model , transform );
+			return static_cast< SceneObjectID >( m_render_data.size () - 1 );
+		}
+		SceneObjectID free_id = m_free_render_data.top ();
+		m_free_render_data.pop ();
+
+		m_render_data[ free_id ].m_model_id = model;
+		m_render_data[ free_id ].m_model_transform = transform;
 		m_render_data[ free_id ].m_active = true;
 
 		return free_id;

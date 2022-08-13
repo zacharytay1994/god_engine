@@ -19,6 +19,8 @@ namespace god
 			glm::vec3	m_rotation { 0.0f,0.0f,0.0f };
 			glm::vec3	m_scale { 1.0f,1.0f,1.0f };
 
+			glm::mat4	m_model_transform = glm::mat4 ( 1.0f );
+
 			// material data
 			uint32_t	m_diffuse_id { 0 };
 			uint32_t	m_specular_id { 0 };
@@ -26,6 +28,7 @@ namespace god
 
 			GODUTILITY_API RenderData () = default;
 			GODUTILITY_API RenderData ( uint32_t model , glm::vec3 const& position , glm::vec3 const& rotation , glm::vec3 const& scale );
+			GODUTILITY_API RenderData ( uint32_t model , glm::mat4 modelTransform );
 
 			bool GODUTILITY_API Active () const;
 
@@ -45,9 +48,12 @@ namespace god
 			glm::vec3 const& position = { 0.0f,0.0f,0.0f } ,
 			glm::vec3 const& rotation = { 0.0f,0.0f,0.0f } ,
 			glm::vec3 const& scale = { 1.0f,1.0f,1.0f } );
+		SceneObjectID GODUTILITY_API	AddSceneObject (
+			uint32_t model = 0 ,
+			glm::mat4 const& transform = glm::mat4 ( 1.0f ) );
 
 		void GODUTILITY_API				RemoveSceneObject ( SceneObjectID id );
 		void GODUTILITY_API				ClearScene ();
-		RenderData GODUTILITY_API&		GetSceneObject ( SceneObjectID id );
+		RenderData GODUTILITY_API& GetSceneObject ( SceneObjectID id );
 	};
 }

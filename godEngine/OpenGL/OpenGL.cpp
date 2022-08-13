@@ -128,13 +128,14 @@ namespace god
 
 				// set uniforms for vertex shader
 				// model matrix
-				glm::mat4 model_matrix = glm::mat4 ( 1.0f );
+				/*glm::mat4 model_matrix = glm::mat4 ( 1.0f );
 				model_matrix = glm::translate ( model_matrix , data.m_position );
 				model_matrix = glm::rotate ( model_matrix , data.m_rotation.x , glm::vec3 ( 1.0f , 0.0f , 0.0f ) );
 				model_matrix = glm::rotate ( model_matrix , data.m_rotation.y , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
 				model_matrix = glm::rotate ( model_matrix , data.m_rotation.z , glm::vec3 ( 0.0f , 0.0f , 1.0f ) );
 				model_matrix = glm::scale ( model_matrix , data.m_scale );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uModel" , model_matrix );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uModel" , model_matrix );*/
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uModel" , data.m_model_transform );
 
 				// set uniforms for fragment shader
 				// set view position

@@ -2,6 +2,12 @@
 
 #define SOL_ALL_SAFETIES_ON 1
 
+#pragma warning(disable: 4201)
+#include <glm/glm/glm.hpp>
+#include <glm/glm/gtc/matrix_transform.hpp>
+#include <glm/glm/gtc/type_ptr.hpp>
+#pragma warning(default: 4201)
+
 #include <entt.hpp>
 #include <sol/sol.hpp>
 
@@ -15,6 +21,7 @@
 #include <optional>
 #include <tuple>
 #include <iostream>
+#include <functional>
 
 namespace god
 {
@@ -97,6 +104,9 @@ namespace god
 		// S = scene, T = transform, R = renderable
 		template <typename S , typename T , typename R>
 		void PopulateScene ( S& scene );
+
+		template <typename S , typename T , typename R>
+		void RecursivePopulateScene ( S& scene , Entity e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) );
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -274,19 +284,77 @@ namespace god
 	inline void EnttXSol::PopulateScene ( S& scene )
 	{
 		scene.ClearScene ();
-		auto view = m_registry.view<T , R> ();
-		view.each ( [&scene]( auto& transform , auto& renderable )
+
+		for ( auto i = 0; i < m_entities.size (); ++i )
+		{
+			if ( m_entities[ i ].has_value () && m_entity_data[ i ].m_parent == NullEntity )
 			{
-				// temporary
-				if ( renderable.m_model_id != -1 )
-				{
-					auto& object = scene.GetSceneObject (
-						scene.AddSceneObject ( renderable.m_model_id , transform.m_position , transform.m_rotation , transform.m_scale ) );
-					object.m_diffuse_id = renderable.m_diffuse_id;
-					object.m_specular_id = renderable.m_specular_id;
-					object.m_shininess = renderable.m_shininess;
-				}
-			} );
+				RecursivePopulateScene<S , T , R> ( scene , i );
+			}
+		}
+	}
+
+	template<typename S , typename T , typename R>
+	inline void EnttXSol::RecursivePopulateScene ( S& scene , Entity e , glm::mat4 parentTransform )
+	{
+		// if parent has both transform and renderable component
+		if ( m_registry.all_of<T , R> ( m_entities[ e ].value () ) )
+		{
+			auto const& [transform , renderable] = m_registry.get<T , R> ( m_entities[ e ].value () );
+
+			glm::mat4 model_transform = glm::mat4 ( 1.0f );
+			model_transform = glm::translate ( model_transform , transform.m_position );
+			model_transform = glm::rotate ( model_transform , transform.m_rotation.x , glm::vec3 ( 1.0f , 0.0f , 0.0f ) );
+			model_transform = glm::rotate ( model_transform , transform.m_rotation.y , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
+			model_transform = glm::rotate ( model_transform , transform.m_rotation.z , glm::vec3 ( 0.0f , 0.0f , 1.0f ) );
+			model_transform = glm::scale ( model_transform , transform.m_scale );
+
+			auto model_xform_cat = parentTransform * model_transform;
+
+			// add to scene
+			if ( renderable.m_model_id != -1 )
+			{
+				auto& object = scene.GetSceneObject ( scene.AddSceneObject ( renderable.m_model_id , model_xform_cat ) );
+				object.m_diffuse_id = renderable.m_diffuse_id;
+				object.m_specular_id = renderable.m_specular_id;
+				object.m_shininess = renderable.m_shininess;
+			}
+
+			// populate scene with children
+			for ( auto const& child : m_entity_data[ e ].m_children )
+			{
+				RecursivePopulateScene<S , T , R> ( scene , child , model_xform_cat );
+			}
+		}
+		// if only transform component
+		else if ( m_registry.all_of<T> ( m_entities[ e ].value () ) )
+		{
+			auto const& transform = m_registry.get<T> ( m_entities[ e ].value () );
+
+			glm::mat4 model_transform = glm::mat4 ( 1.0f );
+			model_transform = glm::translate ( model_transform , transform.m_position );
+			model_transform = glm::rotate ( model_transform , transform.m_rotation.x , glm::vec3 ( 1.0f , 0.0f , 0.0f ) );
+			model_transform = glm::rotate ( model_transform , transform.m_rotation.y , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
+			model_transform = glm::rotate ( model_transform , transform.m_rotation.z , glm::vec3 ( 0.0f , 0.0f , 1.0f ) );
+			model_transform = glm::scale ( model_transform , transform.m_scale );
+
+			auto model_xform_cat = parentTransform * model_transform;
+
+			// populate scene with children
+			for ( auto const& child : m_entity_data[ e ].m_children )
+			{
+				RecursivePopulateScene<S , T , R> ( scene , child , model_xform_cat );
+			}
+		}
+		// if neither, take the previous transform in the hierarchy, default identity matrix
+		else
+		{
+			// populate scene with children
+			for ( auto const& child : m_entity_data[ e ].m_children )
+			{
+				RecursivePopulateScene<S , T , R> ( scene , child , parentTransform );
+			}
+		}
 	}
 
 	template<typename T>
