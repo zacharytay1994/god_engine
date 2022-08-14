@@ -56,6 +56,14 @@ namespace god
 			rjValue.AddMember ( rj_key , rj_value , document.GetAllocator () );
 		}
 
+		template <>
+		inline void JSONifyToValue<rapidjson::Value> ( rapidjson::Value& rjValue , rapidjson::Document& document , std::string const& key , rapidjson::Value const& value )
+		{
+			//rapidjson::Value rj_value ( value.c_str () , document.GetAllocator () );
+			rapidjson::Value rj_key ( key.c_str () , document.GetAllocator () );
+			rjValue.AddMember ( rj_key , const_cast< rapidjson::Value& >( value ) , document.GetAllocator () );
+		}
+
 		template <typename...VALUES>
 		void JSONifyValues ( rapidjson::Value& rjValue , rapidjson::Document& document , std::string const& key , VALUES&& ... values )
 		{

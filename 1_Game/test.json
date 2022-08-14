@@ -1,0 +1,54 @@
+{
+    "no_name": {
+        "Script Components": {
+            "C_test1": {
+                "x": 35481,
+                "y": 1.0,
+                "b": true,
+                "s": "something"
+            }
+        },
+        "Engine Components": {
+            "ExampleComponent": {},
+            "Transform": {},
+            "Renderable3D": {}
+        },
+        "Parent": -1
+    },
+    "no_name": {
+        "Script Components": {
+            "C_Example1_Paired": {
+                "b": false,
+                "i": 1,
+                "f": 722.9354248046875,
+                "s": "new string?"
+            },
+            "Example1_RandomComponent": {}
+        },
+        "Engine Components": {},
+        "Parent": 0
+    },
+    "next": {
+        "Script Components": {
+            "C_test1": {
+                "x": 3,
+                "y": 1.0,
+                "b": true,
+                "s": "something"
+            }
+        },
+        "Engine Components": {
+            "ExampleComponent": {},
+            "Transform": {},
+            "Renderable3D": {}
+        },
+        "Parent": -1
+    },
+    "child": {
+        "Script Components": {},
+        "Engine Components": {
+            "Transform": {}
+        },
+        "Parent": 1
+    }
+}

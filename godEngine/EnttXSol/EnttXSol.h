@@ -12,6 +12,8 @@
 #include <sol/sol.hpp>
 
 #include "../../godUtility/TemplateManipulation.h"
+#include "../../godUtility/FileIO.h"
+#include "../../godUtility/Internal/RapidJSONWrapper.h"
 #include "EngineComponents/EngineComponents.h"
 
 #include <string>
@@ -68,6 +70,7 @@ namespace god
 		entt::entity operator[]( Entity entity );
 		entt::entity GetEntity ( Entity entity );
 		Entity CreateEntity ( std::string const& name = "" , Entity parent = NullEntity );
+		Entity LoadEntity ( std::string const& name = "" , Entity parent = NullEntity );
 		void RemoveEntity ( Entity entity , uint32_t childIndex = NullEntity );
 
 		template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
@@ -104,9 +107,11 @@ namespace god
 		// S = scene, T = transform, R = renderable
 		template <typename S , typename T , typename R>
 		void PopulateScene ( S& scene );
-
 		template <typename S , typename T , typename R>
 		void RecursivePopulateScene ( S& scene , Entity e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) );
+
+		void SerializeState ();
+		void DeserializeState ( std::string const& filePath );
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -144,7 +149,7 @@ namespace god
 		void AttachComponent ( Entity id , std::string const& name );
 		template <typename T>
 		auto&& GetStorage ( std::string const& name );
-		entt::runtime_view GetView ( std::vector<std::string> const& components );
+		entt::runtime_view GetView ( std::vector<std::string> const& components , std::vector<std::string> const& engineComponents );
 
 		// register engine components with lua
 		struct BindCTypeToLua
@@ -163,6 +168,41 @@ namespace god
 					return registry.get<T> ( e );
 				};
 				std::cout << "Bound " << name << std::endl;
+			}
+		};
+
+		// builds the view with engine components
+		struct AppendEngineComponentToView
+		{
+			template <typename T>
+			void operator()( entt::registry& registry , entt::runtime_view& view )
+			{
+				view.iterate ( registry.storage<T> () );
+			}
+		};
+
+		struct SerializeEngineComponent
+		{
+			template <typename T>
+			void operator()( entt::registry& registry , rapidjson::Document& document , rapidjson::Value& engineComponents , entt::entity const& entity , std::string const& name )
+			{
+				auto ptr = registry.try_get<T> ( entity );
+				if ( ptr )
+				{
+					rapidjson::Value engine_component;
+					engine_component.SetObject ();
+
+					RapidJSON::JSONifyToValue ( engineComponents , document , name , engine_component );
+				}
+			}
+		};
+
+		struct DeserializeEngineComponent
+		{
+			template <typename T>
+			void operator()( entt::registry& registry , entt::entity& entity )
+			{
+				registry.emplace<T> ( entity );
 			}
 		};
 	};

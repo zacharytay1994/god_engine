@@ -98,6 +98,12 @@ namespace god
 				RecursivelyDisplaySceneHierarchy ( i , entity_data );
 			}
 		}
+
+		// test serialize
+		if ( ImGui::Button ( "Serialize" ) )
+		{
+			m_enttxsol.SerializeState ();
+		}
 		ImGui::End ();
 	}
 
