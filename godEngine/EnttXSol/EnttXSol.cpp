@@ -233,7 +233,7 @@ namespace god
 		return m_scripts;
 	}
 
-	void EnttXSol::SerializeState ()
+	void EnttXSol::SerializeState ( std::string const& filePath )
 	{
 		rapidjson::Document document;
 		document.SetObject ();
@@ -319,7 +319,7 @@ namespace god
 			}
 		}
 
-		WriteJSON ( document , "test.json" );
+		WriteJSON ( document , filePath );
 	}
 
 	void EnttXSol::DeserializeState ( std::string const& filePath )
@@ -399,6 +399,93 @@ namespace god
 				}
 			}
 		}
+	}
+
+	void EnttXSol::SerializeEntity ( rapidjson::Document& document , Entity entity , int parent , int& count )
+	{
+		if ( m_entities[ entity ].has_value () )
+		{
+			rapidjson::Value entity_value;
+			entity_value.SetObject ();
+
+			// loop through all possible script components seeing if its in this entity
+			rapidjson::Value script_components;
+			script_components.SetObject ();
+			for ( auto const& script : m_scripts )
+			{
+				for ( auto const& component : script.second.m_components )
+				{
+					// check if the entity has this component
+					auto&& storage = GetStorage<sol::table> ( component.first );
+					if ( storage.contains ( m_entities[ entity ].value () ) )
+					{
+						rapidjson::Value script_component;
+						script_component.SetObject ();
+
+						// serialize component attributes
+						auto& table = storage.get ( m_entities[ entity ].value () );
+						for ( auto const& attribute : component.second.m_serialize_attributes )
+						{
+							auto name = std::get<0> ( attribute );
+							auto type = std::get<1> ( attribute );
+
+							switch ( type )
+							{
+							case ( AttributeTypes::BOOL ):
+								RapidJSON::JSONifyToValue ( script_component , document , name , table.get<bool> ( name ) );
+								break;
+							case ( AttributeTypes::INT ):
+								RapidJSON::JSONifyToValue ( script_component , document , name , table.get<int> ( name ) );
+								break;
+							case ( AttributeTypes::FLOAT ):
+								RapidJSON::JSONifyToValue ( script_component , document , name , table.get<float> ( name ) );
+								break;
+							case ( AttributeTypes::STRING ):
+								RapidJSON::JSONifyToValue ( script_component , document , name , table.get<std::string> ( name ) );
+								break;
+							}
+						}
+
+						// component.first is now the name of the component in the script
+						RapidJSON::JSONifyToValue ( script_components , document , component.first , script_component );
+					}
+				}
+			}
+			RapidJSON::JSONifyToValue ( entity_value , document , "Script Components" , script_components );
+
+			// loop through all possible engine components seeing if its in this entity
+			rapidjson::Value engine_components;
+			engine_components.SetObject ();
+			for ( auto j = 0; j < EngineComponents::m_component_names.size (); ++j )
+			{
+				T_Manip::RunOnType ( EngineComponents::Components () , j ,
+					SerializeEngineComponent () , std::ref ( m_registry ) , std::ref ( document ) , std::ref ( engine_components ) ,
+					m_entities[ entity ].value () , EngineComponents::m_component_names[ j ] );
+			}
+			RapidJSON::JSONifyToValue ( entity_value , document , "Engine Components" , engine_components );
+
+			RapidJSON::JSONifyToValue ( entity_value , document , "Parent" , parent );
+
+			RapidJSON::JSONify ( document , m_entity_data[ entity ].m_name , entity_value );
+
+			// serialize children too
+			parent = count + 1;
+			for ( auto const& child : m_entity_data[ entity ].m_children )
+			{
+				SerializeEntity ( document , child , parent , ++count );
+			}
+		}
+	}
+
+	void EnttXSol::SerializeAsPrefab ( Entity root , std::string const& filePath )
+	{
+		rapidjson::Document document;
+		document.SetObject ();
+
+		int count { -1 };
+		SerializeEntity ( document , root , NullEntity , count );
+
+		WriteJSON ( document , filePath );
 	}
 
 	void EnttXSol::LoadScript ( std::string const& scriptFile )

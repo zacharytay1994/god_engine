@@ -110,8 +110,11 @@ namespace god
 		template <typename S , typename T , typename R>
 		void RecursivePopulateScene ( S& scene , Entity e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) );
 
-		void SerializeState ();
+		void SerializeState ( std::string const& filePath );
 		void DeserializeState ( std::string const& filePath );
+
+		void SerializeEntity ( rapidjson::Document& document , Entity entity , int parent , int& count);
+		void SerializeAsPrefab ( Entity root , std::string const& filePath );
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -126,6 +129,10 @@ namespace god
 		std::vector<std::optional<entt::entity>> m_entities;
 		std::vector<EntityData> m_entity_data;
 		std::stack<Entity> m_free_ids;
+
+		// for prefabs
+		using EntityPack = std::tuple<entt::entity , EntityData>;
+		using Prefab = std::vector<EntityPack>;
 
 		// script identifiers
 		std::string const m_identifier_component { "--[IsComponent]" };

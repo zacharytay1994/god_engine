@@ -1,0 +1,31 @@
+{
+    "next": {
+        "Script Components": {
+            "C_test1": {
+                "x": 3,
+                "y": 1.0,
+                "b": true,
+                "s": "something"
+            }
+        },
+        "Engine Components": {
+            "ExampleComponent": {},
+            "Transform": {},
+            "Renderable3D": {}
+        },
+        "Parent": -1
+    },
+    "NIL2": {
+        "Script Components": {
+            "C_Example1_Paired": {
+                "b": false,
+                "i": 1,
+                "f": 42.780670166015625,
+                "s": "example"
+            },
+            "Example1_RandomComponent": {}
+        },
+        "Engine Components": {},
+        "Parent": 0
+    }
+}

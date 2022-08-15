@@ -48,7 +48,7 @@ vec3 LightValue()
     float specular_scalar = pow(max(dot(view_direction, reflect_direction), 0.0), uMaterial.shininess);
     vec4 specular = vec4(uLight.specular, 1.0) * (specular_scalar * uMaterial.specular);
 
-    return ambient + diffuse + specular;
+    return vec3 ( ambient + diffuse + specular );
 }
 
 void main()

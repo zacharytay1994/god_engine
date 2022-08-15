@@ -88,10 +88,10 @@ namespace god
 		m_textured_shader.Use ();
 
 		// projection matrix
-		OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uProjection" , projection );
+		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uProjection" , projection );
 
 		// view matrix
-		OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uView" , view );
+		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , view );
 
 		for ( auto const& data : scene.m_render_data )
 		{

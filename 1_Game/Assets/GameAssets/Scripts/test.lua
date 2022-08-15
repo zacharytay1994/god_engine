@@ -47,6 +47,8 @@ function S_test1(e)
     if (e == 0) then
         c1.x = c1.x + 1
     end
+
+    GetComponent(e, "C_System2")
     -- print("Hi")
     -- local transform = GetTransform(e)
     -- transform.x = transform.x + 1

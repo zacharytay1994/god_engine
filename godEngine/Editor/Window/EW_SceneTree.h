@@ -15,12 +15,14 @@ namespace god
 		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override;
 		Entity GetSelectedEntity ();
 	private:
-		std::string m_create_entity_name { "no_name" };
+		std::string m_input_string { "NIL" };
 		Entity m_selected_entity { EnttXSol::NullEntity };
 		Entity m_selected_parent { EnttXSol::NullEntity };
 		Entity m_selected_parent_temp { m_selected_parent };
 		Entity m_selected_remove { EnttXSol::NullEntity };
 		Entity m_selected_child_index { EnttXSol::NullEntity }; // index representing position in the children container of its parent
+		Entity m_selected_prefab { EnttXSol::NullEntity };
+		Entity m_selected_prefab_temp { m_selected_prefab };
 
 		EnttXSol& m_enttxsol;
 
@@ -49,23 +51,35 @@ namespace god
 		// Creating entity without parent
 		if ( ImGui::BeginPopup ( "Create Entity" ) )
 		{
-			ImGui::InputText ( "##EntityName" , &m_create_entity_name );
+			ImGui::InputText ( "##EntityName" , &m_input_string );
 			if ( ImGui::Button ( "Create With Name" ) )
 			{
-				m_enttxsol.CreateEntity ( m_create_entity_name );
-				m_create_entity_name = { "no_name" };
+				m_enttxsol.CreateEntity ( m_input_string );
+				m_input_string = { "NIL" };
 				ImGui::CloseCurrentPopup ();
 			}
 			ImGui::EndPopup ();
 		}
 		if ( ImGui::BeginPopup ( "Create Child Entity" ) )
 		{
-			ImGui::InputText ( "##EntityName" , &m_create_entity_name );
+			ImGui::InputText ( "##EntityName" , &m_input_string );
 			if ( ImGui::Button ( "Create With Name" ) )
 			{
-				m_enttxsol.CreateEntity ( m_create_entity_name , m_selected_parent_temp );
-				m_create_entity_name = { "no_name" };
+				m_enttxsol.CreateEntity ( m_input_string , m_selected_parent_temp );
+				m_input_string = "NIL";
 				m_selected_parent_temp = EnttXSol::NullEntity;
+				ImGui::CloseCurrentPopup ();
+			}
+			ImGui::EndPopup ();
+		}
+		if ( ImGui::BeginPopup ( "Save As Prefab" ) )
+		{
+			ImGui::InputText ( "##PrefabName" , &m_input_string );
+			if ( ImGui::Button ( "Save As" ) )
+			{
+				m_enttxsol.SerializeAsPrefab ( m_selected_prefab_temp , std::string ( "Assets/GameAssets/Prefabs/" ) + m_input_string + ".json" );
+				m_input_string = "NIL";
+				m_selected_prefab_temp = EnttXSol::NullEntity;
 				ImGui::CloseCurrentPopup ();
 			}
 			ImGui::EndPopup ();
@@ -82,6 +96,13 @@ namespace god
 			m_selected_parent_temp = m_selected_parent;
 			m_selected_parent = EnttXSol::NullEntity;
 		}
+		// prefabing
+		if ( m_selected_prefab != EnttXSol::NullEntity )
+		{
+			ImGui::OpenPopup ( "Save As Prefab" );
+			m_selected_prefab_temp = m_selected_prefab;
+			m_selected_prefab = EnttXSol::NullEntity;
+		}
 		// removing entity
 		if ( m_selected_remove != EnttXSol::NullEntity )
 		{
@@ -93,7 +114,7 @@ namespace god
 		// render scene hierarchy
 		for ( auto i = 0; i < entities.size (); ++i )
 		{
-			if ( entities[i].has_value() && entity_data[ i ].m_parent == EnttXSol::NullEntity )
+			if ( entities[ i ].has_value () && entity_data[ i ].m_parent == EnttXSol::NullEntity )
 			{
 				RecursivelyDisplaySceneHierarchy ( i , entity_data );
 			}
@@ -102,7 +123,7 @@ namespace god
 		// test serialize
 		if ( ImGui::Button ( "Serialize" ) )
 		{
-			m_enttxsol.SerializeState ();
+			m_enttxsol.SerializeState ( "test.json" );
 		}
 		ImGui::End ();
 	}
@@ -133,6 +154,10 @@ namespace god
 			if ( ImGui::Selectable ( "Add Child Entity" ) )
 			{
 				m_selected_parent = entity;
+			}
+			if ( ImGui::Selectable ( "Save As Prefab" ) )
+			{
+				m_selected_prefab = entity;
 			}
 			if ( ImGui::Selectable ( "Remove" ) )
 			{
