@@ -1,11 +1,11 @@
 {
-    "no_name": {
+    "NIL": {
         "Script Components": {
             "C_System2": {
-                "o": 15.0
+                "o": 13.399999618530273
             },
             "C_test1": {
-                "x": 123571,
+                "x": 3,
                 "y": 1.0,
                 "b": true,
                 "s": "something"
@@ -13,42 +13,40 @@
         },
         "Engine Components": {
             "ExampleComponent": {},
-            "Transform": {},
-            "Renderable3D": {}
+            "Transform": {
+                "position_x": 0.0,
+                "position_y": 0.0,
+                "position_z": 0.0
+            },
+            "Renderable3D": {
+                "model uid": 1420722900
+            }
         },
         "Parent": -1
     },
-    "no_name": {
+    "NIL": {
         "Script Components": {
-            "C_Example1_Paired": {
-                "b": false,
-                "i": 1,
-                "f": 1373.118896484375,
-                "s": "new string?"
+            "C_System2": {
+                "o": 13.399999618530273
             },
-            "Example1_RandomComponent": {}
+            "C_test1": {
+                "x": 3,
+                "y": 1.0,
+                "b": true,
+                "s": "something"
+            }
         },
-        "Engine Components": {},
-        "Parent": 0
-    },
-    "_non_": {
-        "Script Components": {},
-        "Engine Components": {},
-        "Parent": 1
-    },
-    "_non_": {
-        "Script Components": {},
-        "Engine Components": {},
-        "Parent": 2
-    },
-    "_non_2": {
-        "Script Components": {},
-        "Engine Components": {},
-        "Parent": 1
-    },
-    "_non_": {
-        "Script Components": {},
-        "Engine Components": {},
+        "Engine Components": {
+            "ExampleComponent": {},
+            "Transform": {
+                "position_x": 2.0,
+                "position_y": 2.0,
+                "position_z": 0.0
+            },
+            "Renderable3D": {
+                "model uid": 807737716
+            }
+        },
         "Parent": 0
     }
 }

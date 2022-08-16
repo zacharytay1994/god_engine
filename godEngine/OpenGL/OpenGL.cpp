@@ -61,12 +61,12 @@ namespace god
 	{
 		// clear current mesh list
 		m_models.clear ();
-		
+
 		// copy meshes
-		for ( auto const& asset : asset3DManager.GetResources() )
+		for ( auto const& asset : asset3DManager.GetResources () )
 		{
 			m_models.emplace_back ();
-			BuildOGLMeshesFromAssimpMeshes ( m_models.back () , asset.m_model.m_meshes );
+			BuildOGLMeshesFromAssimpMeshes ( m_models.back () , std::get<1> ( asset ).m_model.m_meshes );
 		}
 
 		// copy mesh ids
@@ -76,7 +76,7 @@ namespace god
 	void OpenGL::UpdateOGLModel ( ResourceID id , Asset3DManager const& asset3DManager )
 	{
 		m_models[ id ].clear ();
-		BuildOGLMeshesFromAssimpMeshes ( m_models[ id ] , asset3DManager.Get ( id ).m_model.m_meshes );
+		BuildOGLMeshesFromAssimpMeshes ( m_models[ id ] , std::get<1> ( asset3DManager.Get ( id ) ).m_model.m_meshes );
 		// copy mesh ids
 		m_model_ids = asset3DManager.GetIDs ();
 	}
@@ -95,7 +95,7 @@ namespace god
 
 		for ( auto const& data : scene.m_render_data )
 		{
-			if ( data.Active() )
+			if ( data.Active () )
 			{
 				//// set uniforms for vertex shader
 				//// model matrix
@@ -143,9 +143,9 @@ namespace god
 
 				// set material
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
-				textures.Get ( data.m_diffuse_id ).Bind ( 0 );
+				std::get<1> ( textures.Get ( data.m_diffuse_id ) ).Bind ( 0 );
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.specular_map" , 1 );
-				textures.Get ( data.m_specular_id ).Bind ( 1 );
+				std::get<1> ( textures.Get ( data.m_specular_id ) ).Bind ( 1 );
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.shininess" , data.m_shininess );
 
 				// set light

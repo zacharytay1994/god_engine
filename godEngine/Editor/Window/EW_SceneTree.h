@@ -26,7 +26,11 @@ namespace god
 
 		EnttXSol& m_enttxsol;
 
-		void RecursivelyDisplaySceneHierarchy ( Entity entity , std::vector<EnttXSol::EntityData> const& entityData , uint32_t childIndex = EnttXSol::NullEntity );
+		int m_uid { 0 };
+
+		void RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , Entity entity , std::vector<EnttXSol::EntityData> const& entityData , std::vector<EnttXSol::Prefab> const& prefabs , uint32_t childIndex = EnttXSol::NullEntity );
+
+		void DisplayPrefab ( EnttXSol::Prefab const& prefab );
 	};
 }
 
@@ -43,9 +47,9 @@ namespace god
 	inline void EW_SceneTree<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
 		( dt );
-		( editorResources );
 		auto& entities = m_enttxsol.GetEntities ();
 		auto& entity_data = m_enttxsol.GetEntityData ();
+		auto const& prefabs = m_enttxsol.GetPrefabs ();
 
 		ImGui::Begin ( "Scene Tree" );
 		// Creating entity without parent
@@ -77,7 +81,7 @@ namespace god
 			ImGui::InputText ( "##PrefabName" , &m_input_string );
 			if ( ImGui::Button ( "Save As" ) )
 			{
-				m_enttxsol.SerializeAsPrefab ( m_selected_prefab_temp , std::string ( "Assets/GameAssets/Prefabs/" ) + m_input_string + ".json" );
+				m_enttxsol.SavePrefab ( editorResources , m_selected_prefab_temp , std::string ( "Assets/GameAssets/Prefabs/" ) + m_input_string + ".json" );
 				m_input_string = "NIL";
 				m_selected_prefab_temp = EnttXSol::NullEntity;
 				ImGui::CloseCurrentPopup ();
@@ -111,21 +115,32 @@ namespace god
 			m_selected_remove = EnttXSol::NullEntity;
 			m_selected_child_index = EnttXSol::NullEntity;
 		}
+		// display prefabs
+		for ( auto const& prefab : prefabs )
+		{
+			if ( std::get<1> ( std::get<1> ( prefab )[ 0 ] ).m_parent == EnttXSol::NullEntity )
+			{
+				DisplayPrefab ( prefab );
+			}
+		}
 		// render scene hierarchy
 		for ( auto i = 0; i < entities.size (); ++i )
 		{
+			// call function only on root nodes
 			if ( entities[ i ].has_value () && entity_data[ i ].m_parent == EnttXSol::NullEntity )
 			{
-				RecursivelyDisplaySceneHierarchy ( i , entity_data );
+				RecursivelyDisplaySceneHierarchy ( editorResources , i , entity_data , prefabs );
 			}
 		}
 
 		// test serialize
 		if ( ImGui::Button ( "Serialize" ) )
 		{
-			m_enttxsol.SerializeState ( "test.json" );
+			m_enttxsol.SerializeState ( editorResources , "test3.json" );
 		}
 		ImGui::End ();
+
+		m_uid = 0;
 	}
 
 	template<typename EDITOR_RESOURCES>
@@ -135,9 +150,9 @@ namespace god
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline void EW_SceneTree<EDITOR_RESOURCES>::RecursivelyDisplaySceneHierarchy ( Entity entity , std::vector<EnttXSol::EntityData> const& entityData , uint32_t childIndex )
+	inline void EW_SceneTree<EDITOR_RESOURCES>::RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , Entity entity , std::vector<EnttXSol::EntityData> const& entityData , std::vector<EnttXSol::Prefab> const& prefabs , uint32_t childIndex )
 	{
-		ImGui::PushID ( entity );
+		ImGui::PushID ( m_uid++ );
 		auto& data = entityData[ entity ];
 		auto tree_node_flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 		if ( m_selected_entity == entity )
@@ -155,6 +170,10 @@ namespace god
 			{
 				m_selected_parent = entity;
 			}
+			if ( ImGui::Selectable ( "Add Child Prefab" ) )
+			{
+				m_enttxsol.LoadPrefab ( engineResources , "NIL" , entity );
+			}
 			if ( ImGui::Selectable ( "Save As Prefab" ) )
 			{
 				m_selected_prefab = entity;
@@ -166,13 +185,37 @@ namespace god
 			}
 			ImGui::EndPopup ();
 		}
+
+		// display children entities
 		if ( open )
 		{
+			// display children prefabs
+			for ( auto const& child_prefab : data.m_prefab_children )
+			{
+				ImGui::PushID ( m_uid++ );
+				if ( ImGui::TreeNodeEx ( ( std::string ( "[p] " ) + std::get<1> ( std::get<1> ( prefabs[ child_prefab ] )[ 0 ] ).m_name ).c_str () , ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet ) )
+				{
+					ImGui::TreePop ();
+				}
+				ImGui::PopID ();
+			}
+
 			// Creating parent as child of entity
 			for ( auto i = 0; i < data.m_children.size (); ++i )
 			{
-				RecursivelyDisplaySceneHierarchy ( data.m_children[ i ] , entityData , i );
+				RecursivelyDisplaySceneHierarchy ( engineResources , data.m_children[ i ] , entityData , prefabs , i );
 			}
+			ImGui::TreePop ();
+		}
+		ImGui::PopID ();
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EW_SceneTree<EDITOR_RESOURCES>::DisplayPrefab ( EnttXSol::Prefab const& prefab )
+	{
+		ImGui::PushID ( m_uid++ );
+		if ( ImGui::TreeNodeEx ( ( std::string ( "[p] " ) + std::get<1> ( std::get<1> ( prefab )[ 0 ] ).m_name ).c_str () , ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet ) )
+		{
 			ImGui::TreePop ();
 		}
 		ImGui::PopID ();

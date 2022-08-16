@@ -61,4 +61,20 @@ namespace god
 				ImGui::InputFloat ( "Scale" , &component.m_scale.z );
 			} );
 	}
+
+	template<>
+	inline void JSONify<Transform> ( EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& value , Transform& component )
+	{
+		RapidJSON::JSONifyToValue ( value , document , "position_x" , component.m_position.x );
+		RapidJSON::JSONifyToValue ( value , document , "position_y" , component.m_position.y );
+		RapidJSON::JSONifyToValue ( value , document , "position_z" , component.m_position.z );
+	}
+
+	template<>
+	inline void DeJSONify<Transform> ( EngineResources& engineResources , Transform& component , rapidjson::Value& jsonObj )
+	{
+		AssignIfExist ( jsonObj , component.m_position.x , "position_x" );
+		AssignIfExist ( jsonObj , component.m_position.y , "position_y" );
+		AssignIfExist ( jsonObj , component.m_position.z , "position_z" );
+	}
 }

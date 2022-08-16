@@ -1,6 +1,5 @@
 #include "../pch.h"
 #include "EnttXSol.h"
-#include "EngineComponents/EC_All.h"
 
 namespace god
 {
@@ -233,10 +232,22 @@ namespace god
 		return m_scripts;
 	}
 
-	void EnttXSol::SerializeState ( std::string const& filePath )
+	void EnttXSol::SerializeState ( EngineResources& engineResources , std::string const& filePath )
 	{
 		rapidjson::Document document;
 		document.SetObject ();
+
+		// serialize all root prefabs
+		rapidjson::Value state_prefabs;
+		state_prefabs.SetObject ();
+		for ( auto const& prefab : m_prefabs )
+		{
+			if ( std::get<1> ( std::get<1> ( prefab )[ 0 ] ).m_parent == NullEntity )
+			{
+				RapidJSON::JSONifyToValue ( state_prefabs , document , std::get<0> ( prefab ) , "test" );
+			}
+		}
+		RapidJSON::JSONify ( document , "State Prefabs" , state_prefabs );
 
 		// loop through all entities
 		for ( auto i = 0; i < m_entities.size (); ++i )
@@ -245,6 +256,15 @@ namespace god
 			{
 				rapidjson::Value entity_value;
 				entity_value.SetObject ();
+
+				// serialize prefabs attached to this entity
+				rapidjson::Value prefabs;
+				prefabs.SetObject ();
+				for ( auto const& prefab_child : m_entity_data[ i ].m_prefab_children )
+				{
+					RapidJSON::JSONifyToValue ( prefabs , document , std::get<0> ( m_prefabs[ prefab_child ] ) , "test" );
+				}
+				RapidJSON::JSONifyToValue ( entity_value , document , "Prefabs" , prefabs );
 
 				// loop through all possible script components seeing if its in this entity
 				rapidjson::Value script_components;
@@ -297,8 +317,8 @@ namespace god
 				for ( auto j = 0; j < EngineComponents::m_component_names.size (); ++j )
 				{
 					T_Manip::RunOnType ( EngineComponents::Components () , j ,
-						SerializeEngineComponent () , std::ref ( m_registry ) , std::ref ( document ) , std::ref ( engine_components ) ,
-						m_entities[ i ].value () , EngineComponents::m_component_names[ j ] );
+						SerializeEngineComponent<EngineResources> () , std::ref ( m_registry ) , std::ref ( document ) , std::ref ( engine_components ) ,
+						m_entities[ i ].value () , EngineComponents::m_component_names[ j ] , engineResources );
 				}
 				RapidJSON::JSONifyToValue ( entity_value , document , "Engine Components" , engine_components );
 
@@ -322,7 +342,7 @@ namespace god
 		WriteJSON ( document , filePath );
 	}
 
-	void EnttXSol::DeserializeState ( std::string const& filePath )
+	void EnttXSol::DeserializeState ( EngineResources& engineResources , std::string const& filePath )
 	{
 		rapidjson::Document document;
 
@@ -330,78 +350,94 @@ namespace god
 
 		for ( auto& member : document.GetObj () )
 		{
-			auto e = LoadEntity ( member.name.GetString () , member.value[ "Parent" ].GetInt () );
-
-			// iterate script components
-			for ( auto& script_component : member.value[ "Script Components" ].GetObj () )
+			if ( std::string ( member.name.GetString () ) == "State Prefabs" )
 			{
-				std::string component_name = script_component.name.GetString ();
-				AttachComponent ( e , component_name );
-
-				// update values
-				auto&& storage = GetStorage<sol::table> ( component_name );
-				auto& component = storage.get ( GetEntity ( e ) );
-
-				bool script_component_found { false };
-				for ( auto const& script : m_scripts )
+				for ( auto& prefab : member.value.GetObj () )
 				{
-					if ( script.second.m_components.find ( component_name ) != script.second.m_components.end () )
-					{
-						// attribute here refers to the component's attribute description
-						for ( auto const& attribute : script.second.m_components.at ( component_name ).m_serialize_attributes )
-						{
-							auto name = std::get<0> ( attribute );
-							auto type = std::get<1> ( attribute );
-
-							if ( script_component.value.FindMember ( name.c_str () ) != script_component.value.MemberEnd () )
-							{
-								switch ( type )
-								{
-								case ( AttributeTypes::BOOL ):
-									component.set ( name , script_component.value[ name.c_str () ].GetBool () );
-									break;
-								case ( AttributeTypes::INT ):
-									component.set ( name , script_component.value[ name.c_str () ].GetInt () );
-									break;
-								case ( AttributeTypes::FLOAT ):
-									component.set ( name , script_component.value[ name.c_str () ].GetFloat () );
-									break;
-								case ( AttributeTypes::STRING ):
-									component.set ( name , script_component.value[ name.c_str () ].GetString () );
-									break;
-								}
-							}
-							else
-							{
-								std::cerr << "EnttXSol::DeserializeState - Expected value not in serialized file. Maybe outdated file? ["
-									<< name << "] in File [" << filePath << "]" << std::endl;
-							}
-						}
-						script_component_found = true;
-					}
-				}
-				if ( !script_component_found )
-				{
-					std::cerr << "EnttXSol::DeserializeState - Previously serialized script component not found. Maybe redefined? ["
-						<< component_name << "] in File [" << filePath << "]" << std::endl;
+					LoadPrefab ( engineResources , prefab.name.GetString () );
 				}
 			}
-
-			// iterate engine components
-			for ( auto& engine_component : member.value[ "Engine Components" ].GetObj () )
+			else
 			{
-				auto it = std::find ( EngineComponents::m_component_names.begin () , EngineComponents::m_component_names.end () , engine_component.name.GetString () );
-				if ( it != EngineComponents::m_component_names.end () )
+				auto e = LoadEntity ( member.name.GetString () , member.value[ "Parent" ].GetInt () );
+
+				// iterate prefabs
+				for ( auto& prefabs : member.value[ "Prefabs" ].GetObj () )
 				{
-					auto i = it - EngineComponents::m_component_names.begin ();
-					T_Manip::RunOnType ( EngineComponents::Components () , i ,
-						DeserializeEngineComponent () , std::ref ( m_registry ) , m_entities[ e ].value () );
+					LoadPrefab ( engineResources , prefabs.name.GetString () , e );
+				}
+
+				// iterate script components
+				for ( auto& script_component : member.value[ "Script Components" ].GetObj () )
+				{
+					std::string component_name = script_component.name.GetString ();
+					AttachComponent ( e , component_name );
+
+					// update values
+					auto&& storage = GetStorage<sol::table> ( component_name );
+					auto& component = storage.get ( GetEntity ( e ) );
+
+					bool script_component_found { false };
+					for ( auto const& script : m_scripts )
+					{
+						if ( script.second.m_components.find ( component_name ) != script.second.m_components.end () )
+						{
+							// attribute here refers to the component's attribute description
+							for ( auto const& attribute : script.second.m_components.at ( component_name ).m_serialize_attributes )
+							{
+								auto name = std::get<0> ( attribute );
+								auto type = std::get<1> ( attribute );
+
+								if ( script_component.value.FindMember ( name.c_str () ) != script_component.value.MemberEnd () )
+								{
+									switch ( type )
+									{
+									case ( AttributeTypes::BOOL ):
+										component.set ( name , script_component.value[ name.c_str () ].GetBool () );
+										break;
+									case ( AttributeTypes::INT ):
+										component.set ( name , script_component.value[ name.c_str () ].GetInt () );
+										break;
+									case ( AttributeTypes::FLOAT ):
+										component.set ( name , script_component.value[ name.c_str () ].GetFloat () );
+										break;
+									case ( AttributeTypes::STRING ):
+										component.set ( name , script_component.value[ name.c_str () ].GetString () );
+										break;
+									}
+								}
+								else
+								{
+									std::cerr << "EnttXSol::DeserializeState - Expected value not in serialized file. Maybe outdated file? ["
+										<< name << "] in File [" << filePath << "]" << std::endl;
+								}
+							}
+							script_component_found = true;
+						}
+					}
+					if ( !script_component_found )
+					{
+						std::cerr << "EnttXSol::DeserializeState - Previously serialized script component not found. Maybe redefined? ["
+							<< component_name << "] in File [" << filePath << "]" << std::endl;
+					}
+				}
+
+				// iterate engine components
+				for ( auto& engine_component : member.value[ "Engine Components" ].GetObj () )
+				{
+					auto it = std::find ( EngineComponents::m_component_names.begin () , EngineComponents::m_component_names.end () , engine_component.name.GetString () );
+					if ( it != EngineComponents::m_component_names.end () )
+					{
+						auto i = it - EngineComponents::m_component_names.begin ();
+						T_Manip::RunOnType ( EngineComponents::Components () , i ,
+							DeserializeEngineComponent<EngineResources> () , std::ref ( m_registry ) , m_entities[ e ].value () , std::ref ( engine_component.value ) , engineResources );
+					}
 				}
 			}
 		}
 	}
 
-	void EnttXSol::SerializeEntity ( rapidjson::Document& document , Entity entity , int parent , int& count )
+	void EnttXSol::SerializeEntity ( EngineResources& engineResources , rapidjson::Document& document , Entity entity , int parent , int& count )
 	{
 		if ( m_entities[ entity ].has_value () )
 		{
@@ -459,8 +495,8 @@ namespace god
 			for ( auto j = 0; j < EngineComponents::m_component_names.size (); ++j )
 			{
 				T_Manip::RunOnType ( EngineComponents::Components () , j ,
-					SerializeEngineComponent () , std::ref ( m_registry ) , std::ref ( document ) , std::ref ( engine_components ) ,
-					m_entities[ entity ].value () , EngineComponents::m_component_names[ j ] );
+					SerializeEngineComponent<EngineResources> () , std::ref ( m_registry ) , std::ref ( document ) , std::ref ( engine_components ) ,
+					m_entities[ entity ].value () , EngineComponents::m_component_names[ j ] , engineResources );
 			}
 			RapidJSON::JSONifyToValue ( entity_value , document , "Engine Components" , engine_components );
 
@@ -472,20 +508,131 @@ namespace god
 			parent = count + 1;
 			for ( auto const& child : m_entity_data[ entity ].m_children )
 			{
-				SerializeEntity ( document , child , parent , ++count );
+				SerializeEntity ( engineResources , document , child , parent , ++count );
 			}
 		}
 	}
 
-	void EnttXSol::SerializeAsPrefab ( Entity root , std::string const& filePath )
+	void EnttXSol::SavePrefab ( EngineResources& engineResources , Entity root , std::string const& filePath )
 	{
 		rapidjson::Document document;
 		document.SetObject ();
 
 		int count { -1 };
-		SerializeEntity ( document , root , NullEntity , count );
+		SerializeEntity ( engineResources , document , root , NullEntity , count );
 
 		WriteJSON ( document , filePath );
+	}
+
+	void EnttXSol::LoadPrefab ( EngineResources& engineResources , std::string const& fileName , Entity parent )
+	{
+		rapidjson::Document document;
+
+		ReadJSON ( document , std::string ( "Assets/GameAssets/Prefabs/" ) + fileName + ".json" );
+
+		Prefab prefab;
+		std::get<0> ( prefab ) = fileName;
+		auto& prefab_data = std::get<1> ( prefab );
+
+		for ( auto& member : document.GetObj () )
+		{
+			//auto e = LoadEntity ( member.name.GetString () , member.value[ "Parent" ].GetInt () );
+			entt::entity entity = m_registry.create ();
+			EntityData entity_data;
+			entity_data.m_name = member.name.GetString ();
+			entity_data.m_parent = static_cast< Entity >( member.value[ "Parent" ].GetInt () );
+
+			if ( entity_data.m_parent != NullEntity )
+			{
+				std::get<1> ( prefab_data[ entity_data.m_parent ] ).m_children.push_back ( prefab_data.size () );
+			}
+
+			// iterate script components
+			for ( auto& script_component : member.value[ "Script Components" ].GetObj () )
+			{
+				std::string component_name = script_component.name.GetString ();
+				AttachComponent ( entity , component_name );
+
+				// update values
+				auto&& storage = GetStorage<sol::table> ( component_name );
+				auto& component = storage.get ( entity );
+
+				bool script_component_found { false };
+				for ( auto const& script : m_scripts )
+				{
+					if ( script.second.m_components.find ( component_name ) != script.second.m_components.end () )
+					{
+						// attribute here refers to the component's attribute description
+						for ( auto const& attribute : script.second.m_components.at ( component_name ).m_serialize_attributes )
+						{
+							auto name = std::get<0> ( attribute );
+							auto type = std::get<1> ( attribute );
+
+							if ( script_component.value.FindMember ( name.c_str () ) != script_component.value.MemberEnd () )
+							{
+								switch ( type )
+								{
+								case ( AttributeTypes::BOOL ):
+									component.set ( name , script_component.value[ name.c_str () ].GetBool () );
+									break;
+								case ( AttributeTypes::INT ):
+									component.set ( name , script_component.value[ name.c_str () ].GetInt () );
+									break;
+								case ( AttributeTypes::FLOAT ):
+									component.set ( name , script_component.value[ name.c_str () ].GetFloat () );
+									break;
+								case ( AttributeTypes::STRING ):
+									component.set ( name , script_component.value[ name.c_str () ].GetString () );
+									break;
+								}
+							}
+							else
+							{
+								std::cerr << "EnttXSol::DeserializeState - Expected value not in serialized file. Maybe outdated file? ["
+									<< name << "] in prefab file [" << fileName << "]" << std::endl;
+							}
+						}
+						script_component_found = true;
+					}
+				}
+				if ( !script_component_found )
+				{
+					std::cerr << "EnttXSol::DeserializeState - Previously serialized script component not found. Maybe redefined? ["
+						<< component_name << "] in prefab file [" << fileName << "]" << std::endl;
+				}
+			}
+
+			// iterate engine components
+			for ( auto& engine_component : member.value[ "Engine Components" ].GetObj () )
+			{
+				auto it = std::find ( EngineComponents::m_component_names.begin () , EngineComponents::m_component_names.end () , engine_component.name.GetString () );
+				if ( it != EngineComponents::m_component_names.end () )
+				{
+					auto i = it - EngineComponents::m_component_names.begin ();
+					T_Manip::RunOnType ( EngineComponents::Components () , i ,
+						DeserializeEngineComponent<EngineResources> () , std::ref ( m_registry ) , entity , std::ref ( engine_component.value ) , engineResources );
+				}
+			}
+
+			// add to prefab container
+			prefab_data.push_back ( { entity, entity_data } );
+		}
+
+		if ( prefab_data.size () > 0 )
+		{
+			if ( parent != NullEntity )
+			{
+				std::get<1> ( prefab_data[ 0 ] ).m_parent = parent;
+				m_entity_data[ parent ].m_prefab_children.push_back ( m_prefabs.size () );
+			}
+
+			m_prefabs.push_back ( prefab );
+		}
+	}
+
+	std::vector<EnttXSol::Prefab> const& EnttXSol::GetPrefabs ()
+	{
+		return m_prefabs;
 	}
 
 	void EnttXSol::LoadScript ( std::string const& scriptFile )
@@ -648,6 +795,16 @@ namespace god
 		if ( !storage.contains ( this->operator[]( id ) ) )
 		{
 			storage.emplace ( this->operator[]( id ) ) = component ();
+		}
+	}
+
+	void EnttXSol::AttachComponent ( entt::entity id , std::string const& name )
+	{
+		sol::function component = m_lua[ name ] ();
+		auto& storage = GetStorage<sol::table> ( name );
+		if ( !storage.contains ( id ) )
+		{
+			storage.emplace ( id ) = component ();
 		}
 	}
 

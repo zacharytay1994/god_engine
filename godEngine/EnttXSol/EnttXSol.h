@@ -15,6 +15,7 @@
 #include "../../godUtility/FileIO.h"
 #include "../../godUtility/Internal/RapidJSONWrapper.h"
 #include "EngineComponents/EngineComponents.h"
+#include "EngineComponents/EC_All.h"
 
 #include <string>
 #include <unordered_map>
@@ -99,10 +100,14 @@ namespace god
 			std::string m_name { "" };
 			Entity m_parent { NullEntity };
 			std::vector<Entity> m_children;
+			std::vector<uint32_t> m_prefab_children;
 		};
 		std::vector<EntityData> const& GetEntityData () const;
 
 		std::unordered_map<std::string , Script> const& GetScripts () const;
+
+		using EntityPack = std::tuple<entt::entity , EntityData>;
+		using Prefab = std::tuple<std::string , std::vector<EntityPack>>;
 
 		// S = scene, T = transform, R = renderable
 		template <typename S , typename T , typename R>
@@ -110,11 +115,19 @@ namespace god
 		template <typename S , typename T , typename R>
 		void RecursivePopulateScene ( S& scene , Entity e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) );
 
-		void SerializeState ( std::string const& filePath );
-		void DeserializeState ( std::string const& filePath );
+		template <typename S , typename T , typename R>
+		void RecursivePopulateScenePrefab ( S& scene , Prefab const& prefab , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) , uint32_t i = 0 );
 
-		void SerializeEntity ( rapidjson::Document& document , Entity entity , int parent , int& count);
-		void SerializeAsPrefab ( Entity root , std::string const& filePath );
+		void SerializeState ( EngineResources& engineResources , std::string const& filePath );
+		void DeserializeState ( EngineResources& engineResources , std::string const& filePath );
+
+		// saving an entity and all its children as a prefab file
+		void SerializeEntity ( EngineResources& engineResources , rapidjson::Document& document , Entity entity , int parent , int& count );
+		void SavePrefab ( EngineResources& engineResources , Entity root , std::string const& filePath );
+		// loading a prefab file, attaching it to an entity
+		void LoadPrefab ( EngineResources& engineResources , std::string const& fileName , Entity parent = NullEntity );
+
+		std::vector<Prefab> const& GetPrefabs ();
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -131,8 +144,7 @@ namespace god
 		std::stack<Entity> m_free_ids;
 
 		// for prefabs
-		using EntityPack = std::tuple<entt::entity , EntityData>;
-		using Prefab = std::vector<EntityPack>;
+		std::vector<Prefab> m_prefabs;
 
 		// script identifiers
 		std::string const m_identifier_component { "--[IsComponent]" };
@@ -154,6 +166,7 @@ namespace god
 		void LoadScript ( std::string const& scriptFile );
 		void LoadSystem ( std::string const& name );
 		void AttachComponent ( Entity id , std::string const& name );
+		void AttachComponent ( entt::entity id , std::string const& name );
 		template <typename T>
 		auto&& GetStorage ( std::string const& name );
 		entt::runtime_view GetView ( std::vector<std::string> const& components , std::vector<std::string> const& engineComponents );
@@ -188,10 +201,11 @@ namespace god
 			}
 		};
 
+		template <typename ENGINE_RESOURCES>
 		struct SerializeEngineComponent
 		{
 			template <typename T>
-			void operator()( entt::registry& registry , rapidjson::Document& document , rapidjson::Value& engineComponents , entt::entity const& entity , std::string const& name )
+			void operator()( entt::registry& registry , rapidjson::Document& document , rapidjson::Value& engineComponents , entt::entity const& entity , std::string const& name , ENGINE_RESOURCES& engineResources )
 			{
 				auto ptr = registry.try_get<T> ( entity );
 				if ( ptr )
@@ -199,17 +213,22 @@ namespace god
 					rapidjson::Value engine_component;
 					engine_component.SetObject ();
 
+					JSONify ( engineResources , document , engine_component , *ptr );
+
 					RapidJSON::JSONifyToValue ( engineComponents , document , name , engine_component );
 				}
 			}
 		};
 
+		template <typename ENGINE_RESOURCES>
 		struct DeserializeEngineComponent
 		{
 			template <typename T>
-			void operator()( entt::registry& registry , entt::entity& entity )
+			void operator()( entt::registry& registry , entt::entity& entity , rapidjson::Value& jsonObj , ENGINE_RESOURCES& engineResources )
 			{
 				registry.emplace<T> ( entity );
+
+				DeJSONify ( engineResources , registry.get<T> ( entity ) , jsonObj );
 			}
 		};
 	};
@@ -339,6 +358,14 @@ namespace god
 				RecursivePopulateScene<S , T , R> ( scene , i );
 			}
 		}
+
+		for ( auto i = 0; i < m_prefabs.size (); ++i )
+		{
+			if ( std::get<1> ( std::get<1> ( m_prefabs[ i ] )[ 0 ] ).m_parent == NullEntity )
+			{
+				RecursivePopulateScenePrefab<S , T , R> ( scene , m_prefabs[ i ] );
+			}
+		}
 	}
 
 	template<typename S , typename T , typename R>
@@ -372,6 +399,12 @@ namespace god
 			{
 				RecursivePopulateScene<S , T , R> ( scene , child , model_xform_cat );
 			}
+
+			// populate scene with prefab children
+			for ( auto const& child : m_entity_data[ e ].m_prefab_children )
+			{
+				RecursivePopulateScenePrefab<S , T , R> ( scene , m_prefabs[ child ] , model_xform_cat );
+			}
 		}
 		// if only transform component
 		else if ( m_registry.all_of<T> ( m_entities[ e ].value () ) )
@@ -392,6 +425,12 @@ namespace god
 			{
 				RecursivePopulateScene<S , T , R> ( scene , child , model_xform_cat );
 			}
+
+			// populate scene with prefab children
+			for ( auto const& child : m_entity_data[ e ].m_prefab_children )
+			{
+				RecursivePopulateScenePrefab<S , T , R> ( scene , m_prefabs[ child ] , model_xform_cat );
+			}
 		}
 		// if neither, take the previous transform in the hierarchy, default identity matrix
 		else
@@ -400,6 +439,50 @@ namespace god
 			for ( auto const& child : m_entity_data[ e ].m_children )
 			{
 				RecursivePopulateScene<S , T , R> ( scene , child , parentTransform );
+			}
+
+			// populate scene with prefab children
+			for ( auto const& child : m_entity_data[ e ].m_prefab_children )
+			{
+				RecursivePopulateScenePrefab<S , T , R> ( scene , m_prefabs[ child ] , parentTransform );
+			}
+		}
+	}
+
+	template<typename S , typename T , typename R>
+	inline void EnttXSol::RecursivePopulateScenePrefab ( S& scene , Prefab const& prefab , glm::mat4 parentTransform , uint32_t i )
+	{
+		auto& entity = std::get<1> ( prefab )[ i ];
+		auto& entt_id = std::get<0> ( entity );
+		auto& entity_data = std::get<1> ( entity );
+
+		// if parent has both transform and renderable component
+		if ( m_registry.all_of<T , R> ( entt_id ) )
+		{
+			auto const& [transform , renderable] = m_registry.get<T , R> ( entt_id );
+
+			glm::mat4 model_transform = glm::mat4 ( 1.0f );
+			model_transform = glm::translate ( model_transform , transform.m_position );
+			model_transform = glm::rotate ( model_transform , transform.m_rotation.x , glm::vec3 ( 1.0f , 0.0f , 0.0f ) );
+			model_transform = glm::rotate ( model_transform , transform.m_rotation.y , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
+			model_transform = glm::rotate ( model_transform , transform.m_rotation.z , glm::vec3 ( 0.0f , 0.0f , 1.0f ) );
+			model_transform = glm::scale ( model_transform , transform.m_scale );
+
+			auto model_xform_cat = parentTransform * model_transform;
+
+			// add to scene
+			if ( renderable.m_model_id != -1 )
+			{
+				auto& object = scene.GetSceneObject ( scene.AddSceneObject ( renderable.m_model_id , model_xform_cat ) );
+				object.m_diffuse_id = renderable.m_diffuse_id;
+				object.m_specular_id = renderable.m_specular_id;
+				object.m_shininess = renderable.m_shininess;
+			}
+
+			// populate scene with children
+			for ( auto const& child : entity_data.m_children )
+			{
+				RecursivePopulateScenePrefab<S , T , R> ( scene , prefab , model_xform_cat , child );
 			}
 		}
 	}

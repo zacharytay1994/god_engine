@@ -18,7 +18,7 @@ namespace god
 		uint32_t m_texture_id;
 	};
 
-	using OGLTextureManager = ResourceManager<OGLTexture>;
+	using OGLTextureManager = ResourceManager<std::tuple<uint32_t , OGLTexture>>;
 
 	void InsertEngineOGLTextures ( OGLTextureManager& manager );
 	void InsertAllOGLTexturesFromConfig ( std::string const& configPath , std::string const& assetFolderPath , OGLTextureManager& manager );

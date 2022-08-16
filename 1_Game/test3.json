@@ -1,0 +1,148 @@
+{
+    "State Prefabs": {
+        "NIL": "test"
+    },
+    "NIL": {
+        "Prefabs": {
+            "NIL": "test"
+        },
+        "Script Components": {
+            "C_Example1_Paired": {
+                "b": false,
+                "i": 1,
+                "f": 4910.7724609375,
+                "s": "example"
+            },
+            "Example1_RandomComponent": {}
+        },
+        "Engine Components": {
+            "Transform": {
+                "position_x": 3.0,
+                "position_y": -2.0,
+                "position_z": 0.0
+            },
+            "Renderable3D": {
+                "model uid": 807737716,
+                "diffuse uid": 652207713,
+                "specular uid": 3916083164
+            }
+        },
+        "Parent": -1
+    },
+    "NIL": {
+        "Prefabs": {
+            "NIL": "test"
+        },
+        "Script Components": {
+            "C_System2": {
+                "o": 13.399999618530273
+            },
+            "C_test1": {
+                "x": 3,
+                "y": 1.0,
+                "b": true,
+                "s": "something"
+            }
+        },
+        "Engine Components": {
+            "ExampleComponent": {},
+            "Transform": {
+                "position_x": -2.0,
+                "position_y": 0.0,
+                "position_z": -2.0
+            },
+            "Renderable3D": {
+                "model uid": 1420722900,
+                "diffuse uid": 670286950,
+                "specular uid": 2380861504
+            }
+        },
+        "Parent": -1
+    },
+    "NIL": {
+        "Prefabs": {},
+        "Script Components": {
+            "C_System2": {
+                "o": 13.399999618530273
+            },
+            "C_test1": {
+                "x": 3,
+                "y": 1.0,
+                "b": true,
+                "s": "something"
+            }
+        },
+        "Engine Components": {
+            "ExampleComponent": {},
+            "Transform": {
+                "position_x": -1.0,
+                "position_y": -2.0,
+                "position_z": 0.0
+            },
+            "Renderable3D": {
+                "model uid": 1068777295,
+                "diffuse uid": 3916083164,
+                "specular uid": 652207713
+            }
+        },
+        "Parent": -1
+    },
+    "NIL": {
+        "Prefabs": {
+            "NIL": "test"
+        },
+        "Script Components": {
+            "C_System2": {
+                "o": 13.399999618530273
+            },
+            "C_test1": {
+                "x": 3,
+                "y": 1.0,
+                "b": true,
+                "s": "something"
+            }
+        },
+        "Engine Components": {
+            "ExampleComponent": {},
+            "Transform": {
+                "position_x": -2.0,
+                "position_y": -3.0,
+                "position_z": 0.0
+            },
+            "Renderable3D": {
+                "model uid": 1420722900,
+                "diffuse uid": 670286950,
+                "specular uid": 2380861504
+            }
+        },
+        "Parent": 2
+    },
+    "NIL": {
+        "Prefabs": {},
+        "Script Components": {
+            "C_System2": {
+                "o": 13.399999618530273
+            },
+            "C_test1": {
+                "x": 3,
+                "y": 1.0,
+                "b": true,
+                "s": "something"
+            }
+        },
+        "Engine Components": {
+            "ExampleComponent": {},
+            "Transform": {
+                "position_x": 0.0,
+                "position_y": 0.0,
+                "position_z": 6.0
+            },
+            "Renderable3D": {
+                "model uid": 1068777295,
+                "diffuse uid": 670286950,
+                "specular uid": 2380861504
+            }
+        },
+        "Parent": 2
+    }
+}

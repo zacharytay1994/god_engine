@@ -19,7 +19,7 @@ namespace god
 
 	void InsertAsset3DFromPath ( std::string const& assetName , std::string const& assetFolderPath , Asset3DManager& manager )
 	{
-		manager.Insert ( assetName , LoadAsset3D ( assetFolderPath + assetName , true ) );
+		manager.Insert ( assetName , { 0, LoadAsset3D ( assetFolderPath + assetName , true ) } );
 	}
 
 	void InsertAllAsset3DsFromConfig ( std::string const& configPath , std::string const& assetFolderPath , Asset3DManager& manager )
@@ -33,7 +33,14 @@ namespace god
 			{
 				if ( !manager.Has ( model.name.GetString () ) )
 				{
-					manager.Insert ( model.name.GetString () , LoadAsset3D ( assetFolderPath + model.name.GetString () , true ) );
+					if ( model.value[ 0 ].HasMember ( "UID" ) )
+					{
+						manager.Insert ( model.name.GetString () , { model.value[ 0 ][ "UID" ].GetUint (), LoadAsset3D ( assetFolderPath + model.name.GetString () , true ) } );
+					}
+					else
+					{
+						manager.Insert ( model.name.GetString () , { 0, LoadAsset3D ( assetFolderPath + model.name.GetString () , true ) } );
+					}
 				}
 			}
 		}

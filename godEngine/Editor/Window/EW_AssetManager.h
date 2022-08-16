@@ -158,7 +158,7 @@ namespace god
 					ImGui::Text ( "New Raw:" );
 					if ( m_edit_new_src )
 					{
-						ImGui::Text ( m_edit_src.c_str() );
+						ImGui::Text ( m_edit_src.c_str () );
 					}
 					else
 					{
@@ -222,7 +222,7 @@ namespace god
 									// check if it has new raw 
 									if ( new_raw )
 									{
-										asset_3d.SetResource ( asset_3d.GetID ( m_edit_name ) , LoadAsset3D ( AssetPath::Folder_BuildModels + m_edit_name , true ) );
+										asset_3d.SetResource ( asset_3d.GetID ( m_edit_name ) , { value->value[ 0 ][ "UID" ].GetUint (), LoadAsset3D ( AssetPath::Folder_BuildModels + m_edit_name , true ) } );
 										editorResources.Get<OpenGL> ().get ().UpdateOGLModel ( asset_3d.GetID ( m_edit_name ) , asset_3d );
 									}
 								}
@@ -391,8 +391,9 @@ namespace god
 
 								if ( ogl_textures.Has ( m_selected_texture ) )
 								{
-									ogl_textures.Get ( m_edit_name ).Free ();
-									ogl_textures.SetResource ( ogl_textures.GetID ( m_edit_name ) , OGLTexture ( AssetPath::Folder_RawTextures + m_edit_raw ) );
+									auto& texture = ogl_textures.Get ( m_edit_name );
+									std::get<1> ( texture ).Free ();
+									ogl_textures.SetResource ( ogl_textures.GetID ( m_edit_name ) , { std::get<0> ( texture ), OGLTexture ( AssetPath::Folder_RawTextures + m_edit_raw ) } );
 								}
 							}
 

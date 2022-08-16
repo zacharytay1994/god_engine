@@ -79,7 +79,7 @@ namespace god
 	void InsertEngineOGLTextures ( OGLTextureManager& manager )
 	{
 		// insert "none" image
-		manager.Insert ( "None" , OGLTexture ( "Assets/EngineAssets/Textures/BlackTexture.png" ) );
+		manager.Insert ( "None" , { 0, OGLTexture ( "Assets/EngineAssets/Textures/BlackTexture.png" ) } );
 	}
 
 	void InsertAllOGLTexturesFromConfig ( std::string const& configPath , std::string const& assetFolderPath , OGLTextureManager& manager )
@@ -93,7 +93,14 @@ namespace god
 			{
 				if ( !manager.Has ( model.name.GetString () ) )
 				{
-					manager.Insert ( model.name.GetString () , OGLTexture ( assetFolderPath + model.value.GetArray ()[ 0 ][ "Raw" ].GetString () ) );
+					if ( model.value[ 0 ].HasMember ( "UID" ) )
+					{
+						manager.Insert ( model.name.GetString () , { model.value[ 0 ][ "UID" ].GetUint (), OGLTexture ( assetFolderPath + model.value.GetArray ()[ 0 ][ "Raw" ].GetString () ) } );
+					}
+					else
+					{
+						manager.Insert ( model.name.GetString () , { 0, OGLTexture ( assetFolderPath + model.value.GetArray ()[ 0 ][ "Raw" ].GetString () ) } );
+					}
 				}
 			}
 		}

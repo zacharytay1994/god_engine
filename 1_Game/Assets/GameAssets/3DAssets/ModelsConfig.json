@@ -2,8 +2,8 @@
     "Backpack": [
         {
             "Raw": "backpack.obj",
-            "Source": "C:\\Users\\zacha\\Downloads\\backpack\\backpack.obj",
-            "Last Edited": "25-07-2022 22-12-32",
+            "Source": "C:\\Users\\zacha\\Documents\\GitHub\\god_engine\\1_Game\\Assets\\GameAssets\\Models\\Backpack\\backpack.obj",
+            "Last Edited": "16-08-2022 22-49-12",
             "UID": 1068777295
         }
     ],
@@ -13,6 +13,14 @@
             "Source": "C:\\Users\\zacha\\Downloads\\cso-salamander-flamethrower\\source\\pawipiw\\salam.fbx",
             "Last Edited": "25-07-2022 22-36-57",
             "UID": 1420722900
+        }
+    ],
+    "Bunny": [
+        {
+            "Raw": "bunny.obj",
+            "Source": "C:\\Users\\zacha\\Documents\\School_2_3\\Spatial Data Structures\\Assignment2\\Assets\\Models\\bunny.obj",
+            "Last Edited": "16-08-2022 22-50-14",
+            "UID": 807737716
         }
     ]
 }

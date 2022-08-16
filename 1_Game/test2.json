@@ -1,0 +1,58 @@
+{
+    "State Prefabs": {
+        "NIL": "test"
+    },
+    "NIL": {
+        "Prefabs": {
+            "NIL": "test",
+            "NIL": "test"
+        },
+        "Script Components": {
+            "C_System2": {
+                "o": 13.399999618530273
+            },
+            "C_test1": {
+                "x": 2378,
+                "y": 1.0,
+                "b": true,
+                "s": "something"
+            }
+        },
+        "Engine Components": {
+            "ExampleComponent": {},
+            "Transform": {
+                "position_x": 0.0,
+                "position_y": 0.0,
+                "position_z": -2.0
+            },
+            "Renderable3D": {
+                "model uid": 1068777295
+            }
+        },
+        "Parent": -1
+    },
+    "NIL": {
+        "Prefabs": {
+            "NIL": "test"
+        },
+        "Script Components": {
+            "C_Example1_Paired": {
+                "b": false,
+                "i": 1,
+                "f": 288.880126953125,
+                "s": "example"
+            },
+            "Example1_RandomComponent": {}
+        },
+        "Engine Components": {},
+        "Parent": -1
+    },
+    "NIL": {
+        "Prefabs": {
+            "NIL": "test"
+        },
+        "Script Components": {},
+        "Engine Components": {},
+        "Parent": 0
+    }
+}
