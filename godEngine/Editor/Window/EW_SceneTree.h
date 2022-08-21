@@ -23,6 +23,7 @@ namespace god
 		Entity m_selected_child_index { EnttXSol::NullEntity }; // index representing position in the children container of its parent
 		Entity m_selected_prefab { EnttXSol::NullEntity };
 		Entity m_selected_prefab_temp { m_selected_prefab };
+		Entity m_remove_prefab { EnttXSol::NullEntity };
 
 		EnttXSol& m_enttxsol;
 
@@ -30,7 +31,7 @@ namespace god
 
 		void RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , Entity entity , std::vector<EnttXSol::EntityData> const& entityData , std::vector<EnttXSol::Prefab> const& prefabs , uint32_t childIndex = EnttXSol::NullEntity );
 
-		void DisplayPrefab ( EnttXSol::Prefab const& prefab );
+		void DisplayPrefab ( EnttXSol::Prefab const& prefab , uint32_t id = -1 );
 	};
 }
 
@@ -115,13 +116,20 @@ namespace god
 			m_selected_remove = EnttXSol::NullEntity;
 			m_selected_child_index = EnttXSol::NullEntity;
 		}
+		// removing prefab
+		if ( m_remove_prefab != EnttXSol::NullEntity )
+		{
+
+		}
 		// display prefabs
+		auto prefab_count { 0 };
 		for ( auto const& prefab : prefabs )
 		{
 			if ( std::get<1> ( std::get<1> ( prefab )[ 0 ] ).m_parent == EnttXSol::NullEntity )
 			{
-				DisplayPrefab ( prefab );
+				DisplayPrefab ( prefab , prefab_count );
 			}
+			++prefab_count;
 		}
 		// render scene hierarchy
 		for ( auto i = 0; i < entities.size (); ++i )
@@ -192,12 +200,13 @@ namespace god
 			// display children prefabs
 			for ( auto const& child_prefab : data.m_prefab_children )
 			{
-				ImGui::PushID ( m_uid++ );
+				/*ImGui::PushID ( m_uid++ );
 				if ( ImGui::TreeNodeEx ( ( std::string ( "[p] " ) + std::get<1> ( std::get<1> ( prefabs[ child_prefab ] )[ 0 ] ).m_name ).c_str () , ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet ) )
 				{
 					ImGui::TreePop ();
 				}
-				ImGui::PopID ();
+				ImGui::PopID ();*/
+				DisplayPrefab ( prefabs[ child_prefab ] , child_prefab );
 			}
 
 			// Creating parent as child of entity
@@ -211,11 +220,20 @@ namespace god
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline void EW_SceneTree<EDITOR_RESOURCES>::DisplayPrefab ( EnttXSol::Prefab const& prefab )
+	inline void EW_SceneTree<EDITOR_RESOURCES>::DisplayPrefab ( EnttXSol::Prefab const& prefab , uint32_t id )
 	{
 		ImGui::PushID ( m_uid++ );
 		if ( ImGui::TreeNodeEx ( ( std::string ( "[p] " ) + std::get<1> ( std::get<1> ( prefab )[ 0 ] ).m_name ).c_str () , ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet ) )
 		{
+			if ( ImGui::BeginPopupContextItem ( "onPrefabRightClick" ) )
+			{
+				if ( ImGui::Selectable ( "Remove" ) )
+				{
+					m_remove_prefab = id;
+				}
+				ImGui::EndPopup ();
+			}
+
 			ImGui::TreePop ();
 		}
 		ImGui::PopID ();

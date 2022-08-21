@@ -108,6 +108,7 @@
     <ClInclude Include="FileIO.h" />
     <ClInclude Include="Internal\Asset3D.h" />
     <ClInclude Include="Internal\RapidJSONWrapper.h" />
+    <ClInclude Include="Internal\RecycleVector.h" />
     <ClInclude Include="Internal\ResourceManager.h" />
     <ClInclude Include="Internal\TextureData.h" />
     <ClInclude Include="Internal\WindowsDialog.h" />

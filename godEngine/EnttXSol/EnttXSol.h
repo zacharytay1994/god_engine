@@ -14,8 +14,12 @@
 #include "../../godUtility/TemplateManipulation.h"
 #include "../../godUtility/FileIO.h"
 #include "../../godUtility/Internal/RapidJSONWrapper.h"
+#include "../../godUtility/Internal/RecycleVector.h"
+
 #include "EngineComponents/EngineComponents.h"
 #include "EngineComponents/EC_All.h"
+
+#include "Internal/godEntity.h"
 
 #include <string>
 #include <unordered_map>
@@ -33,6 +37,8 @@ namespace god
 	{
 		using Entity = uint32_t;
 		static constexpr uint32_t NullEntity = static_cast< uint32_t >( -1 );
+
+		using Entities = RecycleVector<entt::entity>;
 
 	private:
 		enum class AttributeTypes
@@ -126,6 +132,8 @@ namespace god
 		void SavePrefab ( EngineResources& engineResources , Entity root , std::string const& filePath );
 		// loading a prefab file, attaching it to an entity
 		void LoadPrefab ( EngineResources& engineResources , std::string const& fileName , Entity parent = NullEntity );
+		// removing prefab
+		void RemovePrefab ( uint32_t id );
 
 		std::vector<Prefab> const& GetPrefabs ();
 
@@ -145,6 +153,7 @@ namespace god
 
 		// for prefabs
 		std::vector<Prefab> m_prefabs;
+		std::stack<uint32_t> m_free_prefabs_ids;
 
 		// script identifiers
 		std::string const m_identifier_component { "--[IsComponent]" };

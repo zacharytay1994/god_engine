@@ -630,6 +630,11 @@ namespace god
 		}
 	}
 
+	void EnttXSol::RemovePrefab ( uint32_t id )
+	{
+		
+	}
+
 	std::vector<EnttXSol::Prefab> const& EnttXSol::GetPrefabs ()
 	{
 		return m_prefabs;
