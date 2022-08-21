@@ -11,10 +11,11 @@ namespace god
 	{
 		using ID = uint32_t;
 		using IDQueue = std::priority_queue<ID , std::vector<ID> , std::greater<ID>>;
+		static constexpr uint32_t Null = static_cast< uint32_t >( -1 );
 
 		T& operator[]( ID id );
-		bool HasValue ( ID id );
-		uint32_t ContainerSize ();
+		bool Valid ( ID id );
+		uint32_t Size ();
 		uint32_t FreeIDSize ();
 
 		ID Push ( T&& value );
@@ -32,13 +33,13 @@ namespace god
 	}
 
 	template<typename T>
-	inline bool RecycleVector<T>::HasValue ( ID id )
+	inline bool RecycleVector<T>::Valid ( ID id )
 	{
-		return m_container[ id ].has_value ();
+		return id < m_container.size () && m_container[ id ].has_value ();
 	}
 
 	template<typename T>
-	inline uint32_t RecycleVector<T>::ContainerSize ()
+	inline uint32_t RecycleVector<T>::Size ()
 	{
 		return m_container.size ();
 	}

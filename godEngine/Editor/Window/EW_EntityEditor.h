@@ -116,7 +116,7 @@ namespace god
 			ImGui::EndPopup ();
 		}
 
-		if ( scene_tree->GetSelectedEntity () != EnttXSol::NullEntity )
+		if ( scene_tree->GetSelectedEntity () != EnttXSol::Entities::Null )
 		{
 			// display all engine components
 			int uid { 0 };

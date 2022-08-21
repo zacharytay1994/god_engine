@@ -99,7 +99,7 @@ namespace god
 		editor_windows.AddWindow<god::EW_EntityEditor> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_SceneView> ( true , camera.m_aspect_ratio );
 
-		enttxsol.DeserializeState ( engine_resources , "test3.json" );
+		enttxsol.DeserializeState ( engine_resources , "test4.json" );
 		//enttxsol.LoadPrefab ( "NIL" );
 
 		/*rapidjson::Document document;

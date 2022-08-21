@@ -1,10 +1,10 @@
 {
-    "something": {
+    "prefab1": {
         "Script Components": {
             "C_Example1_Paired": {
                 "b": false,
                 "i": 1,
-                "f": 271.81597900390625,
+                "f": 388.8797912597656,
                 "s": "example"
             },
             "Example1_RandomComponent": {}
@@ -16,7 +16,7 @@
                 "position_z": -2.0
             },
             "Renderable3D": {
-                "model uid": 807737716,
+                "model uid": 1068777295,
                 "diffuse uid": 670286950
             }
         },
@@ -28,7 +28,7 @@
                 "o": 13.399999618530273
             },
             "C_test1": {
-                "x": 55975,
+                "x": 64043,
                 "y": 1.0,
                 "b": true,
                 "s": "something"
@@ -42,42 +42,19 @@
                 "position_z": -2.0
             },
             "Renderable3D": {
-                "model uid": 1068777295,
+                "model uid": 807737716,
                 "diffuse uid": 3916083164,
                 "specular uid": 652207713
             }
         },
         "Parent": 0
     },
-    "NIL": {
-        "Script Components": {
-            "C_System2": {
-                "o": 13.399999618530273
-            },
-            "C_test1": {
-                "x": 3,
-                "y": 1.0,
-                "b": true,
-                "s": "something"
-            }
-        },
-        "Engine Components": {
-            "ExampleComponent": {},
-            "Transform": {
-                "position_x": 0.0,
-                "position_y": 0.0,
-                "position_z": 0.0
-            },
-            "Renderable3D": {}
-        },
-        "Parent": -1
-    },
-    "something": {
+    "prefab1": {
         "Script Components": {
             "C_Example1_Paired": {
                 "b": false,
                 "i": 1,
-                "f": 308.3370666503906,
+                "f": 285.46246337890625,
                 "s": "example"
             },
             "Example1_RandomComponent": {}
@@ -89,12 +66,11 @@
                 "position_z": -2.0
             },
             "Renderable3D": {
-                "model uid": 1420722900,
-                "diffuse uid": 670286950,
-                "specular uid": 2380861504
+                "model uid": 1068777295,
+                "diffuse uid": 670286950
             }
         },
-        "Parent": 1
+        "Parent": 0
     },
     "2thing": {
         "Script Components": {
@@ -116,11 +92,11 @@
                 "position_z": -2.0
             },
             "Renderable3D": {
-                "model uid": 1068777295,
+                "model uid": 807737716,
                 "diffuse uid": 3916083164,
                 "specular uid": 652207713
             }
         },
-        "Parent": 3
+        "Parent": 2
     }
 }

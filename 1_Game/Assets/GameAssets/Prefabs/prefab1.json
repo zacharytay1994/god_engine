@@ -1,0 +1,52 @@
+{
+    "something": {
+        "Script Components": {
+            "C_Example1_Paired": {
+                "b": false,
+                "i": 1,
+                "f": 258.34246826171875,
+                "s": "example"
+            },
+            "Example1_RandomComponent": {}
+        },
+        "Engine Components": {
+            "Transform": {
+                "position_x": 0.0,
+                "position_y": 0.0,
+                "position_z": -2.0
+            },
+            "Renderable3D": {
+                "model uid": 1068777295,
+                "diffuse uid": 670286950
+            }
+        },
+        "Parent": -1
+    },
+    "2thing": {
+        "Script Components": {
+            "C_System2": {
+                "o": 13.399999618530273
+            },
+            "C_test1": {
+                "x": 48277,
+                "y": 1.0,
+                "b": true,
+                "s": "something"
+            }
+        },
+        "Engine Components": {
+            "ExampleComponent": {},
+            "Transform": {
+                "position_x": 0.0,
+                "position_y": 0.0,
+                "position_z": -2.0
+            },
+            "Renderable3D": {
+                "model uid": 807737716,
+                "diffuse uid": 3916083164,
+                "specular uid": 652207713
+            }
+        },
+        "Parent": 0
+    }
+}
