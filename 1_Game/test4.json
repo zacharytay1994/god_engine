@@ -1,20 +1,49 @@
 {
+    "NIL": {
+        "Script Components": {},
+        "Engine Components": {},
+        "Parent": -1
+    },
+    "Prefab": {
+        "Name": "NewBackpack",
+        "Parent": 0
+    },
     "Something": {
         "Script Components": {},
         "Engine Components": {
             "Transform": {
-                "position_x": 0.0,
-                "position_y": 2.0,
+                "position_x": 2.0,
+                "position_y": 0.0,
                 "position_z": 0.0
-            },
-            "Renderable3D": {
-                "model uid": 1068777295
             }
         },
         "Parent": -1
     },
     "Prefab": {
-        "Name": "prefab1",
-        "Parent": 0
+        "Name": "NewBackpack",
+        "Parent": 2
+    },
+    "Prefab": {
+        "Name": "NewBackpack",
+        "Parent": 1
+    },
+    "NIL2": {
+        "Script Components": {},
+        "Engine Components": {
+            "Transform": {
+                "position_x": 0.0,
+                "position_y": 0.0,
+                "position_z": 2.0
+            }
+        },
+        "Parent": 1
+    },
+    "Prefab": {
+        "Name": "NewBackpack",
+        "Parent": 5
+    },
+    "Prefab": {
+        "Name": "SupremeBackpack",
+        "Parent": 2
     }
 }

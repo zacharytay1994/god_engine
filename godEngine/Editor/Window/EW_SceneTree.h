@@ -24,7 +24,7 @@ namespace god
 		EnttXSol::Entities::ID m_selected_prefab { EnttXSol::Entities::Null };
 		EnttXSol::Entities::ID m_selected_prefab_temp { m_selected_prefab };
 		EnttXSol::Entities::ID m_remove_prefab { EnttXSol::Entities::Null };
-
+		bool m_save_prefab { false };
 		EnttXSol& m_enttxsol;
 
 		int m_uid { 0 };
@@ -77,12 +77,24 @@ namespace god
 			}
 			ImGui::EndPopup ();
 		}
-		if ( ImGui::BeginPopup ( "Save As Prefab" ) )
+		if ( ImGui::BeginPopup ( "Make New Prefab" ) )
 		{
 			ImGui::InputText ( "##PrefabName" , &m_input_string );
 			if ( ImGui::Button ( "Save As" ) )
 			{
 				m_enttxsol.SavePrefab ( editorResources , m_selected_prefab_temp , std::string ( "Assets/GameAssets/Prefabs/" ) + m_input_string + ".json" );
+				m_input_string = "NIL";
+				m_selected_prefab_temp = EnttXSol::Entities::Null;
+				ImGui::CloseCurrentPopup ();
+			}
+			ImGui::EndPopup ();
+		}
+		if ( ImGui::BeginPopup ( "Save Prefab" ) )
+		{
+			ImGui::InputText ( "##SaveName" , &m_input_string );
+			if ( ImGui::Button ( "Save As" ) )
+			{
+				m_enttxsol.SavePrefab ( editorResources , m_selected_prefab_temp , std::string ( "Assets/GameAssets/Prefabs/" ) + m_input_string + ".json" , true );
 				m_input_string = "NIL";
 				m_selected_prefab_temp = EnttXSol::Entities::Null;
 				ImGui::CloseCurrentPopup ();
@@ -104,9 +116,19 @@ namespace god
 		// prefabing
 		if ( m_selected_prefab != EnttXSol::Entities::Null )
 		{
-			ImGui::OpenPopup ( "Save As Prefab" );
-			m_selected_prefab_temp = m_selected_prefab;
-			m_selected_prefab = EnttXSol::Entities::Null;
+			if ( m_save_prefab )
+			{
+				ImGui::OpenPopup ( "Save Prefab" );
+				m_selected_prefab_temp = m_selected_prefab;
+				m_selected_prefab = EnttXSol::Entities::Null;
+				m_save_prefab = false;
+			}
+			else
+			{
+				ImGui::OpenPopup ( "Make New Prefab" );
+				m_selected_prefab_temp = m_selected_prefab;
+				m_selected_prefab = EnttXSol::Entities::Null;
+			}
 		}
 		// removing entity
 		if ( m_selected_remove != EnttXSol::Entities::Null )
@@ -166,13 +188,26 @@ namespace god
 		std::string node_name { "" };
 		if ( is_prefab )
 		{
-			//tree_node_flags |= ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-			tree_node_flags |= ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf;
+			if ( m_enttxsol.m_entities[ entity ].m_children.size () > 0 )
+			{
+				tree_node_flags |= ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+			}
+			else
+			{
+				tree_node_flags |= ImGuiTreeNodeFlags_Leaf;
+			}
 			( node_name += "[p] " ) += m_enttxsol.m_entities[ entity ].m_name.c_str ();
 		}
 		else
 		{
-			tree_node_flags |= ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+			if ( m_enttxsol.m_entities[ entity ].m_children.size () > 0 )
+			{
+				tree_node_flags |= ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+			}
+			else
+			{
+				tree_node_flags |= ImGuiTreeNodeFlags_Leaf;
+			}
 			node_name = m_enttxsol.m_entities[ entity ].m_name;
 		}
 		if ( m_selected_entity == entity )
@@ -192,9 +227,14 @@ namespace god
 			}
 			if ( ImGui::Selectable ( "Add Child Prefab" ) )
 			{
-				m_enttxsol.LoadPrefab ( engineResources , "prefab1" , entity );
+				m_enttxsol.LoadPrefab ( engineResources , "SupremeBackpack" , entity );
 			}
-			if ( ImGui::Selectable ( "Save As Prefab" ) )
+			if ( ImGui::Selectable ( "Save Prefab" ) )
+			{
+				m_selected_prefab = entity;
+				m_save_prefab = true;
+			}
+			if ( ImGui::Selectable ( "Make New Prefab" ) )
 			{
 				m_selected_prefab = entity;
 			}
@@ -237,10 +277,11 @@ namespace god
 				// Creating parent as child of entity
 				for ( auto const& child : m_enttxsol.m_entities[ entity ].m_children )
 				{
-					if ( m_enttxsol.m_entities[ child ].m_type != Entity_::Type::Prefab || m_enttxsol.m_entities[ child ].m_root )
+					/*if ( m_enttxsol.m_entities[ child ].m_type != Entity_::Type::Prefab || m_enttxsol.m_entities[ child ].m_root )
 					{
 						RecursivelyDisplaySceneHierarchy ( engineResources , child );
-					}
+					}*/
+					RecursivelyDisplaySceneHierarchy ( engineResources , child );
 				}
 			}
 			ImGui::TreePop ();

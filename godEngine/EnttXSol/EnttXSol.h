@@ -132,8 +132,8 @@ namespace god
 		void DeserializeState ( EngineResources& engineResources , std::string const& filePath );
 
 		// saving an entity and all its children as a prefab file
-		void SerializeEntity ( EngineResources& engineResources , rapidjson::Document& document , Entities::ID entity , int parent , int& count );
-		void SavePrefab ( EngineResources& engineResources , Entities::ID root , std::string const& filePath );
+		void SerializeAsPrefab ( EngineResources& engineResources , rapidjson::Document& document , Entities::ID entity , int parent , int& count , bool updateExisting = false );
+		void SavePrefab ( EngineResources& engineResources , Entities::ID root , std::string const& filePath , bool updateExisting = false );
 		// loading a prefab file, attaching it to an entity
 		Entities::ID LoadPrefab ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null );
 		// removing prefab
