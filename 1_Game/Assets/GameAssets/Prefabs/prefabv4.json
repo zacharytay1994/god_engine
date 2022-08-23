@@ -1,0 +1,73 @@
+{
+    "prefabv4": {
+        "Type": "Default",
+        "Script Components": {
+            "C_System2": {
+                "o": 13.399999618530273
+            }
+        },
+        "Engine Components": {
+            "Transform": {
+                "position_x": 2.0,
+                "position_y": 2.0,
+                "position_z": 2.0
+            },
+            "Renderable3D": {
+                "model uid": 1420722900,
+                "diffuse uid": 670286950,
+                "specular uid": 2380861504
+            }
+        },
+        "Children": {
+            "child1_1": {
+                "Type": "Default",
+                "Script Components": {},
+                "Engine Components": {
+                    "Transform": {
+                        "position_x": 5.0,
+                        "position_y": 0.0,
+                        "position_z": 0.0
+                    },
+                    "Renderable3D": {
+                        "model uid": 1068777295,
+                        "diffuse uid": 3916083164,
+                        "specular uid": 652207713
+                    }
+                },
+                "Children": {
+                    "child2_1": {
+                        "Type": "Default",
+                        "Script Components": {},
+                        "Engine Components": {
+                            "Transform": {
+                                "position_x": 2.0,
+                                "position_y": 0.0,
+                                "position_z": 0.0
+                            },
+                            "Renderable3D": {
+                                "model uid": 807737716,
+                                "diffuse uid": 670286950,
+                                "specular uid": 2380861504
+                            }
+                        },
+                        "Children": {}
+                    }
+                }
+            },
+            "child1_2": {
+                "Type": "Default",
+                "Script Components": {
+                    "C_Example1_Paired": {
+                        "b": false,
+                        "i": 1,
+                        "f": 272.36004638671875,
+                        "s": "example"
+                    },
+                    "Example1_RandomComponent": {}
+                },
+                "Engine Components": {},
+                "Children": {}
+            }
+        }
+    }
+}

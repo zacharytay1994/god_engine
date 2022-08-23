@@ -79,9 +79,9 @@ namespace god
 		/*Entity CreateEntity ( std::string const& name = "" , Entity parent = NullEntity );
 		Entity LoadEntity ( std::string const& name = "" , Entity parent = NullEntity );
 		void RemoveEntity ( Entity entity , uint32_t childIndex = NullEntity );*/
-		Entities::ID CreateEntity ( std::string const& name = "" , bool root = false , Entities::ID parent = Entities::Null );
-		Entities::ID CreatePrefab ( std::string const& name = "" , bool root = false , Entities::ID parent = Entities::Null );
-		Entities::ID LoadEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );
+		Entities::ID CreateEntity ( std::string const& name = "" /*, bool root = false*/ , Entities::ID parent = Entities::Null );
+		/*Entities::ID CreatePrefab ( std::string const& name = "" , bool root = false , Entities::ID parent = Entities::Null );
+		Entities::ID LoadEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );*/
 		void RemoveEntity ( Entities::ID entity );
 
 		template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
@@ -128,16 +128,17 @@ namespace god
 		//template <typename S , typename T , typename R>
 		//void RecursivePopulateScenePrefab ( S& scene , Prefab const& prefab , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) , uint32_t i = 0 );
 
-		void SerializeState ( EngineResources& engineResources , std::string const& filePath );
-		void DeserializeState ( EngineResources& engineResources , std::string const& filePath );
+		//void SerializeState ( EngineResources& engineResources , std::string const& filePath );
+		//void DeserializeState ( EngineResources& engineResources , std::string const& filePath );
 
-		// saving an entity and all its children as a prefab file
-		void SerializeAsPrefab ( EngineResources& engineResources , rapidjson::Document& document , Entities::ID entity , int parent , int& count , bool updateExisting = false );
-		void SavePrefab ( EngineResources& engineResources , Entities::ID root , std::string const& filePath , bool updateExisting = false );
-		// loading a prefab file, attaching it to an entity
-		Entities::ID LoadPrefab ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null );
-		// removing prefab
+		//// saving an entity and all its children as a prefab file
+		//void SerializeAsPrefab ( EngineResources& engineResources , rapidjson::Document& document , Entities::ID entity , int parent , int& count , bool updateExisting = false );
+		//void SavePrefab ( EngineResources& engineResources , Entities::ID root , std::string const& filePath , bool updateExisting = false );
+		//// loading a prefab file, attaching it to an entity
+		//Entities::ID LoadPrefab ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null );
+		//// removing prefab
 		//void RemovePrefab ( uint32_t id );
+
 		void SerializeStateV2 ( EngineResources& engineResources , std::string const& fileName );
 		void SerializeStateV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value );
 
@@ -145,10 +146,10 @@ namespace god
 		void DeserializeStateV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent );
 
 		void SavePrefabV2 ( EngineResources& engineResources , Entities::ID root , std::string const& fileName );
-		void SavePrefabV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value );
+		void SavePrefabV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value , bool root = false );
 
 		void LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null );
-		void LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent );
+		void LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root = false );
 
 		//std::vector<Prefab> const& GetPrefabs ();
 
@@ -388,14 +389,6 @@ namespace god
 				RecursivePopulateScene<S , T , R> ( scene , i );
 			}
 		}
-
-		/*for ( auto i = 0; i < m_prefabs.size (); ++i )
-		{
-			if ( std::get<1> ( std::get<1> ( m_prefabs[ i ] )[ 0 ] ).m_parent == NullEntity )
-			{
-				RecursivePopulateScenePrefab<S , T , R> ( scene , m_prefabs[ i ] );
-			}
-		}*/
 	}
 
 	template<typename S , typename T , typename R>
@@ -429,12 +422,6 @@ namespace god
 			{
 				RecursivePopulateScene<S , T , R> ( scene , child , model_xform_cat );
 			}
-
-			// populate scene with prefab children
-			/*for ( auto const& child : m_entity_data[ e ].m_prefab_children )
-			{
-				RecursivePopulateScenePrefab<S , T , R> ( scene , m_prefabs[ child ] , model_xform_cat );
-			}*/
 		}
 		// if only transform component
 		else if ( m_registry.all_of<T> ( m_entities[ e ].m_id ) )
@@ -455,12 +442,6 @@ namespace god
 			{
 				RecursivePopulateScene<S , T , R> ( scene , child , model_xform_cat );
 			}
-
-			// populate scene with prefab children
-			/*for ( auto const& child : m_entity_data[ e ].m_prefab_children )
-			{
-				RecursivePopulateScenePrefab<S , T , R> ( scene , m_prefabs[ child ] , model_xform_cat );
-			}*/
 		}
 		// if neither, take the previous transform in the hierarchy, default identity matrix
 		else
@@ -470,12 +451,6 @@ namespace god
 			{
 				RecursivePopulateScene<S , T , R> ( scene , child , parentTransform );
 			}
-
-			// populate scene with prefab children
-			/*for ( auto const& child : m_entity_data[ e ].m_prefab_children )
-			{
-				RecursivePopulateScenePrefab<S , T , R> ( scene , m_prefabs[ child ] , parentTransform );
-			}*/
 		}
 	}
 
