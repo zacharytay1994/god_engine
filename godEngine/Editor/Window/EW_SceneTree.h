@@ -82,7 +82,7 @@ namespace god
 			ImGui::InputText ( "##PrefabName" , &m_input_string );
 			if ( ImGui::Button ( "Save As" ) )
 			{
-				m_enttxsol.SavePrefab ( editorResources , m_selected_prefab_temp , std::string ( "Assets/GameAssets/Prefabs/" ) + m_input_string + ".json" );
+				m_enttxsol.SavePrefabV2 ( editorResources , m_selected_prefab_temp , m_input_string );
 				m_input_string = "NIL";
 				m_selected_prefab_temp = EnttXSol::Entities::Null;
 				ImGui::CloseCurrentPopup ();
@@ -166,7 +166,7 @@ namespace god
 		// test serialize
 		if ( ImGui::Button ( "Serialize" ) )
 		{
-			m_enttxsol.SerializeState ( editorResources , "test4.json" );
+			m_enttxsol.SerializeStateV2 ( editorResources , "SerializeV2" );
 		}
 		ImGui::End ();
 
@@ -227,7 +227,7 @@ namespace god
 			}
 			if ( ImGui::Selectable ( "Add Child Prefab" ) )
 			{
-				m_enttxsol.LoadPrefab ( engineResources , "SupremeBackpack" , entity );
+				m_enttxsol.LoadPrefabV2 ( engineResources , "prefabv2" , entity );
 			}
 			if ( ImGui::Selectable ( "Save Prefab" ) )
 			{

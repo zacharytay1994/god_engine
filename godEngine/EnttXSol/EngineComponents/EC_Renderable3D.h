@@ -194,7 +194,7 @@ namespace god
 		}
 		else
 		{
-			std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to diffuse texture" << std::endl;
+			std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to specular texture" << std::endl;
 		}
 	}
 

@@ -138,6 +138,17 @@ namespace god
 		Entities::ID LoadPrefab ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null );
 		// removing prefab
 		//void RemovePrefab ( uint32_t id );
+		void SerializeStateV2 ( EngineResources& engineResources , std::string const& fileName );
+		void SerializeStateV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value );
+
+		void DeserializeStateV2 ( EngineResources& engineResources , std::string const& fileName );
+		void DeserializeStateV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent );
+
+		void SavePrefabV2 ( EngineResources& engineResources , Entities::ID root , std::string const& fileName );
+		void SavePrefabV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value );
+
+		void LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null );
+		void LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent );
 
 		//std::vector<Prefab> const& GetPrefabs ();
 
