@@ -35,9 +35,6 @@ namespace god
 	using namespace entt::literals;
 	struct EnttXSol
 	{
-		/*using Entity = uint32_t;
-		static constexpr uint32_t NullEntity = static_cast< uint32_t >( -1 );*/
-
 		using Entities = RecycleVector<Entity_>;
 
 	private:
@@ -66,6 +63,7 @@ namespace god
 	public:
 		EnttXSol ( std::vector<std::string> scriptFiles );
 		void Update ();
+		void Clear ();
 		template<typename ENGINE_COMPONENTS>
 		void BindEngineComponents ();
 		template<typename T , typename ...ARGS>
@@ -74,14 +72,7 @@ namespace god
 		void RunEngineSystem ( void( *system )( T... ) );
 		void BindEngineSystemUpdate ( void( *update )( EnttXSol& ) );
 
-		/*entt::entity operator[]( Entity entity );
-		entt::entity GetEntity ( Entity entity );*/
-		/*Entity CreateEntity ( std::string const& name = "" , Entity parent = NullEntity );
-		Entity LoadEntity ( std::string const& name = "" , Entity parent = NullEntity );
-		void RemoveEntity ( Entity entity , uint32_t childIndex = NullEntity );*/
-		Entities::ID CreateEntity ( std::string const& name = "" /*, bool root = false*/ , Entities::ID parent = Entities::Null );
-		/*Entities::ID CreatePrefab ( std::string const& name = "" , bool root = false , Entities::ID parent = Entities::Null );
-		Entities::ID LoadEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );*/
+		Entities::ID CreateEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );
 		void RemoveEntity ( Entities::ID entity );
 
 		template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
@@ -103,41 +94,13 @@ namespace god
 		void AttachScriptSystem ( Entities::ID entity , std::string const& scriptSystem );
 		void AttachEngineComponent ( Entities::ID entity , uint32_t componentID );
 
-		std::vector<std::optional<entt::entity>> const& GetEntities () const;
-
-		/*struct EntityData
-		{
-			std::string m_name { "" };
-			Entity m_parent { NullEntity };
-			std::vector<Entity> m_children;
-			std::vector<uint32_t> m_prefab_children;
-		};*/
-		//std::vector<EntityData> const& GetEntityData () const;
-
 		std::unordered_map<std::string , Script> const& GetScripts () const;
-
-		//using EntityPack = std::tuple<entt::entity , EntityData>;
-		//using Prefab = std::tuple<std::string , std::vector<EntityPack>>;
 
 		// S = scene, T = transform, R = renderable
 		template <typename S , typename T , typename R>
 		void PopulateScene ( S& scene );
 		template <typename S , typename T , typename R>
 		void RecursivePopulateScene ( S& scene , Entities::ID e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) );
-
-		//template <typename S , typename T , typename R>
-		//void RecursivePopulateScenePrefab ( S& scene , Prefab const& prefab , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) , uint32_t i = 0 );
-
-		//void SerializeState ( EngineResources& engineResources , std::string const& filePath );
-		//void DeserializeState ( EngineResources& engineResources , std::string const& filePath );
-
-		//// saving an entity and all its children as a prefab file
-		//void SerializeAsPrefab ( EngineResources& engineResources , rapidjson::Document& document , Entities::ID entity , int parent , int& count , bool updateExisting = false );
-		//void SavePrefab ( EngineResources& engineResources , Entities::ID root , std::string const& filePath , bool updateExisting = false );
-		//// loading a prefab file, attaching it to an entity
-		//Entities::ID LoadPrefab ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null );
-		//// removing prefab
-		//void RemovePrefab ( uint32_t id );
 
 		void SerializeStateV2 ( EngineResources& engineResources , std::string const& fileName );
 		void SerializeStateV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value );
@@ -151,8 +114,6 @@ namespace god
 		void LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null );
 		void LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root = false );
 
-		//std::vector<Prefab> const& GetPrefabs ();
-
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
 		{
@@ -165,15 +126,6 @@ namespace god
 	private:
 		sol::state m_lua;
 		entt::registry m_registry;
-
-		/*std::vector<std::optional<entt::entity>> m_entities;
-		std::vector<EntityData> m_entity_data;
-		std::stack<Entity> m_free_ids;*/
-
-
-		// for prefabs
-		/*std::vector<Prefab> m_prefabs;
-		std::stack<uint32_t> m_free_prefabs_ids;*/
 
 		// script identifiers
 		std::string const m_identifier_component { "--[IsComponent]" };
@@ -322,7 +274,6 @@ namespace god
 					AttachComponent ( entity , component );
 				}
 				// add all engine components used by this system to the entity
-				//auto const& engine_component_names = engineComponents.m_component_names;
 				for ( auto const& component : system.second.m_used_engine_components )
 				{
 					for ( int i = 0; i < T::m_component_names.size (); ++i )
@@ -359,7 +310,6 @@ namespace god
 						AttachComponent ( entity , component );
 					}
 					// add all engine components used by this system to the entity
-					//auto const& engine_component_names = engineComponents.m_component_names;
 					for ( auto const& component : system.second.m_used_engine_components )
 					{
 						for ( int i = 0; i < T::m_component_names.size (); ++i )
@@ -454,51 +404,12 @@ namespace god
 		}
 	}
 
-	//template<typename S , typename T , typename R>
-	//inline void EnttXSol::RecursivePopulateScenePrefab ( S& scene , Prefab const& prefab , glm::mat4 parentTransform , uint32_t i )
-	//{
-	//	auto& entity = std::get<1> ( prefab )[ i ];
-	//	auto& entt_id = std::get<0> ( entity );
-	//	auto& entity_data = std::get<1> ( entity );
-
-	//	// if parent has both transform and renderable component
-	//	if ( m_registry.all_of<T , R> ( entt_id ) )
-	//	{
-	//		auto const& [transform , renderable] = m_registry.get<T , R> ( entt_id );
-
-	//		glm::mat4 model_transform = glm::mat4 ( 1.0f );
-	//		model_transform = glm::translate ( model_transform , transform.m_position );
-	//		model_transform = glm::rotate ( model_transform , transform.m_rotation.x , glm::vec3 ( 1.0f , 0.0f , 0.0f ) );
-	//		model_transform = glm::rotate ( model_transform , transform.m_rotation.y , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
-	//		model_transform = glm::rotate ( model_transform , transform.m_rotation.z , glm::vec3 ( 0.0f , 0.0f , 1.0f ) );
-	//		model_transform = glm::scale ( model_transform , transform.m_scale );
-
-	//		auto model_xform_cat = parentTransform * model_transform;
-
-	//		// add to scene
-	//		if ( renderable.m_model_id != -1 )
-	//		{
-	//			auto& object = scene.GetSceneObject ( scene.AddSceneObject ( renderable.m_model_id , model_xform_cat ) );
-	//			object.m_diffuse_id = renderable.m_diffuse_id;
-	//			object.m_specular_id = renderable.m_specular_id;
-	//			object.m_shininess = renderable.m_shininess;
-	//		}
-
-	//		// populate scene with children
-	//		for ( auto const& child : entity_data.m_children )
-	//		{
-	//			RecursivePopulateScenePrefab<S , T , R> ( scene , prefab , model_xform_cat , child );
-	//		}
-	//	}
-	//}
-
 	template<typename T>
 	inline auto&& EnttXSol::GetStorage ( std::string const& name )
 	{
 		return m_registry.storage<T> ( entt::hashed_string ( name.c_str () ) );
 	}
 
-	//using Entity = EnttXSol::Entity;
 	template<typename T>
 	inline void EnttXSol::AttachEngineComponentFunctor::operator()( EnttXSol* enttxsol , Entities::ID e )
 	{

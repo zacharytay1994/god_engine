@@ -17,8 +17,6 @@ namespace god
 			Prefab
 		};
 		Type m_type { Type::Default };
-		//bool m_root { false };
-		//bool m_prefab_of_prefab { false };
 
 		EnttID m_id { entt::null };
 		ContainerID m_parent_id { Null };

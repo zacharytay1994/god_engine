@@ -21,6 +21,6 @@ namespace god
 
 		std::vector<std::string> GetDirectories ( const std::string& dir );
 
-		std::vector<std::string> GetFiles ( const std::string& dir );
+		std::vector<std::string> GODUTILITY_API GetFiles ( const std::string& dir );
 	}
 }

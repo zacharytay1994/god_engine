@@ -21,6 +21,8 @@ namespace god
 		ID Push ( T&& value );
 		bool Erase ( ID id );
 
+		void Clear ();
+
 	private:
 		std::vector<std::optional<T>> m_container;
 		IDQueue m_free_ids;
@@ -81,5 +83,12 @@ namespace god
 			return false;
 		}
 		return false;
+	}
+
+	template<typename T>
+	inline void RecycleVector<T>::Clear ()
+	{
+		m_container.clear ();
+		m_free_ids = IDQueue ();
 	}
 }

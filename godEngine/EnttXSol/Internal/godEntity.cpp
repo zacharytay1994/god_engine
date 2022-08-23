@@ -10,10 +10,6 @@ namespace god
 		m_parent_id { parent }
 	{
 		m_id = registry.create ();
-		/*if ( parent == Null )
-		{
-			m_root = true;
-		}*/
 	}
 
 	void Entity_::Destroy ( entt::registry& registry )

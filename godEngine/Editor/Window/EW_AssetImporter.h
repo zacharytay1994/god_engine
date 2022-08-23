@@ -105,12 +105,13 @@ namespace god
 
 					ImGui::PopID ();
 				}
-				ImGui::EndChild ();
 
 				ImGui::Text ( "Flip UVs :" );
 				ImGui::SameLine ();
 				ImGui::Checkbox ( "##flipuvs" , &m_flip_model_UVs );
+				this->ToolTipOnHover ( "Usually checked, but if your model has weird behaviour try unchecking this and reimporting." );
 
+				ImGui::EndChild ();
 				ImGui::EndTabItem ();
 			}
 

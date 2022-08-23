@@ -1,0 +1,1 @@
+{"Something":{"Type":"Default","Script Components":{"C_System2":{"o":13.399999618530273},"C_test1":{"x":7861,"y":1.0,"b":true,"s":"something"}},"Engine Components":{"ExampleComponent":{},"Transform":{"position_x":0.0,"position_y":0.0,"position_z":-2.0},"Renderable3D":{"model uid":1068777295,"diffuse uid":3916083164,"specular uid":652207713}},"Children":{}}}

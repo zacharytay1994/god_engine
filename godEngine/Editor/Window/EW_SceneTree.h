@@ -1,8 +1,9 @@
 #pragma once
 #include "../Editor.h"
 #include "../../EnttXSol/EnttXSol.h"
+#include "../../imgui/imgui_stdlib.h"
 
-#include "../../imgui/imgui_stdlib.h" 
+#include <godUtility/Internal/FolderHelper.h>
 
 #include <string>
 
@@ -12,27 +13,34 @@ namespace god
 	struct EW_SceneTree : EditorWindow<EDITOR_RESOURCES>
 	{
 		EW_SceneTree ( EnttXSol& enttxsol );
-		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override;
+		void Update ( float dt , EDITOR_RESOURCES& engineResources ) override;
+		void Reset ();
 		EnttXSol::Entities::ID GetSelectedEntity ();
 	private:
 		std::string m_input_string { "NIL" };
 		EnttXSol::Entities::ID m_selected_entity { EnttXSol::Entities::Null };
 		EnttXSol::Entities::ID m_selected_parent { EnttXSol::Entities::Null };
 		EnttXSol::Entities::ID m_selected_parent_temp { m_selected_parent };
+		EnttXSol::Entities::ID m_selected_prefab_parent { EnttXSol::Entities::Null };
+		EnttXSol::Entities::ID m_selected_prefab_parent_temp { m_selected_prefab_parent };
 		EnttXSol::Entities::ID m_selected_remove { EnttXSol::Entities::Null };
-		EnttXSol::Entities::ID m_selected_child_index { EnttXSol::Entities::Null }; // index representing position in the children container of its parent
 		EnttXSol::Entities::ID m_selected_new_prefab { EnttXSol::Entities::Null };
 		EnttXSol::Entities::ID m_selected_new_prefab_temp { m_selected_new_prefab };
-		EnttXSol::Entities::ID m_remove_prefab { EnttXSol::Entities::Null };
-		bool m_save_prefab { false };
+
 		EnttXSol& m_enttxsol;
 
 		int m_uid { 0 };
+		uint32_t m_selected_scene { 0 };
 
-		void RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , EnttXSol::Entities::ID entity /*, std::vector<EnttXSol::EntityData> const& entityData , std::vector<EnttXSol::Prefab> const& prefabs , uint32_t childIndex = EnttXSol::Entities::Null*/ );
+		std::vector<std::string> m_prefabs_list;
+		std::vector<std::string> m_scene_list;
 
-		void ToolTipOnHover ( std::string const& text );
-		//void DisplayPrefab ( EnttXSol::Prefab const& prefab , uint32_t id = -1 );
+		void RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , EnttXSol::Entities::ID entity );
+
+		void DisplayPrefabsPopup ( EDITOR_RESOURCES& engineResources );
+		void OpenPrefabPopup ();
+
+		void RefreshSceneList ();
 	};
 }
 
@@ -43,125 +51,183 @@ namespace god
 		:
 		m_enttxsol { enttxsol }
 	{
+		RefreshSceneList ();
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline void EW_SceneTree<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
+	inline void EW_SceneTree<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& engineResources )
 	{
 		( dt );
-		//auto& entities = m_enttxsol.GetEntities ();
-		//auto& entity_data = m_enttxsol.GetEntityData ();
-		//auto const& prefabs = m_enttxsol.GetPrefabs ();
-
 		ImGui::Begin ( "Scene Tree" );
-		// Creating entity without parent
-		if ( ImGui::BeginPopup ( "Create Entity" ) )
-		{
-			ImGui::InputText ( "##EntityName" , &m_input_string );
-			if ( ImGui::Button ( "Create With Name" ) )
-			{
-				m_enttxsol.CreateEntity ( m_input_string );
-				m_input_string = { "NIL" };
-				ImGui::CloseCurrentPopup ();
-			}
-			ImGui::EndPopup ();
-		}
-		if ( ImGui::BeginPopup ( "Add Entity" ) )
-		{
-			ImGui::InputText ( "##EntityName" , &m_input_string );
-			if ( ImGui::Button ( "Create With Name" ) )
-			{
-				m_enttxsol.CreateEntity ( m_input_string , m_selected_parent_temp );
-				m_input_string = "NIL";
-				m_selected_parent_temp = EnttXSol::Entities::Null;
-				ImGui::CloseCurrentPopup ();
-			}
-			ImGui::EndPopup ();
-		}
-		if ( ImGui::BeginPopup ( "Save As" ) )
-		{
-			ImGui::InputText ( "##PrefabName" , &m_input_string );
-			if ( ImGui::Button ( "Save As" ) )
-			{
-				m_enttxsol.SavePrefabV2 ( editorResources , m_selected_new_prefab_temp , m_input_string );
-				m_input_string = "NIL";
-				m_selected_new_prefab_temp = EnttXSol::Entities::Null;
-				ImGui::CloseCurrentPopup ();
-			}
-			ImGui::EndPopup ();
-		}
-		/*if ( ImGui::BeginPopup ( "Save Prefab" ) )
-		{
-			ImGui::InputText ( "##SaveName" , &m_input_string );
-			if ( ImGui::Button ( "Save As" ) )
-			{
-				m_enttxsol.SavePrefab ( editorResources , m_selected_new_prefab_temp , std::string ( "Assets/GameAssets/Prefabs/" ) + m_input_string + ".json" , true );
-				m_input_string = "NIL";
-				m_selected_new_prefab_temp = EnttXSol::Entities::Null;
-				ImGui::CloseCurrentPopup ();
-			}
-			ImGui::EndPopup ();
-		}*/
-		// adding to root
-		if ( ImGui::Button ( "Add Entity" , { ImGui::GetWindowWidth () , 0.0f } ) )
-		{
-			ImGui::OpenPopup ( "Create Entity" );
-		}
-		// adding child
-		if ( m_selected_parent != EnttXSol::Entities::Null )
-		{
-			ImGui::OpenPopup ( "Add Entity" );
-			m_selected_parent_temp = m_selected_parent;
-			m_selected_parent = EnttXSol::Entities::Null;
-		}
-		// prefabing
-		if ( m_selected_new_prefab != EnttXSol::Entities::Null )
-		{
-			ImGui::OpenPopup ( "Save As" );
-			m_selected_new_prefab_temp = m_selected_new_prefab;
-			m_selected_new_prefab = EnttXSol::Entities::Null;
-		}
-		// removing entity
-		if ( m_selected_remove != EnttXSol::Entities::Null )
-		{
-			m_enttxsol.RemoveEntity ( m_selected_remove );
-			m_selected_entity = EnttXSol::Entities::Null;
-			m_selected_remove = EnttXSol::Entities::Null;
-			m_selected_child_index = EnttXSol::Entities::Null;
-		}
-		// removing prefab
-		/*if ( m_remove_prefab != EnttXSol::Entities::Null )
-		{
 
-		}*/
-		// display prefabs
-		/*auto prefab_count { 0 };
-		for ( auto const& prefab : prefabs )
+		if ( ImGui::BeginTabBar ( "Scene" ) )
 		{
-			if ( std::get<1> ( std::get<1> ( prefab )[ 0 ] ).m_parent == EnttXSol::Entities::Null )
+			if ( ImGui::BeginTabItem ( "Hierarchy" ) )
 			{
-				DisplayPrefab ( prefab , prefab_count );
-			}
-			++prefab_count;
-		}*/
-		// render scene hierarchy
-		for ( auto i = 0; i < m_enttxsol.m_entities.Size (); ++i )
-		{
-			// call function only on root nodes
-			if ( m_enttxsol.m_entities.Valid ( i ) && m_enttxsol.m_entities[ i ].m_parent_id == EnttXSol::Entities::Null )
-			{
-				RecursivelyDisplaySceneHierarchy ( editorResources , i /*, entity_data , prefabs*/ );
-			}
-		}
+				// Creating entity without parent
+				if ( ImGui::BeginPopup ( "Create Entity" ) )
+				{
+					ImGui::InputText ( "##EntityName" , &m_input_string );
+					if ( ImGui::Button ( "Create With Name" ) )
+					{
+						m_enttxsol.CreateEntity ( m_input_string );
+						m_input_string = { "NIL" };
+						ImGui::CloseCurrentPopup ();
+					}
+					ImGui::EndPopup ();
+				}
 
-		// test serialize
-		if ( ImGui::Button ( "Serialize" ) )
-		{
-			m_enttxsol.SerializeStateV2 ( editorResources , "SerializeV2" );
+				DisplayPrefabsPopup ( engineResources );
+
+				if ( ImGui::BeginPopup ( "Add Entity" ) )
+				{
+					ImGui::InputText ( "##EntityName" , &m_input_string );
+					if ( ImGui::Button ( "Create With Name" ) )
+					{
+						m_enttxsol.CreateEntity ( m_input_string , m_selected_parent_temp );
+						m_input_string = "NIL";
+						m_selected_parent_temp = EnttXSol::Entities::Null;
+						ImGui::CloseCurrentPopup ();
+					}
+					ImGui::EndPopup ();
+				}
+
+				if ( ImGui::BeginPopup ( "Save As" ) )
+				{
+					ImGui::InputText ( "##PrefabName" , &m_input_string );
+					if ( ImGui::Button ( "Save As" ) )
+					{
+						m_enttxsol.SavePrefabV2 ( engineResources , m_selected_new_prefab_temp , m_input_string );
+						m_input_string = "NIL";
+						m_selected_new_prefab_temp = EnttXSol::Entities::Null;
+						ImGui::CloseCurrentPopup ();
+					}
+					ImGui::EndPopup ();
+				}
+
+				// serialize scene
+				if ( ImGui::BeginPopup ( "SerializeScene" ) )
+				{
+					ImGui::InputText ( "##SceneName" , &m_input_string );
+					if ( ImGui::Button ( "Create With Name" ) )
+					{
+						m_enttxsol.SerializeStateV2 ( engineResources , m_input_string );
+						RefreshSceneList ();
+						m_input_string = "NIL";
+						ImGui::CloseCurrentPopup ();
+					}
+					ImGui::EndPopup ();
+				}
+				if ( ImGui::Button ( "Save Scene" , { ImGui::GetWindowWidth () , 0.0f } ) )
+				{
+					ImGui::OpenPopup ( "SerializeScene" );
+				}
+				this->ToolTipOnHover ( "Saves the current scene." );
+
+				// adding to root
+				if ( ImGui::Button ( "Add Object" , { ImGui::GetWindowWidth () , 0.0f } ) )
+				{
+					ImGui::OpenPopup ( "Create Entity" );
+				}
+				this->ToolTipOnHover ( "Adds a new object to the scene." );
+
+				// adding object
+				if ( m_selected_parent != EnttXSol::Entities::Null )
+				{
+					ImGui::OpenPopup ( "Add Entity" );
+					m_selected_parent_temp = m_selected_parent;
+					m_selected_parent = EnttXSol::Entities::Null;
+				}
+
+				// adding prefab
+				if ( m_selected_prefab_parent != EnttXSol::Entities::Null )
+				{
+					OpenPrefabPopup ();
+					m_selected_prefab_parent_temp = m_selected_prefab_parent;
+					m_selected_prefab_parent = EnttXSol::Entities::Null;
+				}
+
+				// prefabing
+				if ( m_selected_new_prefab != EnttXSol::Entities::Null )
+				{
+					ImGui::OpenPopup ( "Save As" );
+					m_selected_new_prefab_temp = m_selected_new_prefab;
+					m_selected_new_prefab = EnttXSol::Entities::Null;
+				}
+
+				// removing entity
+				if ( m_selected_remove != EnttXSol::Entities::Null )
+				{
+					m_enttxsol.RemoveEntity ( m_selected_remove );
+					m_selected_entity = EnttXSol::Entities::Null;
+					m_selected_remove = EnttXSol::Entities::Null;
+				}
+
+				// render scene hierarchy
+				for ( auto i = 0; i < m_enttxsol.m_entities.Size (); ++i )
+				{
+					// call function only on root nodes
+					if ( m_enttxsol.m_entities.Valid ( i ) && m_enttxsol.m_entities[ i ].m_parent_id == EnttXSol::Entities::Null )
+					{
+						RecursivelyDisplaySceneHierarchy ( engineResources , i );
+					}
+				}
+
+				m_uid = 0;
+				ImGui::EndTabItem ();
+			}
+			if ( ImGui::BeginTabItem ( "Scenes" ) )
+			{
+				if ( ImGui::Button ( "New Scene" , { ImGui::GetWindowWidth () , 0.0f } ) )
+				{
+					Reset ();
+					m_enttxsol.Clear ();
+				}
+				this->ToolTipOnHover ( "Clears the current scene, providing a fresh canvas." );
+
+				// display all scenes as selectable
+				uint32_t i { 0 };
+				for ( auto const& scene : m_scene_list )
+				{
+					auto last_dash = scene.find_last_of ( '/' );
+					auto last_dot = scene.find_last_of ( '.' );
+					std::string name = scene.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
+					if ( ImGui::Selectable ( name.c_str () , m_selected_scene == i ) );
+					if ( ImGui::BeginPopupContextItem () )
+					{
+						m_selected_scene = i;
+						if ( ImGui::Selectable ( "Load" ) )
+						{
+							Reset ();
+							m_enttxsol.Clear ();
+							m_enttxsol.DeserializeStateV2 ( engineResources , name );
+						}
+						this->ToolTipOnHover ( "Loads the scene up as the current scene." );
+
+						ImGui::EndPopup ();
+					}
+					++i;
+				}
+
+				ImGui::EndTabItem ();
+			}
+			ImGui::EndTabBar ();
 		}
 		ImGui::End ();
+	}
 
-		m_uid = 0;
+	template<typename EDITOR_RESOURCES>
+	inline void EW_SceneTree<EDITOR_RESOURCES>::Reset ()
+	{
+		m_input_string = "NIL";
+		m_selected_entity = EnttXSol::Entities::Null;
+		m_selected_parent = EnttXSol::Entities::Null;
+		m_selected_parent_temp = m_selected_parent;
+		m_selected_prefab_parent = EnttXSol::Entities::Null;
+		m_selected_prefab_parent_temp = m_selected_prefab_parent;
+		m_selected_remove = EnttXSol::Entities::Null;
+		m_selected_new_prefab = EnttXSol::Entities::Null;
+		m_selected_new_prefab_temp = m_selected_new_prefab;
 	}
 
 	template<typename EDITOR_RESOURCES>
@@ -171,7 +237,7 @@ namespace god
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline void EW_SceneTree<EDITOR_RESOURCES>::RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , EnttXSol::Entities::ID entity /*, std::vector<EnttXSol::EntityData> const& entityData , std::vector<EnttXSol::Prefab> const& prefabs , uint32_t childIndex*/ )
+	inline void EW_SceneTree<EDITOR_RESOURCES>::RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , EnttXSol::Entities::ID entity )
 	{
 		ImGui::PushID ( m_uid++ );
 		bool is_prefab = m_enttxsol.m_entities[ entity ].m_type == Entity_::Type::Prefab;
@@ -219,27 +285,28 @@ namespace god
 				{
 					m_selected_parent = entity;
 				}
-				ToolTipOnHover ( "Add a new object as child of this object." );
+				this->ToolTipOnHover ( "Add a new object as child of this object." );
 				if ( ImGui::Selectable ( "Add Prefab" ) )
 				{
-					m_enttxsol.LoadPrefabV2 ( engineResources , "prefabv3" , entity );
+					m_selected_prefab_parent = entity;
+					//m_enttxsol.LoadPrefabV2 ( engineResources , "prefabv3" , entity );
 				}
-				ToolTipOnHover ( "Add a prefab as child of this object." );
+				this->ToolTipOnHover ( "Add a prefab as child of this object." );
 				if ( ImGui::Selectable ( "Save" ) )
 				{
 					m_enttxsol.SavePrefabV2 ( engineResources , entity , m_enttxsol.m_entities[ entity ].m_name );
 				}
-				ToolTipOnHover ( "Updates this prefab in file with it's current state." );
+				this->ToolTipOnHover ( "Updates this prefab in file with it's current state." );
 				if ( ImGui::Selectable ( "Save As" ) )
 				{
 					m_selected_new_prefab = entity;
 				}
-				ToolTipOnHover ( "Create a new prefab with this object as the root." );
+				this->ToolTipOnHover ( "Create a new prefab with this object as the root." );
 				if ( ImGui::Selectable ( "Remove" ) )
 				{
 					m_selected_remove = entity;
 				}
-				ToolTipOnHover ( "Remove this object and all its children from the scene." );
+				this->ToolTipOnHover ( "Remove this object and all its children from the scene." );
 				ImGui::EndPopup ();
 			}
 		}
@@ -252,22 +319,23 @@ namespace god
 				{
 					m_selected_parent = entity;
 				}
-				ToolTipOnHover ( "Add a new object as child of this object." );
+				this->ToolTipOnHover ( "Add a new object as child of this object." );
 				if ( ImGui::Selectable ( "Add Prefab" ) )
 				{
-					m_enttxsol.LoadPrefabV2 ( engineResources , "prefabv3" , entity );
+					m_selected_prefab_parent = entity;
+					//m_enttxsol.LoadPrefabV2 ( engineResources , "prefabv3" , entity );
 				}
-				ToolTipOnHover ( "Add a prefab as child of this object." );
+				this->ToolTipOnHover ( "Add a prefab as child of this object." );
 				if ( ImGui::Selectable ( "Save As" ) )
 				{
 					m_selected_new_prefab = entity;
 				}
-				ToolTipOnHover ( "Create a new prefab with this object as the root." );
+				this->ToolTipOnHover ( "Create a new prefab with this object as the root." );
 				if ( ImGui::Selectable ( "Remove" ) )
 				{
 					m_selected_remove = entity;
 				}
-				ToolTipOnHover ( "Remove this object and all its children from the scene." );
+				this->ToolTipOnHover ( "Remove this object and all its children from the scene." );
 				ImGui::EndPopup ();
 			}
 		}
@@ -275,40 +343,10 @@ namespace god
 		// display children entities
 		if ( open )
 		{
-			// display children prefabs
-			//for ( auto const& child_prefab : data.m_prefab_children )
-			//{
-			//	/*ImGui::PushID ( m_uid++ );
-			//	if ( ImGui::TreeNodeEx ( ( std::string ( "[p] " ) + std::get<1> ( std::get<1> ( prefabs[ child_prefab ] )[ 0 ] ).m_name ).c_str () , ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet ) )
-			//	{
-			//		ImGui::TreePop ();
-			//	}
-			//	ImGui::PopID ();*/
-			//	DisplayPrefab ( prefabs[ child_prefab ] , child_prefab );
-			//}
-			//if ( !is_prefab )
-			//{
-			//	// Creating parent as child of entity
-			//	//for ( auto i = 0; i < m_enttxsol.m_entities[ entity ].m_children.size (); ++i )
-			//	//{
-			//	//	RecursivelyDisplaySceneHierarchy ( engineResources , m_enttxsol.m_entities[ entity ].m_children[ i ] /*, entityData , prefabs , i*/ );
-			//	//}
-			//	for ( auto const& child : m_enttxsol.m_entities[ entity ].m_children )
-			//	{
-			//		RecursivelyDisplaySceneHierarchy ( engineResources , child );
-			//	}
-			//}
-			//else
+			// Creating parent as child of entity
+			for ( auto const& child : m_enttxsol.m_entities[ entity ].m_children )
 			{
-				// Creating parent as child of entity
-				for ( auto const& child : m_enttxsol.m_entities[ entity ].m_children )
-				{
-					/*if ( m_enttxsol.m_entities[ child ].m_type != Entity_::Type::Prefab || m_enttxsol.m_entities[ child ].m_root )
-					{
-						RecursivelyDisplaySceneHierarchy ( engineResources , child );
-					}*/
-					RecursivelyDisplaySceneHierarchy ( engineResources , child );
-				}
+				RecursivelyDisplaySceneHierarchy ( engineResources , child );
 			}
 			ImGui::TreePop ();
 		}
@@ -316,35 +354,44 @@ namespace god
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline void EW_SceneTree<EDITOR_RESOURCES>::ToolTipOnHover ( std::string const& text )
+	inline void EW_SceneTree<EDITOR_RESOURCES>::DisplayPrefabsPopup ( EDITOR_RESOURCES& engineResources )
 	{
-		if ( ImGui::IsItemHovered () )
+		if ( ImGui::BeginPopup ( "PrefabsPopup" ) )
 		{
-			ImGui::BeginTooltip ();
-			ImGui::PushTextWrapPos ( ImGui::GetFontSize () * 35.0f );
-			ImGui::TextUnformatted ( text.c_str () );
-			ImGui::PopTextWrapPos ();
-			ImGui::EndTooltip ();
+			ImGui::Text ( "Choose A Prefab :" );
+			ImGui::Separator ();
+			if ( ImGui::BeginListBox ( "##PrefabsList" ) )
+			{
+				for ( auto const& prefab : m_prefabs_list )
+				{
+					auto last_dash = prefab.find_last_of ( '/' );
+					auto last_dot = prefab.find_last_of ( '.' );
+					std::string name = prefab.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
+					if ( ImGui::Selectable ( name.c_str () ) )
+					{
+						m_enttxsol.LoadPrefabV2 ( engineResources , name , m_selected_prefab_parent_temp );
+						ImGui::CloseCurrentPopup ();
+					}
+				}
+				ImGui::EndListBox ();
+			}
+
+			ImGui::EndPopup ();
 		}
 	}
 
-	/*template<typename EDITOR_RESOURCES>
-	inline void EW_SceneTree<EDITOR_RESOURCES>::DisplayPrefab ( EnttXSol::Prefab const& prefab , uint32_t id )
+	template<typename EDITOR_RESOURCES>
+	inline void EW_SceneTree<EDITOR_RESOURCES>::OpenPrefabPopup ()
 	{
-		ImGui::PushID ( m_uid++ );
-		if ( ImGui::TreeNodeEx ( ( std::string ( "[p] " ) + std::get<1> ( std::get<1> ( prefab )[ 0 ] ).m_name ).c_str () , ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet ) )
-		{
-			if ( ImGui::BeginPopupContextItem ( "onPrefabRightClick" ) )
-			{
-				if ( ImGui::Selectable ( "Remove" ) )
-				{
-					m_remove_prefab = id;
-				}
-				ImGui::EndPopup ();
-			}
+		// read all prefabs from folder
+		m_prefabs_list = FolderHelper::GetFiles ( "Assets/GameAssets/Prefabs/" );
 
-			ImGui::TreePop ();
-		}
-		ImGui::PopID ();
-	}*/
+		ImGui::OpenPopup ( "PrefabsPopup" );
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EW_SceneTree<EDITOR_RESOURCES>::RefreshSceneList ()
+	{
+		m_scene_list = FolderHelper::GetFiles ( "Assets/GameAssets/Scenes/" );
+	}
 }

@@ -79,6 +79,7 @@ namespace god
 		EditorWindows<ENGINE_RESOURCES>* m_editor_windows { nullptr };
 		template <template <typename T> class WINDOW>
 		std::shared_ptr<WINDOW<ENGINE_RESOURCES>> Get ();
+		void ToolTipOnHover ( std::string const& text );
 	};
 
 	template <typename ENGINE_RESOURCES>
@@ -138,6 +139,19 @@ namespace god
 	{
 		assert ( m_editor_windows->GetWindows ().find ( typeid( WINDOW ).name () ) != m_editor_windows->GetWindows ().end () );
 		return std::dynamic_pointer_cast< WINDOW<ENGINE_RESOURCES> >( m_editor_windows->GetWindows ().at ( typeid( WINDOW ).name () ) );
+	}
+
+	template<typename ENGINE_RESOURCES>
+	inline void EditorWindow<ENGINE_RESOURCES>::ToolTipOnHover ( std::string const& text )
+	{
+		if ( ImGui::IsItemHovered () )
+		{
+			ImGui::BeginTooltip ();
+			ImGui::PushTextWrapPos ( ImGui::GetFontSize () * 35.0f );
+			ImGui::TextUnformatted ( text.c_str () );
+			ImGui::PopTextWrapPos ();
+			ImGui::EndTooltip ();
+		}
 	}
 
 	template<typename ENGINE_RESOURCES>
