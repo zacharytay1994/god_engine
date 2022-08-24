@@ -20,20 +20,23 @@ namespace god
 
 	void EnttXSol::Update ()
 	{
-		// update engine systems
-		if ( m_engine_update )
+		if ( !m_pause )
 		{
-			m_engine_update ( *this );
-		}
-		// update script systems
-		// for each script in loaded scripts
-		for ( auto const& script : m_scripts )
-		{
-			// run system with views created by their used components,
-			// i.e. process all entities
-			for ( auto const& system : script.second.m_systems )
+			// update engine systems
+			if ( m_engine_update )
 			{
-				GetView ( system.second.m_used_script_components , system.second.m_used_engine_components ).each ( m_sol_functions[ system.first ] );
+				m_engine_update ( *this );
+			}
+			// update script systems
+			// for each script in loaded scripts
+			for ( auto const& script : m_scripts )
+			{
+				// run system with views created by their used components,
+				// i.e. process all entities
+				for ( auto const& system : script.second.m_systems )
+				{
+					GetView ( system.second.m_used_script_components , system.second.m_used_engine_components ).each ( m_sol_functions[ system.first ] );
+				}
 			}
 		}
 	}
@@ -42,6 +45,7 @@ namespace god
 	{
 		m_registry.clear ();
 		m_entities.Clear ();
+		m_pause = true;
 	}
 
 	void EnttXSol::SetupBindings ()

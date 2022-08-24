@@ -89,7 +89,7 @@ namespace god
 		editor_windows.AddWindow<god::EW_Asset3DImporter> ( true );
 		editor_windows.AddWindow<god::EW_SceneTree> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_EntityEditor> ( true , std::ref ( enttxsol ) );
-		editor_windows.AddWindow<god::EW_SceneView> ( true , camera.m_aspect_ratio );
+		editor_windows.AddWindow<god::EW_SceneView> ( true , camera.m_aspect_ratio , std::ref ( enttxsol ) );
 
 		while ( !window.WindowShouldClose () )
 		{

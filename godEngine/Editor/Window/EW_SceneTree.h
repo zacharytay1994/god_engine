@@ -16,6 +16,7 @@ namespace god
 		void Update ( float dt , EDITOR_RESOURCES& engineResources ) override;
 		void Reset ();
 		EnttXSol::Entities::ID GetSelectedEntity ();
+		void ResetScene ( EDITOR_RESOURCES& engineResources );
 	private:
 		std::string m_input_string { "NIL" };
 		EnttXSol::Entities::ID m_selected_entity { EnttXSol::Entities::Null };
@@ -393,5 +394,20 @@ namespace god
 	inline void EW_SceneTree<EDITOR_RESOURCES>::RefreshSceneList ()
 	{
 		m_scene_list = FolderHelper::GetFiles ( "Assets/GameAssets/Scenes/" );
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EW_SceneTree<EDITOR_RESOURCES>::ResetScene ( EDITOR_RESOURCES& engineResources )
+	{
+		if ( m_selected_scene < static_cast< uint32_t >( m_scene_list.size () ) )
+		{
+			Reset ();
+			m_enttxsol.Clear ();
+			std::string scene_path = m_scene_list[ m_selected_scene ];
+			auto last_dash = scene_path.find_last_of ( '/' );
+			auto last_dot = scene_path.find_last_of ( '.' );
+			std::string name = scene_path.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
+			m_enttxsol.DeserializeStateV2 ( engineResources , name );
+		}
 	}
 }

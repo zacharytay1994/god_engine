@@ -121,6 +121,7 @@ namespace god
 		};
 
 		Entities m_entities;
+		bool m_pause { true };
 
 	private:
 		sol::state m_lua;

@@ -1,5 +1,6 @@
 #pragma once
 #include "../Editor.h"
+#include "../../EnttXSol/EnttXSol.h"
 
 #include "../../imgui/imgui_stdlib.h" 
 
@@ -8,8 +9,8 @@ namespace god
 	template <typename EDITOR_RESOURCES>
 	struct EW_SceneView : EditorWindow<EDITOR_RESOURCES>
 	{
-		EW_SceneView ( float aspectRatio );
-		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override;
+		EW_SceneView ( float aspectRatio , EnttXSol& enttxsol );
+		void Update ( float dt , EDITOR_RESOURCES& engineResources ) override;
 	private:
 		static constexpr unsigned int NO_TEXTURE = static_cast< unsigned int >( -1 );
 	public:
@@ -19,23 +20,27 @@ namespace god
 		float m_aspect_ratio;
 		float m_margin_buffer_x { 20.0f };
 		float m_margin_buffer_y { 50.0f };
+		EnttXSol& m_enttxsol;
 	};
 }
+
+#include "EW_SceneTree.h"
 
 namespace god
 {
 	template<typename EDITOR_RESOURCES>
-	inline EW_SceneView<EDITOR_RESOURCES>::EW_SceneView ( float aspectRatio )
+	inline EW_SceneView<EDITOR_RESOURCES>::EW_SceneView ( float aspectRatio , EnttXSol& enttxsol )
 		:
-		m_aspect_ratio { aspectRatio }
+		m_aspect_ratio { aspectRatio } ,
+		m_enttxsol { enttxsol }
 	{
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline void EW_SceneView<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
+	inline void EW_SceneView<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& engineResources )
 	{
 		( dt );
-		( editorResources );
+		( engineResources );
 		ImGui::Begin ( "Scene View" );
 		if ( m_renderpass_texture != NO_TEXTURE )
 		{
@@ -53,6 +58,23 @@ namespace god
 			}
 			ImGui::Image ( ( void* ) ( static_cast< uint64_t >( m_renderpass_texture ) ) , viewport_size , { 0,1 } , { 1,0 } );
 		}
+		if ( ImGui::Button ( "PLAY" ) )
+		{
+			m_enttxsol.m_pause = false;
+		}
+		this->ToolTipOnHover ( "Objects will be updated." );
+		ImGui::SameLine ();
+		if ( ImGui::Button ( "PAUSE" ) )
+		{
+			m_enttxsol.m_pause = true;
+		}
+		this->ToolTipOnHover ( "Objects will not be updated." );
+		ImGui::SameLine ();
+		if ( ImGui::Button ( "RESET" ) )
+		{
+			this->Get<EW_SceneTree> ()->ResetScene ( engineResources );
+		}
+		this->ToolTipOnHover ( "Resets the scene to its original state." );
 		ImGui::End ();
 	}
 
