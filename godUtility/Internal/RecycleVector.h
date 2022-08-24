@@ -43,7 +43,7 @@ namespace god
 	template<typename T>
 	inline uint32_t RecycleVector<T>::Size ()
 	{
-		return m_container.size ();
+		return static_cast< uint32_t >( m_container.size () );
 	}
 
 	template<typename T>
@@ -59,7 +59,7 @@ namespace god
 		if ( m_free_ids.empty () )
 		{
 			m_container.push_back ( value );
-			return m_container.size () - 1;
+			return static_cast< uint32_t >( m_container.size () ) - 1;
 		}
 
 		// if provide the free id nearest to 0

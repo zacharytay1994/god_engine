@@ -84,6 +84,7 @@ namespace god
 	void OpenGL::RenderScene ( Scene const& scene ,
 		glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures )
 	{
+		// use the shader
 		//m_flat_shader.Use ();
 		m_textured_shader.Use ();
 
@@ -97,44 +98,8 @@ namespace god
 		{
 			if ( data.Active () )
 			{
-				//// set uniforms for vertex shader
-				//// model matrix
-				//glm::mat4 model_matrix = glm::mat4 ( 1.0f );
-				//model_matrix = glm::translate ( model_matrix , data.m_position );
-				//model_matrix = glm::rotate ( model_matrix , data.m_rotation.x , glm::vec3 ( 1.0f , 0.0f , 0.0f ) );
-				//model_matrix = glm::rotate ( model_matrix , data.m_rotation.y , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
-				//model_matrix = glm::rotate ( model_matrix , data.m_rotation.z , glm::vec3 ( 0.0f , 0.0f , 1.0f ) );
-				//model_matrix = glm::scale ( model_matrix , data.m_scale );
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uModel" , model_matrix );
-
-				//// set uniforms for fragment shader
-				//// set view position
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uViewPosition" , camera_position );
-
-				//// set material
-				//OGLMaterial material;
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uMaterial.ambient" , material.m_ambient );
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uMaterial.diffuse" , material.m_diffuse );
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uMaterial.specular" , material.m_specular );
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uMaterial.shininess" , material.m_shininess );
-
-				//// set light
-				//OGLLight light;
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uLight.position" , light.m_position );
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uLight.colour" , light.m_colour );
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uLight.ambient" , light.m_ambient );
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uLight.diffuse" , light.m_diffuse );
-				//OGLShader::SetUniform ( m_flat_shader.GetShaderID () , "uLight.specular" , light.m_specular );
-
 				// set uniforms for vertex shader
-				// model matrix
-				/*glm::mat4 model_matrix = glm::mat4 ( 1.0f );
-				model_matrix = glm::translate ( model_matrix , data.m_position );
-				model_matrix = glm::rotate ( model_matrix , data.m_rotation.x , glm::vec3 ( 1.0f , 0.0f , 0.0f ) );
-				model_matrix = glm::rotate ( model_matrix , data.m_rotation.y , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
-				model_matrix = glm::rotate ( model_matrix , data.m_rotation.z , glm::vec3 ( 0.0f , 0.0f , 1.0f ) );
-				model_matrix = glm::scale ( model_matrix , data.m_scale );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uModel" , model_matrix );*/
+				// set model transform
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uModel" , data.m_model_transform );
 
 				// set uniforms for fragment shader

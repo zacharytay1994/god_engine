@@ -22,12 +22,24 @@ namespace god
 	struct ComponentInspector
 	{
 		template<typename T>
-		void operator()( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources ) {}
+		void operator()( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources ) 
+		{
+			( entity );
+			( registry );
+			( imguiUniqueID );
+			( editorResources );
+		}
 	};
 
 	// for serializing an engine component to json
 	template <typename T>
-	void JSONify ( EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& value , T& component ) {}
+	void JSONify ( EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& value , T& component ) 
+	{
+		( engineResources );
+		( document );
+		( value );
+		( component );
+	}
 
 	template <typename T>
 	void Assign ( T& val , rapidjson::Value& jsonObj , std::string const& name ) {};
@@ -60,7 +72,12 @@ namespace god
 	}
 
 	template <typename T>
-	void DeJSONify ( EngineResources& engineResources , T& component , rapidjson::Value& jsonObj ) {}
+	void DeJSONify ( EngineResources& engineResources , T& component , rapidjson::Value& jsonObj ) 
+	{
+		( engineResources );
+		( component );
+		( jsonObj );
+	}
 
 	template<typename T , typename ...Args>
 	void RegisterLuaType ( sol::state& luaState , std::string const& name , Args... args )

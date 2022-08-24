@@ -164,7 +164,7 @@ namespace god
 				}
 
 				// render scene hierarchy
-				for ( auto i = 0; i < m_enttxsol.m_entities.Size (); ++i )
+				for ( uint32_t i = 0; i < m_enttxsol.m_entities.Size (); ++i )
 				{
 					// call function only on root nodes
 					if ( m_enttxsol.m_entities.Valid ( i ) && m_enttxsol.m_entities[ i ].m_parent_id == EnttXSol::Entities::Null )
@@ -192,7 +192,7 @@ namespace god
 					auto last_dash = scene.find_last_of ( '/' );
 					auto last_dot = scene.find_last_of ( '.' );
 					std::string name = scene.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
-					if ( ImGui::Selectable ( name.c_str () , m_selected_scene == i ) );
+					ImGui::Selectable ( name.c_str () , m_selected_scene == i );
 					if ( ImGui::BeginPopupContextItem () )
 					{
 						m_selected_scene = i;

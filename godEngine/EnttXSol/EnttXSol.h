@@ -24,8 +24,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <stack>
-#include <optional>
 #include <tuple>
 #include <iostream>
 #include <functional>
@@ -64,6 +62,7 @@ namespace god
 		EnttXSol ( std::vector<std::string> scriptFiles );
 		void Update ();
 		void Clear ();
+		void SetupBindings ();
 		template<typename ENGINE_COMPONENTS>
 		void BindEngineComponents ();
 		template<typename T , typename ...ARGS>
@@ -332,7 +331,7 @@ namespace god
 	{
 		scene.ClearScene ();
 
-		for ( auto i = 0; i < m_entities.Size (); ++i )
+		for ( uint32_t i = 0; i < m_entities.Size (); ++i )
 		{
 			if ( m_entities.Valid ( i ) && m_entities[ i ].m_parent_id == Entities::Null )
 			{

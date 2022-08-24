@@ -13,10 +13,6 @@ namespace god
 		uint32_t m_diffuse_id { 0 };
 		uint32_t m_specular_id { 0 };
 		float m_shininess { 32.0f };
-
-		/*uint32_t m_model_uid { 0 };
-		uint32_t m_diffuse_uid { 0 };
-		uint32_t m_specular_uid { 0 };*/
 	};
 	template <>
 	inline void NewLuaType<Renderable3D> ( sol::state& luaState , std::string const& name )
@@ -44,19 +40,6 @@ namespace god
 						if ( ImGui::Selectable ( asset.first.c_str () ) )
 						{
 							component.m_model_id = asset.second;
-							// find uid
-							/*rapidjson::Document document;
-							document.SetObject ();
-							ReadJSON ( document , "Assets/GameAssets/3DAssets/ModelsConfig.json" );
-							if ( document.FindMember ( asset.first.c_str () ) != document.MemberEnd () )
-							{
-								component.m_model_uid = document[ asset.first.c_str () ][ 0 ][ "UID" ].GetUint ();
-							}
-							else
-							{
-								std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to model" << std::endl;
-							}*/
-
 							ImGui::CloseCurrentPopup ();
 						}
 					}
@@ -70,18 +53,6 @@ namespace god
 						if ( ImGui::Selectable ( texture.first.c_str () ) )
 						{
 							component.m_diffuse_id = texture.second;
-							// find uid
-							/*rapidjson::Document document;
-							document.SetObject ();
-							ReadJSON ( document , "Assets/GameAssets/2DAssets/TexturesConfig.json" );
-							if ( document.FindMember ( texture.first.c_str () ) != document.MemberEnd () )
-							{
-								component.m_diffuse_uid = document[ texture.first.c_str () ][ 0 ][ "UID" ].GetUint ();
-							}
-							else
-							{
-								std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to diffuse texture" << std::endl;
-							}*/
 							ImGui::CloseCurrentPopup ();
 						}
 					}
@@ -95,18 +66,6 @@ namespace god
 						if ( ImGui::Selectable ( texture.first.c_str () ) )
 						{
 							component.m_specular_id = texture.second;
-							// find uid
-							/*rapidjson::Document document;
-							document.SetObject ();
-							ReadJSON ( document , "Assets/GameAssets/2DAssets/TexturesConfig.json" );
-							if ( document.FindMember ( texture.first.c_str () ) != document.MemberEnd () )
-							{
-								component.m_specular_uid = document[ texture.first.c_str () ][ 0 ][ "UID" ].GetUint ();
-							}
-							else
-							{
-								std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to specular texture" << std::endl;
-							}*/
 							ImGui::CloseCurrentPopup ();
 						}
 					}
@@ -152,11 +111,6 @@ namespace god
 	template<>
 	inline void JSONify<Renderable3D> ( EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& value , Renderable3D& component )
 	{
-		// serialize model uid
-		//RapidJSON::JSONifyToValue ( value , document , "model uid" , component.m_model_uid );
-		/*RapidJSON::JSONifyToValue ( value , document , "diffuse uid" , component.m_diffuse_uid );
-		RapidJSON::JSONifyToValue ( value , document , "specular uid" , component.m_specular_uid );*/
-
 		// find model uid
 		auto model_name = engineResources.Get<Asset3DManager> ().get ().GetName ( component.m_model_id );
 		rapidjson::Document model_doc;
@@ -168,7 +122,7 @@ namespace god
 		}
 		else
 		{
-			std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to model" << std::endl;
+			std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to model. Ignore this warning for now." << std::endl;
 		}
 
 		// find diffuse uid
@@ -183,7 +137,7 @@ namespace god
 		}
 		else
 		{
-			std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to diffuse texture" << std::endl;
+			std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to diffuse texture. Ignore this warning for now." << std::endl;
 		}
 
 		// find specular uid
@@ -194,17 +148,13 @@ namespace god
 		}
 		else
 		{
-			std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to specular texture" << std::endl;
+			std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to specular texture. Ignore this warning for now." << std::endl;
 		}
 	}
 
 	template<>
 	inline void DeJSONify<Renderable3D> ( EngineResources& engineResources , Renderable3D& component , rapidjson::Value& jsonObj )
 	{
-		/*AssignIfExist ( jsonObj , component.m_model_uid , "model uid" );
-		AssignIfExist ( jsonObj , component.m_diffuse_uid , "model uid" );
-		AssignIfExist ( jsonObj , component.m_specular_uid , "model uid" );*/
-
 		// find model corresponding to uid
 		uint32_t model_uid { 0 };
 		AssignIfExist ( jsonObj , model_uid , "model uid" );

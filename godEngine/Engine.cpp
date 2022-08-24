@@ -63,33 +63,25 @@ namespace god
 				"Assets/GameAssets/Scripts/test.lua",
 				"Assets/GameAssets/Scripts/test2.lua",
 				"Assets/GameAssets/Scripts/ExampleScript.lua"} };
-		//god::EngineComponentType engine_components ( g_EngineComponents );
 		enttxsol.BindEngineComponents< EngineComponents > ();
-		//enttxsol.BindEngineComponents ( engine_components );
 		enttxsol.BindEngineSystemUpdate ( EngineSystems );
-		enttxsol.RegisterLuaType<glm::vec3> ( "vec3" ,
-			"x" , &glm::vec3::x ,
-			"y" , &glm::vec3::y ,
-			"z" , &glm::vec3::z );
-		/*auto e1 = enttxsol.CreateEntity ();
-		enttxsol.AttachScript ( e1 , "test" );
-		enttxsol.AttachScript ( e1 , "test2" );*/
+		enttxsol.SetupBindings ();
 
 		// setup scene
 		Scene scene;
-		//god::SceneObjectID skull = scene.AddSceneObject ( assets_3d.GetID ( "Skull" ) , { 0.0f,0.0f,-2.0f } );
-		//SceneObjectID backpack = scene.AddSceneObject ( assets_3d.GetID ( "Backpack" ) , { 0.0f, 0.0f, -5.0f } );
 
 		// glfw+opengl imgui setup
 		ImGuiOpenGLEditor ogl_editor ( window );
 
-		// imgui editors : EditorResourcesDef is defined in EditorResourcesDefinition.h
+		// engine resources used by imgui as defined in EditorResourcesDefinition.h
 		EngineResources engine_resources (
 			window ,
 			opengl ,
 			assets_3d ,
 			ogl_textures
 		);
+
+		// imgui editor windows
 		EditorWindows<EngineResources> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
 		editor_windows.AddWindow<god::EW_EditorStyles> ( false );
@@ -98,28 +90,6 @@ namespace god
 		editor_windows.AddWindow<god::EW_SceneTree> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_EntityEditor> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_SceneView> ( true , camera.m_aspect_ratio );
-
-		//enttxsol.DeserializeStateV2 ( engine_resources , "SerializeV2" );
-		//enttxsol.LoadPrefab ( "NIL" );
-
-		/*rapidjson::Document document;
-		document.SetObject ();*/
-		/*rapidjson::Value value ( 10 );
-		document.AddMember ( "test" , value , document.GetAllocator () );
-		rapidjson::Value value2 ( rapidjson::kObjectType );
-		value2.AddMember ( "value2" , "i am string?" , document.GetAllocator () );
-		document.AddMember ( "objectmember" , value2 , document.GetAllocator () );
-		god::WriteJSON ( document , "test.json" );*/
-		/*RapidJSON::JSONify ( document , "something" , 11 );
-		RapidJSON::JSONify ( document , "something3" , 15.0f );
-		RapidJSON::JSONifyValues ( document , "arraytest" , "re" , 2 , 3 , 4);
-		god::WriteJSON ( document , "test2.json" );*/
-
-		/*rapidjson::Document document;
-		god::ReadJSON ( document , "test.json" );
-		rapidjson::Value value ( 11 );
-		document["objectmember"].AddMember ("newvalue" , value , document.GetAllocator ());
-		god::WriteJSON ( document , "test.json" );*/
 
 		while ( !window.WindowShouldClose () )
 		{
@@ -139,7 +109,6 @@ namespace god
 			// ...
 			enttxsol.Update ();
 			enttxsol.PopulateScene<Scene , Transform , Renderable3D> ( scene );
-			//scene.GetSceneObject ( skull ).m_rotation.y += 0.0002f;
 
 			// render scene
 			first_renderpass.Bind ();

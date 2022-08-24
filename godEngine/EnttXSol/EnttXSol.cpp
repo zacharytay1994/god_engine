@@ -44,6 +44,14 @@ namespace god
 		m_entities.Clear ();
 	}
 
+	void EnttXSol::SetupBindings ()
+	{
+		RegisterLuaType<glm::vec3> ( "vec3" ,
+			"x" , &glm::vec3::x ,
+			"y" , &glm::vec3::y ,
+			"z" , &glm::vec3::z );
+	}
+
 	void EnttXSol::BindEngineSystemUpdate ( void( *update )( EnttXSol& ) )
 	{
 		m_engine_update = update;
@@ -150,7 +158,7 @@ namespace god
 		rapidjson::Document document { rapidjson::kObjectType };
 
 		// serialize only root nodes
-		for ( auto entity = 0; entity < m_entities.Size (); ++entity )
+		for ( uint32_t entity = 0; entity < m_entities.Size (); ++entity )
 		{
 			if ( m_entities.Valid ( entity ) && m_entities[ entity ].m_parent_id == Entities::Null )
 			{
@@ -286,31 +294,31 @@ namespace god
 						// attribute here refers to the component's attribute description
 						for ( auto const& attribute : script.second.m_components.at ( component_name ).m_serialize_attributes )
 						{
-							auto name = std::get<0> ( attribute );
-							auto type = std::get<1> ( attribute );
+							auto attribute_name = std::get<0> ( attribute );
+							auto attribute_type = std::get<1> ( attribute );
 
-							if ( script_component.value.FindMember ( name.c_str () ) != script_component.value.MemberEnd () )
+							if ( script_component.value.FindMember ( attribute_name.c_str () ) != script_component.value.MemberEnd () )
 							{
-								switch ( type )
+								switch ( attribute_type )
 								{
 								case ( AttributeTypes::BOOL ):
-									component.set ( name , script_component.value[ name.c_str () ].GetBool () );
+									component.set ( attribute_name , script_component.value[ attribute_name.c_str () ].GetBool () );
 									break;
 								case ( AttributeTypes::INT ):
-									component.set ( name , script_component.value[ name.c_str () ].GetInt () );
+									component.set ( attribute_name , script_component.value[ attribute_name.c_str () ].GetInt () );
 									break;
 								case ( AttributeTypes::FLOAT ):
-									component.set ( name , script_component.value[ name.c_str () ].GetFloat () );
+									component.set ( attribute_name , script_component.value[ attribute_name.c_str () ].GetFloat () );
 									break;
 								case ( AttributeTypes::STRING ):
-									component.set ( name , script_component.value[ name.c_str () ].GetString () );
+									component.set ( attribute_name , script_component.value[ attribute_name.c_str () ].GetString () );
 									break;
 								}
 							}
 							else
 							{
 								std::cerr << "EnttXSol::DeserializeState - Expected value not in serialized file. Maybe outdated file? ["
-									<< name << "] in File [" << "oops" << "]" << std::endl;
+									<< attribute_name << "] in File [" << "oops" << "]" << std::endl;
 							}
 						}
 						script_component_found = true;
@@ -488,31 +496,31 @@ namespace god
 						// attribute here refers to the component's attribute description
 						for ( auto const& attribute : script.second.m_components.at ( component_name ).m_serialize_attributes )
 						{
-							auto name = std::get<0> ( attribute );
-							auto type = std::get<1> ( attribute );
+							auto attribute_name = std::get<0> ( attribute );
+							auto attribute_type = std::get<1> ( attribute );
 
-							if ( script_component.value.FindMember ( name.c_str () ) != script_component.value.MemberEnd () )
+							if ( script_component.value.FindMember ( attribute_name.c_str () ) != script_component.value.MemberEnd () )
 							{
-								switch ( type )
+								switch ( attribute_type )
 								{
 								case ( AttributeTypes::BOOL ):
-									component.set ( name , script_component.value[ name.c_str () ].GetBool () );
+									component.set ( attribute_name , script_component.value[ attribute_name.c_str () ].GetBool () );
 									break;
 								case ( AttributeTypes::INT ):
-									component.set ( name , script_component.value[ name.c_str () ].GetInt () );
+									component.set ( attribute_name , script_component.value[ attribute_name.c_str () ].GetInt () );
 									break;
 								case ( AttributeTypes::FLOAT ):
-									component.set ( name , script_component.value[ name.c_str () ].GetFloat () );
+									component.set ( attribute_name , script_component.value[ attribute_name.c_str () ].GetFloat () );
 									break;
 								case ( AttributeTypes::STRING ):
-									component.set ( name , script_component.value[ name.c_str () ].GetString () );
+									component.set ( attribute_name , script_component.value[ attribute_name.c_str () ].GetString () );
 									break;
 								}
 							}
 							else
 							{
 								std::cerr << "EnttXSol::DeserializeState - Expected value not in serialized file. Maybe outdated file? ["
-									<< name << "] in prefab file [" << "oops" << "]" << std::endl;
+									<< attribute_name << "] in prefab file [" << "oops" << "]" << std::endl;
 							}
 						}
 						script_component_found = true;
