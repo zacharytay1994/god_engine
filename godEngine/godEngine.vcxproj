@@ -107,6 +107,7 @@
     <ClInclude Include="Editor\Window\EW_EditorStyles.h" />
     <ClInclude Include="Editor\Window\EW_MainMenuBar.h" />
     <ClInclude Include="Editor\Window\EW_EntityEditor.h" />
+    <ClInclude Include="Editor\Window\EW_Performance.h" />
     <ClInclude Include="Editor\Window\EW_SceneTree.h" />
     <ClInclude Include="Editor\Window\EW_SceneView.h" />
     <ClInclude Include="Editor\Window\PathConfig.h" />
@@ -141,6 +142,8 @@
     <ClInclude Include="OpenGL\OpenGL.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
+    <ClInclude Include="Window\DeltaTimer.h" />
+    <ClInclude Include="Window\SystemTimer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\0_InternalDependencies\glad\src\glad.c">
@@ -225,7 +228,15 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Window\DeltaTimer.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="Window\GLFWWindow.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Window\SystemTimer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>

@@ -19,12 +19,13 @@ namespace god
 		unsigned int m_renderpass_texture { NO_TEXTURE };
 		float m_aspect_ratio;
 		float m_margin_buffer_x { 20.0f };
-		float m_margin_buffer_y { 50.0f };
+		float m_margin_buffer_y { 100.0f };
 		EnttXSol& m_enttxsol;
 	};
 }
 
 #include "EW_SceneTree.h"
+#include "../../Window/DeltaTimer.h"
 
 namespace god
 {
@@ -75,6 +76,8 @@ namespace god
 			this->Get<EW_SceneTree> ()->ResetScene ( engineResources );
 		}
 		this->ToolTipOnHover ( "Resets the scene to its original state." );
+		ImGui::SameLine ();
+		ImGui::Text ( "FPS: %d" , DeltaTimer::m_fps );
 		ImGui::End ();
 	}
 

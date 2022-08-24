@@ -6,6 +6,8 @@
 #include "OpenGL/Internal/OGLTexture.h"
 
 #include "Window/GLFWWindow.h"
+#include "Window/DeltaTimer.h"
+#include "Window/SystemTimer.h"
 
 #include "EnttXSol/EngineComponents/EC_All.h"
 #include "EnttXSol/EngineSystems/ES_All.h"
@@ -21,6 +23,7 @@
 #include "Editor/Window/EW_SceneTree.h"
 #include "Editor/Window/EW_EntityEditor.h"
 #include "Editor/Window/EW_SceneView.h"
+#include "Editor/Window/EW_Performance.h"
 #include "Editor/Editor.h"
 
 #include <godCamera/Camera.h>
@@ -42,6 +45,7 @@ namespace god
 	{
 		// create window
 		GLFWWindow window ( 1920 , 1080 );
+		DeltaTimer delta_timer;
 		OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
 		OGLRenderPass first_renderpass ( window.GetWindowWidth () , window.GetWindowHeight () );
 
@@ -90,9 +94,14 @@ namespace god
 		editor_windows.AddWindow<god::EW_SceneTree> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_EntityEditor> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_SceneView> ( true , camera.m_aspect_ratio , std::ref ( enttxsol ) );
+		editor_windows.AddWindow<god::EW_Performance> ( true );
 
 		while ( !window.WindowShouldClose () )
 		{
+			SystemTimer::StartTimeSegment ( "Overall" );
+			delta_timer.StartFrame ();
+
+
 			window.PollEvents ();
 
 			// window resize changes
@@ -107,10 +116,15 @@ namespace god
 
 			// update scene
 			// ...
+			SystemTimer::StartTimeSegment ( "EnTT Update" );
 			enttxsol.Update ();
+			SystemTimer::EndTimeSegment ( "EnTT Update" );
+			SystemTimer::StartTimeSegment ( "Populating Scene" );
 			enttxsol.PopulateScene<Scene , Transform , Renderable3D> ( scene );
+			SystemTimer::EndTimeSegment ( "Populating Scene" );
 
 			// render scene
+			SystemTimer::StartTimeSegment ( "Rendering" );
 			first_renderpass.Bind ();
 			opengl.RenderScene (
 				scene ,
@@ -120,16 +134,21 @@ namespace god
 				ogl_textures
 			);
 			first_renderpass.UnBind ();
+			SystemTimer::EndTimeSegment ( "Rendering" );
 
 			// ... render imgui windows
+			SystemTimer::StartTimeSegment ( "Editor" );
 			ogl_editor.BeginFrame ();
 			// pass scene view the renderpass texture
 			editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( first_renderpass.GetTexture () );
 			editor_windows.Update ( 0.02f , engine_resources );
 			ogl_editor.Render ();
 			ogl_editor.EndFrame ();
+			SystemTimer::EndTimeSegment ( "Editor" );
 
+			SystemTimer::StartTimeSegment ( "Window Buffer Swap" );
 			window.SwapWindowBuffers ();
+			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
 			// free camera update
 			camera.FreeCamera ( 0.02f ,
 				true ,
@@ -148,6 +167,9 @@ namespace god
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );
+
+			delta_timer.EndFrame ();
+			SystemTimer::EndTimeSegment ( "Overall" );
 		}
 	}
 }

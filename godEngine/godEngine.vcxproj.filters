@@ -144,6 +144,15 @@
     <ClInclude Include="EnttXSol\Internal\godEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Window\DeltaTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Window\SystemTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\Window\EW_Performance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -213,6 +222,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EnttXSol\Internal\godEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Window\DeltaTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Window\SystemTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
