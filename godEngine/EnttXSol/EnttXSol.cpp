@@ -255,6 +255,15 @@ namespace god
 		else if ( m_entities[ entity ].m_type == Entity_::Type::Prefab )
 		{
 			RapidJSON::JSONifyToValue ( value , document , "Type" , "Prefab" );
+
+			// serialize the prefab transform if any
+			Transform* transform = m_registry.try_get<Transform> ( m_entities[ entity ].m_id );
+			if ( transform )
+			{
+				rapidjson::Value transform_value { rapidjson::kObjectType };
+				JSONify ( engineResources , document , transform_value , *transform );
+				RapidJSON::JSONifyToValue ( value , document , "Transform" , transform_value );
+			}
 		}
 	}
 
@@ -274,7 +283,17 @@ namespace god
 	{
 		if ( std::string ( value[ "Type" ].GetString () ) == "Prefab" )
 		{
-			LoadPrefabV2 ( engineResources , name , parent );
+			Entities::ID prefab_root = LoadPrefabV2 ( engineResources , name , parent );
+
+			// deserialize transform component if has transform in file and in prefab
+			Transform* transform = m_registry.try_get<Transform> ( m_entities[ prefab_root ].m_id );
+			if ( transform )
+			{
+				if ( value.HasMember ( "Transform" ) )
+				{
+					DeJSONify ( engineResources , *transform , value[ "Transform" ] );
+				}
+			}
 		}
 		else if ( std::string ( value[ "Type" ].GetString () ) == "Default" )
 		{
@@ -451,23 +470,42 @@ namespace god
 			else if ( m_entities[ entity ].m_type == Entity_::Type::Prefab )
 			{
 				RapidJSON::JSONifyToValue ( value , document , "Type" , "Prefab" );
+
+				// serialize the prefab transform if any
+				Transform* transform = m_registry.try_get<Transform> ( m_entities[ entity ].m_id );
+				if ( transform )
+				{
+					rapidjson::Value transform_value { rapidjson::kObjectType };
+					JSONify ( engineResources , document , transform_value , *transform );
+					RapidJSON::JSONifyToValue ( value , document , "Transform" , transform_value );
+				}
 			}
 		}
 	}
 
-	void EnttXSol::LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent )
+	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent )
 	{
 		rapidjson::Document document;
 		ReadJSON ( document , std::string ( "Assets/GameAssets/Prefabs/" ) + fileName + ".json" );
 
-		LoadPrefabV2Recurse ( engineResources , document.MemberBegin ()->value , document.MemberBegin ()->name.GetString () , parent , true );
+		return LoadPrefabV2Recurse ( engineResources , document.MemberBegin ()->value , document.MemberBegin ()->name.GetString () , parent , true );
 	}
 
-	void EnttXSol::LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root )
+	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root )
 	{
 		if ( std::string ( value[ "Type" ].GetString () ) == "Prefab" )
 		{
-			LoadPrefabV2 ( engineResources , name , parent );
+			Entities::ID prefab_root = LoadPrefabV2 ( engineResources , name , parent );
+
+			// deserialize transform component if has transform in file and in prefab
+			Transform* transform = m_registry.try_get<Transform> ( m_entities[ prefab_root ].m_id );
+			if ( transform )
+			{
+				if ( value.HasMember ( "Transform" ) )
+				{
+					DeJSONify ( engineResources , *transform , value[ "Transform" ] );
+				}
+			}
 		}
 		else if ( std::string ( value[ "Type" ].GetString () ) == "Default" )
 		{
@@ -556,7 +594,14 @@ namespace god
 			{
 				LoadPrefabV2Recurse ( engineResources , children.value , children.name.GetString () , entity );
 			}
+
+			if ( root )
+			{
+				return entity;
+			}
 		}
+
+		return Entities::Null;
 	}
 
 	void EnttXSol::LoadScript ( std::string const& scriptFile )
