@@ -11,10 +11,11 @@
 #include <entt.hpp>
 #include <sol/sol.hpp>
 
-#include "../../godUtility/TemplateManipulation.h"
-#include "../../godUtility/FileIO.h"
-#include "../../godUtility/Internal/RapidJSONWrapper.h"
-#include "../../godUtility/Internal/RecycleVector.h"
+#include <godUtility/TemplateManipulation.h>
+#include <godUtility/FileIO.h>
+#include <godUtility/Internal/RapidJSONWrapper.h>
+#include <godUtility/Internal/RecycleVector.h>
+#include <godUtility/Math.h>
 
 #include "EngineComponents/EngineComponents.h"
 #include "EngineComponents/EC_All.h"
@@ -92,6 +93,9 @@ namespace god
 		template<typename T>
 		void AttachScriptSystem ( Entities::ID entity , std::string const& scriptSystem );
 		void AttachEngineComponent ( Entities::ID entity , uint32_t componentID );
+
+		template<typename T>
+		T* GetEngineComponent ( Entities::ID entity );
 
 		std::unordered_map<std::string , Script> const& GetScripts () const;
 
@@ -327,6 +331,16 @@ namespace god
 		std::cerr << "EnttXSol::AttachScriptSystem - System not found " << system << std::endl;
 	}
 
+	template<typename T>
+	inline T* EnttXSol::GetEngineComponent ( Entities::ID entity )
+	{
+		if ( m_entities.Valid ( entity ) )
+		{
+			return m_registry.try_get<T> ( m_entities[ entity ].m_id );
+		}
+		return nullptr;
+	}
+
 	template<typename S , typename T , typename R>
 	inline void EnttXSol::PopulateScene ( S& scene )
 	{
@@ -347,14 +361,12 @@ namespace god
 		// if parent has both transform and renderable component
 		if ( m_registry.all_of<T , R> ( m_entities[ e ].m_id ) )
 		{
-			auto const& [transform , renderable] = m_registry.get<T , R> ( m_entities[ e ].m_id );
+			auto [transform , renderable] = m_registry.get<T , R> ( m_entities[ e ].m_id );
 
-			glm::mat4 model_transform = glm::mat4 ( 1.0f );
-			model_transform = glm::translate ( model_transform , transform.m_position );
-			model_transform = glm::rotate ( model_transform , transform.m_rotation.x , glm::vec3 ( 1.0f , 0.0f , 0.0f ) );
-			model_transform = glm::rotate ( model_transform , transform.m_rotation.y , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
-			model_transform = glm::rotate ( model_transform , transform.m_rotation.z , glm::vec3 ( 0.0f , 0.0f , 1.0f ) );
-			model_transform = glm::scale ( model_transform , transform.m_scale );
+			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
+
+			transform.m_parent_transform = parentTransform;
+			transform.m_local_transform = model_transform;
 
 			auto model_xform_cat = parentTransform * model_transform;
 
@@ -376,14 +388,12 @@ namespace god
 		// if only transform component
 		else if ( m_registry.all_of<T> ( m_entities[ e ].m_id ) )
 		{
-			auto const& transform = m_registry.get<T> ( m_entities[ e ].m_id );
+			auto& transform = m_registry.get<T> ( m_entities[ e ].m_id );
 
-			glm::mat4 model_transform = glm::mat4 ( 1.0f );
-			model_transform = glm::translate ( model_transform , transform.m_position );
-			model_transform = glm::rotate ( model_transform , transform.m_rotation.x , glm::vec3 ( 1.0f , 0.0f , 0.0f ) );
-			model_transform = glm::rotate ( model_transform , transform.m_rotation.y , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
-			model_transform = glm::rotate ( model_transform , transform.m_rotation.z , glm::vec3 ( 0.0f , 0.0f , 1.0f ) );
-			model_transform = glm::scale ( model_transform , transform.m_scale );
+			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
+
+			transform.m_parent_transform = parentTransform;
+			transform.m_local_transform = model_transform;
 
 			auto model_xform_cat = parentTransform * model_transform;
 

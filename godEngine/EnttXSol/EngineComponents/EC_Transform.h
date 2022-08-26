@@ -12,6 +12,9 @@ namespace god
 		glm::vec3 m_position;
 		glm::vec3 m_rotation;
 		glm::vec3 m_scale { 1.0f, 1.0f,1.0f };
+
+		glm::mat4 m_parent_transform { glm::mat4 ( 1.0f ) };
+		glm::mat4 m_local_transform { glm::mat4 ( 1.0f ) };
 	};
 	template <>
 	inline void NewLuaType<Transform> ( sol::state& luaState , std::string const& name )
@@ -66,17 +69,35 @@ namespace god
 	inline void JSONify<Transform> ( EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& value , Transform& component )
 	{
 		( engineResources );
+		// serialize position
 		RapidJSON::JSONifyToValue ( value , document , "position_x" , component.m_position.x );
 		RapidJSON::JSONifyToValue ( value , document , "position_y" , component.m_position.y );
 		RapidJSON::JSONifyToValue ( value , document , "position_z" , component.m_position.z );
+		// serialize rotation
+		RapidJSON::JSONifyToValue ( value , document , "rotation_x" , component.m_rotation.x );
+		RapidJSON::JSONifyToValue ( value , document , "rotation_y" , component.m_rotation.y );
+		RapidJSON::JSONifyToValue ( value , document , "rotation_z" , component.m_rotation.z );
+		// serialize scale
+		RapidJSON::JSONifyToValue ( value , document , "scale_x" , component.m_scale.x );
+		RapidJSON::JSONifyToValue ( value , document , "scale_y" , component.m_scale.y );
+		RapidJSON::JSONifyToValue ( value , document , "scale_z" , component.m_scale.z );
 	}
 
 	template<>
 	inline void DeJSONify<Transform> ( EngineResources& engineResources , Transform& component , rapidjson::Value& jsonObj )
 	{
 		( engineResources );
+		// deserialize position
 		AssignIfExist ( jsonObj , component.m_position.x , "position_x" );
 		AssignIfExist ( jsonObj , component.m_position.y , "position_y" );
 		AssignIfExist ( jsonObj , component.m_position.z , "position_z" );
+		// deserialize rotation
+		AssignIfExist ( jsonObj , component.m_rotation.x , "rotation_x" );
+		AssignIfExist ( jsonObj , component.m_rotation.y , "rotation_y" );
+		AssignIfExist ( jsonObj , component.m_rotation.z , "rotation_z" );
+		// deserialize scale
+		AssignIfExist ( jsonObj , component.m_scale.x , "scale_x" );
+		AssignIfExist ( jsonObj , component.m_scale.y , "scale_y" );
+		AssignIfExist ( jsonObj , component.m_scale.z , "scale_z" );
 	}
 }

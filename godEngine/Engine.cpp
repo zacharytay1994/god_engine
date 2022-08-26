@@ -81,6 +81,7 @@ namespace god
 		EngineResources engine_resources (
 			window ,
 			opengl ,
+			camera ,
 			assets_3d ,
 			ogl_textures
 		);

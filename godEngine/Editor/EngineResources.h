@@ -2,6 +2,7 @@
 
 #include <godUtility/Structures.h>
 #include <godUtility/Utility.h>
+#include <godCamera/Camera.h>
 #include "../Window/GLFWWindow.h"
 #include "../OpenGL/OpenGL.h"
 #include "../OpenGL/Internal/OGLTexture.h"
@@ -20,6 +21,7 @@ namespace god
 	using EngineResources = Resources<
 		GLFWWindow ,
 		OpenGL ,
+		Camera ,
 		Asset3DManager ,
 		OGLTextureManager
 	>;

@@ -1,6 +1,7 @@
 #pragma once
 #include "../Editor.h"
 #include "../../imgui/imgui_stdlib.h" 
+#include <sstream>
 
 namespace god
 {
@@ -25,7 +26,7 @@ namespace god
 	inline void EW_Performance<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& engineResources )
 	{
 		ImGui::Begin ( "Performance View" );
-
+		ImGui::Text ( "Time in microseconds. i.e. 1/1,000,000 seconds" );
 		auto const& time_segments = SystemTimer::GetTimeSegments ();
 		float overall = std::get<1> ( time_segments.at ( "Overall" ) );
 
@@ -40,7 +41,9 @@ namespace god
 			{
 				ImGui::PushID ( i++ );
 				float percentage = ( std::get<1> ( time_segment.second ) / overall ) * 100.0f;
-				ImGui::SliderFloat ( ( std::string ( "% " ) + time_segment.first.c_str () ).c_str () , &percentage , 0.0f , 100.0f );
+				std::stringstream ss;
+				ss << "% [" << static_cast< int >( std::get<1> ( time_segment.second ) * 1'000'000.0f ) << "] " << time_segment.first;
+				ImGui::SliderFloat ( ss.str ().c_str () , &percentage , 0.0f , 100.0f );
 				ImGui::PopID ();
 			}
 			++i;

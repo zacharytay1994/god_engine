@@ -21,7 +21,7 @@ namespace god
 				current ,
 				std::chrono::duration_cast< std::chrono::microseconds >(
 					std::chrono::system_clock::now () - std::get<0> ( m_time_segments[ name ] ) ).count () / 1'000'000.0f ,
-				DeltaTimer::m_dt * 0.2f
+				DeltaTimer::m_dt * 0.3f
 			);
 	}
 
