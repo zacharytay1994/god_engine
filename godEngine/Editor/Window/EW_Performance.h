@@ -25,6 +25,8 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EW_Performance<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& engineResources )
 	{
+		( dt );
+		( engineResources );
 		ImGui::Begin ( "Performance View" );
 		ImGui::Text ( "Time in microseconds. i.e. 1/1,000,000 seconds" );
 		auto const& time_segments = SystemTimer::GetTimeSegments ();

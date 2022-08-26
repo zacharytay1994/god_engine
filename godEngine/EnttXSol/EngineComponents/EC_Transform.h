@@ -62,6 +62,17 @@ namespace god
 				ImGui::SameLine ();
 				ImGui::SetNextItemWidth ( width / 4 );
 				ImGui::InputFloat ( "Scale" , &component.m_scale.z );
+
+				ImGui::SameLine ();
+				ImGui::TextDisabled ( "(?)" );
+				if ( ImGui::IsItemHovered () )
+				{
+					ImGui::BeginTooltip ();
+					ImGui::PushTextWrapPos ( ImGui::GetFontSize () * 35.0f );
+					ImGui::TextUnformatted ( "Note: Non-uniform scale on parent objects affects the child's rotation." );
+					ImGui::PopTextWrapPos ();
+					ImGui::EndTooltip ();
+				}
 			} );
 	}
 
