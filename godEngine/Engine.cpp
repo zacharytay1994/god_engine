@@ -63,10 +63,7 @@ namespace god
 		opengl.BuildOGLModels ( assets_3d );
 
 		// setup ecs and scripting
-		EnttXSol enttxsol { {
-				"Assets/GameAssets/Scripts/test.lua",
-				"Assets/GameAssets/Scripts/test2.lua",
-				"Assets/GameAssets/Scripts/ExampleScript.lua"} };
+		EnttXSol enttxsol;
 		enttxsol.BindEngineComponents< EngineComponents > ();
 		enttxsol.BindEngineSystemUpdate ( EngineSystems );
 		enttxsol.SetupBindings ();

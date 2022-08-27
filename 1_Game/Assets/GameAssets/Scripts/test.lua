@@ -3,12 +3,12 @@ function C_test1()
     local var = {
         --[SerializeInt]
         x = 3,
-        --[SerializeFloat]
-        y = 1,
         --[SerializeBool]
         b = true,
         --[SerializeString]
-        s = "something"
+        s = "something",
+        --[SerializeFloat]
+        newthing = 2.3
     };
     return function()
         return var
@@ -44,9 +44,7 @@ function S_test1(e)
     --     print("hello");
     -- end
     c1 = GetComponent(e, "C_test1")
-    if (e == 0) then
-        c1.x = c1.x + 1
-    end
+    c1.x = c1.x + 1
 
     GetComponent(e, "C_System2")
     -- print("Hi")

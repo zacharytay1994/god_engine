@@ -1,8 +1,13 @@
 #pragma once
 #include "../Editor.h"
 #include "../../EnttXSol/EnttXSol.h"
+#include "../../imgui/imgui_stdlib.h"
 
-#include "../../imgui/imgui_stdlib.h" 
+#include <godUtility/Internal/FolderHelper.h>
+#include <godUtility/FileIO.h>
+
+#include <vector>
+#include <string>
 
 namespace god
 {
@@ -12,11 +17,23 @@ namespace god
 		EW_EntityEditor ( EnttXSol& enttxsol );
 		void Update ( float dt , EDITOR_RESOURCES& editorResources ) override;
 
+		bool m_select_inspector_tab { false };
+
 	private:
 		std::string m_selected_script { "" };
 		std::string m_selected_system { "" };
 
 		EnttXSol& m_enttxsol;
+
+		void Inspector ( EDITOR_RESOURCES& editorResources );
+
+		std::string m_new_script_name { "new_script" };
+		std::string m_script_to_delete { "" };
+		std::string m_script_to_delete_temp { "" };
+		std::vector<std::string> m_scripts;
+		int m_selected_script_id { -1 };
+		void Scripts ( EDITOR_RESOURCES& editorResources );
+		void LoadScripts ();
 	};
 }
 
@@ -30,15 +47,47 @@ namespace god
 		:
 		m_enttxsol { enttxsol }
 	{
+		LoadScripts ();
 	}
 
 	template<typename EDITOR_RESOURCES>
 	inline void EW_EntityEditor<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& editorResources )
 	{
 		( dt );
-		auto scene_tree = this->Get<EW_SceneTree> ();
 
-		ImGui::Begin ("Entity Editor");
+		ImGui::Begin ( "Entity Editor" );
+
+		if ( ImGui::BeginTabBar ( "EntityEditorTab" ) )
+		{
+			ImGuiTabItemFlags flag { 0 };
+			if ( m_select_inspector_tab )
+			{
+				flag |= ImGuiTabItemFlags_SetSelected;
+				m_select_inspector_tab = false;
+			}
+
+			if ( ImGui::BeginTabItem ( "Inspector" , 0 , flag ) )
+			{
+				Inspector ( editorResources );
+				ImGui::EndTabItem ();
+			}
+
+			if ( ImGui::BeginTabItem ( "Scripts" ) )
+			{
+				Scripts ( editorResources );
+				ImGui::EndTabItem ();
+			}
+
+			ImGui::EndTabBar ();
+		}
+
+		ImGui::End ();
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EW_EntityEditor<EDITOR_RESOURCES>::Inspector ( EDITOR_RESOURCES& editorResources )
+	{
+		auto scene_tree = this->Get<EW_SceneTree> ();
 
 		// imgui popup to handle on attach script button click
 		if ( ImGui::BeginPopup ( "Attach Script" ) )
@@ -60,7 +109,7 @@ namespace god
 				{
 					if ( !m_selected_script.empty () )
 					{
-						m_enttxsol.AttachScript< EngineComponents > ( scene_tree->GetSelectedEntity() , m_selected_script );
+						m_enttxsol.AttachScript< EngineComponents > ( scene_tree->GetSelectedEntity () , m_selected_script );
 					}
 					m_selected_script.clear ();
 					ImGui::CloseCurrentPopup ();
@@ -116,6 +165,9 @@ namespace god
 
 		if ( scene_tree->GetSelectedEntity () != EnttXSol::Entities::Null )
 		{
+			// entity id
+			ImGui::Text ( "Entity ID [%d]" , scene_tree->GetSelectedEntity () );
+
 			// display all engine components
 			int uid { 0 };
 			m_enttxsol.SerializeEngineComponents< EngineComponents , EDITOR_RESOURCES > ( scene_tree->GetSelectedEntity () , uid , editorResources );
@@ -171,7 +223,90 @@ namespace god
 				ImGui::OpenPopup ( "Attach Engine Component" );
 			}
 		}
+	}
 
-		ImGui::End ();
+	template<typename EDITOR_RESOURCES>
+	inline void EW_EntityEditor<EDITOR_RESOURCES>::Scripts ( EDITOR_RESOURCES& editorResources )
+	{
+		auto scene_tree = this->Get<EW_SceneTree> ();
+
+		// display all scripts
+		if ( ImGui::Button ( "Refresh List" , ImVec2 ( ImGui::GetWindowWidth () , 0 ) ) )
+		{
+			LoadScripts ();
+		}
+		ImGui::SetNextItemWidth ( ImGui::GetWindowWidth () );
+
+		if ( ImGui::BeginPopup ( "DeleteScript" ) )
+		{
+			ImGui::Text ( "This is a DESTRUCTIVE action. Confirm?" );
+			if ( ImGui::Button ( "Confirm Delete" ) )
+			{
+				m_enttxsol.DeleteScript ( m_script_to_delete_temp );
+				scene_tree->ResetScene ( editorResources );
+				ImGui::CloseCurrentPopup ();
+			}
+			ImGui::EndPopup ();
+		}
+		if ( !m_script_to_delete.empty () )
+		{
+			m_script_to_delete_temp = m_script_to_delete;
+			m_script_to_delete.clear ();
+			ImGui::OpenPopup ( "DeleteScript" );
+		}
+
+		if ( ImGui::BeginListBox ( "##scripts" , ImVec2 ( ImGui::GetWindowWidth () , 0 ) ) )
+		{
+			int i { 0 };
+			for ( auto const& script : m_scripts )
+			{
+				auto last_dash = script.find_last_of ( '/' );
+				auto last_dot = script.find_last_of ( '.' );
+				std::string name = script.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
+				if ( ImGui::Selectable ( name.c_str () , m_selected_script_id == i ) )
+				{
+					m_selected_script_id = i;
+				}
+				if ( ImGui::BeginPopupContextItem () )
+				{
+					m_selected_script_id = i;
+					if ( ImGui::Selectable ( "Reload" ) )
+					{
+						m_enttxsol.ReloadScript ( script );
+						scene_tree->ResetScene ( editorResources );
+					}
+					if ( ImGui::Selectable ( "Delete" ) )
+					{
+						m_script_to_delete = script;
+					}
+					ImGui::EndPopup ();
+				}
+				++i;
+			}
+			ImGui::EndListBox ();
+		}
+
+		if ( ImGui::BeginPopup ( "NewScriptFile" ) )
+		{
+			ImGui::InputText ( "##newscriptname" , &m_new_script_name );
+			if ( ImGui::Button ( "Create With Name" ) )
+			{
+				m_enttxsol.NewScriptTemplate ( m_new_script_name );
+				m_enttxsol.LoadScript ( std::string ( "Assets/GameAssets/Scripts/" ) + m_new_script_name + ".lua" );
+				m_new_script_name = { "new_script" };
+				ImGui::CloseCurrentPopup ();
+			}
+			ImGui::EndPopup ();
+		}
+		if ( ImGui::Button ( "New Script" , ImVec2 ( ImGui::GetWindowWidth () , 0 ) ) )
+		{
+			ImGui::OpenPopup ( "NewScriptFile" );
+		}
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EW_EntityEditor<EDITOR_RESOURCES>::LoadScripts ()
+	{
+		m_scripts = FolderHelper::GetFiles ( "Assets/GameAssets/Scripts/" );
 	}
 }
