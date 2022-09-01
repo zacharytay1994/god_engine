@@ -32,6 +32,8 @@
 #include <godUtility/TemplateManipulation.h>
 #include <godUtility/FileIO.h>
 
+#include <Jolt/Jolt.h>
+
 #include <tuple>
 
 namespace god
