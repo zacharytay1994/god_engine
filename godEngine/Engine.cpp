@@ -13,7 +13,7 @@
 #include "EnttXSol/EngineSystems/ES_All.h"
 #include "EnttXSol/EnttXSol.h"
 
-#include "PhysX/godPhysics.h"
+#include "Physics/godPhysics.h"
 
 #include "Editor/Editor.h"
 #include "Editor/EngineResources.h"
