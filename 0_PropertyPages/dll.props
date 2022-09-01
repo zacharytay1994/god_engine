@@ -3,14 +3,14 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>$(SolutionDir);$(SolutionDir)0_ExternalDependencies;$(SolutionDir)0_InternalDependencies\Includes;$(SolutionDir)0_ExternalDependencies\PhysX\physx\include;$(SolutionDir)0_ExternalDependencies\PhysX\physx\bin;$(SolutionDir)0_ExternalDependencies\PhysX\pxshared\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)0_InternalDependencies\Libraries;$(SolutionDir)0_ExternalDependencies\Libraries;$(SolutionDir)0_ExternalDependencies\PhysX\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)0_ExternalDependencies;$(SolutionDir)0_InternalDependencies\Includes;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)0_InternalDependencies\Libraries;$(SolutionDir)0_ExternalDependencies\Libraries;$(SolutionDir)0_InternalDependencies\PhysX\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(SolutionDir)0_ExternalDependencies\PhysX\pxshared\include\;$(SolutionDir)0_ExternalDependencies\PhysX\physx\bin\;$(SolutionDir)0_ExternalDependencies\PhysX\physx\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include\;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin\;$(SolutionDir)0_InternalDependencies\PhysX\physx\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
