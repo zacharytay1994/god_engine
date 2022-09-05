@@ -46,4 +46,10 @@ rem copy lua dlls
 robocopy "%InternalDependencies%/lua" "%TargetDirDebug%" "lua.dll"
 robocopy "%InternalDependencies%/lua" "%TargetDirRelease%" "lua.dll"
 
+rem copy physX dlls
+robocopy "%InternalDependencies%/PhysX" "%TargetDirDebug%" "PhysX_64.dll"
+robocopy "%InternalDependencies%/PhysX" "%TargetDirRelease%" "PhysXCommon_64.dll"
+robocopy "%InternalDependencies%/PhysX" "%TargetDirDebug%" "PhysXCooking_64.dll"
+robocopy "%InternalDependencies%/PhysX" "%TargetDirRelease%" "PhysXFoundation_64.dll"
+
 pause
