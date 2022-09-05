@@ -23,6 +23,10 @@ rem Rapidjson
 rmdir /s /q "%ExternalDependencies%/RapidJSON/"
 git clone "https://github.com/Tencent/rapidjson.git" "%ExternalDependencies%/RapidJSON/"
 
+rem PhysiX
+rmdir /s /q "%ExternalDependencies%/RapidJSON/"
+git clone "https://github.com/Tencent/rapidjson.git" "%ExternalDependencies%/RapidJSON/"
+
 rem assimp for model loading, build and copy libraries to libraries directory
 rmdir /s /q "%ExternalDependencies%/assimp"
 git clone https://github.com/assimp/assimp.git "%ExternalDependencies%/assimp/"
