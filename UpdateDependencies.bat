@@ -23,10 +23,6 @@ rem Rapidjson
 rmdir /s /q "%ExternalDependencies%/RapidJSON/"
 git clone "https://github.com/Tencent/rapidjson.git" "%ExternalDependencies%/RapidJSON/"
 
-rem PhysX
-rmdir /s /q "%ExternalDependencies%/PhysX/"
-git clone "https://github.com/NVIDIAGameWorks/PhysX.git" "%ExternalDependencies%/PhysX/"
-
 rem assimp for model loading, build and copy libraries to libraries directory
 rmdir /s /q "%ExternalDependencies%/assimp"
 git clone https://github.com/assimp/assimp.git "%ExternalDependencies%/assimp/"
