@@ -155,6 +155,13 @@ namespace god
 				}
 				this->ToolTipOnHover ( "Adds a new object to the scene." );
 
+				if ( ImGui::Button ( "Add Prefab" , { ImGui::GetWindowWidth () , 0.0f } ) )
+				{
+					OpenPrefabPopup ();
+					m_selected_prefab_parent_temp = EnttXSol::Entities::Null;
+				}
+				this->ToolTipOnHover ( "Adds a prefab to the scene." );
+
 				// adding object
 				if ( m_selected_parent != EnttXSol::Entities::Null )
 				{
@@ -212,13 +219,14 @@ namespace god
 				this->ToolTipOnHover ( "Clears the current scene, providing a fresh canvas." );
 
 				// display all scenes as selectable
-				uint32_t i { 0 };
+				int i { 0 };
 				for ( auto const& scene : m_scene_list )
 				{
 					auto last_dash = scene.find_last_of ( '/' );
 					auto last_dot = scene.find_last_of ( '.' );
 					std::string name = scene.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
 					ImGui::Selectable ( name.c_str () , m_selected_scene == i );
+					this->ToolTipOnHover ( "Right Click for Options." );
 					if ( ImGui::BeginPopupContextItem () )
 					{
 						m_selected_scene = i;
@@ -428,7 +436,7 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EW_SceneTree<EDITOR_RESOURCES>::ResetScene ( EDITOR_RESOURCES& engineResources )
 	{
-		if ( m_selected_scene < static_cast< uint32_t >( m_scene_list.size () ) )
+		if ( m_selected_scene < static_cast< int >( m_scene_list.size () ) )
 		{
 			Reset ();
 			m_enttxsol.ClearEntt ();

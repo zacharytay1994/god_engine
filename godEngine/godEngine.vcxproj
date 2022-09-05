@@ -110,6 +110,7 @@
     <ClInclude Include="Editor\Window\EW_Performance.h" />
     <ClInclude Include="Editor\Window\EW_SceneTree.h" />
     <ClInclude Include="Editor\Window\EW_SceneView.h" />
+    <ClInclude Include="Editor\Window\EW_TilemapEditor.h" />
     <ClInclude Include="Editor\Window\PathConfig.h" />
     <ClInclude Include="Editor\Window\TestWindow.h" />
     <ClInclude Include="Editor\Window\TestWindow2.h" />

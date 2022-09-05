@@ -841,6 +841,17 @@ namespace god
 		return Entities::Null;
 	}
 
+	void EnttXSol::AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent , glm::vec3 const& position )
+	{
+		auto entity = LoadPrefabV2 ( engineResources , fileName , parent );
+		Transform* transform = m_registry.try_get<Transform> ( m_entities[ entity ].m_id );
+		if ( transform )
+		{
+			// assign position
+			transform->m_position = position;
+		}
+	}
+
 	void EnttXSol::LoadSystem ( std::string const& name )
 	{
 		m_sol_functions.insert ( { name, m_lua[ name ] } );

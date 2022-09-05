@@ -267,6 +267,7 @@ namespace god
 				{
 					m_selected_script_id = i;
 				}
+				this->ToolTipOnHover ( "Right Click for Options." );
 				if ( ImGui::BeginPopupContextItem () )
 				{
 					m_selected_script_id = i;
@@ -275,10 +276,12 @@ namespace god
 						m_enttxsol.ReloadScript ( script );
 						scene_tree->ResetScene ( editorResources );
 					}
+					this->ToolTipOnHover ( "Reloads the Script for Runtime Changes." );
 					if ( ImGui::Selectable ( "Delete" ) )
 					{
 						m_script_to_delete = script;
 					}
+					this->ToolTipOnHover ( "Deletes the Script from the Engine." );
 					ImGui::EndPopup ();
 				}
 				++i;

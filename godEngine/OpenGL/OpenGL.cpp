@@ -15,6 +15,8 @@
 
 namespace god
 {
+	OpenGL::Lines OpenGL::m_lines {};
+
 	OpenGL::OpenGL ( HWND windowHandle , int width , int height )
 		:
 		m_window_device_context { GetDC ( windowHandle ) }
@@ -42,6 +44,39 @@ namespace god
 		// opengl settings
 		glEnable ( GL_CULL_FACE );
 		glEnable ( GL_DEPTH_TEST );
+		SetLineWidth ( m_default_line_size );
+
+		// temp line rendering code
+		// line shader
+		constexpr int MAX_POINTS { 1000 };
+		char const line_vs[] = {
+			"#version 430 core\n"
+			"layout ( location = 0 ) in vec3 aPos;\n"
+			"layout ( location = 4 ) in vec4 aColour;\n"
+			"out vec4 vColour;\n"
+			"uniform mat4 uProjection;\n"
+			"uniform mat4 uView;\n"
+			"void main ()\n"
+			"{\n"
+			"gl_Position = uProjection * uView * vec4(aPos, 1.0);\n"
+			"vColour = aColour;\n"
+			"}\n"
+		};
+
+		char const line_fs[] = {
+			"#version 430 core\n"
+			"in vec4 vColour;\n"
+			"out vec4 fFragColor;\n"
+			"void main ()\n"
+			"{\n"
+			"fFragColor = vColour;\n"
+			"}\n"
+		};
+
+		m_line_shader.InitializeFromCode ( line_vs , line_fs );
+		m_lines_mesh.m_vertices.resize ( MAX_POINTS );
+		m_lines_mesh.m_indices.resize ( MAX_POINTS );
+		m_lines_mesh.Initialize ();
 
 		std::cout << "OpenGL constructed." << std::endl;
 	}
@@ -137,6 +172,51 @@ namespace god
 	{
 		glViewport ( 0 , 0 , width , height );
 		std::cout << "OpenGL viewport resized x:" << width << " y: " << height << std::endl;
+	}
+
+	void OpenGL::DrawLine ( glm::vec3 const& a , glm::vec3 const& b , glm::vec4 const& c , float size )
+	{
+		m_lines[ size ].push_back ( { a, b, c, size } );
+	}
+
+	void OpenGL::RenderLines ( glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position )
+	{
+		m_line_shader.Use ();
+
+		m_line_shader.SetUniform ( m_line_shader.GetShaderID () , "uProjection" , projection );
+		m_line_shader.SetUniform ( m_line_shader.GetShaderID () , "uView" , view );
+
+		for ( auto const& line_group : m_lines )
+		{
+			m_lines_mesh.m_indices.clear ();
+			m_lines_mesh.m_vertices.clear ();
+
+			for ( auto const& line : line_group.second )
+			{
+				OGLMesh::OGLVertex start , end;
+				start.m_position = std::get<0> ( line );
+				end.m_position = std::get<1> ( line );
+				start.m_colour = std::get<2> ( line );
+				end.m_colour = std::get<2> ( line );
+
+				m_lines_mesh.m_indices.push_back ( static_cast< Index3D >( m_lines_mesh.m_vertices.size () ) );
+				m_lines_mesh.m_vertices.push_back ( start );
+				m_lines_mesh.m_indices.push_back ( static_cast< Index3D >( m_lines_mesh.m_vertices.size () ) );
+				m_lines_mesh.m_vertices.push_back ( end );
+			}
+
+			m_lines_mesh.SetData ();
+			SetLineWidth ( line_group.first );
+			m_lines_mesh.Draw ( GL_LINES );
+		}
+
+		OGLShader::UnUse ();
+		m_lines.clear ();
+	}
+
+	void OpenGL::SetLineWidth ( float size )
+	{
+		glLineWidth ( size );
 	}
 
 	OGLMesh OpenGL::BuildOGLMeshFromAssimpMesh ( Mesh3D const& mesh3d ) const
