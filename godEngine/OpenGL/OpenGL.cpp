@@ -39,9 +39,21 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/texturemaps.fs"
 		);
 
+		m_single_colour_outline_shader.InitializeFromFile(
+			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.vs",
+			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.fs"
+		);
+
+
 		// opengl settings
 		glEnable ( GL_CULL_FACE );
-		glEnable ( GL_DEPTH_TEST );
+		// Enables the Depth Buffer
+		glEnable( GL_DEPTH_TEST );
+		// Enables the Stencil Buffer
+		glEnable( GL_STENCIL_TEST );
+		// Sets rules for outcomes of stecil tests
+		glStencilOp( GL_KEEP, GL_KEEP, GL_REPLACE );
+
 
 		std::cout << "OpenGL constructed." << std::endl;
 	}
@@ -54,7 +66,7 @@ namespace god
 	void OpenGL::ClearColour () const
 	{
 		glClearColor ( 0.2f , 0.2f , 0.2f , 1.0f );
-		glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+		glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 	}
 
 	void OpenGL::BuildOGLModels ( Asset3DManager const& asset3DManager )
@@ -84,20 +96,28 @@ namespace god
 	void OpenGL::RenderScene ( Scene const& scene ,
 		glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures )
 	{
-		// use the shader
+		ClearColour();
+		//use the shader
 		//m_flat_shader.Use ();
-		m_textured_shader.Use ();
-
-		// projection matrix
-		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uProjection" , projection );
-
-		// view matrix
-		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , view );
 
 		for ( auto const& data : scene.m_render_data )
 		{
 			if ( data.Active () )
 			{
+				// Make it so the stencil test always passes
+				glStencilFunc( GL_ALWAYS, 1, 0xFF );
+				// Enable modifying of the stencil buffer
+				glStencilMask( 0xFF );
+
+				// Draw the normal model
+				m_textured_shader.Use ();
+
+				// projection matrix
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uProjection" , projection );
+
+				// view matrix
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , view );
+
 				// set uniforms for vertex shader
 				// set model transform
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uModel" , data.m_model_transform );
@@ -126,6 +146,31 @@ namespace god
 				{
 					mesh.Draw ( GL_TRIANGLES );
 				}
+
+				// Make it so only the pixels without the value 1 pass the test
+				glStencilFunc( GL_NOTEQUAL, 1, 0xFF );
+				// Disable modifying of the stencil buffer
+				glStencilMask( 0x00 );
+				// Disable the depth buffer
+				glDisable( GL_DEPTH_TEST );
+
+				m_single_colour_outline_shader.Use();
+				OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uProjection", projection );
+				OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uView", view );
+				OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uModel", data.m_model_transform );
+				OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uOutlining", 0.01f );
+
+				for ( auto const& mesh : m_models[data.m_model_id] )
+				{
+					mesh.Draw( GL_TRIANGLES );
+				}
+
+				// Enable modifying of the stencil buffer
+				glStencilMask( 0xFF );
+				// Clear stencil buffer
+				glStencilFunc( GL_ALWAYS, 0, 0xFF );
+				// Enable the depth buffer
+				glEnable( GL_DEPTH_TEST );
 			}
 		}
 
