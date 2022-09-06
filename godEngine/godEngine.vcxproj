@@ -142,6 +142,7 @@
     <ClInclude Include="OpenGL\Internal\OGLShader.h" />
     <ClInclude Include="OpenGL\OpenGL.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Physics\godPhysics.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
     <ClInclude Include="Window\DeltaTimer.h" />
     <ClInclude Include="Window\SystemTimer.h" />
