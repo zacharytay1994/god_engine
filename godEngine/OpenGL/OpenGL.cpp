@@ -150,6 +150,8 @@ namespace god
 
 				// set light
 				OGLLight light;
+				light.m_position = { 0.0f, 100.0f, 0.0f };
+				light.m_ambient = { 0.8f, 0.8f, 0.8f };
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.position" , light.m_position );
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.colour" , light.m_colour );
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.ambient" , light.m_ambient );

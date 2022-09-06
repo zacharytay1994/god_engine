@@ -48,6 +48,7 @@ namespace god
 }
 
 #include "EW_EntityEditor.h"
+#include "EW_TilemapEditor.h"
 
 namespace god
 {
@@ -211,6 +212,7 @@ namespace god
 			{
 				if ( ImGui::Button ( "New Scene" , { ImGui::GetWindowWidth () , 0.0f } ) )
 				{
+					this->Get<EW_TilemapEditor> ()->ClearPreview ();
 					Reset ();
 					m_enttxsol.ClearEntt ();
 					m_selected_scene = -1;
@@ -232,6 +234,7 @@ namespace god
 						m_selected_scene = i;
 						if ( ImGui::Selectable ( "Load" ) )
 						{
+							this->Get<EW_TilemapEditor> ()->ClearPreview ();
 							Reset ();
 							m_enttxsol.ClearEntt ();
 							m_enttxsol.DeserializeStateV2 ( engineResources , name );
@@ -274,6 +277,10 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EW_SceneTree<EDITOR_RESOURCES>::RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , EnttXSol::Entities::ID entity )
 	{
+		if ( !m_enttxsol.m_entities[ entity ].m_persist_in_scene )
+		{
+			return;
+		}
 		ImGui::PushID ( m_uid++ );
 		bool is_prefab = m_enttxsol.m_entities[ entity ].m_type == Entity_::Type::Prefab;
 		ImGuiTreeNodeFlags tree_node_flags { 0 };
@@ -307,9 +314,17 @@ namespace god
 			tree_node_flags |= ImGuiTreeNodeFlags_Selected;
 		}
 		bool open = ImGui::TreeNodeEx ( node_name.c_str () , tree_node_flags );
+		this->ToolTipOnHover ( "Left-Click: Select/Unselect.\nRight-Click: Options." );
 		if ( ImGui::IsItemClicked () )
 		{
-			m_selected_entity = entity;
+			if ( m_selected_entity == entity )
+			{
+				m_selected_entity = EnttXSol::Entities::Null;
+			}
+			else
+			{
+				m_selected_entity = entity;
+			}
 
 			this->Get<EW_EntityEditor> ()->m_select_inspector_tab = true;
 
@@ -438,6 +453,7 @@ namespace god
 	{
 		if ( m_selected_scene < static_cast< int >( m_scene_list.size () ) )
 		{
+			this->Get<EW_TilemapEditor> ()->ClearPreview ();
 			Reset ();
 			m_enttxsol.ClearEntt ();
 			if ( m_selected_scene < m_scene_list.size () && m_selected_scene >= 0 )

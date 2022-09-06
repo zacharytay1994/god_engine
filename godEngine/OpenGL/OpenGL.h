@@ -48,7 +48,6 @@ namespace god
 		void RenderLines ( glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position );
 		void SetLineWidth ( float size );
 
-
 	private:
 		int m_pixel_format { 0 };
 		HDC m_window_device_context { nullptr };

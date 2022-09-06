@@ -395,7 +395,7 @@ namespace god
 		// serialize only root nodes
 		for ( uint32_t entity = 0; entity < m_entities.Size (); ++entity )
 		{
-			if ( m_entities.Valid ( entity ) && m_entities[ entity ].m_parent_id == Entities::Null )
+			if ( m_entities.Valid ( entity ) && m_entities[ entity ].m_parent_id == Entities::Null && m_entities[ entity ].m_persist_in_scene )
 			{
 				rapidjson::Value value { rapidjson::kObjectType };
 				SerializeStateV2Recurse ( engineResources , entity , document , value );
@@ -694,10 +694,13 @@ namespace god
 				rapidjson::Value children_value { rapidjson::kObjectType };
 				for ( auto const& child : m_entities[ entity ].m_children )
 				{
-					rapidjson::Value child_value { rapidjson::kObjectType };
-					SavePrefabV2Recurse ( engineResources , child , document , child_value );
+					if ( m_entities.Valid ( child ) && m_entities[ child ].m_persist_in_scene )
+					{
+						rapidjson::Value child_value { rapidjson::kObjectType };
+						SavePrefabV2Recurse ( engineResources , child , document , child_value );
 
-					RapidJSON::JSONifyToValue ( children_value , document , m_entities[ child ].m_name , child_value );
+						RapidJSON::JSONifyToValue ( children_value , document , m_entities[ child ].m_name , child_value );
+					}
 				}
 				RapidJSON::JSONifyToValue ( value , document , "Children" , children_value );
 			}
@@ -717,12 +720,14 @@ namespace god
 		}
 	}
 
-	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent )
+	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent , bool persist )
 	{
 		rapidjson::Document document;
 		ReadJSON ( document , std::string ( "Assets/GameAssets/Prefabs/" ) + fileName + ".json" );
 
-		return LoadPrefabV2Recurse ( engineResources , document.MemberBegin ()->value , document.MemberBegin ()->name.GetString () , parent , true );
+		auto id = LoadPrefabV2Recurse ( engineResources , document.MemberBegin ()->value , document.MemberBegin ()->name.GetString () , parent , true );
+		m_entities[ id ].m_persist_in_scene = persist;
+		return id;
 	}
 
 	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root )
@@ -841,8 +846,13 @@ namespace god
 		return Entities::Null;
 	}
 
-	void EnttXSol::AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent , glm::vec3 const& position )
+	EnttXSol::Entities::ID EnttXSol::AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent , glm::vec3 const& position )
 	{
+		// if not null and no valid parent
+		if ( parent != Entities::Null && !m_entities.Valid ( parent ) )
+		{
+			return Entities::Null;
+		}
 		auto entity = LoadPrefabV2 ( engineResources , fileName , parent );
 		Transform* transform = m_registry.try_get<Transform> ( m_entities[ entity ].m_id );
 		if ( transform )
@@ -850,6 +860,7 @@ namespace god
 			// assign position
 			transform->m_position = position;
 		}
+		return entity;
 	}
 
 	void EnttXSol::LoadSystem ( std::string const& name )

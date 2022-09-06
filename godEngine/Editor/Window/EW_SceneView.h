@@ -41,6 +41,7 @@ namespace god
 }
 
 #include "EW_SceneTree.h"
+#include "EW_TilemapEditor.h"
 
 namespace god
 {
@@ -174,6 +175,10 @@ namespace god
 
 		ImGui::SameLine ();
 		ImGui::Text ( "FPS: %d" , DeltaTimer::m_fps );
+
+		ImGui::SameLine ();
+		auto tilemap_editor = this->Get<EW_TilemapEditor> ();
+		ImGui::Text ( "Parent: %d, CellX: %d, CellZ: %d" , tilemap_editor->m_parent , tilemap_editor->m_cell_x , tilemap_editor->m_cell_z );
 
 
 		ImGui::End ();
