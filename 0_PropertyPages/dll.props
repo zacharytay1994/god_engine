@@ -4,7 +4,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <IncludePath>$(SolutionDir);$(SolutionDir)0_ExternalDependencies;$(SolutionDir)0_InternalDependencies\Includes;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)0_InternalDependencies\Libraries;$(SolutionDir)0_ExternalDependencies\Libraries;$(SolutionDir)0_InternalDependencies\PhysX\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)0_InternalDependencies\Libraries;$(SolutionDir)0_ExternalDependencies\Libraries;$(SolutionDir)0_InternalDependencies\PhysX\lib\physxdebug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -12,6 +12,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include\;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin\;$(SolutionDir)0_InternalDependencies\PhysX\physx\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>PhysXTask_static_64.lib;SceneQuery_static_64.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;PhysXFoundation_64.lib;LowLevelDynamics_static_64.lib;SimulationController_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysX_64.lib;PhysXExtensions_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
