@@ -196,6 +196,13 @@ namespace god
 				std::string name = prefab.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
 				if ( ImGui::Selectable ( name.c_str () ) )
 				{
+					// remove old preview if any
+					if ( m_preview_id != EnttXSol::Entities::Null && m_enttxsol.m_entities.Valid ( m_preview_id ) )
+					{
+						m_enttxsol.RemoveEntity ( m_preview_id );
+						m_preview_id = EnttXSol::Entities::Null;
+					}
+
 					m_selected_prefab = name;
 
 					// if there is a selected prefab brush load the selected prefab as a preview

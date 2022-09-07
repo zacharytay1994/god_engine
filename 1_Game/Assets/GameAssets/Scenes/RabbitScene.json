@@ -1,16 +1,1 @@
-{
-    "RabbitTile": {
-        "Type": "Prefab",
-        "Transform": {
-            "position_x": 3.0,
-            "position_y": 0.0,
-            "position_z": -3.0,
-            "rotation_x": 0.0,
-            "rotation_y": -0.0,
-            "rotation_z": 0.0,
-            "scale_x": 1.0,
-            "scale_y": 1.0,
-            "scale_z": 1.0
-        }
-    }
-}
+{"RabbitTile":{"Type":"Prefab","Transform":{"position_x":3.0,"position_y":0.0,"position_z":3.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0}},"RabbitTile":{"Type":"Prefab","Transform":{"position_x":-3.0,"position_y":0.0,"position_z":3.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0}},"RabbitTile":{"Type":"Prefab","Transform":{"position_x":-5.0,"position_y":0.0,"position_z":5.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0}},"RabbitTile":{"Type":"Prefab","Transform":{"position_x":-7.0,"position_y":0.0,"position_z":-5.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0}},"RabbitTile":{"Type":"Prefab","Transform":{"position_x":-3.0,"position_y":-4.400000095367432,"position_z":5.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.15000003576278687,"scale_y":0.15000003576278687,"scale_z":0.15000003576278687}}}
