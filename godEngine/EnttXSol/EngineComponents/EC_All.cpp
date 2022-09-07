@@ -5,8 +5,9 @@ namespace god
 {
 	std::array<std::string , std::tuple_size_v<EngineComponents::Components>> EngineComponents::m_component_names
 	{
-		"ExampleComponent",
+		"Entity Data",
 		"Transform",
-		"Renderable3D"
+		"Renderable3D",
+		"GridCell"
 	};
 }
