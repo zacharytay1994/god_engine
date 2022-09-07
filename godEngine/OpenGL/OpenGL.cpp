@@ -181,7 +181,7 @@ namespace god
 		m_lines[ size ].push_back ( { a, b, c, size } );
 	}
 
-	void OpenGL::RenderLines ( glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position )
+	void OpenGL::RenderLines ( glm::mat4 const& projection , glm::mat4 const& view )
 	{
 		m_line_shader.Use ();
 

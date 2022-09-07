@@ -52,11 +52,10 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EW_TilemapEditor<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& engineResources )
 	{
+		( dt );
 		float m_true_cell_size { m_cell_size * 2 };
 
 		float tilemap_dimension { m_tilemap_dimensions * m_true_cell_size };
-
-		OpenGL& opengl = engineResources.Get<OpenGL> ();
 
 		// origin
 		float ox { 0.0f } , oy { 0.0f } , oz { 0.0f } , osx { 1.0f } , osy { 1.0f } , osz { 1.0f };
@@ -97,11 +96,10 @@ namespace god
 			camera.GetCameraViewMatrix () );
 		glm::vec3 a = camera.m_position , b = camera.m_position + ray_dir * 1000.0f;
 		glm::vec3 intersect;
-		bool changed { false };
 		if ( IntersectLineSegmentPlane ( a , b , { 0,1,0 } , child_y , intersect ) )
 		{
-			m_cell_x = std::floor ( ( intersect.x - ox ) / ( m_true_cell_size * osx ) );
-			m_cell_z = std::floor ( ( intersect.z - oz ) / ( m_true_cell_size * osz ) );
+			m_cell_x = static_cast< int >( std::floor ( ( intersect.x - ox ) / ( m_true_cell_size * osx ) ) );
+			m_cell_z = static_cast< int >( std::floor ( ( intersect.z - oz ) / ( m_true_cell_size * osz ) ) );
 		}
 
 		// draw grid at mouse position
@@ -154,7 +152,7 @@ namespace god
 
 		ImGui::DragFloat ( "Y" , &m_y_level , 0.1f );
 		ImGui::DragInt ( "Dimension" , &m_tilemap_dimensions , 1 , 1 , 100 , "%.3f" , 0 );
-		ImGui::DragFloat ( "Cell Size" , &m_cell_size , 0.1f , 0.1 , 100 , "%.3f" , 0 );
+		ImGui::DragFloat ( "Cell Size" , &m_cell_size , 0.1f , 0.1f , 100 , "%.3f" , 0 );
 
 		auto old_parent { m_parent };
 		m_parent = this->Get<EW_SceneTree> ()->GetSelectedEntity ();

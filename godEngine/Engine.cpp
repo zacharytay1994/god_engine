@@ -137,8 +137,8 @@ namespace god
 			);
 			opengl.RenderLines (
 				camera.GetPerpectiveProjectionMatrix () ,
-				camera.GetCameraViewMatrix () ,
-				camera.m_position );
+				camera.GetCameraViewMatrix ()
+			);
 			first_renderpass.UnBind ();
 			SystemTimer::EndTimeSegment ( "Rendering" );
 

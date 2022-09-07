@@ -100,7 +100,6 @@ namespace god
 					ImGuizmo::SetRect ( viewport_pos.x , viewport_pos.y , viewport_size.x , viewport_size.y );
 
 					// camera
-					Camera& camera = engineResources.Get<Camera> ().get ();
 					glm::mat4 view = camera.GetCameraViewMatrix ();
 					glm::mat4 projection = camera.GetPerpectiveProjectionMatrix ();
 
