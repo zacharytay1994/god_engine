@@ -22,7 +22,7 @@ namespace god
 	struct ComponentInspector
 	{
 		template<typename T>
-		void operator()( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources ) 
+		void operator()( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
 		{
 			( entity );
 			( registry );
@@ -33,7 +33,7 @@ namespace god
 
 	// for serializing an engine component to json
 	template <typename T>
-	void JSONify ( EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& value , T& component ) 
+	void JSONify ( EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& value , T& component )
 	{
 		( engineResources );
 		( document );
@@ -62,6 +62,12 @@ namespace god
 		val = jsonObj[ name.c_str () ].GetUint ();
 	}
 
+	template<>
+	inline void Assign<std::string> ( std::string& val , rapidjson::Value& jsonObj , std::string const& name )
+	{
+		val = jsonObj[ name.c_str () ].GetString ();
+	}
+
 	template<typename T>
 	void AssignIfExist ( rapidjson::Value& jsonObj , T& val , std::string const& name )
 	{
@@ -72,7 +78,7 @@ namespace god
 	}
 
 	template <typename T>
-	void DeJSONify ( EngineResources& engineResources , T& component , rapidjson::Value& jsonObj ) 
+	void DeJSONify ( EngineResources& engineResources , T& component , rapidjson::Value& jsonObj )
 	{
 		( engineResources );
 		( component );

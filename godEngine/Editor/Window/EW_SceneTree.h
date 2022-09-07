@@ -31,10 +31,12 @@ namespace god
 		EnttXSol& m_enttxsol;
 
 		int m_uid { 0 };
-		uint32_t m_selected_scene { 0 };
+		int m_selected_scene { -1 };
 
 		std::vector<std::string> m_prefabs_list;
 		std::vector<std::string> m_scene_list;
+
+		bool m_select_hierarchy_tab { false };
 
 		void RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , EnttXSol::Entities::ID entity );
 
@@ -44,6 +46,9 @@ namespace god
 		void RefreshSceneList ();
 	};
 }
+
+#include "EW_EntityEditor.h"
+#include "EW_TilemapEditor.h"
 
 namespace god
 {
@@ -63,7 +68,13 @@ namespace god
 
 		if ( ImGui::BeginTabBar ( "Scene" ) )
 		{
-			if ( ImGui::BeginTabItem ( "Hierarchy" ) )
+			ImGuiTabItemFlags flag { 0 };
+			if ( m_select_hierarchy_tab )
+			{
+				flag |= ImGuiTabItemFlags_SetSelected;
+				m_select_hierarchy_tab = false;
+			}
+			if ( ImGui::BeginTabItem ( "Hierarchy" , 0 , flag ) )
 			{
 				// Creating entity without parent
 				if ( ImGui::BeginPopup ( "Create Entity" ) )
@@ -119,6 +130,19 @@ namespace god
 					}
 					ImGui::EndPopup ();
 				}
+				if ( m_selected_scene < m_scene_list.size () && m_selected_scene >= 0 )
+				{
+					std::string scene_path = m_scene_list[ m_selected_scene ];
+					auto last_dash = scene_path.find_last_of ( '/' );
+					auto last_dot = scene_path.find_last_of ( '.' );
+					std::string name = scene_path.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
+					ImGui::Text ( "[%s]" , name.c_str () );
+				}
+				else
+				{
+					ImGui::Text ( "[NONE]" );
+				}
+				ImGui::Separator ();
 				if ( ImGui::Button ( "Save Scene" , { ImGui::GetWindowWidth () , 0.0f } ) )
 				{
 					ImGui::OpenPopup ( "SerializeScene" );
@@ -131,6 +155,13 @@ namespace god
 					ImGui::OpenPopup ( "Create Entity" );
 				}
 				this->ToolTipOnHover ( "Adds a new object to the scene." );
+
+				if ( ImGui::Button ( "Add Prefab" , { ImGui::GetWindowWidth () , 0.0f } ) )
+				{
+					OpenPrefabPopup ();
+					m_selected_prefab_parent_temp = EnttXSol::Entities::Null;
+				}
+				this->ToolTipOnHover ( "Adds a prefab to the scene." );
 
 				// adding object
 				if ( m_selected_parent != EnttXSol::Entities::Null )
@@ -181,27 +212,33 @@ namespace god
 			{
 				if ( ImGui::Button ( "New Scene" , { ImGui::GetWindowWidth () , 0.0f } ) )
 				{
+					this->Get<EW_TilemapEditor> ()->ClearPreview ();
 					Reset ();
-					m_enttxsol.Clear ();
+					m_enttxsol.ClearEntt ();
+					m_selected_scene = -1;
+					m_select_hierarchy_tab = true;
 				}
 				this->ToolTipOnHover ( "Clears the current scene, providing a fresh canvas." );
 
 				// display all scenes as selectable
-				uint32_t i { 0 };
+				int i { 0 };
 				for ( auto const& scene : m_scene_list )
 				{
 					auto last_dash = scene.find_last_of ( '/' );
 					auto last_dot = scene.find_last_of ( '.' );
 					std::string name = scene.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
 					ImGui::Selectable ( name.c_str () , m_selected_scene == i );
+					this->ToolTipOnHover ( "Right Click for Options." );
 					if ( ImGui::BeginPopupContextItem () )
 					{
 						m_selected_scene = i;
 						if ( ImGui::Selectable ( "Load" ) )
 						{
+							this->Get<EW_TilemapEditor> ()->ClearPreview ();
 							Reset ();
-							m_enttxsol.Clear ();
+							m_enttxsol.ClearEntt ();
 							m_enttxsol.DeserializeStateV2 ( engineResources , name );
+							m_select_hierarchy_tab = true;
 						}
 						this->ToolTipOnHover ( "Loads the scene up as the current scene." );
 
@@ -240,6 +277,10 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EW_SceneTree<EDITOR_RESOURCES>::RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , EnttXSol::Entities::ID entity )
 	{
+		if ( !m_enttxsol.m_entities[ entity ].m_persist_in_scene )
+		{
+			return;
+		}
 		ImGui::PushID ( m_uid++ );
 		bool is_prefab = m_enttxsol.m_entities[ entity ].m_type == Entity_::Type::Prefab;
 		ImGuiTreeNodeFlags tree_node_flags { 0 };
@@ -273,9 +314,20 @@ namespace god
 			tree_node_flags |= ImGuiTreeNodeFlags_Selected;
 		}
 		bool open = ImGui::TreeNodeEx ( node_name.c_str () , tree_node_flags );
+		this->ToolTipOnHover ( "Left-Click: Select/Unselect.\nRight-Click: Options." );
 		if ( ImGui::IsItemClicked () )
 		{
-			m_selected_entity = entity;
+			if ( m_selected_entity == entity )
+			{
+				m_selected_entity = EnttXSol::Entities::Null;
+			}
+			else
+			{
+				m_selected_entity = entity;
+			}
+
+			this->Get<EW_EntityEditor> ()->m_select_inspector_tab = true;
+
 		}
 		if ( is_prefab )
 		{
@@ -399,15 +451,19 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline void EW_SceneTree<EDITOR_RESOURCES>::ResetScene ( EDITOR_RESOURCES& engineResources )
 	{
-		if ( m_selected_scene < static_cast< uint32_t >( m_scene_list.size () ) )
+		if ( m_selected_scene < static_cast< int >( m_scene_list.size () ) )
 		{
+			this->Get<EW_TilemapEditor> ()->ClearPreview ();
 			Reset ();
-			m_enttxsol.Clear ();
-			std::string scene_path = m_scene_list[ m_selected_scene ];
-			auto last_dash = scene_path.find_last_of ( '/' );
-			auto last_dot = scene_path.find_last_of ( '.' );
-			std::string name = scene_path.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
-			m_enttxsol.DeserializeStateV2 ( engineResources , name );
+			m_enttxsol.ClearEntt ();
+			if ( m_selected_scene < m_scene_list.size () && m_selected_scene >= 0 )
+			{
+				std::string scene_path = m_scene_list[ m_selected_scene ];
+				auto last_dash = scene_path.find_last_of ( '/' );
+				auto last_dot = scene_path.find_last_of ( '.' );
+				std::string name = scene_path.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
+				m_enttxsol.DeserializeStateV2 ( engineResources , name );
+			}
 		}
 	}
 }

@@ -15,6 +15,13 @@ namespace god
 		return buffer.str ();
 	}
 
+	void WriteStringToFile ( std::string const& file , std::string const& content )
+	{
+		std::ofstream output_file ( file );
+		output_file << content;
+		output_file.close ();
+	}
+
 	std::vector<char> ReadSPVToBuffer ( char const* spv )
 	{
 		std::ifstream file ( spv , std::ios::ate | std::ios::binary );
@@ -51,5 +58,10 @@ namespace god
 		WindowsDialog::MODE mode , const char* dir )
 	{
 		return DialogBoxToDirectoryMulti ( fileType , fileExt , mode , dir );
+	}
+
+	void DeleteFileAtPath ( std::string const& filePath )
+	{
+		std::filesystem::remove ( filePath );
 	}
 }

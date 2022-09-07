@@ -35,4 +35,24 @@ namespace god
 				ImGui::InputText ( "a string" , &component.s );
 			} );
 	}
+
+	template<>
+	inline void JSONify<ExampleComponent> ( EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& value , ExampleComponent& component )
+	{
+		( engineResources );
+		// serialize
+		RapidJSON::JSONifyToValue ( value , document , "i" , component.i );
+		RapidJSON::JSONifyToValue ( value , document , "f" , component.f );
+		RapidJSON::JSONifyToValue ( value , document , "s" , component.s );
+	}
+
+	template<>
+	inline void DeJSONify<ExampleComponent> ( EngineResources& engineResources , ExampleComponent& component , rapidjson::Value& jsonObj )
+	{
+		( engineResources );
+		// deserialize
+		AssignIfExist ( jsonObj , component.i , "i" );
+		AssignIfExist ( jsonObj , component.f , "f" );
+		AssignIfExist ( jsonObj , component.s , "s" );
+	}
 }

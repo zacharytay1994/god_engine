@@ -12,6 +12,6 @@ end
 --[IsSystem]
 function S_System2(e)
     -- c1 = GetComponent(e, "C_test1")
-    c1.x = c1.x + 2
-    GetPosition(e)
+    -- c1.x = c1.x - 2
+    -- GetPosition(e)
 end

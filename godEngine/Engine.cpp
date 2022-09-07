@@ -26,6 +26,7 @@
 #include "Editor/Window/EW_EntityEditor.h"
 #include "Editor/Window/EW_SceneView.h"
 #include "Editor/Window/EW_Performance.h"
+#include "Editor/Window/EW_TilemapEditor.h"
 #include "Editor/Editor.h"
 
 #include <godCamera/Camera.h>
@@ -33,6 +34,7 @@
 #include <godUtility/Scene.h>
 #include <godUtility/TemplateManipulation.h>
 #include <godUtility/FileIO.h>
+#include <godUtility/Math.h>
 
 #include <tuple>
 
@@ -65,10 +67,7 @@ namespace god
 		opengl.BuildOGLModels ( assets_3d );
 
 		// setup ecs and scripting
-		EnttXSol enttxsol { {
-				"Assets/GameAssets/Scripts/test.lua",
-				"Assets/GameAssets/Scripts/test2.lua",
-				"Assets/GameAssets/Scripts/ExampleScript.lua"} };
+		EnttXSol enttxsol;
 		enttxsol.BindEngineComponents< EngineComponents > ();
 		enttxsol.BindEngineSystemUpdate ( EngineSystems );
 		enttxsol.SetupBindings ();
@@ -96,14 +95,14 @@ namespace god
 		editor_windows.AddWindow<god::EW_Asset3DImporter> ( true );
 		editor_windows.AddWindow<god::EW_SceneTree> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_EntityEditor> ( true , std::ref ( enttxsol ) );
-		editor_windows.AddWindow<god::EW_SceneView> ( true , camera.m_aspect_ratio , std::ref ( enttxsol ) );
+		editor_windows.AddWindow<god::EW_SceneView> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_Performance> ( true );
+		editor_windows.AddWindow<god::EW_TilemapEditor> ( true , std::ref ( enttxsol ) );
 
 		while ( !window.WindowShouldClose () )
 		{
 			SystemTimer::StartTimeSegment ( "Overall" );
 			delta_timer.StartFrame ();
-
 
 			window.PollEvents ();
 
@@ -136,6 +135,10 @@ namespace god
 				camera.m_position ,
 				ogl_textures
 			);
+			opengl.RenderLines (
+				camera.GetPerpectiveProjectionMatrix () ,
+				camera.GetCameraViewMatrix ()
+			);
 			first_renderpass.UnBind ();
 			SystemTimer::EndTimeSegment ( "Rendering" );
 
@@ -162,14 +165,24 @@ namespace god
 				window.KeyDown ( GLFW_KEY_SPACE ) ,
 				window.KeyDown ( GLFW_KEY_LEFT_SHIFT ) ,
 				window.MouseRDown () ,
-				static_cast< float >( window.MouseX () ) ,
-				static_cast< float >( window.MouseY () ) ,
+				static_cast< float >( window.ScreenMouseX () ) ,
+				static_cast< float >( window.ScreenMouseY () ) ,
 				window.MouseRDown () ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () ,
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );
+
+			/*glm::vec3 dir = ViewportToWorldRay (
+				{ window.ViewportMouseX (), window.ViewportMouseY () } ,
+				window.GetWindowWidth () ,
+				window.GetWindowHeight () ,
+				camera.GetPerpectiveProjectionMatrix () ,
+				camera.GetCameraViewMatrix () );
+			glm::vec3 a = camera.m_position , b = camera.m_position + dir * 1000.0f;
+			glm::vec3 ints = IntersectLineSegmentPlane ( a , b , { 0,1,0 } , 0 );*/
+			//std::cout << ints.x << "," << ints.y << "," << ints.z << std::endl;
 
 			delta_timer.EndFrame ();
 			SystemTimer::EndTimeSegment ( "Overall" );

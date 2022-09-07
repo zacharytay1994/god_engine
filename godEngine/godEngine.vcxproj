@@ -42,7 +42,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\0_PropertyPages\dll.props" />
+    <Import Project="..\0_PropertyPages\dll_release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -62,14 +62,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)\0_InternalDependencies\fmod\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\0_InternalDependencies\lua;$(SolutionDir)\0_InternalDependencies\fmod;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;PhysXTask_static_64.lib;SceneQuery_static_64.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;PhysXFoundation_64.lib;LowLevelDynamics_static_64.lib;SimulationController_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysX_64.lib;PhysXExtensions_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\0_InternalDependencies\lua;$(SolutionDir)0_InternalDependencies\PhysX\lib\physxdebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -83,7 +83,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)\0_InternalDependencies\fmod\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,8 +91,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\0_InternalDependencies\lua;$(SolutionDir)\0_InternalDependencies\fmod;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;PhysXTask_static_64.lib;SceneQuery_static_64.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;PhysXFoundation_64.lib;LowLevelDynamics_static_64.lib;SimulationController_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysX_64.lib;PhysXExtensions_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\0_InternalDependencies\lua;$(SolutionDir)0_InternalDependencies\PhysX\lib\physxrelease;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -110,6 +110,7 @@
     <ClInclude Include="Editor\Window\EW_Performance.h" />
     <ClInclude Include="Editor\Window\EW_SceneTree.h" />
     <ClInclude Include="Editor\Window\EW_SceneView.h" />
+    <ClInclude Include="Editor\Window\EW_TilemapEditor.h" />
     <ClInclude Include="Editor\Window\PathConfig.h" />
     <ClInclude Include="Editor\Window\TestWindow.h" />
     <ClInclude Include="Editor\Window\TestWindow2.h" />

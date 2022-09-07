@@ -16,7 +16,7 @@ namespace god
 		float m_field_of_view { 60.0f };
 		float m_aspect_ratio { 1.0f };
 		float m_near_plane { 0.1f };
-		float m_far_plane { 100.0f };
+		float m_far_plane { 1'000'000.0f };
 
 		GODCAMERA_API Camera ();
 		void GODCAMERA_API UpdateAspectRatio ( int width , int height );

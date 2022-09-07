@@ -176,18 +176,43 @@ namespace god
 		return !m_key_states[ key ] && m_previous_key_states[ key ];
 	}
 
-	double GLFWWindow::MouseX ()
+	bool GLFWWindow::WithinWindow ()
+	{
+		return m_viewport_mouse_x > 0.0f && m_viewport_mouse_x < GetWindowWidth () &&
+			m_viewport_mouse_y > 0.0f && m_viewport_mouse_y < GetWindowHeight ();
+	}
+
+	double GLFWWindow::ScreenMouseX ()
 	{
 		double x , y;
 		glfwGetCursorPos ( m_window , &x , &y );
 		return x;
 	}
 
-	double GLFWWindow::MouseY ()
+	double GLFWWindow::ScreenMouseY ()
 	{
 		double x , y;
 		glfwGetCursorPos ( m_window , &x , &y );
 		return y;
+	}
+
+#define EditorMode
+	double GLFWWindow::ViewportMouseX ()
+	{
+#ifdef EditorMode
+		return m_viewport_mouse_x;
+#else
+		return ScreenMouseX ();
+#endif
+	}
+
+	double GLFWWindow::ViewportMouseY ()
+	{
+#ifdef EditorMode
+		return m_viewport_mouse_y;
+#else
+		return ScreenMouseY ();
+#endif
 	}
 
 	bool GLFWWindow::MouseLDown ()
@@ -228,5 +253,11 @@ namespace god
 	double GLFWWindow::MouseScrollDown ()
 	{
 		return m_scroll_down;
+	}
+
+	void GLFWWindow::SetViewportMouseCoordinates ( double x , double y )
+	{
+		m_viewport_mouse_x = x;
+		m_viewport_mouse_y = y;
 	}
 }
