@@ -53,6 +53,8 @@ robocopy "%InternalDependencies%/PhysX" "%TargetDirRelease%" "PhysXCommon_64.dll
 robocopy "%InternalDependencies%/PhysX" "%TargetDirRelease%" "PhysXCooking_64.dll"
 robocopy "%InternalDependencies%/PhysX" "%TargetDirRelease%" "PhysXFoundation_64.dll"
 
-
+rem copy fmod dlls
+robocopy "%InternalDependencies%/fmod" "%TargetDirDebug%" "fmod.dll"
+robocopy "%InternalDependencies%/fmod" "%TargetDirRelease%" "fmod.dll"
 
 pause
