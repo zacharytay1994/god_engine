@@ -23,10 +23,6 @@ rem Rapidjson
 rmdir /s /q "%ExternalDependencies%/RapidJSON/"
 git clone "https://github.com/Tencent/rapidjson.git" "%ExternalDependencies%/RapidJSON/"
 
-rem PhysX
-rmdir /s /q "%ExternalDependencies%/PhysX/"
-git clone "https://github.com/NVIDIAGameWorks/PhysX.git" "%ExternalDependencies%/PhysX/"
-
 rem assimp for model loading, build and copy libraries to libraries directory
 rmdir /s /q "%ExternalDependencies%/assimp"
 git clone https://github.com/assimp/assimp.git "%ExternalDependencies%/assimp/"
@@ -45,5 +41,18 @@ robocopy "%ExternalDependencies%/assimp/build/x64/bin/Release" "%TargetDirReleas
 rem copy lua dlls
 robocopy "%InternalDependencies%/lua" "%TargetDirDebug%" "lua.dll"
 robocopy "%InternalDependencies%/lua" "%TargetDirRelease%" "lua.dll"
+
+rem copy physX dlls
+robocopy "%InternalDependencies%/PhysX" "%TargetDirDebug%" "PhysX_64.dll"
+robocopy "%InternalDependencies%/PhysX" "%TargetDirDebug%" "PhysXCommon_64.dll"
+robocopy "%InternalDependencies%/PhysX" "%TargetDirDebug%" "PhysXCooking_64.dll"
+robocopy "%InternalDependencies%/PhysX" "%TargetDirDebug%" "PhysXFoundation_64.dll"
+
+robocopy "%InternalDependencies%/PhysX" "%TargetDirRelease%" "PhysX_64.dll"
+robocopy "%InternalDependencies%/PhysX" "%TargetDirRelease%" "PhysXCommon_64.dll"
+robocopy "%InternalDependencies%/PhysX" "%TargetDirRelease%" "PhysXCooking_64.dll"
+robocopy "%InternalDependencies%/PhysX" "%TargetDirRelease%" "PhysXFoundation_64.dll"
+
+
 
 pause
