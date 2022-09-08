@@ -1,0 +1,49 @@
+{
+    "Backpack": {
+        "Type": "Default",
+        "Script Components": {},
+        "Engine Components": {
+            "Transform": {
+                "position_x": 0.0,
+                "position_y": 0.0,
+                "position_z": 0.0,
+                "rotation_x": 0.0,
+                "rotation_y": -0.0,
+                "rotation_z": 0.0,
+                "scale_x": 1.0,
+                "scale_y": 1.0,
+                "scale_z": 1.0
+            },
+            "Renderable3D": {
+                "model uid": 807737716,
+                "diffuse uid": 3916083164,
+                "specular uid": 652207713
+            }
+        },
+        "Children": {
+            "ft": {
+                "Type": "Default",
+                "Script Components": {},
+                "Engine Components": {
+                    "Transform": {
+                        "position_x": 1.8869085311889648,
+                        "position_y": -0.4450492858886719,
+                        "position_z": 1.5364631414413452,
+                        "rotation_x": 0.0,
+                        "rotation_y": -0.0,
+                        "rotation_z": 0.0,
+                        "scale_x": 1.0,
+                        "scale_y": 1.0,
+                        "scale_z": 1.0
+                    },
+                    "Renderable3D": {
+                        "model uid": 1068777295,
+                        "diffuse uid": 670286950,
+                        "specular uid": 2380861504
+                    }
+                },
+                "Children": {}
+            }
+        }
+    }
+}

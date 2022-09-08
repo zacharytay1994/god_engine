@@ -3,13 +3,10 @@
 
 namespace god
 {
-	EnttXSol::EnttXSol ( std::vector<std::string> scriptFiles )
+	EnttXSol::EnttXSol ()
 	{
 		m_lua.open_libraries ( sol::lib::base );
-		for ( auto file : scriptFiles )
-		{
-			LoadScript ( file );
-		}
+		LoadScriptsFromFolder ();
 
 		m_lua.set ( "sol_table" , sol::table () );
 		m_lua[ m_identifier_GetScriptComponent ] = [this]( entt::entity e , std::string const& s )->sol::table
@@ -41,7 +38,7 @@ namespace god
 		}
 	}
 
-	void EnttXSol::Clear ()
+	void EnttXSol::ClearEntt ()
 	{
 		m_registry.clear ();
 		m_entities.Clear ();
@@ -54,6 +51,240 @@ namespace god
 			"x" , &glm::vec3::x ,
 			"y" , &glm::vec3::y ,
 			"z" , &glm::vec3::z );
+	}
+
+	void EnttXSol::NewScriptTemplate ( std::string const& newScript )
+	{
+		std::stringstream ss;
+		ss << "--[IsComponent]" << std::endl;
+		ss << "function C_" << newScript << "()" << std::endl;
+		ss << "local var = {" << std::endl;
+		ss << "}" << std::endl;
+		ss << "return function()" << std::endl;
+		ss << "return var" << std::endl;
+		ss << "end" << std::endl;
+		ss << "end" << std::endl << std::endl;
+		ss << "--[IsSystem]" << std::endl;
+		ss << "function S_" << newScript << "(e)" << std::endl;
+		ss << "end";
+		WriteStringToFile ( std::string ( "Assets/GameAssets/Scripts/" ) + newScript + ".lua" , ss.str () );
+	}
+
+	void EnttXSol::LoadScriptsFromFolder ()
+	{
+		auto script_file_paths = FolderHelper::GetFiles ( "Assets/GameAssets/Scripts/" );
+
+		for ( auto const& path : script_file_paths )
+		{
+			LoadScript ( path );
+		}
+	}
+
+	void EnttXSol::LoadScript ( std::string const& scriptFile )
+	{
+		auto script_result = m_lua.script_file ( scriptFile , []( lua_State* , sol::protected_function_result pfr ) { return pfr; } );
+		if ( !script_result.valid () )
+		{
+			std::cout << "Script " << scriptFile << " contains invalid lua code." << std::endl;
+			return;
+		}
+
+		auto last_slash = scriptFile.find_last_of ( '/' ) + 1;
+		auto last_dot = scriptFile.find_last_of ( '.' );
+		auto script_name = scriptFile.substr ( last_slash , last_dot - last_slash );
+		m_scripts.insert ( { script_name, {} } );
+		auto& script = m_scripts.at ( script_name );
+
+		// process script
+		// read all components
+		std::ifstream file { scriptFile };
+		if ( file )
+		{
+			std::string line;
+			while ( std::getline ( file , line ) )
+			{
+				// next line contains a component
+				if ( line.find ( m_identifier_component ) != std::string::npos )
+				{
+					std::getline ( file , line );
+					std::string component_name;
+					std::stringstream ss;
+					ss.str ( line );
+					ss >> component_name >> component_name;
+					auto component = script.m_components.insert ( { component_name.substr ( 0 , component_name.find_first_of ( '(' ) ), {} } );
+
+					// loop till end of component
+					while ( line.find ( "end" ) != 0 )
+					{
+						// check if any components need serializing/gui
+						// NOTE: Assumes next line should be the attribute to serialize
+						// serialize bool
+						if ( line.find ( m_identifier_serialize_input_bool ) != std::string::npos )
+						{
+							std::getline ( file , line );
+							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
+							attribute_name.erase ( std::remove_if ( attribute_name.begin () , attribute_name.end () , []( auto c ) { return std::isspace ( c ); } ) , attribute_name.end () );
+							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::BOOL } );
+						}
+						// serialize int
+						else if ( line.find ( m_identifier_serialize_input_int ) != std::string::npos )
+						{
+							std::getline ( file , line );
+							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
+							attribute_name.erase ( std::remove_if ( attribute_name.begin () , attribute_name.end () , []( auto c ) { return std::isspace ( c ); } ) , attribute_name.end () );
+							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::INT } );
+						}
+						// serialize float
+						else if ( line.find ( m_identifier_serialize_input_float ) != std::string::npos )
+						{
+							std::getline ( file , line );
+							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
+							attribute_name.erase ( std::remove_if ( attribute_name.begin () , attribute_name.end () , []( auto c ) { return std::isspace ( c ); } ) , attribute_name.end () );
+							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::FLOAT } );
+						}
+						// serialize string
+						else if ( line.find ( m_identifier_serialize_input_string ) != std::string::npos )
+						{
+							std::getline ( file , line );
+							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
+							attribute_name.erase ( std::remove_if ( attribute_name.begin () , attribute_name.end () , []( auto c ) { return std::isspace ( c ); } ) , attribute_name.end () );
+							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::STRING } );
+						}
+						std::getline ( file , line );
+					}
+				}
+				// if next line contains a system
+				if ( line.find ( m_identifier_system ) != std::string::npos )
+				{
+					std::getline ( file , line );
+					std::string system_name;
+					std::stringstream ss;
+					ss.str ( line );
+					ss >> system_name >> system_name;
+					system_name = system_name.substr ( 0 , system_name.find_first_of ( '(' ) );
+					script.m_systems.insert ( { system_name, {} } );
+					auto& system = script.m_systems.at ( system_name );
+
+					std::string component_name;
+					while ( line.find ( "end" ) != 0 )
+					{
+						// do stuff with function lines that are not commented out
+						if ( line.find ( "--" ) == std::string::npos )
+						{
+							// find GetScriptComponent lines
+							if ( line.find ( m_identifier_GetScriptComponent ) != std::string::npos )
+							{
+								auto first = line.find_first_of ( '\"' ) + 1;
+								component_name = line.substr ( first , line.find_last_of ( '\"' ) - first );
+								if ( std::find ( system.m_used_script_components.begin () , system.m_used_script_components.end () , component_name ) == system.m_used_script_components.end () )
+								{
+									system.m_used_script_components.push_back ( component_name );
+								}
+							}
+							// find Get... engine component lines
+							// identified with a "Get" and no "", more robust test might be neededs
+							std::string get_key { "Get" };
+							if ( line.find ( get_key ) != std::string::npos &&
+								line.find ( "\"" ) == std::string::npos )
+							{
+								auto get = line.find ( get_key );
+								auto engine_component_name = line.substr ( get , line.size () - get );
+								engine_component_name = engine_component_name.substr ( get_key.length () , engine_component_name.find_first_of ( "(" ) - get_key.length () );
+								if ( std::find ( system.m_used_engine_components.begin () , system.m_used_engine_components.end () , engine_component_name ) == system.m_used_engine_components.end () )
+								{
+									system.m_used_engine_components.push_back ( engine_component_name );
+								}
+							}
+						}
+
+						// get next line
+						std::getline ( file , line );
+					}
+				}
+			}
+		}
+		else
+		{
+			std::cerr << "EnttXSol::AddScript - Failed to read script." << std::endl;
+		}
+
+		// check if there is a matching component made for this system in the script
+		for ( auto& system : script.m_systems )
+		{
+			if ( auto dash_position = system.first.find_first_of ( '_' ) )
+			{
+				auto const name_to_match = system.first.substr ( dash_position , system.first.length () - dash_position );
+				for ( auto const& component : script.m_components )
+				{
+					if ( component.first.find ( name_to_match ) != std::string::npos &&
+						std::find ( system.second.m_used_script_components.begin () , system.second.m_used_script_components.end () , component.first ) == system.second.m_used_script_components.end () )
+					{
+						// add matching component as system required component
+						system.second.m_used_script_components.push_back ( component.first );
+					}
+				}
+			}
+		}
+
+		// load all systems found in script as a sol::function
+		for ( auto const& system : script.m_systems )
+		{
+			m_sol_functions.insert ( { system.first, m_lua[ system.first ] } );
+		}
+
+		std::cout << "EnttXSol::LoadScript() - " << scriptFile << " loaded." << std::endl;
+	}
+
+	void EnttXSol::ReloadScript ( std::string const& scriptFile )
+	{
+		auto last_slash = scriptFile.find_last_of ( '/' ) + 1;
+		auto last_dot = scriptFile.find_last_of ( '.' );
+		auto script_name = scriptFile.substr ( last_slash , last_dot - last_slash );
+
+		UnloadScript ( script_name );
+		LoadScript ( scriptFile );
+	}
+
+	void EnttXSol::UnloadScript ( std::string const& scriptName )
+	{
+		// remove from sol functions and scripts
+		if ( m_scripts.find ( scriptName ) != m_scripts.end () )
+		{
+			// erase from lua state
+			for ( auto const& component : m_scripts[ scriptName ].m_components )
+			{
+				sol::optional<sol::function> fn = m_lua[ component ];
+				if ( fn != sol::nullopt )
+				{
+					m_lua[ component ] = sol::lua_nil;
+				}
+			}
+
+			for ( auto const& system : m_scripts[ scriptName ].m_systems )
+			{
+				sol::optional<sol::function> fn = m_lua[ system ];
+				if ( fn != sol::nullopt )
+				{
+					m_lua[ system ] = sol::lua_nil;
+				}
+
+				if ( m_sol_functions.find ( system.first ) != m_sol_functions.end () )
+				{
+					m_sol_functions.erase ( system.first );
+				}
+			}
+			m_scripts.erase ( scriptName );
+		}
+	}
+
+	void EnttXSol::DeleteScript ( std::string const& scriptFile )
+	{
+		auto last_slash = scriptFile.find_last_of ( '/' ) + 1;
+		auto last_dot = scriptFile.find_last_of ( '.' );
+		auto script_name = scriptFile.substr ( last_slash , last_dot - last_slash );
+
+		UnloadScript ( script_name );
+		DeleteFileAtPath ( scriptFile );
 	}
 
 	void EnttXSol::BindEngineSystemUpdate ( void( *update )( EnttXSol& ) )
@@ -164,7 +395,7 @@ namespace god
 		// serialize only root nodes
 		for ( uint32_t entity = 0; entity < m_entities.Size (); ++entity )
 		{
-			if ( m_entities.Valid ( entity ) && m_entities[ entity ].m_parent_id == Entities::Null )
+			if ( m_entities.Valid ( entity ) && m_entities[ entity ].m_parent_id == Entities::Null && m_entities[ entity ].m_persist_in_scene )
 			{
 				rapidjson::Value value { rapidjson::kObjectType };
 				SerializeStateV2Recurse ( engineResources , entity , document , value );
@@ -303,7 +534,10 @@ namespace god
 			for ( auto& script_component : value[ "Script Components" ].GetObj () )
 			{
 				std::string component_name = script_component.name.GetString ();
-				AttachComponent ( entity , component_name );
+				if ( !AttachComponent ( entity , component_name ) )
+				{
+					continue;
+				}
 
 				// update values
 				auto&& storage = GetStorage<sol::table> ( component_name );
@@ -341,7 +575,7 @@ namespace god
 							else
 							{
 								std::cerr << "EnttXSol::DeserializeState - Expected value not in serialized file. Maybe outdated file? ["
-									<< attribute_name << "] in File [" << "oops" << "]" << std::endl;
+									<< attribute_name << "] in object [" << name << "]" << std::endl;
 							}
 						}
 						script_component_found = true;
@@ -350,7 +584,7 @@ namespace god
 				if ( !script_component_found )
 				{
 					std::cerr << "EnttXSol::DeserializeState - Previously serialized script component not found. Maybe redefined? ["
-						<< component_name << "] in File [" << "oops" << "]" << std::endl;
+						<< component_name << "] in object [" << name << "]" << std::endl;
 				}
 			}
 
@@ -460,10 +694,13 @@ namespace god
 				rapidjson::Value children_value { rapidjson::kObjectType };
 				for ( auto const& child : m_entities[ entity ].m_children )
 				{
-					rapidjson::Value child_value { rapidjson::kObjectType };
-					SavePrefabV2Recurse ( engineResources , child , document , child_value );
+					if ( m_entities.Valid ( child ) && m_entities[ child ].m_persist_in_scene )
+					{
+						rapidjson::Value child_value { rapidjson::kObjectType };
+						SavePrefabV2Recurse ( engineResources , child , document , child_value );
 
-					RapidJSON::JSONifyToValue ( children_value , document , m_entities[ child ].m_name , child_value );
+						RapidJSON::JSONifyToValue ( children_value , document , m_entities[ child ].m_name , child_value );
+					}
 				}
 				RapidJSON::JSONifyToValue ( value , document , "Children" , children_value );
 			}
@@ -483,12 +720,14 @@ namespace god
 		}
 	}
 
-	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent )
+	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent , bool persist )
 	{
 		rapidjson::Document document;
 		ReadJSON ( document , std::string ( "Assets/GameAssets/Prefabs/" ) + fileName + ".json" );
 
-		return LoadPrefabV2Recurse ( engineResources , document.MemberBegin ()->value , document.MemberBegin ()->name.GetString () , parent , true );
+		auto id = LoadPrefabV2Recurse ( engineResources , document.MemberBegin ()->value , document.MemberBegin ()->name.GetString () , parent , true );
+		m_entities[ id ].m_persist_in_scene = persist;
+		return id;
 	}
 
 	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root )
@@ -524,7 +763,10 @@ namespace god
 			for ( auto& script_component : value[ "Script Components" ].GetObj () )
 			{
 				std::string component_name = script_component.name.GetString ();
-				AttachComponent ( entity , component_name );
+				if ( !AttachComponent ( entity , component_name ) )
+				{
+					continue;
+				}
 
 				// update values
 				auto&& storage = GetStorage<sol::table> ( component_name );
@@ -604,152 +846,21 @@ namespace god
 		return Entities::Null;
 	}
 
-	void EnttXSol::LoadScript ( std::string const& scriptFile )
+	EnttXSol::Entities::ID EnttXSol::AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent , glm::vec3 const& position )
 	{
-		m_lua.script_file ( scriptFile );
-
-		auto last_slash = scriptFile.find_last_of ( '/' ) + 1;
-		auto last_dot = scriptFile.find_last_of ( '.' );
-		auto script_name = scriptFile.substr ( last_slash , last_dot - last_slash );
-		m_scripts.insert ( { script_name, {} } );
-		auto& script = m_scripts.at ( script_name );
-
-		// process script
-		// read all components
-		std::ifstream file { scriptFile };
-		if ( file )
+		// if not null and no valid parent
+		if ( parent != Entities::Null && !m_entities.Valid ( parent ) )
 		{
-			std::string line;
-			while ( std::getline ( file , line ) )
-			{
-				// next line contains a component
-				if ( line.find ( m_identifier_component ) != std::string::npos )
-				{
-					std::getline ( file , line );
-					std::string component_name;
-					std::stringstream ss;
-					ss.str ( line );
-					ss >> component_name >> component_name;
-					auto component = script.m_components.insert ( { component_name.substr ( 0 , component_name.find_first_of ( '(' ) ), {} } );
-
-					// loop till end of component
-					while ( line.find ( "end" ) != 0 )
-					{
-						// check if any components need serializing/gui
-						// NOTE: Assumes next line should be the attribute to serialize
-						// serialize bool
-						if ( line.find ( m_identifier_serialize_input_bool ) != std::string::npos )
-						{
-							std::getline ( file , line );
-							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
-							attribute_name.erase ( std::remove ( attribute_name.begin () , attribute_name.end () , ' ' ) , attribute_name.end () );
-							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::BOOL } );
-						}
-						// serialize int
-						else if ( line.find ( m_identifier_serialize_input_int ) != std::string::npos )
-						{
-							std::getline ( file , line );
-							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
-							attribute_name.erase ( std::remove ( attribute_name.begin () , attribute_name.end () , ' ' ) , attribute_name.end () );
-							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::INT } );
-						}
-						// serialize float
-						else if ( line.find ( m_identifier_serialize_input_float ) != std::string::npos )
-						{
-							std::getline ( file , line );
-							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
-							attribute_name.erase ( std::remove ( attribute_name.begin () , attribute_name.end () , ' ' ) , attribute_name.end () );
-							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::FLOAT } );
-						}
-						// serialize string
-						else if ( line.find ( m_identifier_serialize_input_string ) != std::string::npos )
-						{
-							std::getline ( file , line );
-							auto attribute_name = line.substr ( 0 , line.find_first_of ( '=' ) );
-							attribute_name.erase ( std::remove ( attribute_name.begin () , attribute_name.end () , ' ' ) , attribute_name.end () );
-							component.first->second.m_serialize_attributes.push_back ( { attribute_name, AttributeTypes::STRING } );
-						}
-						std::getline ( file , line );
-					}
-				}
-				// if next line contains a system
-				if ( line.find ( m_identifier_system ) != std::string::npos )
-				{
-					std::getline ( file , line );
-					std::string system_name;
-					std::stringstream ss;
-					ss.str ( line );
-					ss >> system_name >> system_name;
-					system_name = system_name.substr ( 0 , system_name.find_first_of ( '(' ) );
-					script.m_systems.insert ( { system_name, {} } );
-					auto& system = script.m_systems.at ( system_name );
-
-					std::string component_name;
-					while ( line.find ( "end" ) != 0 )
-					{
-						// do stuff with function lines that are not commented out
-						if ( line.find ( "--" ) == std::string::npos )
-						{
-							// find GetScriptComponent lines
-							if ( line.find ( m_identifier_GetScriptComponent ) != std::string::npos )
-							{
-								auto first = line.find_first_of ( '\"' ) + 1;
-								component_name = line.substr ( first , line.find_last_of ( '\"' ) - first );
-								if ( std::find ( system.m_used_script_components.begin () , system.m_used_script_components.end () , component_name ) == system.m_used_script_components.end () )
-								{
-									system.m_used_script_components.push_back ( component_name );
-								}
-							}
-							// find Get... engine component lines
-							// identified with a "Get" and no "", more robust test might be neededs
-							std::string get_key { "Get" };
-							if ( line.find ( get_key ) != std::string::npos &&
-								line.find ( "\"" ) == std::string::npos )
-							{
-								auto get = line.find ( get_key );
-								auto engine_component_name = line.substr ( get , line.size () - get );
-								engine_component_name = engine_component_name.substr ( get_key.length () , engine_component_name.find_first_of ( "(" ) - get_key.length () );
-								if ( std::find ( system.m_used_engine_components.begin () , system.m_used_engine_components.end () , engine_component_name ) == system.m_used_engine_components.end () )
-								{
-									system.m_used_engine_components.push_back ( engine_component_name );
-								}
-							}
-						}
-
-						// get next line
-						std::getline ( file , line );
-					}
-				}
-			}
+			return Entities::Null;
 		}
-		else
+		auto entity = LoadPrefabV2 ( engineResources , fileName , parent );
+		Transform* transform = m_registry.try_get<Transform> ( m_entities[ entity ].m_id );
+		if ( transform )
 		{
-			std::cerr << "EnttXSol::AddScript - Failed to read script." << std::endl;
+			// assign position
+			transform->m_position = position;
 		}
-
-		// check if there is a matching component made for this system in the script
-		for ( auto& system : script.m_systems )
-		{
-			if ( auto dash_position = system.first.find_first_of ( '_' ) )
-			{
-				auto const name_to_match = system.first.substr ( dash_position , system.first.length () - dash_position );
-				for ( auto const& component : script.m_components )
-				{
-					if ( component.first.find ( name_to_match ) != std::string::npos &&
-						std::find ( system.second.m_used_script_components.begin () , system.second.m_used_script_components.end () , component.first ) == system.second.m_used_script_components.end () )
-					{
-						// add matching component as system required component
-						system.second.m_used_script_components.push_back ( component.first );
-					}
-				}
-			}
-		}
-
-		// load all systems found in script as a sol::function
-		for ( auto const& system : script.m_systems )
-		{
-			m_sol_functions.insert ( { system.first, m_lua[ system.first ] } );
-		}
+		return entity;
 	}
 
 	void EnttXSol::LoadSystem ( std::string const& name )
@@ -757,24 +868,36 @@ namespace god
 		m_sol_functions.insert ( { name, m_lua[ name ] } );
 	}
 
-	void EnttXSol::AttachComponent ( Entities::ID id , std::string const& name )
+	bool EnttXSol::AttachComponent ( Entities::ID id , std::string const& name )
 	{
-		sol::function component = m_lua[ name ] ();
+		sol::optional<sol::function> fn = m_lua[ name ];
+		if ( fn == sol::nullopt )
+		{
+			return false;
+		}
+		sol::function component = fn.value () ( );
 		auto& storage = GetStorage<sol::table> ( name );
 		if ( !storage.contains ( m_entities[ id ].m_id ) )
 		{
 			storage.emplace ( m_entities[ id ].m_id ) = component ();
 		}
+		return true;
 	}
 
-	void EnttXSol::AttachComponent ( entt::entity id , std::string const& name )
+	bool EnttXSol::AttachComponent ( entt::entity id , std::string const& name )
 	{
-		sol::function component = m_lua[ name ] ();
+		sol::optional<sol::function> fn = m_lua[ name ];
+		if ( fn == sol::nullopt )
+		{
+			return false;
+		}
+		sol::function component = fn.value () ( );
 		auto& storage = GetStorage<sol::table> ( name );
 		if ( !storage.contains ( id ) )
 		{
 			storage.emplace ( id ) = component ();
 		}
+		return true;
 	}
 
 	entt::runtime_view EnttXSol::GetView ( std::vector<std::string> const& scriptComponents , std::vector<std::string> const& engineComponents )

@@ -24,8 +24,8 @@ namespace god
 	struct AssimpMesh;
 	struct OpenGL
 	{
-		 OpenGL ( HWND windowHandle , int width , int height );
-		 ~OpenGL ();
+		OpenGL ( HWND windowHandle , int width , int height );
+		~OpenGL ();
 
 		void  ClearColour () const;
 
@@ -37,6 +37,16 @@ namespace god
 			glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures );
 
 		void  ResizeViewport ( int width , int height ) const;
+
+		// temp line rendering
+		OGLShader m_line_shader;
+		OGLMesh m_lines_mesh;
+		static constexpr float m_default_line_size { 2.0f };
+		using Lines = std::unordered_map<float , std::vector<std::tuple<glm::vec3 , glm::vec3 , glm::vec4 , float>>>;
+		static Lines m_lines;
+		static void DrawLine ( glm::vec3 const& a , glm::vec3 const& b , glm::vec4 const& c = { 1,1,1,1 } , float size = m_default_line_size );
+		void RenderLines ( glm::mat4 const& projection , glm::mat4 const& view );
+		void SetLineWidth ( float size );
 
 	private:
 		int m_pixel_format { 0 };

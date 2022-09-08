@@ -19,4 +19,36 @@ namespace god
 
 		return model_transform;
 	}
+
+	glm::vec3 ViewportToWorldRay ( glm::vec2 const& position , uint32_t viewportWidth , uint32_t viewportHeight , glm::mat4 const& perspectiveMatrix , glm::mat4 const& viewMatrix )
+	{
+		glm::mat4 inv = glm::inverse ( perspectiveMatrix * viewMatrix );
+		float halfwidth = static_cast< float >( viewportWidth ) / 2.0f;
+		float halfheight = static_cast< float >( viewportHeight ) / 2.0f;
+		glm::vec4 n = glm::vec4 (
+			( position.x - halfwidth ) / halfwidth ,
+			-( position.y - halfheight ) / halfheight ,
+			-1.0f ,
+			1.0f
+		);
+		glm::vec4 f = n;
+		f.z = 1.0f;
+		glm::vec4 near_result = inv * n;
+		glm::vec4 far_result = inv * f;
+		near_result /= near_result.w;
+		far_result /= far_result.w;
+		return glm::normalize ( far_result - near_result );
+	}
+
+	bool IntersectLineSegmentPlane ( glm::vec3 const& a , glm::vec3 const& b , glm::vec3 const& n , float d , glm::vec3& p )
+	{
+		glm::vec3 ab = b - a;
+		float t = ( d - glm::dot ( n , a ) ) / glm::dot ( n , ab );
+		if ( t >= 0.0f && t <= 1.0f )
+		{
+			p = ( a + t * ab );
+			return true;
+		}
+		return false;
+	}
 }

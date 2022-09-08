@@ -60,10 +60,18 @@ namespace god
 		};
 
 	public:
-		EnttXSol ( std::vector<std::string> scriptFiles );
+		EnttXSol ();
 		void Update ();
-		void Clear ();
+		void ClearEntt ();
 		void SetupBindings ();
+
+		void NewScriptTemplate ( std::string const& newScript );
+		void LoadScriptsFromFolder ();
+		void LoadScript ( std::string const& scriptFile );
+		void ReloadScript ( std::string const& scriptFile );
+		void UnloadScript ( std::string const& scriptName );
+		void DeleteScript ( std::string const& scriptFile );
+
 		template<typename ENGINE_COMPONENTS>
 		void BindEngineComponents ();
 		template<typename T , typename ...ARGS>
@@ -114,8 +122,10 @@ namespace god
 		void SavePrefabV2 ( EngineResources& engineResources , Entities::ID root , std::string const& fileName );
 		void SavePrefabV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value , bool root = false );
 
-		EnttXSol::Entities::ID LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null );
+		EnttXSol::Entities::ID LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , bool persist = true );
 		EnttXSol::Entities::ID LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root = false );
+
+		EnttXSol::Entities::ID AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , glm::vec3 const& position = { 0,0,0 } );
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -148,10 +158,9 @@ namespace god
 
 		void( *m_engine_update )( EnttXSol& ) = nullptr;
 
-		void LoadScript ( std::string const& scriptFile );
 		void LoadSystem ( std::string const& name );
-		void AttachComponent ( Entities::ID id , std::string const& name );
-		void AttachComponent ( entt::entity id , std::string const& name );
+		bool AttachComponent ( Entities::ID id , std::string const& name );
+		bool AttachComponent ( entt::entity id , std::string const& name );
 		template <typename T>
 		auto&& GetStorage ( std::string const& name );
 		entt::runtime_view GetView ( std::vector<std::string> const& components , std::vector<std::string> const& engineComponents );
