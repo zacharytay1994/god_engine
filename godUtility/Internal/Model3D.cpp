@@ -194,7 +194,7 @@ namespace god
 				auto edge1 = v1.m_position - v2.m_position;
 				auto edge2 = v3.m_position - v2.m_position;
 
-				auto normal = glm::cross ( edge2 , edge1 );
+				auto normal = glm::normalize(glm::cross ( edge2 , edge1 ));
 				v1.m_normal = normal;
 				v2.m_normal = normal;
 				v3.m_normal = normal;
