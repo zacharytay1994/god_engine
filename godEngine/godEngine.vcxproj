@@ -116,6 +116,7 @@
     <ClInclude Include="Editor\Window\TestWindow2.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Renderable3D.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_RigidBody.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EngineComponents.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_All.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h" />
