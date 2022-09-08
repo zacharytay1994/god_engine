@@ -22,6 +22,7 @@ namespace god
 		ContainerID m_parent_id { Null };
 		std::string m_name { "" };
 		std::vector<ContainerID> m_children;
+		bool m_persist_in_scene { true };
 
 		Entity_ () = default;
 		Entity_ ( entt::registry& registry , std::string const& name , ContainerID parent , Type type = Type::Default );

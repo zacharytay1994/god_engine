@@ -8,8 +8,8 @@ namespace god
 {
 	struct GLFWWindow
 	{
-		 GLFWWindow ( uint32_t width , uint32_t height );
-		 ~GLFWWindow ();
+		GLFWWindow ( uint32_t width , uint32_t height );
+		~GLFWWindow ();
 
 		bool			WindowShouldClose ();
 		void			PollEvents ();
@@ -17,7 +17,7 @@ namespace god
 
 		// getters & setters
 		HWND			GetWindowHandle ();
-		GLFWwindow*		GetGLFWWindow ();
+		GLFWwindow* GetGLFWWindow ();
 		uint32_t		GetWindowWidth ();
 		uint32_t		GetWindowHeight ();
 		bool			Resized ();
@@ -28,8 +28,13 @@ namespace god
 		bool			KeyUp ( int key );
 
 		// mouse input
-		double			MouseX ();			// mouse coordinates
-		double			MouseY ();
+		bool			WithinWindow ();
+
+		double			ScreenMouseX ();			// mouse coordinates
+		double			ScreenMouseY ();
+
+		double			ViewportMouseX ();
+		double			ViewportMouseY ();
 
 		bool			MouseLDown ();		// left mouse
 		bool			MouseLPressed ();
@@ -46,6 +51,8 @@ namespace god
 		friend void GLFWKeyCallback ( GLFWwindow* window , int key , int scancode , int action , int mods );
 		friend void GLFWMouseCallback ( GLFWwindow* window , int button , int action , int mods );
 		friend void GLFWScrollCallback ( GLFWwindow* window , double xOffset , double yOffset );
+
+		void		SetViewportMouseCoordinates ( double x , double y );
 
 	private:
 		GLFWwindow* m_window;
@@ -65,5 +72,8 @@ namespace god
 
 		bool m_scroll_up { false };
 		bool m_scroll_down { false };
+
+		double m_viewport_mouse_x { 0.0f };
+		double m_viewport_mouse_y { 0.0f };
 	};
 }

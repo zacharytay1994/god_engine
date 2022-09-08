@@ -14,5 +14,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <fstream>
+#include <sstream>
+#include <cctype>
 
 #endif //PCH_H
