@@ -17,13 +17,14 @@ namespace god
 
 	void EnttXSol::Update ()
 	{
+		// update engine systems
+		if ( m_engine_update )
+		{
+			m_engine_update ( *this , m_pause );
+		}
+
 		if ( !m_pause )
 		{
-			// update engine systems
-			if ( m_engine_update )
-			{
-				m_engine_update ( *this );
-			}
 			// update script systems
 			// for each script in loaded scripts
 			for ( auto const& script : m_scripts )
@@ -287,7 +288,7 @@ namespace god
 		DeleteFileAtPath ( scriptFile );
 	}
 
-	void EnttXSol::BindEngineSystemUpdate ( void( *update )( EnttXSol& ) )
+	void EnttXSol::BindEngineSystemUpdate ( void( *update )( EnttXSol& , bool ) )
 	{
 		m_engine_update = update;
 	}

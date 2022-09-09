@@ -78,7 +78,7 @@ namespace god
 		void RegisterLuaType ( std::string const& name , ARGS...args );
 		template<typename ...T>
 		void RunEngineSystem ( void( *system )( EnttXSol& , std::tuple<T...> ) );
-		void BindEngineSystemUpdate ( void( *update )( EnttXSol& ) );
+		void BindEngineSystemUpdate ( void( *update )( EnttXSol& , bool ) );
 
 		Entities::ID CreateEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );
 		void RemoveEntity ( Entities::ID entity );
@@ -156,7 +156,7 @@ namespace god
 		std::unordered_map<std::string , Script> m_scripts;
 		std::unordered_map<std::string , sol::function> m_sol_functions;
 
-		void( *m_engine_update )( EnttXSol& ) = nullptr;
+		void( *m_engine_update )( EnttXSol& , bool ) = nullptr;
 
 		void LoadSystem ( std::string const& name );
 		bool AttachComponent ( Entities::ID id , std::string const& name );

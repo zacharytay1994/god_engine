@@ -19,6 +19,9 @@ namespace god
 			parent_transform.
 		}*/
 
-		transform.m_position = { grid_cell.m_cell_x * 2.0f + 1.0f, transform.m_position.y, grid_cell.m_cell_z * 2.0f + 1.0f };
+		transform.m_position = { 
+			( grid_cell.m_cell_x * 2 + 1 ) * grid_cell.m_cell_size, 
+			transform.m_position.y,
+			( grid_cell.m_cell_z * 2 + 1 ) * grid_cell.m_cell_size };
 	}
 }
