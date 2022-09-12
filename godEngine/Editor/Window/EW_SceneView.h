@@ -124,8 +124,9 @@ namespace god
 
 					if ( grid_cell )
 					{
-						grid_cell->m_cell_x = ( ( static_cast< int32_t >( std::floor ( position.x / grid_cell->m_cell_size ) ) - 1 ) / 2.0f ) ;
-						grid_cell->m_cell_z = ( ( static_cast< int32_t >( std::floor ( position.z / grid_cell->m_cell_size ) ) - 1 ) / 2.0f ) ;
+						grid_cell->m_cell_x = static_cast< int32_t >( ( static_cast< int32_t >( std::floor ( position.x / grid_cell->m_cell_size ) ) - 1 ) / 2.0f );
+						grid_cell->m_cell_y = static_cast< int32_t >( static_cast< int32_t >( std::floor ( position.y / grid_cell->m_cell_size ) ) / 2.0f );
+						grid_cell->m_cell_z = static_cast< int32_t >( ( static_cast< int32_t >( std::floor ( position.z / grid_cell->m_cell_size ) ) - 1 ) / 2.0f );
 						transform->m_rotation = rotation;
 						transform->m_scale = scale;
 					}

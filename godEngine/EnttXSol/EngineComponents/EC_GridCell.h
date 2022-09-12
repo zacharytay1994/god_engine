@@ -32,13 +32,13 @@ namespace god
 
 				auto width = ImGui::GetWindowWidth ();
 				ImGui::SetNextItemWidth ( width / 4 );
-				ImGui::DragInt ( "Cell X" , &component.m_cell_x );
+				ImGui::DragInt ( "X" , &component.m_cell_x );
 				ImGui::SameLine ();
 				ImGui::SetNextItemWidth ( width / 4 );
-				ImGui::DragInt ( "Cell Y" , &component.m_cell_y );
+				ImGui::DragInt ( "Y" , &component.m_cell_y );
 				ImGui::SameLine ();
 				ImGui::SetNextItemWidth ( width / 4 );
-				ImGui::DragInt ( "Cell Z" , &component.m_cell_z );
+				ImGui::DragInt ( "Z" , &component.m_cell_z );
 			} );
 	}
 
@@ -59,7 +59,7 @@ namespace god
 		( engineResources );
 		// deserialize
 		AssignIfExist ( jsonObj , component.m_cell_x , "cell_x" );
-		AssignIfExist ( jsonObj , component.m_cell_x , "cell_y" );
+		AssignIfExist ( jsonObj , component.m_cell_y , "cell_y" );
 		AssignIfExist ( jsonObj , component.m_cell_z , "cell_z" );
 		AssignIfExist ( jsonObj , component.m_cell_size , "cell_size" );
 	}

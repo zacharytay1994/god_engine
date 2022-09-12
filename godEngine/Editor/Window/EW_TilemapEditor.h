@@ -23,6 +23,7 @@ namespace god
 		int m_cell_x { 0 } , m_cell_y { 0 } , m_cell_z { 0 };
 		int m_placement_mode { 1 };
 		bool m_show_selected_grid { false } , m_show_parent_grid { true };
+		bool m_is_grid_cell { true } , m_free_placement { false };
 		EnttXSol::Entities::ID m_selected { EnttXSol::Entities::Null };
 
 		const float INF { 1'000'000.0f };
@@ -102,8 +103,8 @@ namespace god
 					}
 
 					float parent_grid_y { grid_position.y };
-					glm::vec3 transform_position;
-					Transform* transform = m_enttxsol.GetEngineComponent<Transform> ( m_selected );
+					/*glm::vec3 transform_position;
+					Transform* transform = m_enttxsol.GetEngineComponent<Transform> ( m_selected );*/
 					if ( transform )
 					{
 						auto position = transform->m_parent_transform * glm::vec4 ( transform->m_position , 1.0f );
@@ -161,6 +162,8 @@ namespace god
 			m_cell_z = static_cast< int >( std::floor ( ( intersect.z - oz ) / ( m_true_cell_size * osz ) ) );
 		}
 
+		glm::vec3 intersect_local { ( intersect.x - ox ) / ( osx ), ( intersect.y - oy ) / ( osy ), ( intersect.z - oz ) / ( osz ) };
+
 		// draw grid at mouse position
 		if ( m_show_selected_grid )
 		{
@@ -205,16 +208,23 @@ namespace god
 
 		if ( window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) && window.MouseLPressed () && window.WithinWindow () && m_selected_prefab != "-None-" )
 		{
-			auto entity = m_enttxsol.AddPrefabToScene ( engineResources , m_selected_prefab , m_selected , {
-				( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size,
+			glm::vec3 placement_position { intersect_local };
+			if ( !m_free_placement )
+			{
+				placement_position = { ( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size,
 				static_cast< float >( m_cell_y ) * m_true_cell_size,
-				( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size } );
-			m_enttxsol.AttachComponent<GridCell> ( entity );
-			GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( entity );
-			grid_cell->m_cell_x = m_cell_x;
-			grid_cell->m_cell_y = m_cell_y;
-			grid_cell->m_cell_z = m_cell_z;
-			grid_cell->m_cell_size = m_cell_size;
+				( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size };
+			}
+			auto entity = m_enttxsol.AddPrefabToScene ( engineResources , m_selected_prefab , m_selected , placement_position );
+			if ( m_is_grid_cell )
+			{
+				m_enttxsol.AttachComponent<GridCell> ( entity );
+				GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( entity );
+				grid_cell->m_cell_x = m_cell_x;
+				grid_cell->m_cell_y = m_cell_y;
+				grid_cell->m_cell_z = m_cell_z;
+				grid_cell->m_cell_size = m_cell_size;
+			}
 		}
 
 		// move the preview to the right cell
@@ -223,10 +233,26 @@ namespace god
 			Transform* transform = m_enttxsol.GetEngineComponent<Transform> ( m_preview_id );
 			if ( transform )
 			{
-				transform->m_position = {
-					( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size,
-					static_cast< float >( m_cell_y ) * m_true_cell_size,
-					( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size };
+				if ( m_free_placement )
+				{
+					transform->m_position = intersect_local;
+				}
+				else
+				{
+					transform->m_position = {
+						( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size,
+						static_cast< float >( m_cell_y ) * m_true_cell_size,
+						( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size };
+
+					GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( m_preview_id );
+					if ( grid_cell )
+					{
+						grid_cell->m_cell_x = m_cell_x;
+						grid_cell->m_cell_y = m_cell_y;
+						grid_cell->m_cell_z = m_cell_z;
+						grid_cell->m_cell_size = m_cell_size;
+					}
+				}
 			}
 		}
 
@@ -246,6 +272,14 @@ namespace god
 		{
 			m_show_parent_grid = false;
 			m_show_selected_grid = true;
+		}
+
+		ImGui::Checkbox ( "As Cell" , &m_is_grid_cell );
+		ImGui::SameLine ();
+		ImGui::Checkbox ( "Free Placement" , &m_free_placement );
+		if ( m_free_placement )
+		{
+			m_is_grid_cell = false;
 		}
 
 		ImGui::DragInt ( "Y" , &m_cell_y , 1 );

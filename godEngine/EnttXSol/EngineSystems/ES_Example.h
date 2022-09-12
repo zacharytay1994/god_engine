@@ -7,6 +7,8 @@ namespace god
 {
 	void ExampleSystem ( EnttXSol& entt , std::tuple<EntityData& , Transform&> components )
 	{
+		( entt );
+		( components );
 		// some code here ...
 		/*auto& entity_data = std::get<0> ( components );
 		Transform* parent_transform = entt.GetEngineComponent<Transform> ( entity_data.m_parent_id );

@@ -28,6 +28,7 @@
 #include <tuple>
 #include <iostream>
 #include <functional>
+#include <type_traits>
 
 namespace god
 {
@@ -204,7 +205,7 @@ namespace god
 			void operator()( entt::registry& registry , rapidjson::Document& document , rapidjson::Value& engineComponents , entt::entity const& entity , std::string const& name , ENGINE_RESOURCES& engineResources )
 			{
 				auto ptr = registry.try_get<T> ( entity );
-				if ( ptr )
+				if ( ptr && !std::is_same<T , EntityData> () )
 				{
 					rapidjson::Value engine_component;
 					engine_component.SetObject ();
@@ -222,9 +223,12 @@ namespace god
 			template <typename T>
 			void operator()( entt::registry& registry , entt::entity& entity , rapidjson::Value& jsonObj , ENGINE_RESOURCES& engineResources )
 			{
-				registry.emplace<T> ( entity );
+				if ( !std::is_same<T , EntityData> () )
+				{
+					registry.emplace<T> ( entity );
 
-				DeJSONify ( engineResources , registry.get<T> ( entity ) , jsonObj );
+					DeJSONify ( engineResources , registry.get<T> ( entity ) , jsonObj );
+				}
 			}
 		};
 	};
