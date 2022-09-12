@@ -8,32 +8,60 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct RigidBody
 	{
-		enum class PrimitiveTypes
+		enum class Type
 		{
-			BOX,
-			SPHERE,
-			CAPSULE,
-			PLANE
+			Static,
+			Dynamic
 		};
 
-		enum class MeshTypes
+		enum class CollisionDetectionType : uint32_t
 		{
-			CONVEX,
-			TRIANGLE,
-			HEIGHT
+			Discrete, 
+			Continuous,
+			ContinuousSpeculative
 		};
 
-		PrimitiveTypes m_Primitivetype;
-		MeshTypes m_Meshtype;
+		Type m_type = Type::Dynamic;
+		CollisionDetectionType m_Collisiontype;
+
+		float m_mass = 1.0f;
+		float m_LinearDrag = 0.01f;
+		float m_AngularDrag = 0.05f;
+		bool m_DisableGravity = false;
+		bool m_IsKinematic = false;
+
+		uint32_t Layer = 0;
+		CollisionDetectionType m_CollisionDetection = CollisionDetectionType::Discrete;
+
+		bool LockPositionX = false;
+		bool LockPositionY = false;
+		bool LockPositionZ = false;
+		bool LockRotationX = false;
+		bool LockRotationY = false;
+		bool LockRotationZ = false;
+
+		RigidBody() = default;
+		RigidBody(const RigidBody& rhs) = default;
+
 		int i{ 2 };
 		float f{ 3.14f };
 		std::string s{ "example" };
 
-		physx::PxPhysics* m_physics{ nullptr };
-		//physx::xRigidBody* m_rigidbody{ nullptr };
-		
-	
 	};
+
+	struct BoxColliderComponent
+	{
+		glm::vec3 m_size = { 1.0f, 1.0f, 1.0f };
+		glm::vec3 m_offset = { 0.0f, 0.0f, 0.0f };
+		bool IsTrigger = false;
+
+		// The mesh that will be drawn in the editor to show the collision bounds
+		Mesh3D& DebugMesh;
+
+		BoxColliderComponent() = default;
+		BoxColliderComponent(const BoxColliderComponent& other) = default;
+	};
+
 	template <>
 	inline void NewLuaType<RigidBody>(sol::state& luaState, std::string const& name)
 	{

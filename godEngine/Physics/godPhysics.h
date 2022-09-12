@@ -1,19 +1,47 @@
 #pragma once
+
 #include "PxPhysicsAPI.h"
+#include "PhysicScene.h"
+#include "PhysicSettings.h"
+#include "PhysicActor.h"
 
 using namespace physx;
 
-PxDefaultAllocator		gAllocator;
-PxDefaultErrorCallback	gErrorCallback;
+namespace god
+{
+	class PhysicsSystem
+	{
+	public:
+		static void Init();
+		static void Shutdown();
 
-PxFoundation* gFoundation = NULL;
-PxPhysics* gPhysics = NULL;
+		static PhysicScene& getScene() { return m_scene; }
 
-PxDefaultCpuDispatcher* gDispatcher = NULL;
-PxScene* gScene = NULL;
+		static void CreateScene();
+		static void DestroyScene();
 
-PxMaterial* gMaterial = NULL;
+		static void CreateActors(Scene& scene);
+		static PhysicActor& CreateActor(Entity_ entity);
 
-PxPvd* gPvd = NULL;
+		static PhysicSettings& getSettings() { return m_settings; }
 
-PxReal stackZ = 10.0f;
+	private:
+		static PhysicScene m_scene;
+		static PhysicSettings m_settings;
+	};
+	PxDefaultAllocator		gAllocator;
+	PxDefaultErrorCallback	gErrorCallback;
+
+	PxFoundation* gFoundation = NULL;
+	PxPhysics* gPhysics = NULL;
+
+	PxDefaultCpuDispatcher* gDispatcher = NULL;
+	PxScene* gScene = NULL;
+
+	PxMaterial* gMaterial = NULL;
+
+	PxPvd* gPvd = NULL;
+
+	PxReal stackZ = 10.0f;
+}
+
