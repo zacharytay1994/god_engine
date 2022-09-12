@@ -3,6 +3,7 @@
 #include "../../OpenGL/OpenGL.h"
 #include "../../imgui/imgui_stdlib.h" 
 #include "../../Window/GLFWWindow.h"
+#include <godUtility/Grid3D.h>
 #include <godCamera/Camera.h>
 #include <glm/glm/glm.hpp>
 #include <cmath>
@@ -23,7 +24,7 @@ namespace god
 		int m_cell_x { 0 } , m_cell_y { 0 } , m_cell_z { 0 };
 		int m_placement_mode { 1 };
 		bool m_show_selected_grid { false } , m_show_parent_grid { true };
-		bool m_is_grid_cell { true } , m_free_placement { false };
+		bool m_is_grid_cell { true } , m_free_placement { false } , m_replace_cell { true };
 		EnttXSol::Entities::ID m_selected { EnttXSol::Entities::Null };
 
 		const float INF { 1'000'000.0f };
@@ -56,6 +57,8 @@ namespace god
 	inline void EW_TilemapEditor<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& engineResources )
 	{
 		( dt );
+		EntityGrid& grid = engineResources.Get<EntityGrid> ().get ();
+
 		float m_true_cell_size { m_cell_size * 2 };
 		float tilemap_dimension { m_tilemap_dimensions * m_true_cell_size };
 
@@ -209,6 +212,7 @@ namespace god
 		if ( window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) && window.MouseLPressed () && window.WithinWindow () && m_selected_prefab != "-None-" )
 		{
 			glm::vec3 placement_position { intersect_local };
+			// free placement of objects
 			if ( !m_free_placement )
 			{
 				placement_position = { ( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size,
@@ -216,14 +220,29 @@ namespace god
 				( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size };
 			}
 			auto entity = m_enttxsol.AddPrefabToScene ( engineResources , m_selected_prefab , m_selected , placement_position );
+
+			// if object being placed belongs to the grid
 			if ( m_is_grid_cell )
 			{
+				// erase entities in cell
+				if ( m_replace_cell )
+				{
+					grid[ m_selected ].RunOver ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } , []( uint32_t e , EnttXSol& entt ) { entt.RemoveEntity ( e ); } , std::ref ( m_enttxsol ) );
+					grid[ m_selected ].Erase ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } );
+				}
+
 				m_enttxsol.AttachComponent<GridCell> ( entity );
 				GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( entity );
 				grid_cell->m_cell_x = m_cell_x;
 				grid_cell->m_cell_y = m_cell_y;
 				grid_cell->m_cell_z = m_cell_z;
 				grid_cell->m_cell_size = m_cell_size;
+			}
+
+			// add to grid - note : grid granularity accurate to 4 decimal place
+			if ( !m_free_placement )
+			{
+				grid[ m_selected ].Insert ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } , entity );
 			}
 		}
 
@@ -281,6 +300,8 @@ namespace god
 		{
 			m_is_grid_cell = false;
 		}
+		ImGui::SameLine ();
+		ImGui::Checkbox ( "Replace" , &m_replace_cell );
 
 		ImGui::DragInt ( "Y" , &m_cell_y , 1 );
 		ImGui::DragInt ( "Dimension" , &m_tilemap_dimensions , 1 , 1 , 100 , "%.3f" , 0 );

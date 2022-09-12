@@ -35,6 +35,7 @@
 #include <godUtility/TemplateManipulation.h>
 #include <godUtility/FileIO.h>
 #include <godUtility/Math.h>
+#include <godUtility/Grid3D.h>
 
 #include <tuple>
 
@@ -75,6 +76,10 @@ namespace god
 		// setup scene
 		Scene scene;
 
+		// setup grid for tilemap
+		
+		EntityGrid grid;
+
 		// glfw+opengl imgui setup
 		ImGuiOpenGLEditor ogl_editor ( window );
 
@@ -84,7 +89,8 @@ namespace god
 			opengl ,
 			camera ,
 			assets_3d ,
-			ogl_textures
+			ogl_textures ,
+			grid
 		);
 
 		// imgui editor windows

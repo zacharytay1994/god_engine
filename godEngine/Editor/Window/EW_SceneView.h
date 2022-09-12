@@ -6,6 +6,7 @@
 #include "../../Window/DeltaTimer.h"
 #include <godCamera/Camera.h>
 #include <godUtility/Math.h>
+#include <godUtility/Grid3D.h>
 
 #include "../../imgui/imgui_stdlib.h" 
 #include "../../imgui/ImGuizmo.h"
@@ -124,9 +125,18 @@ namespace god
 
 					if ( grid_cell )
 					{
-						grid_cell->m_cell_x = static_cast< int32_t >( ( static_cast< int32_t >( std::floor ( position.x / grid_cell->m_cell_size ) ) - 1 ) / 2.0f );
-						grid_cell->m_cell_y = static_cast< int32_t >( static_cast< int32_t >( std::floor ( position.y / grid_cell->m_cell_size ) ) / 2.0f );
-						grid_cell->m_cell_z = static_cast< int32_t >( ( static_cast< int32_t >( std::floor ( position.z / grid_cell->m_cell_size ) ) - 1 ) / 2.0f );
+						auto cellx = static_cast< int32_t >( ( static_cast< int32_t >( std::floor ( position.x / grid_cell->m_cell_size ) ) - 1 ) / 2.0f );
+						auto celly = static_cast< int32_t >( static_cast< int32_t >( std::floor ( position.y / grid_cell->m_cell_size ) ) / 2.0f );
+						auto cellz = static_cast< int32_t >( ( static_cast< int32_t >( std::floor ( position.z / grid_cell->m_cell_size ) ) - 1 ) / 2.0f );
+						if ( cellx != grid_cell->m_cell_x || celly != grid_cell->m_cell_y || cellz != grid_cell->m_cell_z )
+						{
+							EntityGrid& grid = engineResources.Get<EntityGrid> ().get ();
+							grid[ selected_entity ].ChangeCell ( selected_entity , grid_cell->m_cell_size , { grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } , { cellx, celly, cellz } );
+							grid_cell->m_cell_x = cellx;
+							grid_cell->m_cell_y = celly;
+							grid_cell->m_cell_z = cellz;
+
+						}
 						transform->m_rotation = rotation;
 						transform->m_scale = scale;
 					}
