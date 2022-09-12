@@ -2,6 +2,7 @@
 #include "OpenGL.h"
 #include "../godUtility/Scene.h"
 
+
 #pragma comment(lib, "opengl32.lib")
 
 #include <iostream>
@@ -18,7 +19,8 @@ namespace god
 	OpenGL::Lines OpenGL::m_lines{};
 
 	OpenGL::OpenGL(HWND windowHandle, int width, int height)
-		: m_window_device_context{GetDC(windowHandle)}
+		: 
+		m_window_device_context{GetDC(windowHandle)}
 	{
 		// load opengl functions with glad
 		if (!gladLoadGL())
@@ -43,6 +45,11 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.vs",
 			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.fs");
 
+		m_cubemap_shader.InitializeFromFile(
+			"Assets/EngineAssets/OpenGLShaders/skybox.vs",
+			"Assets/EngineAssets/OpenGLShaders/skybox.fs" );
+
+		
 		// opengl settings
 		glEnable(GL_CULL_FACE);
 		// Enables the Depth Buffer
@@ -84,6 +91,23 @@ namespace god
 		m_lines_mesh.m_vertices.resize(MAX_POINTS);
 		m_lines_mesh.m_indices.resize(MAX_POINTS);
 		m_lines_mesh.Initialize();
+
+
+		// creating cube map
+		m_cubemap.Initialize( width, height );
+		std::string skybox_model_path = "Assets/GameAssets/2DAssets/Raw/Skybox/";
+		// All the faces of the cubemap (make sure they are in this exact order)
+		std::string facesCubemap[6] =
+		{
+			skybox_model_path + "right.jpg",
+			skybox_model_path + "left.jpg",
+			skybox_model_path + "top.jpg",
+			skybox_model_path + "bottom.jpg",
+			skybox_model_path + "front.jpg",
+			skybox_model_path + "back.jpg"
+		};
+		m_cubemap.CubeTexture( facesCubemap );
+
 
 		std::cout << "OpenGL constructed." << std::endl;
 	}
@@ -130,10 +154,13 @@ namespace god
 		// use the shader
 		// m_flat_shader.Use ();
 
+
 		for (auto const &data : scene.m_render_data)
 		{
 			if (data.Active())
 			{
+				
+
 				// Make it so the stencil test always passes
 				glStencilFunc(GL_ALWAYS, 1, 0xFF);
 				// Enable modifying of the stencil buffer
@@ -162,6 +189,9 @@ namespace god
 				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uMaterial.specular_map", 1);
 				std::get<1>(textures.Get(data.m_specular_id)).Bind(1);
 				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uMaterial.shininess", data.m_shininess);
+				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uSkybox", 2 );
+				glActiveTexture( GL_TEXTURE0 + 2);
+				glBindTexture( GL_TEXTURE_CUBE_MAP, m_cubemap.GetTexture() );
 
 				// set light
 				OGLLight light;
@@ -192,6 +222,7 @@ namespace god
 				OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uModel", data.m_model_transform);
 				OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uOutlining", 0.01f);
 
+
 				for (auto const &mesh : m_models[data.m_model_id])
 				{
 					mesh.Draw(GL_TRIANGLES);
@@ -205,6 +236,19 @@ namespace god
 				glEnable(GL_DEPTH_TEST);
 			}
 		}
+
+
+		// draw skybox as last
+		m_cubemap.CubeMapEnableDepth();
+		m_cubemap_shader.Use();
+		OGLShader::SetUniform( m_cubemap_shader.GetShaderID(), "view", view );
+		OGLShader::SetUniform( m_cubemap_shader.GetShaderID(), "projection", projection );
+		OGLShader::SetUniform( m_cubemap_shader.GetShaderID(), "camera", camera_position );
+		m_cubemap.Bind();
+		m_cubemap.Draw();
+		m_cubemap.UnBind();
+		m_cubemap.CubeMapDisableDepth();
+
 
 		// unuse the bound shader
 		OGLShader::UnUse();

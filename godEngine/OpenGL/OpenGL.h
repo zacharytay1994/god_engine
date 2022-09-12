@@ -3,6 +3,9 @@
 #include "Internal/OGLShader.h"
 #include "Internal/OGLPrimitives.h"
 #include "Internal/OGLTexture.h"
+
+#include "Advance/CubeMap.h"
+
 #include "../godUtility/Utility.h"
 
 #include <vector>
@@ -57,6 +60,7 @@ namespace god
 		OGLShader m_flat_shader;
 		OGLShader m_textured_shader;
 		OGLShader m_single_colour_outline_shader;
+		OGLShader m_cubemap_shader;
 
 		// models - vector of vector of OGLMesh because 1 model can consist of more than 1 mesh
 		std::vector<std::vector<OGLMesh>> m_models;
@@ -65,5 +69,7 @@ namespace god
 		// assimp bridge
 		OGLMesh BuildOGLMeshFromAssimpMesh ( Mesh3D const& mesh3D ) const;
 		void BuildOGLMeshesFromAssimpMeshes ( std::vector<OGLMesh>& oglMeshes , std::vector<Mesh3D> const& meshes3D ) const;
+
+		OGLCubeMap m_cubemap;
 	};
 }

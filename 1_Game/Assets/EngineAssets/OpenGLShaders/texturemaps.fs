@@ -8,6 +8,9 @@ in vec3 vWorldPos;
 
 uniform vec3 uViewPosition;
 
+//skybox
+uniform samplerCube uSkybox; //--
+
 // material properties
 struct Material 
 {
@@ -53,5 +56,10 @@ vec3 LightValue()
 
 void main()
 {
+    vec3 I = normalize (vWorldPos - uViewPosition) ; //--
+    vec3 R = reflect (I ,normalize(vNormal)) ; //--
+    R.z = R.z * -1.0f; //--
+    // fFragColor = vec4(texture(uSkybox, R).rgb, 1.0); //--
+
     fFragColor =  vec4(LightValue(), 1.0);
 }

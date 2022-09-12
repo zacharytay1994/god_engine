@@ -8,7 +8,7 @@ namespace god
 {
 	struct TextureData
 	{
-		GODUTILITY_API TextureData ( std::string const& texturePath );
+		GODUTILITY_API TextureData ( std::string const& texturePath, bool setFlip = true );
 		//GODUTILITY_API TextureData& operator=( TextureData const& texture );
 		GODUTILITY_API void Free ();
 
