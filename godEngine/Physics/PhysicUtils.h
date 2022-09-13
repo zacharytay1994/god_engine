@@ -4,8 +4,6 @@
 #include "../EnttXSol/EngineComponents/EC_Transform.h"
 #define BIT(x) (1u << x)
 
-using namespace physx;
-
 namespace god
 {
 	
@@ -32,19 +30,19 @@ namespace god
 		RotationX = BIT(3), RotationY = BIT(4), RotationZ = BIT(5), Rotation = RotationX | RotationY | RotationZ
 	};
 
-	PxTransform ConvertToPhysXTransform(const Transform& transform);
+	physx::PxTransform ConvertToPhysXTransform(const Transform& transform);
 	//PxTransform ConvertToPhysXTransform(const glm::mat4& transform);
-	PxTransform ConvertToPhysXTransform(const glm::vec3& translation, const glm::vec3& rotation);
-	PxMat44 ConvertToPhysXMatrix(const glm::mat4& matrix);
+	physx::PxTransform ConvertToPhysXTransform(const glm::vec3& translation, const glm::vec3& rotation);
+	physx::PxMat44 ConvertToPhysXMatrix(const glm::mat4& matrix);
 	const physx::PxVec3& ConvertToPhysXVector(const glm::vec3& vector);
 	const physx::PxVec4& ConvertToPhysXVector(const glm::vec4& vector);
-	PxQuat ConvertToPhysXQuat(const glm::quat& quat);
+	physx::PxQuat ConvertToPhysXQuat(const glm::quat& quat);
 
-	glm::mat4 ConvertToGlmTransform(const PxTransform& transform);
-	glm::mat4 ConvertToGlmMatrix(const PxMat44& matrix);
-	glm::vec3 ConvertToGlmVector(const PxVec3& vector);
-	glm::vec4 ConvertToGlmVector(const PxVec4& vector);
-	glm::quat ConvertToGlmQuat(const PxQuat& quat);
+	glm::mat4 ConvertToGlmTransform(const physx::PxTransform& transform);
+	glm::mat4 ConvertToGlmMatrix(const physx::PxMat44& matrix);
+	glm::vec3 ConvertToGlmVector(const physx::PxVec3& vector);
+	glm::vec4 ConvertToGlmVector(const physx::PxVec4& vector);
+	glm::quat ConvertToGlmQuat(const physx::PxQuat& quat);
 
 	/*CookingResult FromPhysXCookingResult(PxConvexMeshCookingResult::Enum cookingResult);
 	CookingResult FromPhysXCookingResult(PxTriangleMeshCookingResult::Enum cookingResult);*/

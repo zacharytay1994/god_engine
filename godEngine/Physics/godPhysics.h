@@ -5,8 +5,6 @@
 #include "PhysicSettings.h"
 #include "PhysicActor.h"
 
-using namespace physx;
-
 namespace god
 {
 	class PhysicsSystem

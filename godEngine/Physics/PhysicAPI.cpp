@@ -27,34 +27,47 @@ namespace god
 		{
 		case physx::PxErrorCode::eNO_ERROR:
 		case physx::PxErrorCode::eDEBUG_INFO:
-			//HZ_CORE_INFO("[PhysX]: {0}: {1} at {2} ({3})", errorMessage, message, file, line);
+			//LOG("[PhysX]: {0}: {1} at {2} ({3})", errorMessage, message, file, line);
 			break;
 		case physx::PxErrorCode::eDEBUG_WARNING:
 		case physx::PxErrorCode::ePERF_WARNING:
-			//HZ_CORE_WARN("[PhysX]: {0}: {1} at {2} ({3})", errorMessage, message, file, line);
+			//LOG("[PhysX]: {0}: {1} at {2} ({3})", errorMessage, message, file, line);
 			break;
 		case physx::PxErrorCode::eINVALID_PARAMETER:
 		case physx::PxErrorCode::eINVALID_OPERATION:
 		case physx::PxErrorCode::eOUT_OF_MEMORY:
 		case physx::PxErrorCode::eINTERNAL_ERROR:
-			//HZ_CORE_ERROR("[PhysX]: {0}: {1} at {2} ({3})", errorMessage, message, file, line);
+			//LOG("[PhysX]: {0}: {1} at {2} ({3})", errorMessage, message, file, line);
 			break;
 		case physx::PxErrorCode::eABORT:
 		case physx::PxErrorCode::eMASK_ALL:
-			//HZ_CORE_FATAL("[PhysX]: {0}: {1} at {2} ({3})", errorMessage, message, file, line);
-			//HZ_CORE_ASSERT(false);
+			//LOG("[PhysX]: {0}: {1} at {2} ({3})", errorMessage, message, file, line);
+
 			break;
 		}
 	}
 
 	void PhysicAssertHandler::operator()(const char* exp, const char* file, int line, bool& ignore)
 	{
-
+		//LOG("[PhysX Error]: {0}:{1} - {2}", file, line, exp);
 	}
 
 	void PhysicAPI::Init()
 	{
+		assert(!p_physicData, "Attempt to initialize the PhysX numerous times!");
+		p_physicData = new PhysicData();
 
+		p_physicData->m_PhysXFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, p_physicData->Allocator, p_physicData->ErrorCallback);
+		assert(!p_physicData->m_PhysXFoundation, "Creation of PhysXFoundation FAILED!");
+
+		physx::PxTolerancesScale physic_scale = physx::PxTolerancesScale();
+		physic_scale.length = 1.f;
+		physic_scale.speed = 100.f;
+
+		//p_physicData->m_PhysX = PxCreatePhysics(PX_PHYSICS_VERSION, *p_physicData->m_PhysXFoundation, physic_scale, true, (physx::PxPvd)*);
+		//assert(s_PhysXData->PhysXSDK, "PxCreatePhysics failed.");
+
+		//s_PhysXData->PhysXCPUDispatcher = physx::PxDefaultCpuDispatcherCreate(1);
 	}
 	void PhysicAPI::Shutdown()
 	{
