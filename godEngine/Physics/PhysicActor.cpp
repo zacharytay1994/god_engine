@@ -3,5 +3,10 @@
 
 namespace god
 {
-
+	PhysicActor::PhysicActor(Entity_ entity)
+	{
+	}
+	PhysicActor::~PhysicActor()
+	{
+	}
 }

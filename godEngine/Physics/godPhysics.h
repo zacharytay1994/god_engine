@@ -29,7 +29,7 @@ namespace god
 		static PhysicScene m_scene;
 		static PhysicSettings m_settings;
 	};
-	PxDefaultAllocator		gAllocator;
+	/*PxDefaultAllocator		gAllocator;
 	PxDefaultErrorCallback	gErrorCallback;
 
 	PxFoundation* gFoundation = NULL;
@@ -42,6 +42,6 @@ namespace god
 
 	PxPvd* gPvd = NULL;
 
-	PxReal stackZ = 10.0f;
+	PxReal stackZ = 10.0f;*/
 }
 
