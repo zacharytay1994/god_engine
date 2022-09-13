@@ -7,6 +7,7 @@ namespace god
 	{
 		"ExampleComponent",
 		"Transform",
-		"Renderable3D"
+		"Renderable3D",
+		"AudioSource"
 	};
 }

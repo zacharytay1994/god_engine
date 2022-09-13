@@ -162,6 +162,15 @@
     <ClInclude Include="Physics\godPhysics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EnttXSol\EngineComponents\EC_AudioSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnttXSol\EngineComponents\EC_AudioListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
