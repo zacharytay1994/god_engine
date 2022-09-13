@@ -8,12 +8,11 @@ namespace god
 		void Initialize( unsigned int width, unsigned int height );
 		void CubeTexture( std::string facesCubemap[6] );
 		void CubeMapEnableDepth();
-		void CubeMapDisableDepth();
-		void Free();
 		void Bind();
 		void Bind( uint32_t location );
 		void Draw();
 		void UnBind();
+		void CubeMapDisableDepth();
 		unsigned int GetTexture();
 
 	private:

@@ -7,6 +7,7 @@
 #include <godUtility/Internal/TextureData.h>
 
 #include <iostream>
+#include "ShadowMap.h"
 
 namespace god
 {
@@ -35,25 +36,6 @@ namespace god
 
 	unsigned int skyboxIndices[] =
 	{
-		//// Right
-		//1, 2, 6,
-		//6, 5, 1,
-		//// Left
-		//0, 4, 7,   
-		//7, 3, 0,   
-		//// Top	   
-		//4, 5, 6,   
-		//6, 7, 4,   
-		//// Bottom  
-		//0, 3, 2,   
-		//2, 1, 0,
-		//// Back
-		//0, 1, 5,
-		//5, 4, 0,
-		//// Front
-		//3, 7, 6,
-		//6, 2, 3
-
 		7,3,2,
 		2,6,7,
 
@@ -72,12 +54,6 @@ namespace god
 		3,0,2,
 		2,0,1
 	};
-
-	
-
-
-
-
 
 	void OGLCubeMap::Initialize( unsigned int width, unsigned int height )
 	{
@@ -169,8 +145,7 @@ namespace god
 		// Switch back to the normal depth function
 		glDepthFunc( GL_LESS );
 	}
-	void OGLCubeMap::Free()
-	{}
+
 	void OGLCubeMap::Bind()
 	{
 		// Draws the cubemap as the last object so we can save a bit of performance by discarding all fragments

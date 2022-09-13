@@ -45,6 +45,7 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.vs",
 			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.fs");
 
+		// create cubemap shader
 		m_cubemap_shader.InitializeFromFile(
 			"Assets/EngineAssets/OpenGLShaders/skybox.vs",
 			"Assets/EngineAssets/OpenGLShaders/skybox.fs" );
@@ -107,7 +108,6 @@ namespace god
 			skybox_model_path + "back.jpg"
 		};
 		m_cubemap.CubeTexture( facesCubemap );
-
 
 		std::cout << "OpenGL constructed." << std::endl;
 	}
@@ -218,7 +218,6 @@ namespace god
 				OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uModel", data.m_model_transform);
 				OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uOutlining", 0.01f);
 
-
 				for (auto const &mesh : m_models[data.m_model_id])
 				{
 					mesh.Draw(GL_TRIANGLES);
@@ -233,7 +232,6 @@ namespace god
 			}
 		}
 
-
 		// draw skybox as last
 		m_cubemap.CubeMapEnableDepth();
 		m_cubemap_shader.Use();
@@ -244,7 +242,6 @@ namespace god
 		m_cubemap.Draw();
 		m_cubemap.UnBind();
 		m_cubemap.CubeMapDisableDepth();
-
 
 		// unuse the bound shader
 		OGLShader::UnUse();
