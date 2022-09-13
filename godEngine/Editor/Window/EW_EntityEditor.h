@@ -165,9 +165,6 @@ namespace god
 
 		if ( scene_tree->GetSelectedEntity () != EnttXSol::Entities::Null )
 		{
-			// entity id
-			ImGui::Text ( "Entity ID [%d]" , scene_tree->GetSelectedEntity () );
-
 			// display all engine components
 			int uid { 0 };
 			m_enttxsol.SerializeEngineComponents< EngineComponents , EDITOR_RESOURCES > ( scene_tree->GetSelectedEntity () , uid , editorResources );

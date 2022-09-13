@@ -135,7 +135,12 @@ namespace god
 
 		if ( window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) && window.MouseLPressed () && window.WithinWindow () && m_selected_prefab != "-None-" )
 		{
-			m_enttxsol.AddPrefabToScene ( engineResources , m_selected_prefab , m_parent , { ( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size, m_y_level, ( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size } );
+			auto entity = m_enttxsol.AddPrefabToScene ( engineResources , m_selected_prefab , m_parent , { ( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size, m_y_level, ( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size } );
+			m_enttxsol.AttachComponent<GridCell> ( entity );
+			GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( entity );
+			grid_cell->m_cell_x = m_cell_x;
+			grid_cell->m_cell_z = m_cell_z;
+			grid_cell->m_cell_size = m_cell_size;
 		}
 
 		// move the preview to the right cell
@@ -160,6 +165,7 @@ namespace god
 		// if parent changed and there is a preview update preview
 		if ( old_parent != m_parent )
 		{
+			m_y_level = 0;
 			if ( m_preview_id != EnttXSol::Entities::Null && m_enttxsol.m_entities.Valid ( m_preview_id ) )
 			{
 				m_enttxsol.RemoveEntity ( m_preview_id );

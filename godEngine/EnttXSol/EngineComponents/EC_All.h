@@ -1,9 +1,11 @@
 #pragma once
 
 #include "EC_Example.h"
+#include "EC_EntityData.h"
 #include "EC_Transform.h"
 #include "EC_Renderable3D.h"
 #include "EC_RigidBody.h"
+#include "EC_GridCell.h"
 
 #include <tuple>
 #include <string>
@@ -14,9 +16,10 @@ namespace god
 	struct EngineComponents
 	{
 		using Components = std::tuple<
-			ExampleComponent ,
+			EntityData ,
 			Transform ,
 			Renderable3D ,
+			GridCell,
 			RigidBody
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;

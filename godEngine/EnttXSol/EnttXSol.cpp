@@ -299,6 +299,13 @@ namespace god
 		{
 			m_entities[ parent ].m_children.push_back ( new_entity );
 		}
+
+		// attach entity data
+		AttachComponent<EntityData> ( new_entity );
+		EntityData* ed = GetEngineComponent<EntityData> ( new_entity );
+		ed->m_id = new_entity;
+		ed->m_parent_id = parent;
+
 		return new_entity;
 	}
 
@@ -495,6 +502,15 @@ namespace god
 				JSONify ( engineResources , document , transform_value , *transform );
 				RapidJSON::JSONifyToValue ( value , document , "Transform" , transform_value );
 			}
+
+			// serialize grid cell if any
+			GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
+			if ( grid_cell )
+			{
+				rapidjson::Value grid_cell_value { rapidjson::kObjectType };
+				JSONify ( engineResources , document , grid_cell_value , *grid_cell );
+				RapidJSON::JSONifyToValue ( value , document , "Grid Cell" , grid_cell_value );
+			}
 		}
 	}
 
@@ -524,6 +540,14 @@ namespace god
 				{
 					DeJSONify ( engineResources , *transform , value[ "Transform" ] );
 				}
+			}
+
+			// if prefab was part of a grid before, load its grid cell data
+			if ( value.HasMember ( "Grid Cell" ) )
+			{
+				AttachComponent<GridCell> ( prefab_root );
+				GridCell* grid_cell = GetEngineComponent<GridCell> ( prefab_root );
+				DeJSONify ( engineResources , *grid_cell , value[ "Grid Cell" ] );
 			}
 		}
 		else if ( std::string ( value[ "Type" ].GetString () ) == "Default" )
@@ -716,6 +740,15 @@ namespace god
 					JSONify ( engineResources , document , transform_value , *transform );
 					RapidJSON::JSONifyToValue ( value , document , "Transform" , transform_value );
 				}
+
+				// serialize grid cell if any
+				GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
+				if ( grid_cell )
+				{
+					rapidjson::Value grid_cell_value { rapidjson::kObjectType };
+					JSONify ( engineResources , document , grid_cell_value , *grid_cell );
+					RapidJSON::JSONifyToValue ( value , document , "Grid Cell" , grid_cell_value );
+				}
 			}
 		}
 	}
@@ -744,6 +777,14 @@ namespace god
 				{
 					DeJSONify ( engineResources , *transform , value[ "Transform" ] );
 				}
+			}
+
+			// if prefab was part of a grid before, load its grid cell data
+			if ( value.HasMember ( "Grid Cell" ) )
+			{
+				AttachComponent<GridCell> ( prefab_root );
+				GridCell* grid_cell = GetEngineComponent<GridCell> ( prefab_root );
+				DeJSONify ( engineResources , *grid_cell , value[ "Grid Cell" ] );
 			}
 		}
 		else if ( std::string ( value[ "Type" ].GetString () ) == "Default" )

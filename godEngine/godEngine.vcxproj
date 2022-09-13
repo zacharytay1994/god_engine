@@ -115,6 +115,8 @@
     <ClInclude Include="Editor\Window\TestWindow.h" />
     <ClInclude Include="Editor\Window\TestWindow2.h" />
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_EntityData.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_GridCell.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Renderable3D.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_RigidBody.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EngineComponents.h" />
@@ -123,6 +125,7 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_All.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
     <ClInclude Include="EnttXSol\EnttXSol.h" />
     <ClInclude Include="EnttXSol\Internal\godEntity.h" />
     <ClInclude Include="framework.h" />

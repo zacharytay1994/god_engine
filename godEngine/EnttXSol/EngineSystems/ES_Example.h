@@ -1,14 +1,18 @@
 #pragma once
 
 #include "../EngineComponents/EC_All.h"
+#include "../EnttXSol.h"
 
 namespace god
 {
-	void ExampleSystem ( Transform& transform )
+	void ExampleSystem ( EnttXSol& entt , std::tuple<EntityData& , Transform&> components )
 	{
-		( transform );
 		// some code here ...
-		//std::cout << transform.m_position.x << std::endl;
-		//transform.m_rotation.y += 0.002f;
+		/*auto& entity_data = std::get<0> ( components );
+		Transform* parent_transform = entt.GetEngineComponent<Transform> ( entity_data.m_parent_id );
+		if ( parent_transform )
+		{
+			parent_transform->m_position += 0.002f;
+		}*/
 	}
 }
