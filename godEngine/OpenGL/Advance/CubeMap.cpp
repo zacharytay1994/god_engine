@@ -177,6 +177,13 @@ namespace god
 		// where an object is present (a depth of 1.0f will always fail against any object's depth value)
 		glBindVertexArray( m_skybox_vao );
 	}
+	void OGLCubeMap::Bind( uint32_t location )
+	{
+		assert( m_cubemap_texture != static_cast< uint32_t >( -1 ) && ( "Texture not initialized" ) );
+		glActiveTexture( GL_TEXTURE0 + location );
+		glBindTexture( GL_TEXTURE_CUBE_MAP, m_cubemap_texture );
+	
+	}
 	void OGLCubeMap::Draw()
 	{
 		glActiveTexture( GL_TEXTURE0 );

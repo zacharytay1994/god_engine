@@ -151,16 +151,11 @@ namespace god
 							 glm::mat4 const &projection, glm::mat4 const &view, glm::vec3 const &camera_position, OGLTextureManager &textures)
 	{
 		ClearColour();
-		// use the shader
-		// m_flat_shader.Use ();
-
 
 		for (auto const &data : scene.m_render_data)
 		{
 			if (data.Active())
 			{
-				
-
 				// Make it so the stencil test always passes
 				glStencilFunc(GL_ALWAYS, 1, 0xFF);
 				// Enable modifying of the stencil buffer
@@ -189,13 +184,14 @@ namespace god
 				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uMaterial.specular_map", 1);
 				std::get<1>(textures.Get(data.m_specular_id)).Bind(1);
 				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uMaterial.shininess", data.m_shininess);
+
+				// set reflection
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uSkybox", 2 );
-				glActiveTexture( GL_TEXTURE0 + 2);
-				glBindTexture( GL_TEXTURE_CUBE_MAP, m_cubemap.GetTexture() );
+				m_cubemap.Bind( 2 );
 
 				// set light
 				OGLLight light;
-				light.m_position = {0.0f, 100.0f, 0.0f};
+				light.m_position = {0.0f, 10.0f, 0.0f};
 				light.m_ambient = {0.8f, 0.8f, 0.8f};
 				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uLight.position", light.m_position);
 				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uLight.colour", light.m_colour);

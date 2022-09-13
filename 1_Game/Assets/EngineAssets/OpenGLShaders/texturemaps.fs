@@ -47,19 +47,20 @@ vec3 LightValue()
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
     vec4 diffuse = vec4((uLight.colour * uLight.diffuse), 1.0) * (diffuse_scalar * texture(uMaterial.diffuse_map, vUV));
 
+    // cubemap reflection
+    vec3 I = normalize (vWorldPos - uViewPosition) ; //--
+    vec3 R = reflect (I ,normalize(vNormal)) ; //--
+    R.z = R.z * -1.0f; //--
+    vec4 cubemap_colour =  vec4(texture(uSkybox, R).rgb, 1.0);
+
     // specular
     float specular_scalar = pow(max(dot(view_direction, reflect_direction), 0.0), uMaterial.shininess);
-    vec4 specular = vec4(uLight.specular, 1.0) * (specular_scalar * texture(uMaterial.specular_map, vUV));
+    vec4 specular = cubemap_colour * (specular_scalar * texture(uMaterial.specular_map, vUV));
 
     return vec3 ( ambient + diffuse + specular );
 }
 
 void main()
 {
-    vec3 I = normalize (vWorldPos - uViewPosition) ; //--
-    vec3 R = reflect (I ,normalize(vNormal)) ; //--
-    R.z = R.z * -1.0f; //--
-    // fFragColor = vec4(texture(uSkybox, R).rgb, 1.0); //--
-
-    fFragColor =  vec4(LightValue(), 1.0);
+    fFragColor = vec4(LightValue(),1.0);
 }

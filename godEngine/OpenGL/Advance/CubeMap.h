@@ -11,10 +11,10 @@ namespace god
 		void CubeMapDisableDepth();
 		void Free();
 		void Bind();
+		void Bind( uint32_t location );
 		void Draw();
 		void UnBind();
 		unsigned int GetTexture();
-		void UpdateWidth( unsigned int width, unsigned int height );
 
 	private:
 		static constexpr uint32_t GL_UNINITIALIZED = static_cast< uint32_t >( -1 );
