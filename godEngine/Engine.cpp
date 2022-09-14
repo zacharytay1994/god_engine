@@ -38,8 +38,14 @@
 
 #include <tuple>
 
+
+
+
+
 namespace god
 {
+
+
 	GODENGINE_API godEngine::godEngine ()
 	{
 		std::cout << "godEngine constructed." << std::endl;
@@ -47,10 +53,14 @@ namespace god
 
 	void godEngine::Update ()
 	{
+		std::cout << "godEngine Update." << std::endl;
 		// create window
 		GLFWWindow window ( 1920 , 1080 );
 		DeltaTimer delta_timer;
 		OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
+		PhysicsSystem godPhysicsSystem{};
+
+
 		OGLRenderPass first_renderpass ( window.GetWindowWidth () , window.GetWindowHeight () );
 
 		// setup camera
@@ -99,6 +109,11 @@ namespace god
 		editor_windows.AddWindow<god::EW_Performance> ( true );
 		editor_windows.AddWindow<god::EW_TilemapEditor> ( true , std::ref ( enttxsol ) );
 
+
+
+		godPhysicsSystem.Init();
+		godPhysicsSystem.SetupPVD();
+
 		while ( !window.WindowShouldClose () )
 		{
 			SystemTimer::StartTimeSegment ( "Overall" );
@@ -124,6 +139,9 @@ namespace god
 			SystemTimer::StartTimeSegment ( "Populating Scene" );
 			enttxsol.PopulateScene<Scene , Transform , Renderable3D> ( scene );
 			SystemTimer::EndTimeSegment ( "Populating Scene" );
+
+			godPhysicsSystem.Update(60.f);
+
 
 			// render scene
 			SystemTimer::StartTimeSegment ( "Rendering" );

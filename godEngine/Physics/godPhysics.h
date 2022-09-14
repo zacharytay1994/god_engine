@@ -5,41 +5,57 @@
 #include "PhysicSettings.h"
 #include "PhysicActor.h"
 
+#define PVD_HOST "127.0.0.1"
+
+
 namespace god
 {
 	class PhysicsSystem
 	{
 	public:
-		static void Init();
-		static void Shutdown();
 
-		static PhysicScene& getScene() { return m_scene; }
+		PhysicsSystem();
+		~PhysicsSystem();
+		 void Init();
+		 void Update(float fps);
 
-		static void CreateScene();
-		static void DestroyScene();
 
-		static void CreateActors(Scene& scene);
-		static PhysicActor& CreateActor(Entity_ entity);
 
-		static PhysicSettings& getSettings() { return m_settings; }
 
+
+
+		 void Shutdown();
+
+		 PhysicScene& getScene() { return m_scene; }
+
+		 void CreateScene();
+		 void DestroyScene();
+
+		 void CreateActors(Scene& scene);
+		 PhysicActor& CreateActor(Entity_ entity);
+
+		 PhysicSettings& getSettings() { return m_settings; }
+
+		 void SetupPVD();
+		 //PhysX Visual Debugger
 	private:
-		static PhysicScene m_scene;
-		static PhysicSettings m_settings;
+		 PhysicScene m_scene;
+		 PhysicSettings m_settings;
+
+		physx::PxDefaultAllocator      mDefaultAllocatorCallback;
+		physx::PxDefaultErrorCallback  mDefaultErrorCallback;
+		physx::PxDefaultCpuDispatcher* mDispatcher;
+		physx::PxTolerancesScale       mToleranceScale;
+
+		physx::PxFoundation* mFoundation ;
+		physx::PxPhysics* mPhysics;
+
+		physx::PxScene* mScene;
+		physx::PxMaterial* mMaterial;
+
+		physx::PxPvd* mPvd;
+
 	};
-	/*PxDefaultAllocator		gAllocator;
-	PxDefaultErrorCallback	gErrorCallback;
 
-	PxFoundation* gFoundation = NULL;
-	PxPhysics* gPhysics = NULL;
-
-	PxDefaultCpuDispatcher* gDispatcher = NULL;
-	PxScene* gScene = NULL;
-
-	PxMaterial* gMaterial = NULL;
-
-	PxPvd* gPvd = NULL;
-
-	PxReal stackZ = 10.0f;*/
 }
 
