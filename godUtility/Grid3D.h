@@ -6,6 +6,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 
 namespace god
 {
@@ -29,9 +30,10 @@ namespace god
 
 		void Insert ( float granularity , Coordinate const& coord , T const& value );
 		void Erase ( float granularity , Coordinate const& coord );
+		bool EraseValue ( float granularity , Coordinate const& coord , T const& value );
 		std::vector<T> const& Get ( float granularity , Coordinate const& coord ) const;
 		std::vector<T>& Get ( float granularity , Coordinate const& coord );
-		void ChangeCell ( T const& val , float granularity , Coordinate const& coord1 , Coordinate const& coord2 );
+		void ChangeCell ( T const& value , float granularity , Coordinate const& from , Coordinate const& to );
 
 		template <typename FN , typename...ARGS>
 		void RunOver ( float granularity , Coordinate const& coord , FN fn , ARGS...args );
@@ -60,6 +62,19 @@ namespace god
 	}
 
 	template<typename T>
+	inline bool Grid3D<T>::EraseValue ( float granularity , Coordinate const& coord , T const& value )
+	{
+		auto& first_container = Get ( granularity , coord );
+		auto it = std::find ( first_container.begin () , first_container.end () , value );
+		if ( it != first_container.end () )
+		{
+			first_container.erase ( it );
+			return true;
+		}
+		return false;
+	}
+
+	template<typename T>
 	inline void Grid3D<T>::Erase ( float granularity , Coordinate const& coord )
 	{
 		m_grid[ NormGran ( granularity ) ][ coord ].m_values.clear ();
@@ -78,15 +93,12 @@ namespace god
 	}
 
 	template<typename T>
-	inline void Grid3D<T>::ChangeCell ( T const& val , float granularity , Coordinate const& coord1 , Coordinate const& coord2 )
+	inline void Grid3D<T>::ChangeCell ( T const& value , float granularity , Coordinate const& from , Coordinate const& to )
 	{
-		auto& first_container = Get ( granularity , coord1 );
-		auto it = std::find ( first_container.begin () , first_container.end () , val );
-		if ( it != first_container.end () )
+		if ( EraseValue ( granularity , from , value ) )
 		{
-			first_container.erase ( it );
+			Insert ( granularity , to , value );
 		}
-		Insert ( granularity , coord2 , val );
 	}
 
 	template<typename T>

@@ -5,10 +5,11 @@
 
 namespace god
 {
-	void ExampleSystem ( EnttXSol& entt , std::tuple<EntityData& , Transform&> components )
+	void ExampleSystem ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform&> components )
 	{
 		( entt );
 		( components );
+		( engineResources );
 		// some code here ...
 		/*auto& entity_data = std::get<0> ( components );
 		Transform* parent_transform = entt.GetEngineComponent<Transform> ( entity_data.m_parent_id );

@@ -62,7 +62,7 @@ namespace god
 
 	public:
 		EnttXSol ();
-		void Update ();
+		void Update ( EngineResources& engineResources );
 		void ClearEntt ();
 		void SetupBindings ();
 
@@ -78,11 +78,12 @@ namespace god
 		template<typename T , typename ...ARGS>
 		void RegisterLuaType ( std::string const& name , ARGS...args );
 		template<typename ...T>
-		void RunEngineSystem ( void( *system )( EnttXSol& , std::tuple<T...> ) );
-		void BindEngineSystemUpdate ( void( *update )( EnttXSol& , bool ) );
+		void RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) );
+		void BindEngineSystemUpdate ( void( *update )( EnttXSol& , EngineResources& engineResources , bool ) );
 
 		Entities::ID CreateEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );
 		void RemoveEntity ( Entities::ID entity );
+		void RemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity );
 
 		template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
 		void SerializeEngineComponents ( Entities::ID entity , int& imguiUniqueID , EDITOR_RESOURCES& resources );
@@ -105,6 +106,8 @@ namespace god
 
 		template<typename T>
 		T* GetEngineComponent ( Entities::ID entity );
+		template<typename T>
+		void RemoveEngineComponent ( Entities::ID entity );
 
 		std::unordered_map<std::string , Script> const& GetScripts () const;
 
@@ -117,14 +120,14 @@ namespace god
 		void SerializeStateV2 ( EngineResources& engineResources , std::string const& fileName );
 		void SerializeStateV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value );
 
-		void DeserializeStateV2 ( EngineResources& engineResources , std::string const& fileName );
-		void DeserializeStateV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent );
+		void DeserializeStateV2 ( EngineResources& engineResources , std::string const& fileName , EntityGrid* grid = nullptr );
+		void DeserializeStateV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , EntityGrid* grid = nullptr );
 
 		void SavePrefabV2 ( EngineResources& engineResources , Entities::ID root , std::string const& fileName );
 		void SavePrefabV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value , bool root = false );
 
-		EnttXSol::Entities::ID LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , bool persist = true );
-		EnttXSol::Entities::ID LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root = false );
+		EnttXSol::Entities::ID LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , bool persist = true , EntityGrid* grid = nullptr );
+		EnttXSol::Entities::ID LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root = false , EntityGrid* grid = nullptr );
 
 		EnttXSol::Entities::ID AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , glm::vec3 const& position = { 0,0,0 } );
 
@@ -157,7 +160,7 @@ namespace god
 		std::unordered_map<std::string , Script> m_scripts;
 		std::unordered_map<std::string , sol::function> m_sol_functions;
 
-		void( *m_engine_update )( EnttXSol& , bool ) = nullptr;
+		void( *m_engine_update )( EnttXSol& , EngineResources& engineResources , bool ) = nullptr;
 
 		void LoadSystem ( std::string const& name );
 		bool AttachComponent ( Entities::ID id , std::string const& name );
@@ -167,6 +170,7 @@ namespace god
 		entt::runtime_view GetView ( std::vector<std::string> const& components , std::vector<std::string> const& engineComponents );
 
 		void RecursiveRemoveEntity ( Entities::ID entity );
+		void RecursiveRemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity );
 
 		// register engine components with lua
 		struct BindCTypeToLua
@@ -250,14 +254,14 @@ namespace god
 	}
 
 	template<typename ...T>
-	inline void EnttXSol::RunEngineSystem ( void( *system )( EnttXSol& , std::tuple<T...> ) )
+	inline void EnttXSol::RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) )
 	{
 		auto view = m_registry.view<std::remove_reference<T>::type...> ();
 		//view.each ( system );
 
 		for ( auto entity : view )
 		{
-			system ( *this , view.get ( entity ) );
+			system ( *this , engineResources , view.get ( entity ) );
 		}
 	}
 
@@ -357,6 +361,15 @@ namespace god
 			return m_registry.try_get<T> ( m_entities[ entity ].m_id );
 		}
 		return nullptr;
+	}
+
+	template<typename T>
+	inline void EnttXSol::RemoveEngineComponent ( Entities::ID entity )
+	{
+		if ( m_entities.Valid ( entity ) )
+		{
+			m_registry.remove<T> ( m_entities[ entity ].m_id );
+		}
 	}
 
 	template<typename S , typename T , typename R>

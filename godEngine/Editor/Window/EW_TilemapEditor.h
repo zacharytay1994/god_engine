@@ -24,7 +24,7 @@ namespace god
 		int m_cell_x { 0 } , m_cell_y { 0 } , m_cell_z { 0 };
 		int m_placement_mode { 1 };
 		bool m_show_selected_grid { false } , m_show_parent_grid { true };
-		bool m_is_grid_cell { true } , m_free_placement { false } , m_replace_cell { true };
+		bool m_free_placement { false } , m_replace_cell { true };
 		EnttXSol::Entities::ID m_selected { EnttXSol::Entities::Null };
 
 		const float INF { 1'000'000.0f };
@@ -106,8 +106,6 @@ namespace god
 					}
 
 					float parent_grid_y { grid_position.y };
-					/*glm::vec3 transform_position;
-					Transform* transform = m_enttxsol.GetEngineComponent<Transform> ( m_selected );*/
 					if ( transform )
 					{
 						auto position = transform->m_parent_transform * glm::vec4 ( transform->m_position , 1.0f );
@@ -222,13 +220,12 @@ namespace god
 			auto entity = m_enttxsol.AddPrefabToScene ( engineResources , m_selected_prefab , m_selected , placement_position );
 
 			// if object being placed belongs to the grid
-			if ( m_is_grid_cell )
+			if ( !m_free_placement )
 			{
 				// erase entities in cell
 				if ( m_replace_cell )
 				{
-					grid[ m_selected ].RunOver ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } , []( uint32_t e , EnttXSol& entt ) { entt.RemoveEntity ( e ); } , std::ref ( m_enttxsol ) );
-					grid[ m_selected ].Erase ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } );
+					grid[ m_selected ].RunOver ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } , [ &grid ]( uint32_t e , EnttXSol& entt ) { entt.RemoveEntityFromGrid ( grid , e ); } , std::ref ( m_enttxsol ) );
 				}
 
 				m_enttxsol.AttachComponent<GridCell> ( entity );
@@ -237,11 +234,7 @@ namespace god
 				grid_cell->m_cell_y = m_cell_y;
 				grid_cell->m_cell_z = m_cell_z;
 				grid_cell->m_cell_size = m_cell_size;
-			}
 
-			// add to grid - note : grid granularity accurate to 4 decimal place
-			if ( !m_free_placement )
-			{
 				grid[ m_selected ].Insert ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } , entity );
 			}
 		}
@@ -293,13 +286,7 @@ namespace god
 			m_show_selected_grid = true;
 		}
 
-		ImGui::Checkbox ( "As Cell" , &m_is_grid_cell );
-		ImGui::SameLine ();
 		ImGui::Checkbox ( "Free Placement" , &m_free_placement );
-		if ( m_free_placement )
-		{
-			m_is_grid_cell = false;
-		}
 		ImGui::SameLine ();
 		ImGui::Checkbox ( "Replace" , &m_replace_cell );
 

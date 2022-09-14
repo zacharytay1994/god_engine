@@ -9,6 +9,9 @@ namespace god
 	{
 		int32_t m_cell_x { 0 } , m_cell_y { 0 } , m_cell_z { 0 };
 		float m_cell_size { 1.0f };
+
+		// not saved, used to change cell in Grid3D
+		int32_t m_cell_ox { 0 } , m_cell_oy { 0 } , m_cell_oz { 0 };
 	};
 	template <>
 	inline void NewLuaType<GridCell> ( sol::state& luaState , std::string const& name )
@@ -39,6 +42,8 @@ namespace god
 				ImGui::SameLine ();
 				ImGui::SetNextItemWidth ( width / 4 );
 				ImGui::DragInt ( "Z" , &component.m_cell_z );
+
+				ImGui::Text ( "Cell Size: %.3f" , component.m_cell_size );
 			} );
 	}
 

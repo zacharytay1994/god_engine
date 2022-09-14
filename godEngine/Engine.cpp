@@ -77,7 +77,6 @@ namespace god
 		Scene scene;
 
 		// setup grid for tilemap
-		
 		EntityGrid grid;
 
 		// glfw+opengl imgui setup
@@ -125,7 +124,7 @@ namespace god
 			// update scene
 			// ...
 			SystemTimer::StartTimeSegment ( "EnTT Update" );
-			enttxsol.Update ();
+			enttxsol.Update ( engine_resources );
 			SystemTimer::EndTimeSegment ( "EnTT Update" );
 			SystemTimer::StartTimeSegment ( "Populating Scene" );
 			enttxsol.PopulateScene<Scene , Transform , Renderable3D> ( scene );
@@ -179,16 +178,6 @@ namespace god
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );
-
-			/*glm::vec3 dir = ViewportToWorldRay (
-				{ window.ViewportMouseX (), window.ViewportMouseY () } ,
-				window.GetWindowWidth () ,
-				window.GetWindowHeight () ,
-				camera.GetPerpectiveProjectionMatrix () ,
-				camera.GetCameraViewMatrix () );
-			glm::vec3 a = camera.m_position , b = camera.m_position + dir * 1000.0f;
-			glm::vec3 ints = IntersectLineSegmentPlane ( a , b , { 0,1,0 } , 0 );*/
-			//std::cout << ints.x << "," << ints.y << "," << ints.z << std::endl;
 
 			delta_timer.EndFrame ();
 			SystemTimer::EndTimeSegment ( "Overall" );
