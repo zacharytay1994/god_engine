@@ -15,6 +15,8 @@
 
 #include "Physics/godPhysics.h"
 
+#include "Audio/AudioAPI.h"
+
 #include "Editor/Editor.h"
 #include "Editor/EngineResources.h"
 #include "Editor/OpenGLEditor.h"
@@ -65,6 +67,8 @@ namespace god
 		InsertAllOGLTexturesFromConfig ( AssetPath::File_TexturesConfig , AssetPath::Folder_RawTextures , ogl_textures );
 
 		opengl.BuildOGLModels ( assets_3d );
+
+		AudioAPI audio_api;
 
 		// setup ecs and scripting
 		EnttXSol enttxsol;

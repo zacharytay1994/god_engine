@@ -171,6 +171,9 @@
     <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Audio\AudioAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -249,6 +252,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\ImGuizmo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\AudioAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

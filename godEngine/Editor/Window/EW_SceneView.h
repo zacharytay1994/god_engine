@@ -4,6 +4,7 @@
 #include "../../EnttXSol/EngineComponents/EC_All.h"
 #include "../../Window/GLFWWindow.h"
 #include "../../Window/DeltaTimer.h"
+#include "../../Audio/AudioAPI.h"
 #include <godCamera/Camera.h>
 #include <godUtility/Math.h>
 
@@ -130,12 +131,14 @@ namespace god
 		if ( ImGui::Button ( "PLAY" ) )
 		{
 			m_enttxsol.m_pause = false;
+			AudioAPI::ResumeAll();
 		}
 		this->ToolTipOnHover ( "Objects will be updated." );
 		ImGui::SameLine ();
 		if ( ImGui::Button ( "PAUSE" ) )
 		{
 			m_enttxsol.m_pause = true;
+			AudioAPI::PauseAll();
 		}
 		this->ToolTipOnHover ( "Objects will not be updated." );
 		ImGui::SameLine ();
