@@ -57,6 +57,9 @@ namespace god
 		// setup camera
 		Camera camera;
 		camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
+		camera.m_pitch = -45.0f;
+		float scene_camera_zoom_distance { 20.0f };
+		glm::vec3 scene_camera_position_offset { 0.0f };
 
 		// setup resources
 		Asset3DManager assets_3d;
@@ -161,7 +164,7 @@ namespace god
 			window.SwapWindowBuffers ();
 			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
 			// free camera update
-			camera.FreeCamera ( 0.02f ,
+			/*camera.FreeCamera ( 0.02f ,
 				true ,
 				window.KeyDown ( GLFW_KEY_W ) ,
 				window.KeyDown ( GLFW_KEY_S ) ,
@@ -177,7 +180,20 @@ namespace god
 				window.MouseScrollDown () ,
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
-				window.MouseScrollDown () );
+				window.MouseScrollDown () );*/
+			camera.SceneCamera (
+				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
+				0.5f ,
+				0.7f , // value between 0-1
+				scene_camera_position_offset ,
+				window.MouseLDown () ,
+				window.MouseRDown () ,
+				static_cast< float >( window.ScreenMouseX () ) ,
+				static_cast< float >( window.ScreenMouseY () ) ,
+				scene_camera_zoom_distance ,
+				window.MouseScrollUp () ,
+				window.MouseScrollDown ()
+			);
 
 			delta_timer.EndFrame ();
 			SystemTimer::EndTimeSegment ( "Overall" );
