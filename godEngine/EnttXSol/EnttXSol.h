@@ -77,7 +77,7 @@ namespace god
 		template<typename T , typename ...ARGS>
 		void RegisterLuaType ( std::string const& name , ARGS...args );
 		template<typename ...T>
-		void RunEngineSystem ( void( *system )( T... ) );
+		void RunEngineSystem ( void( *system )( EnttXSol& , std::tuple<T...> ) );
 		void BindEngineSystemUpdate ( void( *update )( EnttXSol& ) );
 
 		Entities::ID CreateEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );
@@ -246,10 +246,15 @@ namespace god
 	}
 
 	template<typename ...T>
-	inline void EnttXSol::RunEngineSystem ( void( *system )( T... ) )
+	inline void EnttXSol::RunEngineSystem ( void( *system )( EnttXSol& , std::tuple<T...> ) )
 	{
 		auto view = m_registry.view<std::remove_reference<T>::type...> ();
-		view.each ( system );
+		//view.each ( system );
+
+		for ( auto entity : view )
+		{
+			system ( *this , view.get ( entity ) );
+		}
 	}
 
 	template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>

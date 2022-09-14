@@ -3,6 +3,7 @@
 #include "../EnttXSol.h"
 #include "ES_Example.h"
 #include "ES_Audio.h"
+#include "ES_Grid.h"
 
 namespace god
 {
@@ -10,5 +11,6 @@ namespace god
 	{
 		enttxsol.RunEngineSystem ( ExampleSystem );
 		enttxsol.RunEngineSystem ( AudioSystem );
+		enttxsol.RunEngineSystem ( GridSystem );
 	}
 }

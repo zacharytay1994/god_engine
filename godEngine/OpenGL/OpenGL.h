@@ -56,6 +56,7 @@ namespace god
 		// shaders
 		OGLShader m_flat_shader;
 		OGLShader m_textured_shader;
+		OGLShader m_single_colour_outline_shader;
 
 		// models - vector of vector of OGLMesh because 1 model can consist of more than 1 mesh
 		std::vector<std::vector<OGLMesh>> m_models;
