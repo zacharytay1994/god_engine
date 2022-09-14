@@ -10,7 +10,7 @@ namespace god
 	void EngineSystems ( EnttXSol& enttxsol )
 	{
 		enttxsol.RunEngineSystem ( ExampleSystem );
-		enttxsol.RunEngineSystem ( AudioSystem );
 		enttxsol.RunEngineSystem ( GridSystem );
+		enttxsol.RunEngineSystem ( AudioSystem );
 	}
 }

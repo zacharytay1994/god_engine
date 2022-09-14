@@ -3,21 +3,16 @@
 #include "../EngineComponents/EC_All.h"
 #include "../../Audio/AudioAPI.h"
 
-
-FMOD::System* fmod_system;
-FMOD::Channel* channel;
-FMOD::ChannelGroup* channel_group;
 bool played = false;
-
-float fmod_time = 0.f;
 
 FMOD::Sound* sound;
 
 namespace god
 {
-	void AudioSystem(AudioSource& audio)
+	void AudioSystem(EnttXSol& entt, std::tuple<EntityData&, AudioSource&> components)
 	{
-		(audio);
+		auto& entity_data = std::get<0>(components);
+		auto& audio = std::get<1>(components);
 
 		if (!played)
 		{
