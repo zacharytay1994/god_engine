@@ -150,6 +150,7 @@
     <ClInclude Include="Physics\godPhysics.h" />
     <ClInclude Include="Physics\PhysicActor.h" />
     <ClInclude Include="Physics\PhysicAPI.h" />
+    <ClInclude Include="Physics\PhysicGeometry.h" />
     <ClInclude Include="Physics\PhysicScene.h" />
     <ClInclude Include="Physics\PhysicSettings.h" />
     <ClInclude Include="Physics\PhysicUtils.h" />
@@ -253,6 +254,10 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Physics\PhysicAPI.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Physics\PhysicGeometry.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
