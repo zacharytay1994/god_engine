@@ -145,6 +145,7 @@ namespace god
 		if ( ImGui::Button ( "RESET" ) )
 		{
 			this->Get<EW_SceneTree> ()->ResetScene ( engineResources );
+			AudioAPI::StopAll();
 		}
 		this->ToolTipOnHover ( "Resets the scene to its original state." );
 
