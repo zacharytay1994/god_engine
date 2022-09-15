@@ -10,9 +10,13 @@ namespace god
 		uint32_t m_id;
 		uint32_t m_parent_id;
 	};
+
 	template <>
 	inline void NewLuaType<EntityData> ( sol::state& luaState , std::string const& name )
 	{
+		RegisterLuaType<EntityData> ( luaState , name ,
+			"id" , &EntityData::m_id ,
+			"parent_id" , &EntityData::m_parent_id );
 	}
 
 	template<>
@@ -28,15 +32,5 @@ namespace god
 
 				ImGui::Text ( "ID: %d , Parent ID: %d" , component.m_id , component.m_parent_id );
 			} );
-	}
-
-	template<>
-	inline void JSONify<EntityData> ( EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& value , EntityData& component )
-	{
-	}
-
-	template<>
-	inline void DeJSONify<EntityData> ( EngineResources& engineResources , EntityData& component , rapidjson::Value& jsonObj )
-	{
 	}
 }

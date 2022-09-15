@@ -133,4 +133,86 @@ namespace god
 		direction.z = sin ( glm::radians ( -90 + m_yaw ) ) * cos ( glm::radians ( m_pitch ) );
 		m_look_at = glm::normalize ( direction );
 	}
+
+	void Camera::SceneCamera (
+		bool unlockAll ,
+		float cameraMovementSpeed ,
+		float sensitivity ,
+		glm::vec3& positionOffset ,
+		bool unlockMovement ,
+		bool unlockOrientation ,
+		float mouseX ,
+		float mouseY ,
+		float& zoomDistance ,
+		bool zoomIn ,
+		bool zoomOut )
+	{
+		if ( unlockAll )
+		{
+			if ( m_last_mouse_x > 0.0f )
+			{
+				float x_offset = ( mouseX - m_last_mouse_x ) * m_free_camera_sensitivity;;
+				m_last_mouse_x = mouseX;
+				if ( unlockMovement )
+				{
+					glm::vec3 direction = glm::normalize ( glm::cross ( m_look_at , { 0,1,0 } ) );
+					positionOffset -= direction * cameraMovementSpeed * x_offset;
+					//m_position.x -= cameraMovementSpeed * x_offset;
+				}
+				if ( unlockOrientation )
+				{
+					m_yaw += x_offset;
+				}
+			}
+			else
+			{
+				m_last_mouse_x = mouseX;
+			}
+
+			if ( m_last_mouse_y > 0.0f )
+			{
+				float y_offset = ( mouseY - m_last_mouse_y ) * m_free_camera_sensitivity;
+				m_last_mouse_y = mouseY;
+				if ( unlockMovement )
+				{
+					glm::vec3 direction = glm::normalize ( glm::vec3 ( m_look_at.x , 0 , m_look_at.z ) );
+					if ( m_position.y < 0.0f )
+					{
+						positionOffset -= direction * cameraMovementSpeed * y_offset;
+					}
+					else
+					{
+						positionOffset += direction * cameraMovementSpeed * y_offset;
+					}
+					//m_position.z -= cameraMovementSpeed * y_offset;
+				}
+				if ( unlockOrientation )
+				{
+					m_pitch -= y_offset;
+					m_pitch = std::clamp ( m_pitch , -89.0f , 89.0f );
+				}
+			}
+			else
+			{
+				m_last_mouse_y = mouseY;
+			}
+
+			if ( zoomIn )
+			{
+				zoomDistance *= sensitivity;
+			}
+			if ( zoomOut )
+			{
+				zoomDistance *= 1.0f + ( 1.0f - sensitivity );
+			}
+		}
+
+		glm::vec3 direction;
+		direction.x = cos ( glm::radians ( -90 + m_yaw ) ) * cos ( glm::radians ( m_pitch ) );
+		direction.y = sin ( glm::radians ( m_pitch ) );
+		direction.z = sin ( glm::radians ( -90 + m_yaw ) ) * cos ( glm::radians ( m_pitch ) );
+		m_look_at = glm::normalize ( direction );
+		direction *= zoomDistance;
+		m_position = -direction + positionOffset;
+	}
 }

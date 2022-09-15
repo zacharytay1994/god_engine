@@ -1,1 +1,101 @@
-{"Grid":{"Type":"Default","Script Components":{},"Engine Components":{"Transform":{"position_x":0.0,"position_y":-5.0,"position_z":0.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0}},"Children":{"Tile1":{"Type":"Prefab","Transform":{"position_x":0.0,"position_y":0.0,"position_z":0.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.47999998927116394,"scale_y":0.47999998927116394,"scale_z":0.47999998927116394}},"Tile1":{"Type":"Prefab","Transform":{"position_x":1.0,"position_y":0.0,"position_z":0.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.47999998927116394,"scale_y":0.47999998927116394,"scale_z":0.47999998927116394}},"Tile1":{"Type":"Prefab","Transform":{"position_x":0.0,"position_y":0.0,"position_z":1.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.47999998927116394,"scale_y":0.47999998927116394,"scale_z":0.47999998927116394}},"Tile1":{"Type":"Prefab","Transform":{"position_x":1.0,"position_y":0.0,"position_z":1.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.47999998927116394,"scale_y":0.47999998927116394,"scale_z":0.47999998927116394}},"Player":{"Type":"Default","Script Components":{},"Engine Components":{"Transform":{"position_x":0.0,"position_y":1.0,"position_z":0.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.5,"scale_y":0.5,"scale_z":0.5},"Renderable3D":{"model uid":807737716,"diffuse uid":3916083164,"specular uid":652207713}},"Children":{}}}}}
+{
+    "Grid": {
+        "Type": "Default",
+        "Script Components": {},
+        "Engine Components": {
+            "Entity Data": {},
+            "Transform": {
+                "position_x": 0.0,
+                "position_y": -5.0,
+                "position_z": 0.0,
+                "rotation_x": 0.0,
+                "rotation_y": -0.0,
+                "rotation_z": 0.0,
+                "scale_x": 1.0,
+                "scale_y": 1.0,
+                "scale_z": 1.0
+            }
+        },
+        "Children": {
+            "Tile1": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": 0.0,
+                    "position_y": 0.0,
+                    "position_z": 0.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.47999998927116394,
+                    "scale_y": 0.47999998927116394,
+                    "scale_z": 0.47999998927116394
+                }
+            },
+            "Tile1": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": 1.0,
+                    "position_y": 0.0,
+                    "position_z": 0.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.47999998927116394,
+                    "scale_y": 0.47999998927116394,
+                    "scale_z": 0.47999998927116394
+                }
+            },
+            "Tile1": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": 0.0,
+                    "position_y": 0.0,
+                    "position_z": 1.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.47999998927116394,
+                    "scale_y": 0.47999998927116394,
+                    "scale_z": 0.47999998927116394
+                }
+            },
+            "Tile1": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": 1.0,
+                    "position_y": 0.0,
+                    "position_z": 1.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.47999998927116394,
+                    "scale_y": 0.47999998927116394,
+                    "scale_z": 0.47999998927116394
+                }
+            },
+            "Player": {
+                "Type": "Default",
+                "Script Components": {},
+                "Engine Components": {
+                    "Entity Data": {},
+                    "Transform": {
+                        "position_x": 0.0,
+                        "position_y": 1.0,
+                        "position_z": 0.0,
+                        "rotation_x": 0.0,
+                        "rotation_y": -0.0,
+                        "rotation_z": 0.0,
+                        "scale_x": 0.5,
+                        "scale_y": 0.5,
+                        "scale_z": 0.5
+                    },
+                    "Renderable3D": {
+                        "diffuse uid": 3916083164,
+                        "specular uid": 652207713
+                    }
+                },
+                "Children": {}
+            }
+        }
+    }
+}
