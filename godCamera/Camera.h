@@ -12,6 +12,9 @@ namespace god
 		glm::vec3 m_look_at { 0.0f, 0.0f, -1.0f };
 		glm::vec3 m_up { 0.0f, 1.0f, 0.0f };
 
+		float m_yaw { 0.0f };
+		float m_pitch { 0.0f };
+
 		// perspective
 		float m_field_of_view { 60.0f };
 		float m_aspect_ratio { 1.0f };
@@ -51,9 +54,20 @@ namespace god
 			bool zoomOut
 		);
 
+		void GODCAMERA_API SceneCamera (
+			bool unlockAll ,
+			float cameraMovementSpeed ,
+			float sensitivity ,
+			glm::vec3& positionOffset ,
+			bool unlockMovement ,
+			bool unlockOrientation ,
+			float mouseX ,
+			float mouseY ,
+			float& zoomDistance ,
+			bool zoomIn ,
+			bool zoomOut );
+
 	private:
-		float m_yaw { 0.0f };
-		float m_pitch { 0.0f };
 		float m_last_mouse_x { 0.0f };
 		float m_last_mouse_y { 0.0f };
 	};

@@ -7,10 +7,12 @@
 
 namespace god
 {
-	void EngineSystems ( EnttXSol& enttxsol )
+	void EngineSystems ( EnttXSol& enttxsol , EngineResources& engineResources , bool isPause )
 	{
-		enttxsol.RunEngineSystem ( ExampleSystem );
-		enttxsol.RunEngineSystem ( GridSystem );
-		enttxsol.RunEngineSystem ( AudioSystem );
+		if ( !isPause )
+		{
+			enttxsol.RunEngineSystem ( engineResources , ExampleSystem );
+		}
+		enttxsol.RunEngineSystem ( engineResources , GridSystem );
 	}
 }

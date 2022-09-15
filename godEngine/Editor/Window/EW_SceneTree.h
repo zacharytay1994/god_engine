@@ -217,6 +217,7 @@ namespace god
 					m_enttxsol.ClearEntt ();
 					m_selected_scene = -1;
 					m_select_hierarchy_tab = true;
+					engineResources.Get<EntityGrid> ().get () = EntityGrid ();
 				}
 				this->ToolTipOnHover ( "Clears the current scene, providing a fresh canvas." );
 
@@ -235,9 +236,11 @@ namespace god
 						if ( ImGui::Selectable ( "Load" ) )
 						{
 							this->Get<EW_TilemapEditor> ()->ClearPreview ();
+							EntityGrid& grid = engineResources.Get<EntityGrid> ().get (); // clear tilemap grid
+							grid = EntityGrid ();
 							Reset ();
 							m_enttxsol.ClearEntt ();
-							m_enttxsol.DeserializeStateV2 ( engineResources , name );
+							m_enttxsol.DeserializeStateV2 ( engineResources , name , &grid );
 							m_select_hierarchy_tab = true;
 						}
 						this->ToolTipOnHover ( "Loads the scene up as the current scene." );
@@ -456,6 +459,7 @@ namespace god
 			this->Get<EW_TilemapEditor> ()->ClearPreview ();
 			Reset ();
 			m_enttxsol.ClearEntt ();
+			engineResources.Get<EntityGrid> ().get () = EntityGrid ();
 			if ( m_selected_scene < m_scene_list.size () && m_selected_scene >= 0 )
 			{
 				std::string scene_path = m_scene_list[ m_selected_scene ];

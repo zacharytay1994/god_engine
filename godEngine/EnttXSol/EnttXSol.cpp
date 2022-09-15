@@ -15,15 +15,16 @@ namespace god
 		};
 	}
 
-	void EnttXSol::Update ()
+	void EnttXSol::Update ( EngineResources& engineResources )
 	{
+		// update engine systems
+		if ( m_engine_update )
+		{
+			m_engine_update ( *this , engineResources , m_pause );
+		}
+
 		if ( !m_pause )
 		{
-			// update engine systems
-			if ( m_engine_update )
-			{
-				m_engine_update ( *this );
-			}
 			// update script systems
 			// for each script in loaded scripts
 			for ( auto const& script : m_scripts )
@@ -287,7 +288,7 @@ namespace god
 		DeleteFileAtPath ( scriptFile );
 	}
 
-	void EnttXSol::BindEngineSystemUpdate ( void( *update )( EnttXSol& ) )
+	void EnttXSol::BindEngineSystemUpdate ( void( *update )( EnttXSol& , EngineResources& engineResources , bool ) )
 	{
 		m_engine_update = update;
 	}
@@ -320,6 +321,19 @@ namespace god
 		}
 		// remove all branches
 		RecursiveRemoveEntity ( entity );
+	}
+
+	void EnttXSol::RemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity )
+	{
+		// detach parent if any from this entity
+		auto parent = m_entities[ entity ].m_parent_id;
+		if ( parent != Entities::Null )
+		{
+			auto it = std::find ( m_entities[ parent ].m_children.begin () , m_entities[ parent ].m_children.end () , entity );
+			m_entities[ parent ].m_children.erase ( it );
+		}
+		// remove all branches
+		RecursiveRemoveEntityFromGrid ( grid , entity );
 	}
 
 	void EnttXSol::SerializeScriptComponents ( Entities::ID entity , int imguiUniqueID ,
@@ -479,10 +493,13 @@ namespace god
 			rapidjson::Value children_value { rapidjson::kObjectType };
 			for ( auto const& child : m_entities[ entity ].m_children )
 			{
-				rapidjson::Value child_value { rapidjson::kObjectType };
-				SerializeStateV2Recurse ( engineResources , child , document , child_value );
+				if ( m_entities[ child ].m_persist_in_scene )
+				{
+					rapidjson::Value child_value { rapidjson::kObjectType };
+					SerializeStateV2Recurse ( engineResources , child , document , child_value );
 
-				RapidJSON::JSONifyToValue ( children_value , document , m_entities[ child ].m_name , child_value );
+					RapidJSON::JSONifyToValue ( children_value , document , m_entities[ child ].m_name , child_value );
+				}
 			}
 
 			RapidJSON::JSONifyToValue ( value , document , "Children" , children_value );
@@ -514,7 +531,7 @@ namespace god
 		}
 	}
 
-	void EnttXSol::DeserializeStateV2 ( EngineResources& engineResources , std::string const& fileName )
+	void EnttXSol::DeserializeStateV2 ( EngineResources& engineResources , std::string const& fileName , EntityGrid* grid )
 	{
 		rapidjson::Document document { rapidjson::kObjectType };
 
@@ -522,15 +539,15 @@ namespace god
 
 		for ( auto& member : document.GetObj () )
 		{
-			DeserializeStateV2Recurse ( engineResources , member.value , member.name.GetString () , Entities::Null );
+			DeserializeStateV2Recurse ( engineResources , member.value , member.name.GetString () , Entities::Null , grid );
 		}
 	}
 
-	void EnttXSol::DeserializeStateV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent )
+	void EnttXSol::DeserializeStateV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , EntityGrid* grid )
 	{
 		if ( std::string ( value[ "Type" ].GetString () ) == "Prefab" )
 		{
-			Entities::ID prefab_root = LoadPrefabV2 ( engineResources , name , parent );
+			Entities::ID prefab_root = LoadPrefabV2 ( engineResources , name , parent , true , grid );
 
 			// deserialize transform component if has transform in file and in prefab
 			Transform* transform = m_registry.try_get<Transform> ( m_entities[ prefab_root ].m_id );
@@ -624,12 +641,22 @@ namespace god
 				}
 			}
 
+			// if has grid, load into grid those with GridCells components
+			if ( grid != nullptr )
+			{
+				GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
+				if ( grid_cell )
+				{
+					( *grid )[ parent ].Insert ( grid_cell->m_cell_size , { grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } , entity );
+				}
+			}
+
 			/*
 				DESERIALIZE CHILDREN
 			*/
 			for ( auto& child : value[ "Children" ].GetObj () )
 			{
-				DeserializeStateV2Recurse ( engineResources , child.value , child.name.GetString () , entity );
+				DeserializeStateV2Recurse ( engineResources , child.value , child.name.GetString () , entity , grid );
 			}
 		}
 	}
@@ -703,6 +730,12 @@ namespace god
 				RapidJSON::JSONifyToValue ( value , document , "Script Components" , script_component_value );
 
 				// loop through all possible engine components seeing if its in this entity
+				// remove GridCell component if its the root of the prefab,
+				// for now see no reason for root of the prefab having a gridcell component
+				if ( root )
+				{
+					RemoveEngineComponent<GridCell> ( entity );
+				}
 				rapidjson::Value engine_component_value { rapidjson::kObjectType };
 				for ( auto j = 0; j < EngineComponents::m_component_names.size (); ++j )
 				{
@@ -753,21 +786,21 @@ namespace god
 		}
 	}
 
-	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent , bool persist )
+	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent , bool persist , EntityGrid* grid )
 	{
 		rapidjson::Document document;
 		ReadJSON ( document , std::string ( "Assets/GameAssets/Prefabs/" ) + fileName + ".json" );
 
-		auto id = LoadPrefabV2Recurse ( engineResources , document.MemberBegin ()->value , document.MemberBegin ()->name.GetString () , parent , true );
+		auto id = LoadPrefabV2Recurse ( engineResources , document.MemberBegin ()->value , document.MemberBegin ()->name.GetString () , parent , true , grid );
 		m_entities[ id ].m_persist_in_scene = persist;
 		return id;
 	}
 
-	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root )
+	EnttXSol::Entities::ID EnttXSol::LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root , EntityGrid* grid )
 	{
 		if ( std::string ( value[ "Type" ].GetString () ) == "Prefab" )
 		{
-			Entities::ID prefab_root = LoadPrefabV2 ( engineResources , name , parent );
+			Entities::ID prefab_root = LoadPrefabV2 ( engineResources , name , parent , true , grid );
 
 			// deserialize transform component if has transform in file and in prefab
 			Transform* transform = m_registry.try_get<Transform> ( m_entities[ prefab_root ].m_id );
@@ -870,12 +903,22 @@ namespace god
 				}
 			}
 
+			// if has grid, load into grid those with GridCells components
+			if ( grid != nullptr )
+			{
+				GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
+				if ( grid_cell )
+				{
+					( *grid )[ parent ].Insert ( grid_cell->m_cell_size , { grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } , entity );
+				}
+			}
+
 			/*
 				DESERIALIZE CHILDREN
 			*/
 			for ( auto& children : value[ "Children" ].GetObj () )
 			{
-				LoadPrefabV2Recurse ( engineResources , children.value , children.name.GetString () , entity );
+				LoadPrefabV2Recurse ( engineResources , children.value , children.name.GetString () , entity , false , grid );
 			}
 
 			if ( root )
@@ -966,6 +1009,23 @@ namespace god
 		while ( !m_entities[ entity ].m_children.empty () )
 		{
 			RemoveEntity ( m_entities[ entity ].m_children.front () );
+		}
+		m_entities[ entity ].Destroy ( m_registry );
+		m_entities.Erase ( entity );
+	}
+
+	void EnttXSol::RecursiveRemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity )
+	{
+		while ( !m_entities[ entity ].m_children.empty () )
+		{
+			RemoveEntity ( m_entities[ entity ].m_children.front () );
+		}
+		// if it has GridCell component, remove it from the grid
+		EntityData* data = GetEngineComponent<EntityData> ( entity );
+		GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
+		if ( data && grid_cell )
+		{
+			grid[ data->m_parent_id ].EraseValue ( grid_cell->m_cell_size , { grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } , data->m_id );
 		}
 		m_entities[ entity ].Destroy ( m_registry );
 		m_entities.Erase ( entity );

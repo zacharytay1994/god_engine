@@ -2,6 +2,7 @@
 
 #include <godUtility/Structures.h>
 #include <godUtility/Utility.h>
+#include <godUtility/Grid3D.h>
 #include <godCamera/Camera.h>
 #include "../Window/GLFWWindow.h"
 #include "../OpenGL/OpenGL.h"
@@ -23,6 +24,7 @@ namespace god
 		OpenGL ,
 		Camera ,
 		Asset3DManager ,
-		OGLTextureManager
+		OGLTextureManager ,
+		EntityGrid
 	>;
 }

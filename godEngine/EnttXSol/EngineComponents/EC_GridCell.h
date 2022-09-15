@@ -7,14 +7,18 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct GridCell
 	{
-		int32_t m_cell_x { 0 } , m_cell_z { 0 };
+		int32_t m_cell_x { 0 } , m_cell_y { 0 } , m_cell_z { 0 };
 		float m_cell_size { 1.0f };
+
+		// not saved, used to change cell in Grid3D
+		int32_t m_cell_ox { 0 } , m_cell_oy { 0 } , m_cell_oz { 0 };
 	};
 	template <>
 	inline void NewLuaType<GridCell> ( sol::state& luaState , std::string const& name )
 	{
 		RegisterLuaType<GridCell> ( luaState , name ,
 			"cell_x" , &GridCell::m_cell_x ,
+			"cell_y" , &GridCell::m_cell_y ,
 			"cell_z" , &GridCell::m_cell_z ,
 			"cell_size" , &GridCell::m_cell_size );
 	}
@@ -30,11 +34,16 @@ namespace god
 				ImGui::Separator ();
 
 				auto width = ImGui::GetWindowWidth ();
-				ImGui::SetNextItemWidth ( width / 3 );
-				ImGui::DragInt ( "Cell X" , &component.m_cell_x );
+				ImGui::SetNextItemWidth ( width / 4 );
+				ImGui::DragInt ( "X" , &component.m_cell_x );
 				ImGui::SameLine ();
-				ImGui::SetNextItemWidth ( width / 3 );
-				ImGui::DragInt ( "Cell Y" , &component.m_cell_z );
+				ImGui::SetNextItemWidth ( width / 4 );
+				ImGui::DragInt ( "Y" , &component.m_cell_y );
+				ImGui::SameLine ();
+				ImGui::SetNextItemWidth ( width / 4 );
+				ImGui::DragInt ( "Z" , &component.m_cell_z );
+
+				ImGui::Text ( "Cell Size: %.3f" , component.m_cell_size );
 			} );
 	}
 
@@ -44,6 +53,7 @@ namespace god
 		( engineResources );
 		// serialize
 		RapidJSON::JSONifyToValue ( value , document , "cell_x" , component.m_cell_x );
+		RapidJSON::JSONifyToValue ( value , document , "cell_y" , component.m_cell_y );
 		RapidJSON::JSONifyToValue ( value , document , "cell_z" , component.m_cell_z );
 		RapidJSON::JSONifyToValue ( value , document , "cell_size" , component.m_cell_size );
 	}
@@ -54,6 +64,7 @@ namespace god
 		( engineResources );
 		// deserialize
 		AssignIfExist ( jsonObj , component.m_cell_x , "cell_x" );
+		AssignIfExist ( jsonObj , component.m_cell_y , "cell_y" );
 		AssignIfExist ( jsonObj , component.m_cell_z , "cell_z" );
 		AssignIfExist ( jsonObj , component.m_cell_size , "cell_size" );
 	}

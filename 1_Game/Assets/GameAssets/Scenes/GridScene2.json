@@ -1,0 +1,82 @@
+{
+    "RabbitTile": {
+        "Type": "Prefab",
+        "Transform": {
+            "position_x": 7.0,
+            "position_y": -20.0,
+            "position_z": 5.0,
+            "rotation_x": 0.0,
+            "rotation_y": -0.0,
+            "rotation_z": 0.0,
+            "scale_x": 1.0,
+            "scale_y": 1.0,
+            "scale_z": 1.0
+        },
+        "Grid Cell": {
+            "cell_x": 3,
+            "cell_y": -10,
+            "cell_z": 2,
+            "cell_size": 1.0
+        }
+    },
+    "RabbitTile": {
+        "Type": "Prefab",
+        "Transform": {
+            "position_x": 5.0,
+            "position_y": 0.0,
+            "position_z": 5.0,
+            "rotation_x": 0.0,
+            "rotation_y": -0.0,
+            "rotation_z": 0.0,
+            "scale_x": 1.0,
+            "scale_y": 1.0,
+            "scale_z": 1.0
+        },
+        "Grid Cell": {
+            "cell_x": 2,
+            "cell_y": 0,
+            "cell_z": 2,
+            "cell_size": 1.0
+        }
+    },
+    "RabbitTile": {
+        "Type": "Prefab",
+        "Transform": {
+            "position_x": 5.0,
+            "position_y": 0.0,
+            "position_z": 5.0,
+            "rotation_x": 0.0,
+            "rotation_y": -0.0,
+            "rotation_z": 0.0,
+            "scale_x": 1.0,
+            "scale_y": 1.0,
+            "scale_z": 1.0
+        },
+        "Grid Cell": {
+            "cell_x": 2,
+            "cell_y": 0,
+            "cell_z": 2,
+            "cell_size": 1.0
+        }
+    },
+    "RabbitTile": {
+        "Type": "Prefab",
+        "Transform": {
+            "position_x": 5.0,
+            "position_y": 0.0,
+            "position_z": 5.0,
+            "rotation_x": 0.0,
+            "rotation_y": -0.0,
+            "rotation_z": 0.0,
+            "scale_x": 1.0,
+            "scale_y": 1.0,
+            "scale_z": 1.0
+        },
+        "Grid Cell": {
+            "cell_x": 2,
+            "cell_y": 0,
+            "cell_z": 2,
+            "cell_size": 1.0
+        }
+    }
+}
