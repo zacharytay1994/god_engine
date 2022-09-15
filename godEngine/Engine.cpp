@@ -94,7 +94,8 @@ namespace god
 			opengl ,
 			camera ,
 			assets_3d ,
-			ogl_textures
+			ogl_textures ,
+			godPhysicsSystem
 		);
 
 		// imgui editor windows
@@ -140,7 +141,7 @@ namespace god
 			enttxsol.PopulateScene<Scene , Transform , Renderable3D> ( scene );
 			SystemTimer::EndTimeSegment ( "Populating Scene" );
 
-			godPhysicsSystem.Update(60.f);
+			godPhysicsSystem.Update(1.f/60.f);
 
 
 			// render scene
