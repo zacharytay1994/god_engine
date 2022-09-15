@@ -28,5 +28,14 @@ namespace god
 		{
 			AudioAPI::Play(audio.m_sound);
 		}
+		
+		// access entities with specific component
+		//for (auto&& [entity,audio_source] : entt.GetView<AudioSource>().each())
+		//{
+		//	std::cout << audio_source.m_source_id << std::endl;
+		//}
+
+		// engine resources access
+		//GLFWWindow& window = engineResources.Get<GLFWWindow>().get();
 	}
 }

@@ -131,6 +131,9 @@ namespace god
 
 		EnttXSol::Entities::ID AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , glm::vec3 const& position = { 0,0,0 } );
 
+		template<typename...COMPONENTS>
+		auto GetView();
+
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
 		{
@@ -443,6 +446,12 @@ namespace god
 				RecursivePopulateScene<S , T , R> ( scene , child , parentTransform );
 			}
 		}
+	}
+
+	template<typename ...COMPONENTS>
+	inline auto EnttXSol::GetView()
+	{
+		return m_registry.view<COMPONENTS...>();
 	}
 
 	template<typename T>
