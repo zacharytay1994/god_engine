@@ -4,8 +4,10 @@
 
 namespace god
 {
-	void AudioSystem(EnttXSol& entt, std::tuple<EntityData&, AudioSource&> components)
+	void AudioSystem(EnttXSol& entt, EngineResources& engineResources, std::tuple<EntityData&, AudioSource&> components)
 	{
+		(entt); (engineResources);
+
 		auto& entity_data = std::get<0>(components);
 		auto& audio = std::get<1>(components);
 

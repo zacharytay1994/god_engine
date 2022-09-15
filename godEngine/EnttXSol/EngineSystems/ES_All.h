@@ -12,6 +12,7 @@ namespace god
 		if ( !isPause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystem );
+			enttxsol.RunEngineSystem ( engineResources , AudioSystem );
 		}
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
 	}
