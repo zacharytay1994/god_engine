@@ -6,6 +6,7 @@
 #include "../../Window/DeltaTimer.h"
 #include <godCamera/Camera.h>
 #include <godUtility/Math.h>
+#include <godUtility/Grid3D.h>
 
 #include "../../imgui/imgui_stdlib.h" 
 #include "../../imgui/ImGuizmo.h"
@@ -93,6 +94,7 @@ namespace god
 			if ( selected_entity != EnttXSol::Entities::Null )
 			{
 				Transform* transform = m_enttxsol.GetEngineComponent<Transform> ( selected_entity );
+				GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( selected_entity );
 				if ( transform )
 				{
 					ImGuizmo::SetOrthographic ( false );
@@ -121,9 +123,20 @@ namespace god
 						glm::value_ptr ( local_transform ) ,
 						glm::value_ptr ( position ) , glm::value_ptr ( rotation ) , glm::value_ptr ( scale ) );
 
-					transform->m_position = position;
-					transform->m_rotation = rotation;
-					transform->m_scale = scale;
+					if ( grid_cell )
+					{
+						grid_cell->m_cell_x = static_cast< int32_t >( std::floor ( position.x / ( grid_cell->m_cell_size * 2.0f ) ) );
+						grid_cell->m_cell_y = static_cast< int32_t >( std::floor ( position.y / ( grid_cell->m_cell_size * 2.0f ) ) );
+						grid_cell->m_cell_z = static_cast< int32_t >( std::floor ( position.z / ( grid_cell->m_cell_size * 2.0f ) ) );
+						transform->m_rotation = rotation;
+						transform->m_scale = scale;
+					}
+					else
+					{
+						transform->m_position = position;
+						transform->m_rotation = rotation;
+						transform->m_scale = scale;
+					}
 				}
 			}
 		}
@@ -177,7 +190,7 @@ namespace god
 
 		ImGui::SameLine ();
 		auto tilemap_editor = this->Get<EW_TilemapEditor> ();
-		ImGui::Text ( "Parent: %d, CellX: %d, CellZ: %d" , tilemap_editor->m_parent , tilemap_editor->m_cell_x , tilemap_editor->m_cell_z );
+		ImGui::Text ( "Parent: %d, CellX: %d, CellZ: %d" , tilemap_editor->m_selected , tilemap_editor->m_cell_x , tilemap_editor->m_cell_z );
 
 
 		ImGui::End ();
