@@ -63,16 +63,20 @@ namespace god
 		float scene_camera_zoom_distance { 20.0f };
 		glm::vec3 scene_camera_position_offset { 0.0f };
 
+		// setup FMOD system
+		AudioAPI audio_api;
+
 		// setup resources
 		Asset3DManager assets_3d;
 		InsertAllAsset3DsFromConfig ( AssetPath::File_ModelsConfig , AssetPath::Folder_BuildModels , assets_3d );
 		OGLTextureManager ogl_textures;
 		InsertEngineOGLTextures ( ogl_textures ); // temp solution to insert engine textures, might change
 		InsertAllOGLTexturesFromConfig ( AssetPath::File_TexturesConfig , AssetPath::Folder_RawTextures , ogl_textures );
+		SoundManager assets_sound;
+		InsertAllSoundsFromConfig(AssetPath::File_SoundsConfig, AssetPath::Folder_BuildSounds, assets_sound);
 
 		opengl.BuildOGLModels ( assets_3d );
 
-		AudioAPI audio_api;
 
 		// setup ecs and scripting
 		EnttXSol enttxsol;
@@ -96,7 +100,8 @@ namespace god
 			camera ,
 			assets_3d ,
 			ogl_textures ,
-			grid
+			grid ,
+			assets_sound
 		);
 
 		// imgui editor windows

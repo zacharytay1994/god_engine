@@ -10,6 +10,9 @@ namespace god
 {
 	struct Sound
 	{
+		Sound();
+		Sound(std::string const& soundPath);
+
 		FMOD::Sound* m_sound_sample;
 		std::string m_name;
 		std::string m_file_name;

@@ -3,6 +3,15 @@
 
 namespace god
 {
+	Sound::Sound() : m_sound_sample{ nullptr }, m_name{}, m_file_name{}, m_channel{ nullptr }
+	{
+	}
+
+	Sound::Sound(std::string const& soundPath)
+	{
+		AudioAPI::LoadSound(soundPath.c_str(), *this);
+	}
+
 	FMOD::System* AudioAPI::m_FMOD_system;
 	FMOD::ChannelGroup* AudioAPI::m_master_channel_group;
 	FMOD::SoundGroup* AudioAPI::m_master_sound_group;
@@ -44,6 +53,13 @@ namespace god
 		FMOD_RESULT result = m_FMOD_system->createSound(filePath, FMOD_DEFAULT, 0, &sound.m_sound_sample);
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
+
+		std::string path{ filePath };
+		size_t last_slash = path.find_last_of('\\') + 1;
+		size_t last_dot = path.find_last_of('.');
+
+		sound.m_file_name = filePath;
+		sound.m_name = path.substr(last_slash, last_dot - last_slash);
 	}
 
 	void AudioAPI::UnloadSound(FMOD::Sound* sound)

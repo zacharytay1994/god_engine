@@ -7,6 +7,7 @@
 #include "../Window/GLFWWindow.h"
 #include "../OpenGL/OpenGL.h"
 #include "../OpenGL/Internal/OGLTexture.h"
+#include "../Audio/Internal/SoundManager.h"
 
 namespace god
 {
@@ -25,6 +26,7 @@ namespace god
 		Camera ,
 		Asset3DManager ,
 		OGLTextureManager ,
-		EntityGrid
+		EntityGrid ,
+		SoundManager
 	>;
 }

@@ -16,6 +16,7 @@ namespace god
 
 		//int m_channel_group;
 
+		int m_sound_id{ -1 };
 		int m_source_id{ -1 };
 		//int m_listener_id{ -1 }; // output
 
@@ -50,10 +51,30 @@ namespace god
 		RegisterInspector<AudioSource, EngineResources>(entity, registry, imguiUniqueID, editorResources,
 			[](AudioSource& component, EngineResources& resources)
 			{
-				(resources);
+				auto& sounds = resources.Get<SoundManager>();
+
 				ImGui::Separator();
 				ImGui::Text("Audio Source");
 				ImGui::Separator();
+
+				if (ImGui::BeginPopup("Sound Select"))
+				{
+					for (auto const& asset : sounds.get().GetIDs())
+					{
+						if (ImGui::Selectable(asset.first.c_str()))
+						{
+							component.m_sound_id = asset.second;
+							ImGui::CloseCurrentPopup();
+						}
+					}
+					ImGui::EndPopup();
+				}
+
+				ImGui::Text(" Audio Clip : ");
+				if (ImGui::Button(sounds.get().GetName(component.m_sound_id).c_str(), { ImGui::GetWindowWidth(),0 }))
+				{
+					ImGui::OpenPopup("Sound Select");
+				}
 
 				//ImGui::ListBox("Output", &component.m_listener_id, nullptr, 0, 5);
 
