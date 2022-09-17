@@ -3,7 +3,7 @@
 #include <assert.h>
 namespace god
 {
-	PhysicsSystem::PhysicsSystem()
+	PhysicsSystem::PhysicsSystem() 
 	{
 		mDispatcher = NULL;
 		physx::PxFoundation* mFoundation = NULL;
@@ -46,7 +46,7 @@ namespace god
 
 
 		physx::PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-		sceneDesc.gravity = physx::PxVec3(0.0f, 0.0f, -9.81f);
+		sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 		mDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
 		if (!mDispatcher)
 			std::cerr << "PxDefaultCpuDispatcherCreate failed!" << std::endl;
@@ -103,7 +103,7 @@ namespace god
 	void PhysicsSystem::Update(float dt)
 	{
 
-
+		//mStepSize is 1/60 Physics caps at 60fps
 		mAccumulator += dt;
 		if (mAccumulator < mStepSize)
 			return;
@@ -112,6 +112,12 @@ namespace god
 
 		mScene->simulate(mStepSize);
 		mScene->fetchResults(true);
+
+
+		if (mAccumulator > 1.0f)
+		{
+
+		}
 
 	}
 

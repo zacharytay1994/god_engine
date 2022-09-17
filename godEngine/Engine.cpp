@@ -150,7 +150,7 @@ namespace god
 			enttxsol.PopulateScene<Scene , Transform , Renderable3D> ( scene );
 			SystemTimer::EndTimeSegment ( "Populating Scene" );
 
-			godPhysicsSystem.Update(1.f/60.f);
+			godPhysicsSystem.Update(delta_timer.m_dt);
 
 
 			// render scene
