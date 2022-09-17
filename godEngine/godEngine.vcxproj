@@ -142,6 +142,7 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="OpenGL\Advance\CubeMap.h" />
     <ClInclude Include="OpenGL\Advance\ShadowMap.h" />
+    <ClInclude Include="OpenGL\Internal\OGLDebug.h" />
     <ClInclude Include="OpenGL\Internal\OGLTexture.h" />
     <ClInclude Include="OpenGL\Internal\OGLPrimitives.h" />
     <ClInclude Include="OpenGL\Internal\OGLRenderPass.h" />
@@ -221,6 +222,10 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="OpenGL\Advance\ShadowMap.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Internal\OGLDebug.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
     </ClCompile>

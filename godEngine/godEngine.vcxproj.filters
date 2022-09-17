@@ -177,6 +177,9 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_EntityData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OpenGL\Internal\OGLDebug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -261,6 +264,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OpenGL\Advance\ShadowMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Internal\OGLDebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
