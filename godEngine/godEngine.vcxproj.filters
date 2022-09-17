@@ -25,14 +25,10 @@
     <ClCompile Include="OpenGL\OpenGL.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Physics\godPhysics.cpp" />
-    <ClCompile Include="Physics\PhysicActor.cpp" />
-    <ClCompile Include="Physics\PhysicAPI.cpp" />
-    <ClCompile Include="Physics\PhysicScene.cpp" />
     <ClCompile Include="Physics\PhysicUtils.cpp" />
     <ClCompile Include="Window\DeltaTimer.cpp" />
     <ClCompile Include="Window\GLFWWindow.cpp" />
     <ClCompile Include="Window\SystemTimer.cpp" />
-    <ClCompile Include="Physics\PhysicGeometry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Editor\Editor.h" />
@@ -54,7 +50,6 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_EntityData.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_GridCell.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Renderable3D.h" />
-    <ClInclude Include="EnttXSol\EngineComponents\EC_RigidBody.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EngineComponents.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_All.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h" />
@@ -84,15 +79,15 @@
     <ClInclude Include="OpenGL\OpenGL.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Physics\godPhysics.h" />
-    <ClInclude Include="Physics\PhysicActor.h" />
-    <ClInclude Include="Physics\PhysicAPI.h" />
-    <ClInclude Include="Physics\PhysicScene.h" />
-    <ClInclude Include="Physics\PhysicSettings.h" />
     <ClInclude Include="Physics\PhysicUtils.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
     <ClInclude Include="Window\DeltaTimer.h" />
     <ClInclude Include="Window\SystemTimer.h" />
-    <ClInclude Include="Physics\PhysicGeometry.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Physics.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Material.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Shape.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Dynamic.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

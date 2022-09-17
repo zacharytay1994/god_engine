@@ -9,6 +9,9 @@ namespace god
 		"Transform",
 		"Renderable3D",
 		"GridCell",
-		"RigidBody"
+		"PhysicsMaterial",
+		"PhysicsShape",
+		"RigidStatic",
+		"RigidDynamic"
 	};
 }

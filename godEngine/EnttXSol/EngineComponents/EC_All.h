@@ -4,8 +4,12 @@
 #include "EC_EntityData.h"
 #include "EC_Transform.h"
 #include "EC_Renderable3D.h"
-#include "EC_RigidBody.h"
 #include "EC_GridCell.h"
+
+#include "Physics/EC_Material.h"
+#include "Physics/EC_Shape.h"
+#include "Physics/EC_Static.h"
+#include "Physics/EC_Dynamic.h"
 
 #include <tuple>
 #include <string>
@@ -20,7 +24,10 @@ namespace god
 			Transform ,
 			Renderable3D ,
 			GridCell,
-			RigidBody
+			PhysicsMaterial,
+			PhysicsShape,
+			RigidStatic,
+			RigidDynamic
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};

@@ -54,34 +54,35 @@ namespace god
 
 		sceneDesc.cpuDispatcher = mDispatcher;
 		sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-		sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eABP;
-		//Automatic box pruning
+		sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eABP;//Automatic box pruning
+		
 		mScene = mPhysics->createScene(sceneDesc);
 
 
-		// create table material
-		mMaterial = mPhysics->createMaterial(0.3f, 0.3f, 0.7f);
-		//create plane
-		physx::PxRigidStatic* groundPlane = PxCreatePlane(*mPhysics, physx::PxPlane(0, 0, 1, 50), *mMaterial);
-		mScene->addActor(*groundPlane);
+		//// create table material
+		//mMaterial = mPhysics->createMaterial(0.3f, 0.3f, 0.7f);
+		////create plane
+		//physx::PxRigidStatic* groundPlane = PxCreatePlane(*mPhysics, physx::PxPlane(0, 0, 1, 50), *mMaterial);
+		//mScene->addActor(*groundPlane);
 
-		
-		//Shape can be attached to multiple actors
-		//Shape needs to contain PxGeometry and ref to PxMaterial
-		physx::PxShape* tableshape = mPhysics->createShape(physx::PxBoxGeometry(500.f, 500.f, 2.f), *mMaterial);
-		
-		//physx::PxRigidActorExt::createExclusiveShape()
-		//table
-		physx::PxTransform t(physx::PxVec3(0));
-		physx::PxRigidStatic* table = mPhysics->createRigidStatic(physx::PxTransform(0.f, 10.f, 0.f));
-		table->attachShape(*tableshape);
-		
-		mScene->addActor(*table);
-		tableshape->release();
-
+		//
+		////Shape can be attached to multiple actors
+		////Shape needs to contain PxGeometry and ref to PxMaterial
+		//physx::PxShape* tableshape = mPhysics->createShape(physx::PxBoxGeometry(500.f, 500.f, 2.f), *mMaterial);
+		//
+		////physx::PxRigidActorExt::createExclusiveShape()
+		////table
+		//physx::PxTransform t(physx::PxVec3(0));
+		//physx::PxRigidStatic* table = mPhysics->createRigidStatic(physx::PxTransform(0.f, 10.f, 0.f));
+	
+		//table->attachShape(*tableshape);
+		//
+		//mScene->addActor(*table);
+		//tableshape->release();
+		//
 		//dice
 		// create dice material
-		physx::PxMaterial* DiceMaterial = mPhysics->createMaterial(0.3f, 0.3f, 0.8f);
+/*		physx::PxMaterial* DiceMaterial = mPhysics->createMaterial(0.3f, 0.3f, 0.8f);
 		physx::PxShape* diceshape = mPhysics->createShape(physx::PxBoxGeometry(15.f, 15.f, 15.f), *DiceMaterial);
 		
 
@@ -92,7 +93,7 @@ namespace god
 		physx::PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
 		mScene->addActor(*body);
 
-		diceshape->release();
+		diceshape->release()*/;
 
 		std::cout << "Physics Initialised" << std::endl;
 
@@ -115,19 +116,6 @@ namespace god
 	}
 
 
-	void PhysicsSystem::Shutdown()
-	{
-	}
-	void PhysicsSystem::CreateScene()
-	{
-	}
-	void PhysicsSystem::DestroyScene()
-	{
-	}
-	/*void PhysicsSystem::CreateActors(Scene& scene)
-	{
-	}*/
-
 	void PhysicsSystem::SetupPVD()
 	{
 		physx::PxPvdSceneClient* pvdClient = mScene->getScenePvdClient();
@@ -142,6 +130,16 @@ namespace god
 	physx::PxPhysics* const PhysicsSystem::GetPhysics() const
 	{
 		return mPhysics;
+	}
+
+	physx::PxScene* const PhysicsSystem::GetPhysicsScene() const
+	{
+		return mScene;
+	}
+
+	std::map<std::string, physx::PxMaterial*>& PhysicsSystem::GetMaterialContainer()
+	{
+		return MaterialContainer;
 	}
 
 }

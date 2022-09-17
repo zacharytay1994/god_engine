@@ -118,14 +118,18 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_EntityData.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_GridCell.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Renderable3D.h" />
-    <ClInclude Include="EnttXSol\EngineComponents\EC_RigidBody.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EngineComponents.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_All.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Dynamic.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Material.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Shape.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_All.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Physics.h" />
     <ClInclude Include="EnttXSol\EnttXSol.h" />
     <ClInclude Include="EnttXSol\Internal\godEntity.h" />
     <ClInclude Include="framework.h" />
@@ -148,11 +152,6 @@
     <ClInclude Include="OpenGL\OpenGL.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Physics\godPhysics.h" />
-    <ClInclude Include="Physics\PhysicActor.h" />
-    <ClInclude Include="Physics\PhysicAPI.h" />
-    <ClInclude Include="Physics\PhysicGeometry.h" />
-    <ClInclude Include="Physics\PhysicScene.h" />
-    <ClInclude Include="Physics\PhysicSettings.h" />
     <ClInclude Include="Physics\PhysicUtils.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
     <ClInclude Include="Window\DeltaTimer.h" />
@@ -246,22 +245,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Physics\godPhysics.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Physics\PhysicActor.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Physics\PhysicAPI.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Physics\PhysicGeometry.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Physics\PhysicScene.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>

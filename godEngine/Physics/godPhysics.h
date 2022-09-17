@@ -1,9 +1,7 @@
 #pragma once
 
 #include "PxPhysicsAPI.h"
-//#include "PhysicScene.h"
-//#include "PhysicSettings.h"
-//#include "PhysicActor.h"
+#include <map>
 
 #define PVD_HOST "127.0.0.1"
 
@@ -22,26 +20,16 @@ namespace god
 
 
 
+		 void SetupPVD();//PhysX Visual Debugger
 
 
-		 void Shutdown();
-
-		 //PhysicScene& getScene() { return m_scene; }
-
-		 void CreateScene();
-		 void DestroyScene();
-
-		 //void CreateActors(Scene& scene);
-		 /*PhysicActor& CreateActor(Entity_ entity);
-
-		 PhysicSettings& getSettings() { return m_settings; }*/
-
-		 void SetupPVD();
 		 physx::PxPhysics* const GetPhysics() const;
-		 //PhysX Visual Debugger
+		 physx::PxScene* const GetPhysicsScene() const;
+		 std::map < std::string, physx::PxMaterial*>& GetMaterialContainer();
+
+		 
 	private:
-		 /*PhysicScene m_scene;
-		 PhysicSettings m_settings;*/
+		std::map < std::string, physx::PxMaterial*> MaterialContainer;
 
 		physx::PxDefaultAllocator      mDefaultAllocatorCallback;
 		physx::PxDefaultErrorCallback  mDefaultErrorCallback;
