@@ -100,7 +100,7 @@
       "PhysicsMaterial": {
         "StaticFriction": 0.20000000298023224,
         "DynamicFriction": 0.20000000298023224,
-        "Restitution": 0.8
+        "Restitution": 0.6
       },
       "PhysicsShape": {
         "x extent": 2.0,
