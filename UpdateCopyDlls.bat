@@ -1,5 +1,6 @@
 rem Path presets
 Set "ExternalDependencies=./0_ExternalDependencies"
+Set "InternalDependencies=./0_InternalDependencies"
 Set "TargetDirDebug=./x64/Debug"
 Set "TargetDirRelease=./x64/Release"
 
