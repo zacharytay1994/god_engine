@@ -73,7 +73,7 @@ namespace god
 		// setup ecs and scripting
 		EnttXSol enttxsol;
 		enttxsol.BindEngineComponents< EngineComponents > ();
-		enttxsol.BindEngineSystemUpdate ( EngineSystems );
+		enttxsol.BindEngineSystemUpdate ( EngineSystems , EngineSystemsInit, EngineSystemsCleanup );
 		enttxsol.SetupBindings ();
 
 		// setup scene
@@ -123,6 +123,8 @@ namespace god
 			}
 
 			opengl.ClearColour ();
+
+			EngineSystemsFrameStart ( enttxsol , engine_resources );
 
 			// update scene
 			// ...
@@ -194,6 +196,8 @@ namespace god
 				window.MouseScrollUp () ,
 				window.MouseScrollDown ()
 			);
+
+			EngineSystemsFrameEnd ( enttxsol , engine_resources );
 
 			delta_timer.EndFrame ();
 			SystemTimer::EndTimeSegment ( "Overall" );

@@ -11,11 +11,42 @@ namespace god
 		( components );
 		( engineResources );
 		// some code here ...
-		/*auto& entity_data = std::get<0> ( components );
-		Transform* parent_transform = entt.GetEngineComponent<Transform> ( entity_data.m_parent_id );
-		if ( parent_transform )
-		{
-			parent_transform->m_position += 0.002f;
-		}*/
+		//std::cout << "Update" << std::endl;
+	}
+
+	void ExampleSystemFrameStart ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform&> components )
+	{
+		( entt );
+		( components );
+		( engineResources );
+		// some code here ...
+		//std::cout << "Start Frame" << std::endl;
+	}
+
+	void ExampleSystemFrameEnd ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform&> components )
+	{
+		( entt );
+		( components );
+		( engineResources );
+		// some code here ...
+		//std::cout << "End Frame" << std::endl;
+	}
+
+	void ExampleSystemInit ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform&> components )
+	{
+		( entt );
+		( components );
+		( engineResources );
+		// some code here ...
+		std::cout << "Init - Entities with EntityData & Transform." << std::endl;
+	}
+
+	void ExampleSystemCleanup ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform&> components )
+	{
+		( entt );
+		( components );
+		( engineResources );
+		// some code here ...
+		std::cout << "Cleanup - Entities with EntityData & Transform." << std::endl;
 	}
 }
