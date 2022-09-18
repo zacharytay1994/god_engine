@@ -5,7 +5,7 @@ namespace god
 {
 	struct OGLCubeMap
 	{
-		void Initialize( unsigned int width, unsigned int height );
+		void Initialize();
 		void CubeTexture( std::string facesCubemap[6] );
 		void CubeMapEnableDepth();
 		void Bind();
@@ -16,6 +16,7 @@ namespace god
 		unsigned int GetTexture();
 
 	private:
+
 		static constexpr uint32_t GL_UNINITIALIZED = static_cast< uint32_t >( -1 );
 
 		unsigned int m_skybox_vao{ GL_UNINITIALIZED };

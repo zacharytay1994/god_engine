@@ -47,14 +47,13 @@ namespace OGLDebug
 	// APIENTRY is an alias for WINAPI.
 	void APIENTRY glDebugOutput( GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam )
 	{
-		UNREFERENCED_PARAMETER( userParam );
-		UNREFERENCED_PARAMETER( length );
 		// ignore these non-significant error codes
 		if ( id == 131169 || id == 131185 || id == 131218 || id == 131204 ) return;
 
 		std::cout << "---------------" << std::endl;
 		std::cout << "Debug message (" << id << "): " << message << std::endl;
-
+		std::cout << "Length: " << length << std::endl;
+		std::cout << "User Parameter: " << userParam << std::endl;
 		switch ( source )
 		{
 		case GL_DEBUG_SOURCE_API:

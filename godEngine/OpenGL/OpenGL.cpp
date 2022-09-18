@@ -26,7 +26,7 @@ namespace god
 		m_screen_height{ height },
 		m_window_device_context{ GetDC( windowHandle ) }
 	{
-		// load opengl functions with glad
+		// Load opengl functions with glad
 		if ( !gladLoadGL() )
 		{
 			std::cerr << "Failed to initialize GLAD" << std::endl;
@@ -35,25 +35,23 @@ namespace god
 
 		ResizeViewport( width, height );
 
-
 		// OpenGl debug features
 		int flags;
-		// features of contexts can be detected via context flags
+		// Features of contexts can be detected via context flags
 		glGetIntegerv( GL_CONTEXT_FLAGS, &flags );
-		// check if the context is a debug context
+		// Check if the context is a debug context
 		if ( flags & GL_CONTEXT_FLAG_DEBUG_BIT )
 		{
-			std::cout << "Debug Mode" << std::endl;
 			OGLDebug::EnableOpenGLDebugging();
+			std::cout << "Debug Mode" << std::endl;
 		}
 
-
-		// create flat shader
+		// Create flat shader
 		m_flat_shader.InitializeFromFile(
 			"Assets/EngineAssets/OpenGLShaders/flatcolour.vs",
 			"Assets/EngineAssets/OpenGLShaders/flatcolour.fs" );
 
-		// create textured shader
+		// Create textured shader
 		m_textured_shader.InitializeFromFile(
 			"Assets/EngineAssets/OpenGLShaders/texturemaps.vs",
 			"Assets/EngineAssets/OpenGLShaders/texturemaps.fs" );
@@ -62,16 +60,18 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.vs",
 			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.fs" );
 
-		// create cubemap shader
+		// Create cubemap shader
 		m_cubemap_shader.InitializeFromFile(
 			"Assets/EngineAssets/OpenGLShaders/skybox.vs",
 			"Assets/EngineAssets/OpenGLShaders/skybox.fs" );
 
-		// create depthmap shader
+		// Create depthmap shader
 		m_depthmap_shader.InitializeFromFile(
 			"Assets/EngineAssets/OpenGLShaders/depthmap.vs",
 			"Assets/EngineAssets/OpenGLShaders/depthmap.fs"
 		);
+
+		// Calculation for shadow map
 		m_light_space_matrix =
 			glm::ortho( -15.0f, 15.0f, -15.0f, 15.0f, 1.0f, 50.0f ) *
 			glm::lookAt(
@@ -80,7 +80,7 @@ namespace god
 			glm::vec3( 0.0f, 1.0f, 0.0f ) );
 
 		// opengl settings
-		//glEnable( GL_CULL_FACE );
+		// glEnable( GL_CULL_FACE );
 		// Enables the Depth Buffer
 		glEnable( GL_DEPTH_TEST );
 		// Enables the Stencil Buffer
@@ -91,8 +91,7 @@ namespace god
 		// glEnable ( GL_DEPTH_TEST );
 		SetLineWidth( m_default_line_size );
 
-		// temp line rendering code
-		// line shader
+		// Temp line rendering code 
 		constexpr int MAX_POINTS{ 1000 };
 		char const line_vs[] = {
 			"#version 430 core\n"
@@ -122,8 +121,8 @@ namespace god
 		m_lines_mesh.Initialize();
 
 
-		// creating cube map
-		m_cubemap.Initialize( width, height );
+		// Creating cube map
+		m_cubemap.Initialize();
 		std::string skybox_model_path = "Assets/GameAssets/2DAssets/Raw/Skybox/";
 		// All the faces of the cubemap (make sure they are in this exact order)
 		std::string facesCubemap[6] =
@@ -137,7 +136,9 @@ namespace god
 		};
 		m_cubemap.CubeTexture( facesCubemap );
 
-		CreateDepthmap();
+		// Creating shadow map
+		m_shadowmap.Initialize( 2048, 2048 );
+
 		glCheckError();
 		std::cout << "OpenGL constructed." << std::endl;
 	}
@@ -155,17 +156,17 @@ namespace god
 
 	void OpenGL::BuildOGLModels( Asset3DManager const& asset3DManager )
 	{
-		// clear current mesh list
+		// Clear current mesh list
 		m_models.clear();
 
-		// copy meshes
+		// Copy meshes
 		for ( auto const& asset : asset3DManager.GetResources() )
 		{
 			m_models.emplace_back();
 			BuildOGLMeshesFromAssimpMeshes( m_models.back(), std::get<1>( asset ).m_model.m_meshes );
 		}
 
-		// copy mesh ids
+		// Copy mesh ids
 		m_model_ids = asset3DManager.GetIDs();
 	}
 
@@ -173,7 +174,7 @@ namespace god
 	{
 		m_models[id].clear();
 		BuildOGLMeshesFromAssimpMeshes( m_models[id], std::get<1>( asset3DManager.Get( id ) ).m_model.m_meshes );
-		// copy mesh ids
+		// Copy mesh ids
 		m_model_ids = asset3DManager.GetIDs();
 	}
 
@@ -195,38 +196,39 @@ namespace god
 				// Draw the normal model
 				m_textured_shader.Use();
 
-				// projection matrix
+				// Projection matrix
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uProjection", projection );
 
-				// view matrix
+				// View matrix
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uView", view );
 
-				// set uniforms for vertex shader
-				// set model transform
+				// Set uniforms for vertex shader
+				// Set model transform
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uModel", data.m_model_transform );
 
-				// set uniforms for fragment shader
-				// set view position
+				// Set uniforms for fragment shader
+				// Set view position
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uViewPosition", camera_position );
 
+				// Set uniform for shadowmap lighting
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uLightSpaceMatrix", m_light_space_matrix );
 
-				// set material
+				// Set material
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uMaterial.diffuse_map", 0 );
 				std::get<1>( textures.Get( data.m_diffuse_id ) ).Bind( 0 );
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uMaterial.specular_map", 1 );
 				std::get<1>( textures.Get( data.m_specular_id ) ).Bind( 1 );
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uMaterial.shininess", data.m_shininess );
 
-				// set reflection
+				// Set reflection
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uSkybox", 2 );
 				m_cubemap.Bind( 2 );
 
+				// Set shadowmap
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uShadowMap", 3 );
-				glActiveTexture( GL_TEXTURE0 + 3 );
-				glBindTexture( GL_TEXTURE_2D, m_depthmap );
+				m_shadowmap.Bind( 3 );
 
-				// set light
+				// Set light
 				OGLLight light;
 				light.m_position = { 0.0f, 10.0f, 0.0f };
 				light.m_ambient = { 0.5f, 0.5f, 0.5f };
@@ -236,7 +238,7 @@ namespace god
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uLight.diffuse", light.m_diffuse );
 				OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uLight.specular", light.m_specular );
 
-				// draw model
+				// Draw model
 				for ( auto const& mesh : m_models[data.m_model_id] )
 				{
 					mesh.Draw( GL_TRIANGLES );
@@ -269,7 +271,7 @@ namespace god
 			}
 		}
 
-		// draw skybox as last
+		// Draw skybox as last
 		m_cubemap.CubeMapEnableDepth();
 		m_cubemap_shader.Use();
 		OGLShader::SetUniform( m_cubemap_shader.GetShaderID(), "view", view );
@@ -280,7 +282,7 @@ namespace god
 		m_cubemap.UnBind();
 		m_cubemap.CubeMapDisableDepth();
 
-		// unuse the bound shader
+		// Unuse the bound shader
 		OGLShader::UnUse();
 	}
 
@@ -368,38 +370,9 @@ namespace god
 		}
 	}
 
-	void OpenGL::CreateDepthmap()
-	{
-		glGenFramebuffers( 1, &m_depthmap_fbo );
-
-		glGenTextures( 1, &m_depthmap );
-		glBindTexture( GL_TEXTURE_2D, m_depthmap );
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-					  m_shadow_width, m_shadow_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
-		float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		glTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor );
-
-		glBindFramebuffer( GL_FRAMEBUFFER, m_depthmap_fbo );
-		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthmap, 0 );
-		glDrawBuffer( GL_NONE );
-		glReadBuffer( GL_NONE );
-		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-		std::cout << "Depthmap Created" << std::endl;
-	}
-
 	void OpenGL::FirstPassRenderToDepthmap( Scene const& scene, glm::mat4 const& projection, glm::mat4 const& view, glm::vec3 const& camera_position, OGLTextureManager& textures )
 	{
-		glCullFace( GL_FRONT );
-		glViewport( 0, 0, m_shadow_width, m_shadow_height );
-		glBindFramebuffer( GL_FRAMEBUFFER, m_depthmap_fbo );
-		glClear( GL_DEPTH_BUFFER_BIT );
-		//ConfigureShaderAndMatrices();
-
+		m_shadowmap.EnableDepthMap();
 		for ( auto const& data : scene.m_render_data )
 		{
 			if ( data.Active() )
@@ -407,22 +380,24 @@ namespace god
 				// Draw the normal model
 				m_depthmap_shader.Use();
 
-				// set uniforms for vertex shader
-				// set model transform
-				OGLShader::SetUniform( m_depthmap_shader.GetShaderID(), "uModel", data.m_model_transform );
-				OGLShader::SetUniform( m_depthmap_shader.GetShaderID(), "uLightSpaceMatrix", m_light_space_matrix );
+				// Set uniforms for vertex shader
+				// Set model transform
+				OGLShader::SetUniform( m_depthmap_shader.GetShaderID(),
+									   "uModel",
+									   data.m_model_transform );
 
-				// draw model
+				OGLShader::SetUniform( m_depthmap_shader.GetShaderID(),
+									   "uLightSpaceMatrix",
+									   m_light_space_matrix );
+
+				// Draw model
 				for ( auto const& mesh : m_models[data.m_model_id] )
 				{
 					mesh.Draw( GL_TRIANGLES );
 				}
 			}
 		}
-
-		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-		OGLShader::UnUse();
-		glCullFace( GL_BACK );
+		m_shadowmap.DisableDepthMap();
 		glCheckError();
 	}
 }

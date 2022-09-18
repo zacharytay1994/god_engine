@@ -14,7 +14,16 @@ namespace OGLDebug
 
 #define glCheckError() OGLDebug::glCheckError_(__FILE__, __LINE__)
 
-	void APIENTRY glDebugOutput( GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam );
+	void APIENTRY glDebugOutput
+	(
+		GLenum source,
+		GLenum type,
+		unsigned int id,
+		GLenum severity,
+		GLsizei length,
+		const char* message,
+		const void* userParam
+	);
 
 	/**
 	 * @brief

@@ -54,6 +54,8 @@ namespace god
 		OpenGL opengl( window.GetWindowHandle(), window.GetWindowWidth(), window.GetWindowHeight() );
 		OGLRenderPass first_renderpass( window.GetWindowWidth(), window.GetWindowHeight() );
 
+		glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, true );
+
 		// setup camera
 		Camera camera;
 		camera.UpdateAspectRatio( window.GetWindowWidth(), window.GetWindowHeight() );
@@ -142,8 +144,10 @@ namespace god
 				camera.GetCameraViewMatrix(),
 				camera.m_position,
 				ogl_textures );
+
 			// imgui pass
 			first_renderpass.Bind ();
+
 			opengl.RenderScene (
 				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,
@@ -151,6 +155,7 @@ namespace god
 				camera.m_position ,
 				ogl_textures
 			);
+
 			opengl.RenderLines (
 				camera.GetPerpectiveProjectionMatrix () ,
 				camera.GetCameraViewMatrix ()

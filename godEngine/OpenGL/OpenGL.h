@@ -5,6 +5,7 @@
 #include "Internal/OGLTexture.h"
 
 #include "Advance/CubeMap.h"
+#include "Advance/ShadowMap.h"
 
 #include "../godUtility/Utility.h"
 
@@ -52,7 +53,6 @@ namespace god
 		void SetLineWidth( float size );
 
 		// shadow stuff
-		unsigned int m_depthmap;
 		void FirstPassRenderToDepthmap( Scene const& scene, glm::mat4 const& projection, glm::mat4 const& view, glm::vec3 const& camera_position, OGLTextureManager& textures );
 
 	private:
@@ -67,6 +67,7 @@ namespace god
 		OGLShader m_textured_shader;
 		OGLShader m_single_colour_outline_shader;
 		OGLShader m_cubemap_shader;
+		OGLShader m_depthmap_shader;
 
 		// models - vector of vector of OGLMesh because 1 model can consist of more than 1 mesh
 		std::vector<std::vector<OGLMesh>> m_models;
@@ -79,10 +80,7 @@ namespace god
 		OGLCubeMap m_cubemap;
 
 		// shadow stuff
-		int m_shadow_width{ 2048 }, m_shadow_height{ 2048 };
-		unsigned int m_depthmap_fbo;
-		OGLShader m_depthmap_shader;
 		glm::mat4 m_light_space_matrix;
-		void CreateDepthmap();
+		OGLShadowMap m_shadowmap;
 	};
 }

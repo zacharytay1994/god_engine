@@ -55,7 +55,7 @@ namespace god
 		2,0,1
 	};
 
-	void OGLCubeMap::Initialize( unsigned int width, unsigned int height )
+	void OGLCubeMap::Initialize( )
 	{
 		// Create VAO, VBO, and EBO for the skybox
 		glGenVertexArrays( 1, &m_skybox_vao );
@@ -73,6 +73,7 @@ namespace god
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
 	}
+
 	void OGLCubeMap::CubeTexture( std::string facesCubemap[6] )
 	{
 
@@ -132,14 +133,14 @@ namespace god
 				texture.Free();
 			}
 		}
-
-
 	}
+
 	void OGLCubeMap::CubeMapEnableDepth()
 	{
 		// Since the cubemap will always have a depth of 1.0, we need that equal sign so it doesn't get discarded
 		glDepthFunc( GL_LEQUAL );
 	}
+
 	void OGLCubeMap::CubeMapDisableDepth()
 	{
 		// Switch back to the normal depth function
@@ -152,6 +153,7 @@ namespace god
 		// where an object is present (a depth of 1.0f will always fail against any object's depth value)
 		glBindVertexArray( m_skybox_vao );
 	}
+
 	void OGLCubeMap::Bind( uint32_t location )
 	{
 		assert( m_cubemap_texture != static_cast< uint32_t >( -1 ) && ( "Texture not initialized" ) );
@@ -159,16 +161,19 @@ namespace god
 		glBindTexture( GL_TEXTURE_CUBE_MAP, m_cubemap_texture );
 	
 	}
+
 	void OGLCubeMap::Draw()
 	{
 		glActiveTexture( GL_TEXTURE0 );
 		glBindTexture( GL_TEXTURE_CUBE_MAP, m_cubemap_texture );
 		glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0 );
 	}
+
 	void OGLCubeMap::UnBind()
 	{
 		glBindVertexArray( 0 );
 	}
+
 	unsigned int OGLCubeMap::GetTexture()
 	{
 		return m_cubemap_texture;
