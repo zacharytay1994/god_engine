@@ -5,22 +5,32 @@ namespace god
 {
 	PhysicsSystem::PhysicsSystem() 
 	{
-		mDispatcher = NULL;
-		physx::PxFoundation* mFoundation = NULL;
-		physx::PxPhysics* mPhysics = NULL;
+		mDispatcher = nullptr;
+		mFoundation = nullptr;
+		mPhysics = nullptr;
 
-		physx::PxScene* mScene = NULL;
-		physx::PxMaterial* mMaterial = NULL;
-
-		physx::PxPvd* mPvd = NULL;
+		mScene = nullptr;
+		mPvd = nullptr;
 
 		std::cout << "Physics Constructed" << std::endl;
 	}
 	PhysicsSystem::~PhysicsSystem()
 	{
+		mScene->release();
+		mDispatcher->release();
 		mPhysics->release();
-		mFoundation->release();
 
+		if (mPvd)
+		{
+			physx::PxPvdTransport* transport = mPvd->getTransport();
+			mPvd->release();
+			mPvd = nullptr;
+			transport->release();
+		}
+		mFoundation->release();
+		///mFoundation->release();
+		
+		//mDefaultAllocatorCallback.
 	}
 	void PhysicsSystem::Init()
 	{
@@ -28,7 +38,7 @@ namespace god
 		mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
 		if (!mFoundation) throw("PxCreateFoundation failed!");
 
-
+		
 		//PVD
 		mPvd = PxCreatePvd(*mFoundation);
 		physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);

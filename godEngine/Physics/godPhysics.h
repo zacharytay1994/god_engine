@@ -42,7 +42,7 @@ namespace god
 		physx::PxPhysics* mPhysics;
 
 		physx::PxScene* mScene;
-		physx::PxMaterial* mMaterial;
+		
 
 		physx::PxPvd* mPvd;
 
