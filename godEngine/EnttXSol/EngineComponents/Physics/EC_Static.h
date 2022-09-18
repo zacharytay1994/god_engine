@@ -9,19 +9,24 @@ namespace god
 	struct RigidStatic
 	{
 		physx::PxVec3 Offset;
+		bool Active{ true };
 
 			//Non serialize data
 			physx::PxRigidStatic* p_RigidStatic;
-			bool updateRigidStatic;
+			bool updateRigidStatic{ true };
+			physx::PxScene* mScene;
 
 		//Ctor
-		RigidStatic() : Offset{ 0.f, 0.f, 0.f }, p_RigidStatic{ nullptr }, updateRigidStatic{ true }
+		RigidStatic() : Offset{ 0.f, 0.f, 0.f }, p_RigidStatic{ nullptr }, mScene{nullptr}
 		{};
 
 		~RigidStatic()
 		{
-			if (p_RigidStatic)
+			if (mScene)
+			{
+				mScene->removeActor(*p_RigidStatic);
 				p_RigidStatic->release();
+			}
 
 		};
 	};

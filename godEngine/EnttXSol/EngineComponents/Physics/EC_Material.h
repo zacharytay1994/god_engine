@@ -55,7 +55,7 @@ namespace god
 		// serialize
 		RapidJSON::JSONifyToValue(value, document, "StaticFriction", component.StaticFriction);
 		RapidJSON::JSONifyToValue(value, document, "DynamicFriction", component.DynamicFriction);
-		RapidJSON::JSONifyToValue(value, document, "updateMaterial", component.Restitution);
+		RapidJSON::JSONifyToValue(value, document, "Restitution", component.Restitution);
 	}
 
 	template<>

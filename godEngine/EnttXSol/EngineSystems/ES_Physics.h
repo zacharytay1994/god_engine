@@ -39,14 +39,15 @@ namespace god
 		{
 			if (physhape.p_shape == nullptr)
 			{
-				
-				physhape.p_shape = mPhysics->createShape(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z), *phymaterial.p_material);
+				//exclusive shape which can be modified
+				physhape.p_shape = mPhysics->createShape(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z), *phymaterial.p_material,true);
 			}
 			else
 			{
-				//As Attached Shapes cannot be modified
-				physhape.p_shape->release();
-				physhape.p_shape = mPhysics->createShape(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z), *phymaterial.p_material);
+
+				physhape.p_shape->setGeometry(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z));
+				physhape.p_shape->setMaterials(&phymaterial.p_material, 1);
+
 		
 			}
 			std::cout << " Shape Updated\n";
@@ -56,24 +57,31 @@ namespace god
 
 	void UpdateStatic(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, PhysicsMaterial&, PhysicsShape&, RigidStatic& > component)
 	{
+		
 		Transform& transform = std::get<1>(component);
 		PhysicsMaterial& phymaterial = std::get<2>(component);
 		PhysicsShape& physhape = std::get<3>(component);
 		RigidStatic& rigidstatic = std::get<4>(component);
 
-
 		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
-		//std::map < std::string, physx::PxMaterial*> & materialcont = engineResources.Get<PhysicsSystem>().get().GetMaterialContainer();
+
+
+		if (rigidstatic.Active == false)
+		{
+
+		}
 
 		if (rigidstatic.updateRigidStatic)
 		{
 			if (rigidstatic.p_RigidStatic == nullptr)
 			{
-				rigidstatic.p_RigidStatic = mPhysics->createRigidStatic(physx::PxTransform(transform.m_position.x + rigidstatic.Offset.x,
+				rigidstatic.p_RigidStatic = mPhysics->createRigidStatic(physx::PxTransform(
+					transform.m_position.x + rigidstatic.Offset.x,
 					transform.m_position.y + rigidstatic.Offset.y,
 					transform.m_position.z + rigidstatic.Offset.z));
 
+				rigidstatic.mScene = mScene;
 				rigidstatic.p_RigidStatic->attachShape(*physhape.p_shape);
 
 				mScene->addActor(*rigidstatic.p_RigidStatic);
@@ -84,8 +92,6 @@ namespace god
 				rigidstatic.p_RigidStatic->setGlobalPose(physx::PxTransform(transform.m_position.x + rigidstatic.Offset.x,
 					transform.m_position.y + rigidstatic.Offset.y,
 					transform.m_position.z + rigidstatic.Offset.z));
-
-				rigidstatic.p_RigidStatic->attachShape(*physhape.p_shape);
 			
 		
 			}
@@ -106,7 +112,12 @@ namespace god
 
 		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
-		//std::map < std::string, physx::PxMaterial*> & materialcont = engineResources.Get<PhysicsSystem>().get().GetMaterialContainer();
+
+		if (rigiddynamic.Active == false)
+		{
+			mScene->removeActor(*rigiddynamic.p_RigidDynamic);
+			rigiddynamic.p_RigidDynamic ->release();
+		}
 
 		if (rigiddynamic.updateRigidDynamic)
 		{
@@ -115,8 +126,12 @@ namespace god
 				rigiddynamic.p_RigidDynamic = mPhysics->createRigidDynamic(physx::PxTransform(transform.m_position.x,
 					transform.m_position.y,transform.m_position.z));
 
-				rigiddynamic.p_RigidDynamic->attachShape(*physhape.p_shape);
+				rigiddynamic.mScene = mScene;
 
+				rigiddynamic.p_RigidDynamic->attachShape(*physhape.p_shape);
+				rigiddynamic.p_RigidDynamic->setAngularVelocity(physx::PxVec3(rigiddynamic.AngularVelocity.x, rigiddynamic.AngularVelocity.y, rigiddynamic.AngularVelocity.z), true);
+				physx::PxRigidBodyExt::updateMassAndInertia(*rigiddynamic.p_RigidDynamic, rigiddynamic.Density);
+				
 				mScene->addActor(*rigiddynamic.p_RigidDynamic);
 			}
 			else
@@ -129,10 +144,26 @@ namespace god
 			rigiddynamic.updateRigidDynamic = false;
 
 		}
-		physx::PxTransform pos = rigiddynamic.p_RigidDynamic->getGlobalPose();
-		transform.m_position.x = pos.p.x;
-		transform.m_position.y = pos.p.y;
-		transform.m_position.z = pos.p.z;
+
+
+		physx::PxTransform ptransform = rigiddynamic.p_RigidDynamic->getGlobalPose();
+
+
+		transform.m_position.x = ptransform.p.x;
+		transform.m_position.y = ptransform.p.y;
+		transform.m_position.z = ptransform.p.z;
+
+		glm::quat m;
+		m.w = ptransform.q.w;
+		m.x = ptransform.q.x;
+		m.y = ptransform.q.y;
+		m.z = ptransform.q.z;
+
+		transform.m_rotation = glm::degrees(glm::eulerAngles	(m)	);
+
+	
+														
+
 
 	}
 

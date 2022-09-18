@@ -1,6 +1,8 @@
 #pragma once
 
 #include "PxPhysicsAPI.h"
+#include "PhysicUtils.h"
+
 #include <map>
 
 #define PVD_HOST "127.0.0.1"
@@ -46,8 +48,9 @@ namespace god
 
 
 		float mAccumulator = 0.0f;
+		uint16_t numSteps = 1;
 		float mStepSize = 1.0f / 60.0f;
-
+		
 	};
 
 }

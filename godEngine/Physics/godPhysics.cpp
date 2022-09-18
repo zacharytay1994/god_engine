@@ -46,7 +46,7 @@ namespace god
 
 
 		physx::PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-		sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
+		sceneDesc.gravity = physx::PxVec3(0.0f, -98.11f, 0.0f);
 		mDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
 		if (!mDispatcher)
 			std::cerr << "PxDefaultCpuDispatcherCreate failed!" << std::endl;
@@ -103,20 +103,27 @@ namespace god
 	void PhysicsSystem::Update(float dt)
 	{
 
-		//mStepSize is 1/60 Physics caps at 60fps
+		//mStepSize is 1/60 Physics at 60fps by default
 		mAccumulator += dt;
 		if (mAccumulator < mStepSize)
 			return;
 
-		mAccumulator -= mStepSize;
+		mStepSize = 1.0f / (numSteps * 60.0f);
 
-		mScene->simulate(mStepSize);
-		mScene->fetchResults(true);
+		for (uint16_t i = 0; i < numSteps; ++i)
+		{
+			mAccumulator -= mStepSize;
+			mScene->simulate(mStepSize);
+			mScene->fetchResults(true);
 
-
+		}
 		if (mAccumulator > 1.0f)
 		{
-
+			numSteps = 2;
+		}
+		else if (mAccumulator < 0.1f)
+		{
+			numSteps = 1;
 		}
 
 	}

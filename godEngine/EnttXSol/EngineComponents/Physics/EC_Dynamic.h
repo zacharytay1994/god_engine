@@ -12,20 +12,24 @@ namespace god
 		physx::PxVec3 AngularVelocity;
 		physx::PxVec3 LinearVelocity;
 		float Density;
+		bool Active{ true };
 
 			//Non serialize data
-			physx::PxRigidDynamic* p_RigidDynamic;
-			bool updateRigidDynamic;
-
+			physx::PxRigidDynamic* p_RigidDynamic{ nullptr };
+			bool updateRigidDynamic{ true };
+			physx::PxScene* mScene{ nullptr };
 		//Ctor
-		RigidDynamic() :  p_RigidDynamic{ nullptr }, updateRigidDynamic{ true },
+		RigidDynamic() :  
 			AngularVelocity{ 0.f,0.f,0.f }, LinearVelocity{ 0.f,0.f,0.f }, Density{ 1.f }
 		{};
 
 		~RigidDynamic()
 		{
-			if (p_RigidDynamic)
+			if (mScene)
+			{
+				mScene->removeActor(*p_RigidDynamic);
 				p_RigidDynamic->release();
+			}
 
 		};
 };

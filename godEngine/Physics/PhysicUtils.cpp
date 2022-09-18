@@ -1,15 +1,10 @@
 #include "../pch.h"
 #include "PhysicUtils.h"
-#include <glm/glm/gtx/quaternion.hpp>
+
 
 namespace god
 {
-	physx::PxTransform ConvertToPhysXTransform(const Transform& transform)
-	{
-		physx::PxQuat rot = ConvertToPhysXQuat(glm::quat(transform.m_rotation));
-		physx::PxVec3 vec = ConvertToPhysXVector(transform.m_position);
-		return physx::PxTransform(vec, rot);
-	}
+
 
 	physx::PxTransform ConvertToPhysXTransform(const glm::vec3& translation, const glm::vec3& rotation)
 	{
