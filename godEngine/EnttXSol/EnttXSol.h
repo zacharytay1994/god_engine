@@ -63,7 +63,7 @@ namespace god
 	public:
 		EnttXSol ();
 		void Update ( EngineResources& engineResources );
-		void ClearEntt ();
+		void ClearEntt ( EngineResources& engineResources );
 		void SetupBindings ();
 
 		void NewScriptTemplate ( std::string const& newScript );
@@ -79,7 +79,11 @@ namespace god
 		void RegisterLuaType ( std::string const& name , ARGS...args );
 		template<typename ...T>
 		void RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) );
-		void BindEngineSystemUpdate ( void( *update )( EnttXSol& , EngineResources& engineResources , bool ) );
+		void BindEngineSystemUpdate ( 
+			void( *update )( EnttXSol& , EngineResources& , bool ),
+			void( *init )( EnttXSol& , EngineResources& ),
+			void( *cleanup )( EnttXSol& , EngineResources& )
+		);
 
 		Entities::ID CreateEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );
 		void RemoveEntity ( Entities::ID entity );
@@ -131,6 +135,9 @@ namespace god
 
 		EnttXSol::Entities::ID AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , glm::vec3 const& position = { 0,0,0 } );
 
+		template<typename...COMPONENTS>
+		auto GetView();
+
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
 		{
@@ -161,6 +168,8 @@ namespace god
 		std::unordered_map<std::string , sol::function> m_sol_functions;
 
 		void( *m_engine_update )( EnttXSol& , EngineResources& engineResources , bool ) = nullptr;
+		void( *m_engine_init )( EnttXSol& , EngineResources& engineResources ) = nullptr;
+		void( *m_engine_cleanup )( EnttXSol& , EngineResources& engineResources ) = nullptr;
 
 		void LoadSystem ( std::string const& name );
 		bool AttachComponent ( Entities::ID id , std::string const& name );
@@ -443,6 +452,12 @@ namespace god
 				RecursivePopulateScene<S , T , R> ( scene , child , parentTransform );
 			}
 		}
+	}
+
+	template<typename ...COMPONENTS>
+	inline auto EnttXSol::GetView()
+	{
+		return m_registry.view<COMPONENTS...>();
 	}
 
 	template<typename T>
