@@ -4,7 +4,13 @@
 #include "EC_EntityData.h"
 #include "EC_Transform.h"
 #include "EC_Renderable3D.h"
+#include "EC_AudioSource.h"
 #include "EC_GridCell.h"
+
+#include "Physics/EC_Material.h"
+#include "Physics/EC_Shape.h"
+#include "Physics/EC_Static.h"
+#include "Physics/EC_Dynamic.h"
 
 #include <tuple>
 #include <string>
@@ -17,7 +23,13 @@ namespace god
 		using Components = std::tuple<
 			EntityData ,
 			Transform ,
-			Renderable3D,
+			Renderable3D ,
+			GridCell,
+			PhysicsMaterial,
+			PhysicsShape,
+			RigidStatic,
+			RigidDynamic,
+			AudioSource ,
 			GridCell
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;

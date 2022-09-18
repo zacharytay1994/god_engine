@@ -5,9 +5,15 @@ namespace god
 {
 	std::array<std::string , std::tuple_size_v<EngineComponents::Components>> EngineComponents::m_component_names
 	{
-		"Entity Data",
+		"EntityData",
 		"Transform",
 		"Renderable3D",
+		"GridCell",
+		"PhysicsMaterial",
+		"PhysicsShape",
+		"RigidStatic",
+		"RigidDynamic",
+		"AudioSource", 
 		"GridCell"
 	};
 }
