@@ -79,9 +79,9 @@ namespace god
 		void RegisterLuaType ( std::string const& name , ARGS...args );
 		template<typename ...T>
 		void RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) );
-		void BindEngineSystemUpdate ( 
-			void( *update )( EnttXSol& , EngineResources& , bool ),
-			void( *init )( EnttXSol& , EngineResources& ),
+		void BindEngineSystemUpdate (
+			void( *update )( EnttXSol& , EngineResources& , bool ) ,
+			void( *init )( EnttXSol& , EngineResources& ) ,
 			void( *cleanup )( EnttXSol& , EngineResources& )
 		);
 
@@ -136,7 +136,7 @@ namespace god
 		EnttXSol::Entities::ID AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , glm::vec3 const& position = { 0,0,0 } );
 
 		template<typename...COMPONENTS>
-		auto GetView();
+		auto GetView ();
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -174,8 +174,10 @@ namespace god
 		void LoadSystem ( std::string const& name );
 		bool AttachComponent ( Entities::ID id , std::string const& name );
 		bool AttachComponent ( entt::entity id , std::string const& name );
+	public:
 		template <typename T>
 		auto&& GetStorage ( std::string const& name );
+	private:
 		entt::runtime_view GetView ( std::vector<std::string> const& components , std::vector<std::string> const& engineComponents );
 
 		void RecursiveRemoveEntity ( Entities::ID entity );
@@ -455,9 +457,9 @@ namespace god
 	}
 
 	template<typename ...COMPONENTS>
-	inline auto EnttXSol::GetView()
+	inline auto EnttXSol::GetView ()
 	{
-		return m_registry.view<COMPONENTS...>();
+		return m_registry.view<COMPONENTS...> ();
 	}
 
 	template<typename T>

@@ -77,7 +77,7 @@ namespace god
 		// setup ecs and scripting
 		EnttXSol enttxsol;
 		enttxsol.BindEngineComponents< EngineComponents > ();
-		enttxsol.BindEngineSystemUpdate ( EngineSystems , EngineSystemsInit, EngineSystemsCleanup );
+		enttxsol.BindEngineSystemUpdate ( EngineSystems , EngineSystemsInit , EngineSystemsCleanup );
 		enttxsol.SetupBindings ();
 
 		// setup scene
@@ -169,6 +169,24 @@ namespace god
 			SystemTimer::StartTimeSegment ( "Window Buffer Swap" );
 			window.SwapWindowBuffers ();
 			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
+
+			if ( window.KeyDown ( GLFW_KEY_P ) )
+			{
+				for ( uint32_t i = 0; i < enttxsol.m_entities.Size (); ++i )
+				{
+					if ( enttxsol.m_entities[ i ].m_name == "Entity3" )
+					{
+						//std::cout << m_entities[ i ].m_name << std::endl;
+						//return m_entities[ i ].m_id;
+						//std::cout << static_cast< int >( enttxsol.m_entities[ i ].m_id ) << std::endl;
+						entt::entity id = enttxsol.m_entities[ i ].m_id;
+						std::cout << static_cast< int >( id ) << std::endl;
+						float o = enttxsol.GetStorage<sol::table> ( "C_System3" ).get ( id )[ "p" ];
+						std::cout << o << std::endl;
+					}
+				}
+			}
+
 			// free camera update
 			/*camera.FreeCamera ( 0.02f ,
 				true ,

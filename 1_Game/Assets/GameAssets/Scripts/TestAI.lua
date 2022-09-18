@@ -1,6 +1,12 @@
 --[IsComponent]
 function C_TestAI()
     local var = {
+        --[SerializeString]
+        GlobalStatemachine = "GlobalStatemachine",
+        --[SerializeString]
+        ExampleStateOne = "StateOne",
+        --[SerializeString]
+        ExampleStateTwo = "StateTwo"
     }
     return function()
         return var
@@ -9,20 +15,18 @@ end
 
 --[IsSystem]
 function S_TestAI(e)
-    -- local transform = GetTransform(GetEntity("Entity2"));
-    -- transform.position.y = transform.position.y + 1;
-    -- local transform2 = GetTransform(GetEntity("Entity3"));
-    -- transform2.position.x = transform2.position.x + 1;
-    -- print("hi")
-    local entity3 = GetEntity("Entity3")
-    local example = GetComponent(entity3, "C_System2")
-    -- example.o = example.o + 100;
-    -- example.s = "changed";
-    -- print(entity3);
-    example.o = example.o + 1
-    print(example.o)
-    -- print(example.s);
-    -- print("hello")
-    -- local gridcell = GetGridCell(GetEntity("Entity3"));
-    -- gridcell.z = gridcell.z + 1;
+    -- check if global state entity exists
+    local component = GetComponent(e, "C_TestAI")
+    local gs_entity = GetEntity(component.GlobalStatemachine)
+    if (gs_entity ~= -1) then
+        local current_global_state = GetComponent(gs_entity, "C_GlobalStatemachine").CurrentState
+        -- do some state-only action here
+        if (current_global_state == component.ExampleStateOne) then
+            -- action ...
+            print("State One")
+        end
+        if (current_global_state == component.ExampleStateTwo) then
+            print("State Two")
+        end
+    end
 end
