@@ -37,8 +37,8 @@ namespace god
 		( entt );
 		( components );
 		( engineResources );
-		// some code here ...
-		std::cout << "Init - Entities with EntityData & Transform." << std::endl;
+		 //some code here ...
+		//std::cout << "Init - Entities with EntityData & Transform." << std::endl;
 	}
 
 	void ExampleSystemCleanup ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform&> components )
@@ -47,6 +47,6 @@ namespace god
 		( components );
 		( engineResources );
 		// some code here ...
-		std::cout << "Cleanup - Entities with EntityData & Transform." << std::endl;
+		//std::cout << "Cleanup - Entities with EntityData & Transform." << std::endl;
 	}
 }
