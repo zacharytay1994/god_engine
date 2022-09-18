@@ -1,7 +1,6 @@
 #pragma once
 
 #include "EngineComponents.h"
-#include "../../Audio/AudioAPI.h"
 
 namespace god
 {
@@ -16,9 +15,11 @@ namespace god
 
 		//int m_channel_group;
 
+		bool m_3d_sound{ false };
+
 		int m_sound_id{ -1 };
 		int m_source_id{ -1 };
-		//int m_listener_id{ -1 }; // output
+		int m_listener_id{ -1 }; // output
 
 		bool m_mute{ false };
 		bool m_loop{ false };
@@ -65,6 +66,8 @@ namespace god
 						{
 							component.m_sound_id = asset.second;
 							ImGui::CloseCurrentPopup();
+
+							AudioAPI::StopAll();
 						}
 					}
 					ImGui::EndPopup();

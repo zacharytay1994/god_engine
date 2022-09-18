@@ -19,15 +19,8 @@ namespace god
 	template <>
 	inline void NewLuaType<AudioListener>(sol::state& luaState, std::string const& name)
 	{
-		//RegisterLuaType<AudioListener>(luaState, name,
-		//	"source_id", &AudioSource::m_source_id,
-		//	"listener_id", &AudioSource::m_listener_id,
-		//	"mute", &AudioSource::m_mute,
-		//	"loop", &AudioSource::m_loop,
-		//	"volume", &AudioSource::m_volume,
-		//	"pitch", &AudioSource::m_pitch,
-		//	"min_distance", &AudioSource::m_min_distance,
-		//	"max_distance", &AudioSource::m_max_distance);
+		RegisterLuaType<AudioListener>(luaState, name,
+			"listener_id", &AudioListener::m_listener_id);
 	}
 	template<>
 	inline void ComponentInspector::operator() < AudioListener > (entt::entity entity, entt::registry& registry, int& imguiUniqueID, EngineResources& editorResources)
@@ -37,7 +30,7 @@ namespace god
 			{
 				(resources);
 				ImGui::Separator();
-				ImGui::Text("Audio Source");
+				ImGui::Text("Audio Listener");
 				ImGui::Separator();
 
 				//ImGui::ListBox("Output", &component.m_listener_id, nullptr, 0, 5);

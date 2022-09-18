@@ -8,6 +8,7 @@ namespace god
 		"Entity Data",
 		"Transform",
 		"Renderable3D",
+		"AudioListener", 
 		"AudioSource", 
 		"GridCell"
 	};
