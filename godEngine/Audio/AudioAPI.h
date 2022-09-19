@@ -4,7 +4,8 @@
 
 #include <fmod.hpp>
 #include <fmod_errors.h>
-#include <fmod_common.h>
+
+#define MAX_SOUND_CHANNELS 64
 
 namespace god
 {
@@ -19,7 +20,7 @@ namespace god
 
 		bool m_played{ false };
 
-		FMOD::Channel* m_channel;
+		FMOD::Channel* m_channel{ nullptr };
 	};
 
 	struct AudioAPI
@@ -27,9 +28,9 @@ namespace god
 		AudioAPI();
 		~AudioAPI();
 
-		//void CreateFMODSystem();
 		//void CreateChannelGroup();
-		
+
+	public:
 		static void LoadSound(const char* filePath, FMOD::Sound** sound);
 		static void LoadSound(const char* filePath, Sound& sound);
 		static void UnloadSound(FMOD::Sound* sound);
@@ -39,8 +40,11 @@ namespace god
 		static void SetVolume(Sound& sound, float volume);
 		static void SetPitch(Sound& sound, float pitch);
 
-		static void Play(FMOD::Sound* sound);
-		static void Play(Sound& sound);
+		static void PlaySound(Sound& sound);
+		static void PauseSound(Sound& sound, bool paused);
+		static void StopSound(Sound& sound);
+
+		static void PlayAll(std::vector<Sound>& sounds);
 		static void PauseAll();
 		static void ResumeAll();
 		static void StopAll();

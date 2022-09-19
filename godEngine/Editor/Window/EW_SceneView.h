@@ -145,6 +145,10 @@ namespace god
 		{
 			m_enttxsol.m_pause = false;
 			AudioAPI::ResumeAll();
+
+			// need to play all the sounds that are active
+			//SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
+			//AudioAPI::PlayAll(sound_manager.GetResources());
 		}
 		this->ToolTipOnHover ( "Objects will be updated." );
 		ImGui::SameLine ();

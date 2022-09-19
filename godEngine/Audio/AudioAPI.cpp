@@ -22,7 +22,7 @@ namespace god
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
 
-		m_FMOD_system->init(64, FMOD_INIT_NORMAL, NULL);
+		m_FMOD_system->init(MAX_SOUND_CHANNELS, FMOD_INIT_NORMAL, NULL);
 
 		result = m_FMOD_system->getMasterChannelGroup(&m_master_channel_group);
 		if (result != FMOD_OK)
@@ -89,15 +89,29 @@ namespace god
 		sound.m_channel->setPitch(pitch);
 	}
 
-	void AudioAPI::Play(FMOD::Sound* sound)
-	{
-		m_FMOD_system->playSound(sound, NULL, false, NULL);
-	}
-
-	void AudioAPI::Play(Sound& sound)
+	void AudioAPI::PlaySound(Sound& sound)
 	{
 		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, &sound.m_channel);
 		sound.m_played = true;
+	}
+
+	void AudioAPI::PauseSound(Sound& sound, bool paused)
+	{
+		sound.m_channel->setPaused(paused);
+	}
+
+	void AudioAPI::StopSound(Sound& sound)
+	{
+		sound.m_channel->stop();
+	}
+
+	void AudioAPI::PlayAll(std::vector<Sound>& sounds)
+	{
+		for (auto& sound : sounds)
+		{
+			if (!sound.m_played)
+				PlaySound(sound);;
+		}
 	}
 
 	void AudioAPI::PauseAll()
@@ -113,6 +127,5 @@ namespace god
 	void AudioAPI::StopAll()
 	{
 		m_master_channel_group->stop();
-		//m_master_sound_group->stop();
 	}
 }

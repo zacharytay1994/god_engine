@@ -60,24 +60,19 @@ namespace god
 
 	void AudioSystem(EnttXSol& entt, EngineResources& engineResources, std::tuple<EntityData&, AudioListener&> components)
 	{
-		(entt);
+		(entt); (components);
+
+		// note: only one audio listener allowed
 
 		// engine resources access
 		SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
 
-		auto& entity_data = std::get<0>(components);
-		auto& audio_listener = std::get<1>(components);
+		//auto& entity_data = std::get<0>(components);
+		//auto& audio_listener = std::get<1>(components);
 
 		// access entities with specific component
 		for (auto&& [entity, audio_source] : entt.GetView<AudioSource>().each())
 		{
-			//std::cout << audio_source.m_source_id << std::endl;
-
-			//if (audio_source.m_listener_id == audio_listener.m_listener_id)
-			//{
-			//	// code
-			//}
-
 			if (audio_source.m_sound_id != -1)
 			{
 				if (!audio_source.m_3d_sound)
@@ -89,7 +84,7 @@ namespace god
 
 					if (audio_source.m_play_on_awake && !sound.m_played)
 					{
-						AudioAPI::Play(sound);
+						AudioAPI::PlaySound(sound);
 					}
 
 					AudioAPI::SetMute(sound, audio_source.m_mute);
@@ -99,6 +94,7 @@ namespace god
 				else
 				{
 					// 3d sound
+					// get transform component, fmod is left handed system (need to set listener attributes)
 				}
 			}
 		}
