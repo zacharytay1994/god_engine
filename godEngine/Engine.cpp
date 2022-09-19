@@ -118,7 +118,7 @@ namespace god
 		editor_windows.AddWindow<god::EW_TilemapEditor>(true, std::ref(enttxsol));
 
 		godPhysicsSystem.Init();
-		godPhysicsSystem.SetupPVD();
+	
 
 		while (!window.WindowShouldClose())
 		{
@@ -148,7 +148,8 @@ namespace god
 			enttxsol.PopulateScene<Scene, Transform, Renderable3D>(scene);
 			SystemTimer::EndTimeSegment("Populating Scene");
 
-			godPhysicsSystem.Update(delta_timer.m_dt);
+			//Physics Simulate update
+			godPhysicsSystem.Update(delta_timer.m_dt , enttxsol.m_pause);
 
 			// render scene
 			SystemTimer::StartTimeSegment("Rendering");
@@ -184,6 +185,7 @@ namespace god
 			// editor_windows.GetWindow<EW_SceneView>()->SetRenderpassTexture( opengl.m_depthmap );
 			editor_windows.Update(0.02f, engine_resources);
 			ogl_editor.Render();
+
 			ogl_editor.EndFrame();
 			SystemTimer::EndTimeSegment("Editor");
 

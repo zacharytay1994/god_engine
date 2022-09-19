@@ -29,6 +29,10 @@
     <ClCompile Include="Window\DeltaTimer.cpp" />
     <ClCompile Include="Window\GLFWWindow.cpp" />
     <ClCompile Include="Window\SystemTimer.cpp" />
+    <ClCompile Include="Audio\AudioAPI.cpp" />
+    <ClCompile Include="OpenGL\Advance\CubeMap.cpp" />
+    <ClCompile Include="OpenGL\Advance\ShadowMap.cpp" />
+    <ClCompile Include="OpenGL\Internal\OGLDebug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Editor\Editor.h" />
@@ -83,11 +87,21 @@
     <ClInclude Include="Window\GLFWWindow.h" />
     <ClInclude Include="Window\DeltaTimer.h" />
     <ClInclude Include="Window\SystemTimer.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\ES_Physics.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Material.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Shape.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Dynamic.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
+    <ClInclude Include="Audio\AudioAPI.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_AudioListener.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_AudioSource.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h" />
+    <ClInclude Include="OpenGL\Advance\CubeMap.h" />
+    <ClInclude Include="OpenGL\Advance\ShadowMap.h" />
+    <ClInclude Include="OpenGL\Internal\OGLDebug.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Shape.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Dynamic.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Physics.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -237,12 +251,6 @@
     <ClInclude Include="Physics\godPhysics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGL\Advance\CubeMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\Advance\ShadowMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EnttXSol\EngineComponents\EC_GridCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -250,9 +258,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EnttXSol\EngineComponents\EC_EntityData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\Internal\OGLDebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -333,15 +338,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\ImGuizmo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\Advance\CubeMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\Advance\ShadowMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\Internal\OGLDebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

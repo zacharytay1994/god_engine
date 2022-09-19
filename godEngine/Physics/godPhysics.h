@@ -17,12 +17,10 @@ namespace god
 		PhysicsSystem();
 		~PhysicsSystem();
 		 void Init();
-		 void Update(float fps);
+		 void Update(float dt, bool pause);
 
 
 
-
-		 void SetupPVD();//PhysX Visual Debugger
 
 
 		 physx::PxPhysics* const GetPhysics() const;
@@ -31,10 +29,16 @@ namespace god
 
 		 
 	private:
+
+		//PhysX Visual Debugger
+		void CreatePVD();
+		void SetupPVD();
+
 		std::map < std::string, physx::PxMaterial*> MaterialContainer;
 
 		physx::PxDefaultAllocator      mDefaultAllocatorCallback;
 		physx::PxDefaultErrorCallback  mDefaultErrorCallback;
+
 		physx::PxDefaultCpuDispatcher* mDispatcher;
 		physx::PxTolerancesScale       mToleranceScale;
 

@@ -54,7 +54,7 @@ class PxTransform
 	PX_CUDA_CALLABLE PX_FORCE_INLINE PxTransform()
 	{
 	}
-
+	
 	PX_CUDA_CALLABLE PX_FORCE_INLINE explicit PxTransform(const PxVec3& position) : q(PxIdentity), p(position)
 	{
 	}

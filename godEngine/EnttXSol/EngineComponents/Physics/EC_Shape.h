@@ -24,13 +24,15 @@ namespace god
 		{};
 		~PhysicsShape() 
 		{
-			if(p_shape)
-				p_shape->release();
+			//if(p_shape)
+			//	p_shape->release();
 		};
 	};
 	template <>
 	inline void NewLuaType<PhysicsShape>(sol::state& luaState, std::string const& name)
 	{
+		UNREFERENCED_PARAMETER(luaState);
+		UNREFERENCED_PARAMETER(name);
 	}
 	template<>
 	inline void ComponentInspector::operator() < PhysicsShape > (entt::entity entity, entt::registry& registry, int& imguiUniqueID, EngineResources& editorResources)
