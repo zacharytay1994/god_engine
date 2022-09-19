@@ -131,6 +131,7 @@
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
     <ClInclude Include="EnttXSol\EnttXSol.h" />
     <ClInclude Include="EnttXSol\Internal\godEntity.h" />
+    <ClInclude Include="EnttXSol\LuaFunctionDefinitions.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="godEngine.h" />
     <ClInclude Include="imgui\imconfig.h" />
@@ -182,6 +183,10 @@
     <ClCompile Include="EnttXSol\Internal\godEntity.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="EnttXSol\LuaFunctionDefinitions.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

@@ -172,19 +172,7 @@ namespace god
 
 			if ( window.KeyDown ( GLFW_KEY_P ) )
 			{
-				for ( uint32_t i = 0; i < enttxsol.m_entities.Size (); ++i )
-				{
-					if ( enttxsol.m_entities[ i ].m_name == "Entity3" )
-					{
-						//std::cout << m_entities[ i ].m_name << std::endl;
-						//return m_entities[ i ].m_id;
-						//std::cout << static_cast< int >( enttxsol.m_entities[ i ].m_id ) << std::endl;
-						entt::entity id = enttxsol.m_entities[ i ].m_id;
-						std::cout << static_cast< int >( id ) << std::endl;
-						float o = enttxsol.GetStorage<sol::table> ( "C_System3" ).get ( id )[ "p" ];
-						std::cout << o << std::endl;
-					}
-				}
+				auto path = grid[ -1 ].GetPathAStar ( 1.0f , { 0,0,0 } , { 4,0,2 } );
 			}
 
 			// free camera update

@@ -21,6 +21,7 @@
 #include "EngineComponents/EC_All.h"
 
 #include "Internal/godEntity.h"
+#include "LuaFunctionDefinitions.h"
 
 #include <string>
 #include <unordered_map>
@@ -77,6 +78,8 @@ namespace god
 		void BindEngineComponents ();
 		template<typename T , typename ...ARGS>
 		void RegisterLuaType ( std::string const& name , ARGS...args );
+		template<typename FUNCTION>
+		void RegisterLuaFunction ( std::string const& name , FUNCTION fn );
 		template<typename ...T>
 		void RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) );
 		void BindEngineSystemUpdate (
@@ -137,6 +140,8 @@ namespace god
 
 		template<typename...COMPONENTS>
 		auto GetView ();
+
+		friend void RegisterLuaFunctions ( EnttXSol& entt );
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -262,6 +267,12 @@ namespace god
 	inline void EnttXSol::RegisterLuaType ( std::string const& name , ARGS ...args )
 	{
 		m_lua.new_usertype<T> ( name , sol::constructors<T ()> () , args... );
+	}
+
+	template<typename FUNCTION>
+	inline void EnttXSol::RegisterLuaFunction ( std::string const& name , FUNCTION fn )
+	{
+		m_lua[ name ] = fn;
 	}
 
 	template<typename ...T>

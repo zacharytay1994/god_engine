@@ -1,268 +1,94 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
+    <ClCompile Include="..\0_InternalDependencies\glad\src\glad.c" />
+    <ClCompile Include="Audio\AudioAPI.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Editor\Editor.cpp" />
+    <ClCompile Include="Editor\OpenGLEditor.cpp" />
+    <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="EnttXSol\EngineComponents\EC_All.cpp" />
+    <ClCompile Include="EnttXSol\EnttXSol.cpp" />
+    <ClCompile Include="EnttXSol\Internal\godEntity.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\ImGuizmo.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="imgui\imgui_stdlib.cpp" />
+    <ClCompile Include="imgui\imgui_tables.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="OpenGL\Internal\OGLTexture.cpp" />
+    <ClCompile Include="OpenGL\Internal\OGLPrimitives.cpp" />
+    <ClCompile Include="OpenGL\Internal\OGLRenderPass.cpp" />
+    <ClCompile Include="OpenGL\Internal\OGLShader.cpp" />
+    <ClCompile Include="OpenGL\OpenGL.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Window\DeltaTimer.cpp" />
+    <ClCompile Include="Window\GLFWWindow.cpp" />
+    <ClCompile Include="Window\SystemTimer.cpp" />
+    <ClCompile Include="EnttXSol\LuaFunctionDefinitions.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Audio\AudioAPI.h" />
+    <ClInclude Include="Editor\Editor.h" />
+    <ClInclude Include="Editor\EngineResources.h" />
+    <ClInclude Include="Editor\OpenGLEditor.h" />
+    <ClInclude Include="Editor\Window\EW_AssetImporter.h" />
+    <ClInclude Include="Editor\Window\EW_AssetManager.h" />
+    <ClInclude Include="Editor\Window\EW_EditorStyles.h" />
+    <ClInclude Include="Editor\Window\EW_MainMenuBar.h" />
+    <ClInclude Include="Editor\Window\EW_EntityEditor.h" />
+    <ClInclude Include="Editor\Window\EW_Performance.h" />
+    <ClInclude Include="Editor\Window\EW_SceneTree.h" />
+    <ClInclude Include="Editor\Window\EW_SceneView.h" />
+    <ClInclude Include="Editor\Window\EW_TilemapEditor.h" />
+    <ClInclude Include="Editor\Window\PathConfig.h" />
+    <ClInclude Include="Editor\Window\TestWindow.h" />
+    <ClInclude Include="Editor\Window\TestWindow2.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_AudioListener.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_AudioSource.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_EntityData.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_GridCell.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_Renderable3D.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EngineComponents.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_All.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_All.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
+    <ClInclude Include="EnttXSol\EnttXSol.h" />
+    <ClInclude Include="EnttXSol\Internal\godEntity.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="godEngine.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\ImGuizmo.h" />
+    <ClInclude Include="imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imgui_stdlib.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="OpenGL\Internal\OGLTexture.h" />
+    <ClInclude Include="OpenGL\Internal\OGLPrimitives.h" />
+    <ClInclude Include="OpenGL\Internal\OGLRenderPass.h" />
+    <ClInclude Include="OpenGL\Internal\OGLShader.h" />
+    <ClInclude Include="OpenGL\OpenGL.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Physics\godPhysics.h" />
+    <ClInclude Include="Window\GLFWWindow.h" />
+    <ClInclude Include="Window\DeltaTimer.h" />
+    <ClInclude Include="Window\SystemTimer.h" />
+    <ClInclude Include="EnttXSol\LuaFunctionDefinitions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="godEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\OpenGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Window\GLFWWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\Internal\OGLPrimitives.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\Internal\OGLShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imconfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_glfw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_opengl3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_impl_opengl3_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imstb_rectpack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imstb_textedit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imstb_truetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Editor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\OpenGLEditor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\TestWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\TestWindow2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\EW_MainMenuBar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\EW_EditorStyles.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\EW_AssetImporter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\imgui_stdlib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\EW_AssetManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\PathConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EnttXSol.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\EW_EntityEditor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineComponents\EngineComponents.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineComponents\EC_All.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineSystems\ES_All.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineComponents\EC_Renderable3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\EngineResources.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\Internal\OGLRenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\EW_SceneView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\EW_SceneTree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\Internal\OGLTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\Internal\godEntity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Window\DeltaTimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Window\SystemTimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\EW_Performance.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\ImGuizmo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\Window\EW_TilemapEditor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics\godPhysics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineComponents\EC_AudioSource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineComponents\EC_AudioListener.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Audio\AudioAPI.h">
-    <ClInclude Include="EnttXSol\EngineComponents\EC_GridCell.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EnttXSol\EngineComponents\EC_EntityData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\OpenGL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Window\GLFWWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\Internal\OGLPrimitives.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\Internal\OGLShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\0_InternalDependencies\glad\src\glad.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_demo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_draw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_impl_glfw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_tables.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_widgets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Editor\Editor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Editor\OpenGLEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_stdlib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EnttXSol\EnttXSol.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EnttXSol\EngineComponents\EC_All.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\Internal\OGLRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\Internal\OGLTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EnttXSol\Internal\godEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Window\DeltaTimer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Window\SystemTimer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\ImGuizmo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio\AudioAPI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

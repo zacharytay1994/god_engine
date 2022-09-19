@@ -1,6 +1,8 @@
 #include "../pch.h"
 #include "EnttXSol.h"
 
+#include "LuaFunctionDefinitions.h"
+
 namespace god
 {
 	EnttXSol::EnttXSol ()
@@ -12,29 +14,8 @@ namespace god
 		// GetComponent(entity,componentname)
 		m_lua.set ( "sol_table" , sol::table () );
 		m_lua.set ( "entt_entity" , entt::entity () );
-		m_lua[ m_identifier_GetScriptComponent ] = [this]( entt::entity e , std::string const& s )->sol::table&
-		{
-#if _DEBUG
-			if ( !GetStorage<sol::table> ( s ).contains ( e ) )
-			{
-				std::cout << "LUASCRIPTERROR - Trying to get script component [" << s << "] from entity [" << static_cast< int >( e ) << "] that does not exist." << std::endl;
-			}
-#endif
-			return GetStorage<sol::table> ( s ).get ( e );
-		};
-		// GetEntity(name)
-		m_lua[ "GetEntity" ] = [this]( std::string const& entityName )->int
-		{
-			// potential area for optimization looking for entity of name
-			for ( uint32_t i = 0; i < m_entities.Size (); ++i )
-			{
-				if ( m_entities[ i ].m_name == entityName )
-				{
-					return static_cast< int >( m_entities[ i ].m_id );
-				}
-			}
-			return -1;
-		};
+
+		RegisterLuaFunctions ( *this );
 	}
 
 	void EnttXSol::Update ( EngineResources& engineResources )
