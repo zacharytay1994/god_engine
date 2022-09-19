@@ -163,12 +163,17 @@ namespace god
 			// imgui pass
 			first_renderpass.Bind();
 
+			glm::vec3 camera_front = camera.m_look_at;
+			camera_front.y = 0;
+			camera_front = glm::normalize( camera_front );
+
 			opengl.RenderScene(
 				scene,
 				camera.GetPerpectiveProjectionMatrix(),
 				camera.GetCameraViewMatrix(),
 				camera.m_position,
-				ogl_textures);
+				ogl_textures,
+				camera_front);
 
 			opengl.RenderLines(
 				camera.GetPerpectiveProjectionMatrix(),
