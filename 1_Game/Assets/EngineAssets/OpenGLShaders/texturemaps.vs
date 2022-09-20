@@ -9,10 +9,12 @@ layout (location = 4) in vec4 aColour;
 out vec2 vUV;
 out vec3 vNormal;
 out vec3 vWorldPos;
+out vec4 vFragPosLightSpace;
 
 uniform mat4 uModel;
 uniform mat4 uProjection;
 uniform mat4 uView;
+uniform mat4 uLightSpaceMatrix;
 
 void main() 
 {
@@ -20,4 +22,5 @@ void main()
 	vUV = aUV;
 	vNormal = mat3(transpose(inverse(uModel))) * aNormal;
     vWorldPos = vec3(uModel * vec4(aPos, 1.0));
+	vFragPosLightSpace = uLightSpaceMatrix * vec4(vWorldPos, 1.0f);
 }

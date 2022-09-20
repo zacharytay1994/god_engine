@@ -43,46 +43,50 @@
 
 namespace god
 {
-	GODENGINE_API godEngine::godEngine ()
+	GODENGINE_API godEngine::godEngine()
 	{
 		std::cout << "godEngine constructed." << std::endl;
 	}
 
-	void godEngine::Update ()
+	void godEngine::Update()
 	{
+		std::cout << "godEngine Update." << std::endl;
 		// create window
-		GLFWWindow window ( 1920 , 1080 );
+		GLFWWindow window(1920, 1080);
 		DeltaTimer delta_timer;
-		OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
-		OGLRenderPass first_renderpass ( window.GetWindowWidth () , window.GetWindowHeight () );
+		OpenGL opengl(window.GetWindowHandle(), window.GetWindowWidth(), window.GetWindowHeight());
+		OGLRenderPass first_renderpass(window.GetWindowWidth(), window.GetWindowHeight());
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+
+		PhysicsSystem godPhysicsSystem{};
 
 		// setup camera
 		Camera camera;
-		camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
+		camera.UpdateAspectRatio(window.GetWindowWidth(), window.GetWindowHeight());
 		camera.m_pitch = -45.0f;
-		float scene_camera_zoom_distance { 20.0f };
-		glm::vec3 scene_camera_position_offset { 0.0f };
+		float scene_camera_zoom_distance{20.0f};
+		glm::vec3 scene_camera_position_offset{0.0f};
 
 		// setup FMOD system
 		AudioAPI audio_api;
 
 		// setup resources
 		Asset3DManager assets_3d;
-		InsertAllAsset3DsFromConfig ( AssetPath::File_ModelsConfig , AssetPath::Folder_BuildModels , assets_3d );
+		InsertAllAsset3DsFromConfig(AssetPath::File_ModelsConfig, AssetPath::Folder_BuildModels, assets_3d);
 		OGLTextureManager ogl_textures;
 		InsertEngineOGLTextures ( ogl_textures ); // temp solution to insert engine textures, might change
 		InsertAllOGLTexturesFromConfig ( AssetPath::File_TexturesConfig , AssetPath::Folder_RawTextures , ogl_textures );
 		SoundManager assets_sound;
 		InsertAllSoundsFromConfig(AssetPath::File_SoundsConfig, AssetPath::Folder_BuildSounds, assets_sound);
 
-		opengl.BuildOGLModels ( assets_3d );
+		opengl.BuildOGLModels(assets_3d);
 
 
 		// setup ecs and scripting
 		EnttXSol enttxsol;
-		enttxsol.BindEngineComponents< EngineComponents > ();
-		enttxsol.BindEngineSystemUpdate ( EngineSystems );
-		enttxsol.SetupBindings ();
+		enttxsol.BindEngineComponents<EngineComponents>();
+		enttxsol.BindEngineSystemUpdate(EngineSystems, EngineSystemsInit, EngineSystemsCleanup);
+		enttxsol.SetupBindings();
 
 		// setup scene
 		Scene scene;
@@ -91,106 +95,124 @@ namespace god
 		EntityGrid grid;
 
 		// glfw+opengl imgui setup
-		ImGuiOpenGLEditor ogl_editor ( window );
+		ImGuiOpenGLEditor ogl_editor(window);
 
 		// engine resources used by imgui as defined in EditorResourcesDefinition.h
 		EngineResources engine_resources (
-			window ,
-			opengl ,
-			camera ,
-			assets_3d ,
-			ogl_textures ,
-			grid ,
+			window,
+			opengl,
+			camera,
+			assets_3d,
+			ogl_textures,
+			godPhysicsSystem,
+			grid,
 			assets_sound
 		);
 
 		// imgui editor windows
 		EditorWindows<EngineResources> editor_windows;
-		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
-		editor_windows.AddWindow<god::EW_EditorStyles> ( false );
-		editor_windows.AddWindow<god::EW_AssetManager> ( true );
-		editor_windows.AddWindow<god::EW_Asset3DImporter> ( true );
-		editor_windows.AddWindow<god::EW_SceneTree> ( true , std::ref ( enttxsol ) );
-		editor_windows.AddWindow<god::EW_EntityEditor> ( true , std::ref ( enttxsol ) );
-		editor_windows.AddWindow<god::EW_SceneView> ( true , std::ref ( enttxsol ) );
-		editor_windows.AddWindow<god::EW_Performance> ( true );
-		editor_windows.AddWindow<god::EW_TilemapEditor> ( true , std::ref ( enttxsol ) );
+		editor_windows.AddWindow<god::EW_MainMenuBar>(true);
+		editor_windows.AddWindow<god::EW_EditorStyles>(false);
+		editor_windows.AddWindow<god::EW_AssetManager>(true);
+		editor_windows.AddWindow<god::EW_Asset3DImporter>(true);
+		editor_windows.AddWindow<god::EW_SceneTree>(true, std::ref(enttxsol));
+		editor_windows.AddWindow<god::EW_EntityEditor>(true, std::ref(enttxsol));
+		editor_windows.AddWindow<god::EW_SceneView>(true, std::ref(enttxsol));
+		editor_windows.AddWindow<god::EW_Performance>(true);
+		editor_windows.AddWindow<god::EW_TilemapEditor>(true, std::ref(enttxsol));
 
-		while ( !window.WindowShouldClose () )
+		godPhysicsSystem.Init();
+		godPhysicsSystem.SetupPVD();
+
+		while (!window.WindowShouldClose())
 		{
-			SystemTimer::StartTimeSegment ( "Overall" );
-			delta_timer.StartFrame ();
+			SystemTimer::StartTimeSegment("Overall");
+			delta_timer.StartFrame();
 
-			window.PollEvents ();
+			window.PollEvents();
 
 			// window resize changes
-			if ( window.Resized () )
+			if (window.Resized())
 			{
-				opengl.ResizeViewport ( window.GetWindowWidth () , window.GetWindowHeight () );
-				camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
-				first_renderpass.UpdateWidth ( window.GetWindowWidth () , window.GetWindowHeight () );
+				opengl.ResizeViewport(window.GetWindowWidth(), window.GetWindowHeight());
+				camera.UpdateAspectRatio(window.GetWindowWidth(), window.GetWindowHeight());
+				first_renderpass.UpdateWidth(window.GetWindowWidth(), window.GetWindowHeight());
 			}
 
-			opengl.ClearColour ();
+			opengl.ClearColour();
+
+			EngineSystemsFrameStart(enttxsol, engine_resources);
 
 			// update scene
 			// ...
-			SystemTimer::StartTimeSegment ( "EnTT Update" );
-			enttxsol.Update ( engine_resources );
-			SystemTimer::EndTimeSegment ( "EnTT Update" );
-			SystemTimer::StartTimeSegment ( "Populating Scene" );
-			enttxsol.PopulateScene<Scene , Transform , Renderable3D> ( scene );
-			SystemTimer::EndTimeSegment ( "Populating Scene" );
+			SystemTimer::StartTimeSegment("EnTT Update");
+			enttxsol.Update(engine_resources);
+			SystemTimer::EndTimeSegment("EnTT Update");
+			SystemTimer::StartTimeSegment("Populating Scene");
+			enttxsol.PopulateScene<Scene, Transform, Renderable3D>(scene);
+			SystemTimer::EndTimeSegment("Populating Scene");
+
+			godPhysicsSystem.Update(delta_timer.m_dt);
 
 			// render scene
-			SystemTimer::StartTimeSegment ( "Rendering" );
-			first_renderpass.Bind ();
-			opengl.RenderScene (
-				scene ,
-				camera.GetPerpectiveProjectionMatrix () ,
-				camera.GetCameraViewMatrix () ,
-				camera.m_position ,
-				ogl_textures
-			);
-			opengl.RenderLines (
-				camera.GetPerpectiveProjectionMatrix () ,
-				camera.GetCameraViewMatrix ()
-			);
-			first_renderpass.UnBind ();
-			SystemTimer::EndTimeSegment ( "Rendering" );
+			SystemTimer::StartTimeSegment("Rendering");
+			// depth map pass
+			opengl.FirstPassRenderToDepthmap(
+				scene,
+				camera.GetPerpectiveProjectionMatrix(),
+				camera.GetCameraViewMatrix(),
+				camera.m_position,
+				ogl_textures);
+
+			// imgui pass
+			first_renderpass.Bind();
+
+			opengl.RenderScene(
+				scene,
+				camera.GetPerpectiveProjectionMatrix(),
+				camera.GetCameraViewMatrix(),
+				camera.m_position,
+				ogl_textures);
+
+			opengl.RenderLines(
+				camera.GetPerpectiveProjectionMatrix(),
+				camera.GetCameraViewMatrix());
+			first_renderpass.UnBind();
+			SystemTimer::EndTimeSegment("Rendering");
 
 			// ... render imgui windows
-			SystemTimer::StartTimeSegment ( "Editor" );
-			ogl_editor.BeginFrame ();
+			SystemTimer::StartTimeSegment("Editor");
+			ogl_editor.BeginFrame();
 			// pass scene view the renderpass texture
-			editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( first_renderpass.GetTexture () );
-			editor_windows.Update ( 0.02f , engine_resources );
-			ogl_editor.Render ();
-			ogl_editor.EndFrame ();
-			SystemTimer::EndTimeSegment ( "Editor" );
+			editor_windows.GetWindow<EW_SceneView>()->SetRenderpassTexture(first_renderpass.GetTexture());
+			// editor_windows.GetWindow<EW_SceneView>()->SetRenderpassTexture( opengl.m_depthmap );
+			editor_windows.Update(0.02f, engine_resources);
+			ogl_editor.Render();
+			ogl_editor.EndFrame();
+			SystemTimer::EndTimeSegment("Editor");
 
-			SystemTimer::StartTimeSegment ( "Window Buffer Swap" );
-			window.SwapWindowBuffers ();
-			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
+			SystemTimer::StartTimeSegment("Window Buffer Swap");
+			window.SwapWindowBuffers();
+			SystemTimer::EndTimeSegment("Window Buffer Swap");
 			// free camera update
-			/*camera.FreeCamera ( 0.02f ,
-				true ,
-				window.KeyDown ( GLFW_KEY_W ) ,
-				window.KeyDown ( GLFW_KEY_S ) ,
-				window.KeyDown ( GLFW_KEY_A ) ,
-				window.KeyDown ( GLFW_KEY_D ) ,
-				window.KeyDown ( GLFW_KEY_SPACE ) ,
-				window.KeyDown ( GLFW_KEY_LEFT_SHIFT ) ,
-				window.MouseRDown () ,
-				static_cast< float >( window.ScreenMouseX () ) ,
-				static_cast< float >( window.ScreenMouseY () ) ,
-				window.MouseRDown () ,
-				window.MouseScrollUp () ,
-				window.MouseScrollDown () ,
-				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
-				window.MouseScrollUp () ,
-				window.MouseScrollDown () );*/
-			camera.SceneCamera (
+			camera.FreeCamera(0.02f,
+							  true,
+							  window.KeyDown(GLFW_KEY_W),
+							  window.KeyDown(GLFW_KEY_S),
+							  window.KeyDown(GLFW_KEY_A),
+							  window.KeyDown(GLFW_KEY_D),
+							  window.KeyDown(GLFW_KEY_SPACE),
+							  window.KeyDown(GLFW_KEY_LEFT_SHIFT),
+							  window.MouseRDown(),
+							  static_cast<float>(window.ScreenMouseX()),
+							  static_cast<float>(window.ScreenMouseY()),
+							  window.MouseRDown(),
+							  window.MouseScrollUp(),
+							  window.MouseScrollDown(),
+							  window.KeyDown(GLFW_KEY_LEFT_CONTROL),
+							  window.MouseScrollUp(),
+							  window.MouseScrollDown());
+			/*camera.SceneCamera(
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				0.5f ,
 				0.7f , // value between 0-1
@@ -202,10 +224,12 @@ namespace god
 				scene_camera_zoom_distance ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown ()
-			);
+			);*/
 
-			delta_timer.EndFrame ();
-			SystemTimer::EndTimeSegment ( "Overall" );
+			EngineSystemsFrameEnd(enttxsol, engine_resources);
+
+			delta_timer.EndFrame();
+			SystemTimer::EndTimeSegment("Overall");
 		}
 	}
 }

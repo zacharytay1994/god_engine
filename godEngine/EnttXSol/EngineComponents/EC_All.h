@@ -8,6 +8,11 @@
 #include "EC_AudioListener.h"
 #include "EC_GridCell.h"
 
+#include "Physics/EC_Material.h"
+#include "Physics/EC_Shape.h"
+#include "Physics/EC_Static.h"
+#include "Physics/EC_Dynamic.h"
+
 #include <tuple>
 #include <string>
 #include <array>
@@ -20,8 +25,13 @@ namespace god
 			EntityData ,
 			Transform ,
 			Renderable3D ,
-			AudioListener ,
+			GridCell,
+			PhysicsMaterial,
+			PhysicsShape,
+			RigidStatic,
+			RigidDynamic,
 			AudioSource ,
+			AudioListener ,
 			GridCell
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;

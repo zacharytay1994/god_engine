@@ -8,10 +8,25 @@ namespace god
 		m_lua.open_libraries ( sol::lib::base );
 		LoadScriptsFromFolder ();
 
+		// define lua functions
+		// GetComponent(entity,componentname)
 		m_lua.set ( "sol_table" , sol::table () );
 		m_lua[ m_identifier_GetScriptComponent ] = [this]( entt::entity e , std::string const& s )->sol::table
 		{
 			return GetStorage<sol::table> ( s ).get ( e );
+		};
+		// GetEntity(name)
+		m_lua[ "GetEntity" ] = [this]( std::string const& entityName )->entt::entity
+		{
+			for ( uint32_t i = 0; i < m_entities.Size (); ++i )
+			{
+				if ( m_entities[ i ].m_name == entityName )
+				{
+					std::cout << m_entities[ i ].m_name << std::endl;
+					return m_entities[ i ].m_id;
+				}
+			}
+			return entt::null;
 		};
 	}
 
@@ -39,8 +54,12 @@ namespace god
 		}
 	}
 
-	void EnttXSol::ClearEntt ()
+	void EnttXSol::ClearEntt ( EngineResources& engineResources )
 	{
+		if ( m_engine_cleanup )
+		{
+			m_engine_cleanup ( *this , engineResources );
+		}
 		m_registry.clear ();
 		m_entities.Clear ();
 		m_pause = true;
@@ -214,14 +233,17 @@ namespace god
 		{
 			if ( auto dash_position = system.first.find_first_of ( '_' ) )
 			{
-				auto const name_to_match = system.first.substr ( dash_position , system.first.length () - dash_position );
-				for ( auto const& component : script.m_components )
+				if ( dash_position != std::string::npos )
 				{
-					if ( component.first.find ( name_to_match ) != std::string::npos &&
-						std::find ( system.second.m_used_script_components.begin () , system.second.m_used_script_components.end () , component.first ) == system.second.m_used_script_components.end () )
+					auto const name_to_match = system.first.substr ( dash_position , system.first.length () - dash_position );
+					for ( auto const& component : script.m_components )
 					{
-						// add matching component as system required component
-						system.second.m_used_script_components.push_back ( component.first );
+						if ( component.first.find ( name_to_match ) != std::string::npos &&
+							std::find ( system.second.m_used_script_components.begin () , system.second.m_used_script_components.end () , component.first ) == system.second.m_used_script_components.end () )
+						{
+							// add matching component as system required component
+							system.second.m_used_script_components.push_back ( component.first );
+						}
 					}
 				}
 			}
@@ -288,9 +310,14 @@ namespace god
 		DeleteFileAtPath ( scriptFile );
 	}
 
-	void EnttXSol::BindEngineSystemUpdate ( void( *update )( EnttXSol& , EngineResources& engineResources , bool ) )
+	void EnttXSol::BindEngineSystemUpdate (
+		void( *update )( EnttXSol& , EngineResources& , bool ) ,
+		void( *init )( EnttXSol& , EngineResources& ) ,
+		void( *cleanup )( EnttXSol& , EngineResources& ) )
 	{
 		m_engine_update = update;
+		m_engine_init = init;
+		m_engine_cleanup = cleanup;
 	}
 
 	EnttXSol::Entities::ID EnttXSol::CreateEntity ( std::string const& name , Entities::ID parent )
@@ -540,6 +567,12 @@ namespace god
 		for ( auto& member : document.GetObj () )
 		{
 			DeserializeStateV2Recurse ( engineResources , member.value , member.name.GetString () , Entities::Null , grid );
+		}
+
+		// initialize state
+		if ( m_engine_init )
+		{
+			m_engine_init ( *this , engineResources );
 		}
 	}
 

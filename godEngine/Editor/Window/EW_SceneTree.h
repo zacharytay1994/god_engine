@@ -214,7 +214,7 @@ namespace god
 				{
 					this->Get<EW_TilemapEditor> ()->ClearPreview ();
 					Reset ();
-					m_enttxsol.ClearEntt ();
+					m_enttxsol.ClearEntt ( engineResources );
 					m_selected_scene = -1;
 					m_select_hierarchy_tab = true;
 					engineResources.Get<EntityGrid> ().get () = EntityGrid ();
@@ -239,7 +239,7 @@ namespace god
 							EntityGrid& grid = engineResources.Get<EntityGrid> ().get (); // clear tilemap grid
 							grid = EntityGrid ();
 							Reset ();
-							m_enttxsol.ClearEntt ();
+							m_enttxsol.ClearEntt ( engineResources );
 							m_enttxsol.DeserializeStateV2 ( engineResources , name , &grid );
 							m_select_hierarchy_tab = true;
 						}
@@ -458,7 +458,7 @@ namespace god
 		{
 			this->Get<EW_TilemapEditor> ()->ClearPreview ();
 			Reset ();
-			m_enttxsol.ClearEntt ();
+			m_enttxsol.ClearEntt ( engineResources );
 			engineResources.Get<EntityGrid> ().get () = EntityGrid ();
 			if ( m_selected_scene < m_scene_list.size () && m_selected_scene >= 0 )
 			{

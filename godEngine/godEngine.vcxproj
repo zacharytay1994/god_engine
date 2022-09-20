@@ -126,10 +126,15 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_All.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Dynamic.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Material.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Shape.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_All.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Physics.h" />
     <ClInclude Include="EnttXSol\EnttXSol.h" />
     <ClInclude Include="EnttXSol\Internal\godEntity.h" />
     <ClInclude Include="framework.h" />
@@ -145,6 +150,9 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="OpenGL\Advance\CubeMap.h" />
+    <ClInclude Include="OpenGL\Advance\ShadowMap.h" />
+    <ClInclude Include="OpenGL\Internal\OGLDebug.h" />
     <ClInclude Include="OpenGL\Internal\OGLTexture.h" />
     <ClInclude Include="OpenGL\Internal\OGLPrimitives.h" />
     <ClInclude Include="OpenGL\Internal\OGLRenderPass.h" />
@@ -152,6 +160,7 @@
     <ClInclude Include="OpenGL\OpenGL.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Physics\godPhysics.h" />
+    <ClInclude Include="Physics\PhysicUtils.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
     <ClInclude Include="Window\DeltaTimer.h" />
     <ClInclude Include="Window\SystemTimer.h" />
@@ -221,6 +230,18 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="OpenGL\Advance\CubeMap.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Advance\ShadowMap.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Internal\OGLDebug.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="OpenGL\Internal\OGLTexture.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
@@ -244,6 +265,14 @@
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Physics\godPhysics.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Physics\PhysicUtils.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Window\DeltaTimer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>

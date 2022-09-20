@@ -17,9 +17,9 @@ namespace god
 	inline void NewLuaType<GridCell> ( sol::state& luaState , std::string const& name )
 	{
 		RegisterLuaType<GridCell> ( luaState , name ,
-			"cell_x" , &GridCell::m_cell_x ,
-			"cell_y" , &GridCell::m_cell_y ,
-			"cell_z" , &GridCell::m_cell_z ,
+			"x" , &GridCell::m_cell_x ,
+			"y" , &GridCell::m_cell_y ,
+			"z" , &GridCell::m_cell_z ,
 			"cell_size" , &GridCell::m_cell_size );
 	}
 	template<>
