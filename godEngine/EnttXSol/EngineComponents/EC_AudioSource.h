@@ -68,9 +68,6 @@ namespace god
 
 							component.m_sound_id = asset.second;
 							ImGui::CloseCurrentPopup();
-
-							Sound& sound = std::get<1>(sound_manager.Get(component.m_sound_id));
-							AudioAPI::PlaySound(sound);
 						}
 					}
 					ImGui::EndPopup();

@@ -105,12 +105,12 @@ namespace god
 		sound.m_channel->stop();
 	}
 
-	void AudioAPI::PlayAll(std::vector<Sound>& sounds)
+	void AudioAPI::ResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
 	{
-		for (auto& sound : sounds)
+		for (auto& asset : assets)
 		{
-			if (!sound.m_played)
-				PlaySound(sound);;
+			Sound& sound = const_cast<Sound&>(std::get<1>(asset));
+			sound.m_played = false;
 		}
 	}
 

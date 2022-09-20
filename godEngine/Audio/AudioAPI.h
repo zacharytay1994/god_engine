@@ -44,7 +44,7 @@ namespace god
 		static void PauseSound(Sound& sound, bool paused);
 		static void StopSound(Sound& sound);
 
-		static void PlayAll(std::vector<Sound>& sounds);
+		static void ResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets);
 		static void PauseAll();
 		static void ResumeAll();
 		static void StopAll();

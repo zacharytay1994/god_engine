@@ -145,10 +145,6 @@ namespace god
 		{
 			m_enttxsol.m_pause = false;
 			AudioAPI::ResumeAll();
-
-			// need to play all the sounds that are active
-			//SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
-			//AudioAPI::PlayAll(sound_manager.GetResources());
 		}
 		this->ToolTipOnHover ( "Objects will be updated." );
 		ImGui::SameLine ();
@@ -163,6 +159,11 @@ namespace god
 		{
 			this->Get<EW_SceneTree> ()->ResetScene ( engineResources );
 			AudioAPI::StopAll();
+
+			// resetting all the sounds 
+			SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
+			auto& sounds = sound_manager.GetResources();
+			AudioAPI::ResetAll(sounds);
 		}
 		this->ToolTipOnHover ( "Resets the scene to its original state." );
 
