@@ -78,7 +78,6 @@ namespace god
 		EnttXSol enttxsol;
 		enttxsol.BindEngineComponents< EngineComponents > ();
 		enttxsol.BindEngineSystemUpdate ( EngineSystems , EngineSystemsInit , EngineSystemsCleanup );
-		enttxsol.SetupBindings ();
 
 		// setup scene
 		Scene scene;
@@ -96,8 +95,11 @@ namespace god
 			camera ,
 			assets_3d ,
 			ogl_textures ,
-			grid
+			grid ,
+			scene
 		);
+
+		RegisterLuaCPP ( enttxsol , engine_resources );
 
 		// imgui editor windows
 		EditorWindows<EngineResources> editor_windows;
@@ -172,7 +174,7 @@ namespace god
 
 			if ( window.KeyDown ( GLFW_KEY_P ) )
 			{
-				auto path = grid[ -1 ].GetPathAStar ( 1.0f , { 0,0,0 } , { 4,0,2 } );
+				auto path = grid[ -1 ].GetPathAStar ( 1.0f , { 0,0,0 } , { 4,0,0 } );
 			}
 
 			// free camera update

@@ -190,7 +190,16 @@ namespace god
 				// removing entity
 				if ( m_selected_remove != EnttXSol::Entities::Null )
 				{
-					m_enttxsol.RemoveEntity ( m_selected_remove );
+					// if entity if part of grid
+					GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( m_selected_remove );
+					if ( grid_cell )
+					{
+						m_enttxsol.RemoveEntityFromGrid ( engineResources.Get<EntityGrid> ().get () , m_selected_remove );
+					}
+					else
+					{
+						m_enttxsol.RemoveEntity ( m_selected_remove );
+					}
 					m_selected_entity = EnttXSol::Entities::Null;
 					m_selected_remove = EnttXSol::Entities::Null;
 				}

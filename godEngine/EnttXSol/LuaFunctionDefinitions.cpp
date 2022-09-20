@@ -2,14 +2,28 @@
 #include "LuaFunctionDefinitions.h"
 
 #include "EnttXSol.h"
+#include "EngineComponents/EC_All.h"
 #include "../Window/DeltaTimer.h"
 
 #include <sol/sol.hpp>
+#include <glm/glm/glm.hpp>
 
 namespace god
 {
-	void RegisterLuaFunctions ( EnttXSol& entt )
+	void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources )
 	{
+		// glm::vec3
+		entt.RegisterLuaType<glm::vec3> ( "vec3" ,
+			"x" , &glm::vec3::x ,
+			"y" , &glm::vec3::y ,
+			"z" , &glm::vec3::z );
+
+		// glm::ivec3
+		entt.RegisterLuaType<glm::ivec3> ( "ivec3" ,
+			"x" , &glm::ivec3::x ,
+			"y" , &glm::ivec3::y ,
+			"z" , &glm::ivec3::z );
+
 		// GetComponent(e,componentName)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( entt.m_identifier_GetScriptComponent ,
@@ -22,7 +36,7 @@ namespace god
 				}
 #endif
 				return entt.GetStorage<sol::table> ( s ).get ( e );
-			} 
+			}
 		);
 
 		// GetEntity(entityName)
@@ -48,6 +62,33 @@ namespace god
 			[]()->float
 			{
 				return DeltaTimer::m_dt;
+			}
+		);
+
+		// GetPathToCell(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "GetPath" ,
+			[&entt , &engineResources]( entt::entity e , int x , int y , int z )-> std::vector<glm::ivec3>
+			{
+				GridCell* grid_cell = entt.GetEngineComponent<GridCell> ( e );
+				EntityData* entity_data = entt.GetEngineComponent<EntityData> ( e );
+				if ( grid_cell && entity_data )
+				{
+					auto& grid = engineResources.Get<EntityGrid> ().get ();
+					auto path = grid[ entity_data->m_parent_id ].GetPathAStar (
+						grid_cell->m_cell_size ,
+						{ grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } ,
+						{ x, y, z }
+					);
+
+					std::vector<glm::ivec3> out;
+					for ( auto const& coordinate : path )
+					{
+						out.push_back ( { std::get<0> ( coordinate ),std::get<1> ( coordinate ) ,std::get<2> ( coordinate ) } );
+					}
+					return out;
+				}
+				return std::vector<glm::ivec3> ();
 			}
 		);
 	}

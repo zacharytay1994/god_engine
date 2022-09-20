@@ -87,6 +87,7 @@
     <ClInclude Include="Window\DeltaTimer.h" />
     <ClInclude Include="Window\SystemTimer.h" />
     <ClInclude Include="EnttXSol\LuaFunctionDefinitions.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_ScenePopulate.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

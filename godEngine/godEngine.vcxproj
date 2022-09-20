@@ -129,6 +129,7 @@
     <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_ScenePopulate.h" />
     <ClInclude Include="EnttXSol\EnttXSol.h" />
     <ClInclude Include="EnttXSol\Internal\godEntity.h" />
     <ClInclude Include="EnttXSol\LuaFunctionDefinitions.h" />

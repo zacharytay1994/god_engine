@@ -131,8 +131,22 @@ namespace god
 	template<typename T>
 	inline std::vector<Coordinate> Grid3D<T>::GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 )
 	{
+		// max iterations if no solution found
+		int32_t max_iteration = 1000;
+		int32_t iteration { 0 };
+
 		// A* algorithm
-		auto& grid = m_grid[ NormGran ( granularity ) ];
+		GridLayer grid = m_grid[ NormGran ( granularity ) ];
+
+		// check if target is occupied
+		if ( grid.find ( c2 ) != grid.end () )
+		{
+			if ( grid[ c2 ].m_values.size () > 0 )
+			{
+				return std::vector<Coordinate> ();
+			}
+		}
+
 		AStarGrid astar_grid;
 
 		// initialize the open list
@@ -144,6 +158,12 @@ namespace god
 		bool search { true };
 		while ( search )
 		{
+			if ( ++iteration > max_iteration )
+			{
+				std::cout << "Pathfinding too far, exceeded iterations." << std::endl;
+				break;
+			}
+
 			search = false;
 
 			// pop lowest f value node off the open and add to close list
@@ -154,9 +174,9 @@ namespace god
 				if ( node.second.m_open )
 				{
 					search = true;
-					if ( node.second.GetF() < lowest_f )
+					if ( node.second.GetF () < lowest_f )
 					{
-						lowest_f = node.second.GetF();
+						lowest_f = node.second.GetF ();
 						lowest_f_coordinate = node.first;
 					}
 				}
@@ -179,9 +199,13 @@ namespace god
 
 				while ( current_coordinate != c1 )
 				{
-					out.push_back ( astar_grid[current_coordinate].m_parent );
+					out.push_back ( astar_grid[ current_coordinate ].m_parent );
 					current_coordinate = astar_grid[ current_coordinate ].m_parent;
 				}
+
+				std::reverse ( out.begin () , out.end () );
+
+				out.push_back ( c2 );
 
 				return out;
 			}
@@ -203,8 +227,8 @@ namespace god
 			for ( auto i = 0; i < 4; ++i )
 			{
 				Coordinate& neighbour_coordinate = neighbours[ i ];
-				// if in close, skip
-				if ( astar_grid[ neighbour_coordinate ].m_close )
+				// if in close or not traversable, for now treat any occupied cell as untraversable
+				if ( astar_grid[ neighbour_coordinate ].m_close || ( grid.find ( neighbour_coordinate ) != grid.end () && grid[ neighbour_coordinate ].m_values.size () > 0 ) )
 				{
 					continue;
 				}
@@ -228,7 +252,7 @@ namespace god
 			}
 		}
 
-		return std::vector<Coordinate>();
+		return std::vector<Coordinate> ();
 	}
 
 	template<typename T>

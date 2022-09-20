@@ -65,7 +65,6 @@ namespace god
 		EnttXSol ();
 		void Update ( EngineResources& engineResources );
 		void ClearEntt ( EngineResources& engineResources );
-		void SetupBindings ();
 
 		void NewScriptTemplate ( std::string const& newScript );
 		void LoadScriptsFromFolder ();
@@ -114,6 +113,8 @@ namespace god
 		template<typename T>
 		T* GetEngineComponent ( Entities::ID entity );
 		template<typename T>
+		T* GetEngineComponent ( entt::entity e );
+		template<typename T>
 		void RemoveEngineComponent ( Entities::ID entity );
 
 		std::unordered_map<std::string , Script> const& GetScripts () const;
@@ -141,7 +142,7 @@ namespace god
 		template<typename...COMPONENTS>
 		auto GetView ();
 
-		friend void RegisterLuaFunctions ( EnttXSol& entt );
+		friend void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources );
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -383,6 +384,12 @@ namespace god
 			return m_registry.try_get<T> ( m_entities[ entity ].m_id );
 		}
 		return nullptr;
+	}
+
+	template<typename T>
+	inline T* EnttXSol::GetEngineComponent ( entt::entity e )
+	{
+		return m_registry.try_get<T> ( e );
 	}
 
 	template<typename T>

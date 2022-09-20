@@ -1,7 +1,9 @@
 #pragma once
 
+#include "../Editor/EngineResources.h"
+
 namespace god
 {
 	struct EnttXSol;
-	void RegisterLuaFunctions ( EnttXSol& entt );
+	void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources );
 }

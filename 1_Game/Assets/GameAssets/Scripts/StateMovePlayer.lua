@@ -24,10 +24,9 @@ function S_StateMovePlayer(e)
             if (component.Time < 1.0) then
                 component.Time = component.Time + GetDeltaTime()
             else
-                local cell = GetGridCell(e);
-                cell.x = cell.x + 1
-                global_statemachine.CurrentState = "MoveEnemy"
-                component.Time = 0.0
+                local pathfind = GetComponent(e, "C_Pathfind")
+                pathfind.x = 4
+                pathfind.Path = true;
             end
         end
     end

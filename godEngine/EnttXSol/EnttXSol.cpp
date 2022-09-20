@@ -14,8 +14,6 @@ namespace god
 		// GetComponent(entity,componentname)
 		m_lua.set ( "sol_table" , sol::table () );
 		m_lua.set ( "entt_entity" , entt::entity () );
-
-		RegisterLuaFunctions ( *this );
 	}
 
 	void EnttXSol::Update ( EngineResources& engineResources )
@@ -51,14 +49,6 @@ namespace god
 		m_registry.clear ();
 		m_entities.Clear ();
 		m_pause = true;
-	}
-
-	void EnttXSol::SetupBindings ()
-	{
-		RegisterLuaType<glm::vec3> ( "vec3" ,
-			"x" , &glm::vec3::x ,
-			"y" , &glm::vec3::y ,
-			"z" , &glm::vec3::z );
 	}
 
 	void EnttXSol::NewScriptTemplate ( std::string const& newScript )
