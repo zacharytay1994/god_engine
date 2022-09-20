@@ -10,6 +10,7 @@ namespace god
 		// geometry for occlusion
 
 		//int m_channel_group; // to seperate sounds into different categories
+		bool m_played{ false };
 
 		bool m_3d_sound{ false };
 

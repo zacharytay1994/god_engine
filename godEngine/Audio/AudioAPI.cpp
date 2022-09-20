@@ -16,6 +16,8 @@ namespace god
 	FMOD::ChannelGroup* AudioAPI::m_master_channel_group;
 	FMOD::SoundGroup* AudioAPI::m_master_sound_group;
 
+	std::vector<FMOD::Channel*> AudioAPI::m_channels;
+
 	AudioAPI::AudioAPI()
 	{
 		FMOD_RESULT result = FMOD::System_Create(&m_FMOD_system);
@@ -50,7 +52,10 @@ namespace god
 
 	void AudioAPI::LoadSound(const char* filePath, Sound& sound)
 	{
-		FMOD_RESULT result = m_FMOD_system->createSound(filePath, FMOD_DEFAULT, 0, &sound.m_sound_sample);
+		// change the mode when creating sound
+		FMOD_MODE mode = FMOD_LOOP_OFF | FMOD_3D | FMOD_3D_HEADRELATIVE | FMOD_3D_INVERSEROLLOFF;
+
+		FMOD_RESULT result = m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample);
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
 
@@ -65,6 +70,11 @@ namespace god
 	void AudioAPI::UnloadSound(FMOD::Sound* sound)
 	{
 		sound->release();
+	}
+
+	void AudioAPI::UnloadSound(Sound& sound)
+	{
+		sound.m_sound_sample->release();
 	}
 
 
@@ -95,6 +105,14 @@ namespace god
 		sound.m_played = true;
 	}
 
+	void AudioAPI::PlaySound(Sound& sound, bool& played)
+	{
+		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, &sound.m_channel);
+		played = true;
+
+		m_channels.push_back(sound.m_channel);
+	}
+
 	void AudioAPI::PauseSound(Sound& sound, bool paused)
 	{
 		sound.m_channel->setPaused(paused);
@@ -112,6 +130,8 @@ namespace god
 			Sound& sound = const_cast<Sound&>(std::get<1>(asset));
 			sound.m_played = false;
 		}
+
+		m_channels.clear();
 	}
 
 	void AudioAPI::PauseAll()

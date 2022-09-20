@@ -82,9 +82,9 @@ namespace god
 
 					AudioAPI::SetLoop(sound, audio_source.m_loop);
 
-					if (audio_source.m_play_on_awake && !sound.m_played)
+					if (audio_source.m_play_on_awake && !audio_source.m_played)
 					{
-						AudioAPI::PlaySound(sound);
+						AudioAPI::PlaySound(sound, audio_source.m_played);
 					}
 
 					AudioAPI::SetMute(sound, audio_source.m_mute);

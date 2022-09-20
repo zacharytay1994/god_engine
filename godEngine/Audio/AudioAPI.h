@@ -18,7 +18,7 @@ namespace god
 		std::string m_name;
 		std::string m_file_name;
 
-		bool m_played{ false };
+		bool m_played{ false }; // moved to audio source
 
 		FMOD::Channel* m_channel{ nullptr };
 	};
@@ -34,6 +34,7 @@ namespace god
 		static void LoadSound(const char* filePath, FMOD::Sound** sound);
 		static void LoadSound(const char* filePath, Sound& sound);
 		static void UnloadSound(FMOD::Sound* sound);
+		static void UnloadSound(Sound& sound);
 
 		static void SetLoop(Sound& sound, bool loop);
 		static void SetMute(Sound& sound, bool mute);
@@ -41,6 +42,7 @@ namespace god
 		static void SetPitch(Sound& sound, float pitch);
 
 		static void PlaySound(Sound& sound);
+		static void PlaySound(Sound& sound, bool& played); 
 		static void PauseSound(Sound& sound, bool paused);
 		static void StopSound(Sound& sound);
 
@@ -54,5 +56,6 @@ namespace god
 		static FMOD::ChannelGroup* m_master_channel_group;
 		static FMOD::SoundGroup* m_master_sound_group;
 
+		static std::vector<FMOD::Channel*> m_channels;
 	};
 }
