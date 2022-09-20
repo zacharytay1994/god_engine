@@ -76,8 +76,8 @@ namespace god
 		OGLTextureManager ogl_textures;
 		InsertEngineOGLTextures ( ogl_textures ); // temp solution to insert engine textures, might change
 		InsertAllOGLTexturesFromConfig ( AssetPath::File_TexturesConfig , AssetPath::Folder_RawTextures , ogl_textures );
-		SoundManager assets_sound;
-		InsertAllSoundsFromConfig(AssetPath::File_SoundsConfig, AssetPath::Folder_BuildSounds, assets_sound);
+		SoundManager sound_assets;
+		InsertAllSoundsFromConfig(AssetPath::File_SoundsConfig, AssetPath::Folder_BuildSounds, sound_assets);
 
 		opengl.BuildOGLModels(assets_3d);
 
@@ -104,9 +104,9 @@ namespace god
 			camera,
 			assets_3d,
 			ogl_textures,
-			godPhysicsSystem,
 			grid,
-			assets_sound
+			sound_assets,
+			godPhysicsSystem
 		);
 
 		// imgui editor windows

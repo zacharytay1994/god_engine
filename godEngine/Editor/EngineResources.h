@@ -28,7 +28,7 @@ namespace god
 		Asset3DManager ,
 		OGLTextureManager ,
 		EntityGrid ,
-		SoundManager
+		SoundManager ,
 		PhysicsSystem
 	>;
 }

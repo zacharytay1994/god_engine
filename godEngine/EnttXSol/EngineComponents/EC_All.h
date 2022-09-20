@@ -30,9 +30,8 @@ namespace god
 			PhysicsShape,
 			RigidStatic,
 			RigidDynamic,
-			AudioSource ,
 			AudioListener ,
-			GridCell
+			AudioSource
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};
