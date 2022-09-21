@@ -19,9 +19,6 @@ namespace god
 		 void Init();
 		 void Update(float fps);
 
-
-
-
 		 void SetupPVD();//PhysX Visual Debugger
 
 
