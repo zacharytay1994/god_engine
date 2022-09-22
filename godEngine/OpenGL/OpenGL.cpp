@@ -73,9 +73,9 @@ namespace god
 
 		// Calculation for shadow map
 		m_light_space_matrix =
-			glm::ortho( -15.0f, 15.0f, -15.0f, 15.0f, 1.0f, 50.0f ) *
+			glm::ortho( -35.0f, 35.0f, -35.0f, 35.0f, 1.0f, 50.0f ) *
 			glm::lookAt(
-			glm::vec3( 5.0f, 5.0f, -5.0f ),
+			glm::vec3( 15.0f, 20.0f, -15.0f ),
 			glm::vec3( 0.0f, 0.0f, 0.0f ),
 			glm::vec3( 0.0f, 1.0f, 0.0f ) );
 
