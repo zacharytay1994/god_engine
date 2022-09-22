@@ -10,7 +10,7 @@ namespace god
 	{
 		UNREFERENCED_PARAMETER(entt);
 
-		//Transform& transform = std::get<1>(component);
+		Transform& transform = std::get<1>(component);
 		PhysicsMaterial& phymaterial = std::get<2>(component);
 		PhysicsShape& physhape = std::get<3>(component);
 
@@ -29,8 +29,6 @@ namespace god
 				phymaterial.p_material->setDynamicFriction(phymaterial.DynamicFriction);
 				phymaterial.p_material->setStaticFriction(phymaterial.StaticFriction);
 				phymaterial.p_material->setRestitution(phymaterial.Restitution);
-
-
 			}
 			std::cout << " Material Updated\n";
 			phymaterial.updatematerial = false;
@@ -42,19 +40,22 @@ namespace god
 		{
 			if (physhape.p_shape == nullptr)
 			{
-				//exclusive shape which can be modified
+				//exclusive shape (can be modified)
 				physhape.p_shape = mPhysics->createShape(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z), *phymaterial.p_material, true);
 			}
 			else
 			{
-
 				physhape.p_shape->setGeometry(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z));
 				physhape.p_shape->setMaterials(&phymaterial.p_material, 1);
-
-
 			}
 			std::cout << " Shape Updated\n";
 			physhape.updatePhysicsShape = false;
+		}
+
+		if (physhape.locktoscale)
+		{
+			physhape.extents = transform.m_scale;
+			physhape.p_shape->setGeometry(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z));
 		}
 	}
 

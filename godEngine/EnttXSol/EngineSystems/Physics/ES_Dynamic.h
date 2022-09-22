@@ -7,6 +7,7 @@ namespace god
 {
 	void RigidDynamicFrameBegin(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic& > component)
 	{
+		
 		if (entt.m_pause)
 		{
 			Transform& transform = std::get<1>(component);
@@ -38,9 +39,10 @@ namespace god
 		if (rigiddynamic.Active == false)
 		{
 			mScene->removeActor(*rigiddynamic.p_RigidDynamic);
-			rigiddynamic.p_RigidDynamic->release();
+		
 		}
 
+		
 		if (rigiddynamic.updateRigidDynamic)
 		{
 			if (rigiddynamic.p_RigidDynamic == nullptr)

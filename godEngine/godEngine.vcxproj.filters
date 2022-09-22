@@ -101,7 +101,6 @@
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Shape.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Dynamic.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Physics.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

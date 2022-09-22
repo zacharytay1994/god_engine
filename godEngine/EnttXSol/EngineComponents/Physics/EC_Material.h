@@ -44,8 +44,9 @@ namespace god
 				ImGui::InputFloat("StaticFriction", &component.StaticFriction);
 				ImGui::InputFloat("DynamicFriction", &component.DynamicFriction);
 				ImGui::InputFloat("Restitution", &component.Restitution);
-
-				ImGui::Checkbox("Update Material", &component.updatematerial);
+				if(ImGui::SmallButton("Update Material" ) )
+					component.updatematerial=true;
+				
 			
 			});
 	}

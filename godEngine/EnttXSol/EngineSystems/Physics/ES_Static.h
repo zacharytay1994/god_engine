@@ -33,8 +33,9 @@ namespace god
 
 		if (rigidstatic.Active == false)
 		{
-
+			mScene->removeActor(*rigidstatic.p_RigidStatic);
 		}
+
 
 		if (rigidstatic.updateRigidStatic)
 		{
