@@ -42,6 +42,29 @@ namespace god
 		m_FMOD_system->release();
 	}
 
+	//void AudioAPI::Create3DReverb(FMOD::Reverb3D** reverb)
+	//{
+	//	FMOD_RESULT result = m_FMOD_system->createReverb3D(reverb);
+	//	if (result != FMOD_OK)
+	//		assert(FMOD_ErrorString(result));
+
+	//	SetReverbPreset(*reverb);
+	//}
+
+	//void AudioAPI::SetReverbPreset(FMOD::Reverb3D* reverb)
+	//{
+	//	FMOD_REVERB_PROPERTIES prop = FMOD_PRESET_CAVE;
+	//	reverb->setProperties(&prop);
+
+	//	FMOD_VECTOR pos = { -10.0f, 0.0f, 0.0f };
+	//	float mindist = 10.0f;
+	//	float maxdist = 20.0f;
+	//	reverb->set3DAttributes(&pos, mindist, maxdist);
+
+	//	FMOD_VECTOR  listenerpos = { 0.0f, 0.0f, -1.0f };
+	//	m_FMOD_system->set3DListenerAttributes(0, &listenerpos, 0, 0, 0);
+	//}
+
 
 	void AudioAPI::LoadSound(const char* filePath, FMOD::Sound** sound)
 	{

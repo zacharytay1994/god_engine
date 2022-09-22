@@ -7,12 +7,11 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct AudioSource
 	{
-		// geometry for occlusion
-
 		//int m_channel_group; // to seperate sounds into different categories
 		bool m_played{ false };
 
-		bool m_3d_sound{ false };
+		bool m_3d_sound{ false }; // change to float like unity
+		float m_2d_to_3d{ 0.f }; // modifier value?
 
 		int m_sound_id{ -1 };
 		//int m_source_id{ -1 };
@@ -25,6 +24,8 @@ namespace god
 		float m_pitch{ 1.f };
 		//float m_min_distance;
 		//float m_max_distance;
+
+		//FMOD::Reverb3D* m_reverb{ nullptr };
 	};
 	template <>
 	inline void NewLuaType<AudioSource>(sol::state& luaState, std::string const& name)
@@ -80,12 +81,17 @@ namespace god
 					ImGui::OpenPopup("Sound Select");
 				}
 
+				if (ImGui::Button("Play Sound"))
+				{
+					component.m_played = false;
+				}
+
 				ImGui::Checkbox("Mute", &component.m_mute);
 				ImGui::Checkbox("Loop", &component.m_loop);
 				ImGui::Checkbox("Play On Awake", &component.m_play_on_awake);
 
-				ImGui::SliderFloat("Volume", &component.m_volume, 0.f, 1.f, "%.1f", 1.f);
-				ImGui::SliderFloat("Pitch", &component.m_pitch, 0.f, 1.5f, "%.1f", 1.f);
+				ImGui::SliderFloat("Volume", &component.m_volume, 0.f, 1.f, "%.01f", 1.f);
+				ImGui::SliderFloat("Pitch", &component.m_pitch, 0.f, 1.5f, "%.01f", 1.f);
 				//ImGui::InputFloat("Min Distance", &component.m_min_distance);
 				//ImGui::InputFloat("Max Distance", &component.m_max_distance);
 			});

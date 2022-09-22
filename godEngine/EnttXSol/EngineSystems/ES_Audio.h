@@ -3,6 +3,8 @@
 #include "../EngineComponents/EC_All.h"
 #include "../../Audio/AudioAPI.h"
 
+bool playing = false;
+
 namespace god
 {
 	//void AudioSystem(EnttXSol& entt, EngineResources& engineResources, std::tuple<EntityData&, AudioSource&> components)
@@ -62,13 +64,10 @@ namespace god
 	{
 		(entt); (components);
 
-		// note: only one audio listener allowed
+		// NOTE: ONLY ONE AUDIO LISTENER ALLOWED
 
 		// engine resources access
 		SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
-
-		//auto& entity_data = std::get<0>(components);
-		//auto& audio_listener = std::get<1>(components);
 
 		// access entities with specific component
 		for (auto&& [entity, audio_source] : entt.GetView<AudioSource>().each())
@@ -82,7 +81,7 @@ namespace god
 
 					AudioAPI::SetLoop(sound, audio_source.m_loop);
 
-					if (audio_source.m_play_on_awake && !audio_source.m_played)
+					if (audio_source.m_play_on_awake && !audio_source.m_played) // modify a bit to check for m_play_on_awake
 					{
 						AudioAPI::PlaySound(sound, audio_source.m_played);
 					}

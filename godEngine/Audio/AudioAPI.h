@@ -28,6 +28,10 @@ namespace god
 		AudioAPI();
 		~AudioAPI();
 
+	public:
+		//static void Create3DReverb(FMOD::Reverb3D** reverb);
+		//static void SetReverbPreset(FMOD::Reverb3D* reverb);
+
 		//void CreateChannelGroup();
 
 	public:
