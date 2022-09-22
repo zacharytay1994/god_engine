@@ -251,6 +251,11 @@ namespace god
 							m_enttxsol.ClearEntt ( engineResources );
 							m_enttxsol.DeserializeStateV2 ( engineResources , name , &grid );
 							m_select_hierarchy_tab = true;
+
+							// stopping and resetting all the sounds 
+							SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
+							auto& sounds = sound_manager.GetResources();
+							AudioAPI::StopAndResetAll(sounds);
 						}
 						this->ToolTipOnHover ( "Loads the scene up as the current scene." );
 

@@ -146,8 +146,10 @@ namespace god
 		sound.m_channel->stop();
 	}
 
-	void AudioAPI::ResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
+	void AudioAPI::StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
 	{
+		m_master_channel_group->stop();
+
 		for (auto& asset : assets)
 		{
 			Sound& sound = const_cast<Sound&>(std::get<1>(asset));
@@ -165,10 +167,5 @@ namespace god
 	void AudioAPI::ResumeAll()
 	{
 		m_master_channel_group->setPaused(false);
-	}
-
-	void AudioAPI::StopAll()
-	{
-		m_master_channel_group->stop();
 	}
 }

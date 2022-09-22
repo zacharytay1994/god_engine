@@ -83,6 +83,13 @@ namespace god
 
 				if (ImGui::Button("Play Sound"))
 				{
+					if (component.m_sound_id != -1)
+					{
+						Sound& sound = std::get<1>(sound_manager.Get(component.m_sound_id));
+						if (sound.m_channel)
+							AudioAPI::StopSound(sound);
+					}
+
 					component.m_played = false;
 				}
 
