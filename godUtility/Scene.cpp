@@ -61,9 +61,10 @@ namespace god
 		SceneObjectID free_id = m_free_render_data.top ();
 		m_free_render_data.pop ();
 
-		m_render_data[ free_id ].m_model_id = model;
-		m_render_data[ free_id ].m_model_transform = transform;
-		m_render_data[ free_id ].m_active = true;
+		RenderData& data = m_render_data[ free_id ];
+		data.m_model_id = model;
+		data.m_model_transform = transform;
+		data.m_active = true;
 
 		return free_id;
 	}
@@ -77,8 +78,17 @@ namespace god
 
 	void Scene::ClearScene ()
 	{
-		m_free_render_data = PQueue ();
-		m_render_data.resize ( 0 );
+		/*m_free_render_data = PQueue ();
+		m_render_data.resize ( 0 );*/
+		uint32_t i { 0 };
+		for ( auto const& data : m_render_data )
+		{
+			if ( data.m_active )
+			{
+				RemoveSceneObject ( i );
+			}
+			++i;
+		}
 	}
 
 	Scene::RenderData& Scene::GetSceneObject ( SceneObjectID id )

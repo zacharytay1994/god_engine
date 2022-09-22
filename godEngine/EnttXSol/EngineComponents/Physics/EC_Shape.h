@@ -9,7 +9,7 @@ namespace god
 	struct PhysicsShape
 	{
 
-		//eSPHERE,
+		//	eSPHERE,
 		//	ePLANE,
 		//	eCAPSULE,
 		//	eBOX,

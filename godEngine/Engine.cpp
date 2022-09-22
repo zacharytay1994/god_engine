@@ -84,9 +84,8 @@ namespace god
 
 		// setup ecs and scripting
 		EnttXSol enttxsol;
-		enttxsol.BindEngineComponents<EngineComponents>();
-		enttxsol.BindEngineSystemUpdate(EngineSystems, EngineSystemsInit, EngineSystemsCleanup);
-		enttxsol.SetupBindings();
+		enttxsol.BindEngineComponents< EngineComponents > ();
+		enttxsol.BindEngineSystemUpdate ( EngineSystems , EngineSystemsInit , EngineSystemsCleanup );
 
 		// setup scene
 		Scene scene;
@@ -106,8 +105,11 @@ namespace god
 			ogl_textures,
 			grid,
 			sound_assets,
-			godPhysicsSystem
+			godPhysicsSystem ,
+			scene
 		);
+
+		RegisterLuaCPP ( enttxsol , engine_resources );
 
 		// imgui editor windows
 		EditorWindows<EngineResources> editor_windows;

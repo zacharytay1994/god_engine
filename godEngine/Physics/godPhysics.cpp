@@ -105,7 +105,7 @@ namespace god
 
 		diceshape->release()*/;
 
-		std::cout << "Physics Initialised" << std::endl;
+		std::cout << "Bound Physics" << std::endl;
 
 
 	}
