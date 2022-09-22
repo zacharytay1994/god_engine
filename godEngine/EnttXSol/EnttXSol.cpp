@@ -1,6 +1,8 @@
 #include "../pch.h"
 #include "EnttXSol.h"
 
+#include "LuaFunctionDefinitions.h"
+
 namespace god
 {
 	EnttXSol::EnttXSol ()
@@ -11,23 +13,7 @@ namespace god
 		// define lua functions
 		// GetComponent(entity,componentname)
 		m_lua.set ( "sol_table" , sol::table () );
-		m_lua[ m_identifier_GetScriptComponent ] = [this]( entt::entity e , std::string const& s )->sol::table
-		{
-			return GetStorage<sol::table> ( s ).get ( e );
-		};
-		// GetEntity(name)
-		m_lua[ "GetEntity" ] = [this]( std::string const& entityName )->entt::entity
-		{
-			for ( uint32_t i = 0; i < m_entities.Size (); ++i )
-			{
-				if ( m_entities[ i ].m_name == entityName )
-				{
-					std::cout << m_entities[ i ].m_name << std::endl;
-					return m_entities[ i ].m_id;
-				}
-			}
-			return entt::null;
-		};
+		m_lua.set ( "entt_entity" , entt::entity () );
 	}
 
 	void EnttXSol::Update ( EngineResources& engineResources )
@@ -63,14 +49,6 @@ namespace god
 		m_registry.clear ();
 		m_entities.Clear ();
 		m_pause = true;
-	}
-
-	void EnttXSol::SetupBindings ()
-	{
-		RegisterLuaType<glm::vec3> ( "vec3" ,
-			"x" , &glm::vec3::x ,
-			"y" , &glm::vec3::y ,
-			"z" , &glm::vec3::z );
 	}
 
 	void EnttXSol::NewScriptTemplate ( std::string const& newScript )
@@ -194,11 +172,18 @@ namespace god
 							// find GetScriptComponent lines
 							if ( line.find ( m_identifier_GetScriptComponent ) != std::string::npos )
 							{
-								auto first = line.find_first_of ( '\"' ) + 1;
-								component_name = line.substr ( first , line.find_last_of ( '\"' ) - first );
-								if ( std::find ( system.m_used_script_components.begin () , system.m_used_script_components.end () , component_name ) == system.m_used_script_components.end () )
+								// if called for its own entity
+								auto first_bracket = line.find_first_of ( '(' ) + 1;
+								auto first_argument = line.substr ( first_bracket , line.find_first_of ( ',' ) - first_bracket );
+								first_argument.erase ( std::remove_if ( first_argument.begin () , first_argument.end () , []( auto c ) { return std::isspace ( c ); } ) , first_argument.end () );
+								if ( first_argument == "e" )
 								{
-									system.m_used_script_components.push_back ( component_name );
+									auto first = line.find_first_of ( '\"' ) + 1;
+									component_name = line.substr ( first , line.find_last_of ( '\"' ) - first );
+									if ( std::find ( system.m_used_script_components.begin () , system.m_used_script_components.end () , component_name ) == system.m_used_script_components.end () )
+									{
+										system.m_used_script_components.push_back ( component_name );
+									}
 								}
 							}
 							// find Get... engine component lines

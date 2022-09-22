@@ -21,6 +21,7 @@
 #include "EngineComponents/EC_All.h"
 
 #include "Internal/godEntity.h"
+#include "LuaFunctionDefinitions.h"
 
 #include <string>
 #include <unordered_map>
@@ -64,7 +65,6 @@ namespace god
 		EnttXSol ();
 		void Update ( EngineResources& engineResources );
 		void ClearEntt ( EngineResources& engineResources );
-		void SetupBindings ();
 
 		void NewScriptTemplate ( std::string const& newScript );
 		void LoadScriptsFromFolder ();
@@ -77,11 +77,13 @@ namespace god
 		void BindEngineComponents ();
 		template<typename T , typename ...ARGS>
 		void RegisterLuaType ( std::string const& name , ARGS...args );
+		template<typename FUNCTION>
+		void RegisterLuaFunction ( std::string const& name , FUNCTION fn );
 		template<typename ...T>
 		void RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) );
-		void BindEngineSystemUpdate ( 
-			void( *update )( EnttXSol& , EngineResources& , bool ),
-			void( *init )( EnttXSol& , EngineResources& ),
+		void BindEngineSystemUpdate (
+			void( *update )( EnttXSol& , EngineResources& , bool ) ,
+			void( *init )( EnttXSol& , EngineResources& ) ,
 			void( *cleanup )( EnttXSol& , EngineResources& )
 		);
 
@@ -111,6 +113,8 @@ namespace god
 		template<typename T>
 		T* GetEngineComponent ( Entities::ID entity );
 		template<typename T>
+		T* GetEngineComponent ( entt::entity e );
+		template<typename T>
 		void RemoveEngineComponent ( Entities::ID entity );
 
 		std::unordered_map<std::string , Script> const& GetScripts () const;
@@ -136,7 +140,9 @@ namespace god
 		EnttXSol::Entities::ID AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , glm::vec3 const& position = { 0,0,0 } );
 
 		template<typename...COMPONENTS>
-		auto GetView();
+		auto GetView ();
+
+		friend void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources );
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -174,8 +180,10 @@ namespace god
 		void LoadSystem ( std::string const& name );
 		bool AttachComponent ( Entities::ID id , std::string const& name );
 		bool AttachComponent ( entt::entity id , std::string const& name );
+	public:
 		template <typename T>
 		auto&& GetStorage ( std::string const& name );
+	private:
 		entt::runtime_view GetView ( std::vector<std::string> const& components , std::vector<std::string> const& engineComponents );
 
 		void RecursiveRemoveEntity ( Entities::ID entity );
@@ -260,6 +268,12 @@ namespace god
 	inline void EnttXSol::RegisterLuaType ( std::string const& name , ARGS ...args )
 	{
 		m_lua.new_usertype<T> ( name , sol::constructors<T ()> () , args... );
+	}
+
+	template<typename FUNCTION>
+	inline void EnttXSol::RegisterLuaFunction ( std::string const& name , FUNCTION fn )
+	{
+		m_lua[ name ] = fn;
 	}
 
 	template<typename ...T>
@@ -373,6 +387,12 @@ namespace god
 	}
 
 	template<typename T>
+	inline T* EnttXSol::GetEngineComponent ( entt::entity e )
+	{
+		return m_registry.try_get<T> ( e );
+	}
+
+	template<typename T>
 	inline void EnttXSol::RemoveEngineComponent ( Entities::ID entity )
 	{
 		if ( m_entities.Valid ( entity ) )
@@ -455,9 +475,9 @@ namespace god
 	}
 
 	template<typename ...COMPONENTS>
-	inline auto EnttXSol::GetView()
+	inline auto EnttXSol::GetView ()
 	{
-		return m_registry.view<COMPONENTS...>();
+		return m_registry.view<COMPONENTS...> ();
 	}
 
 	template<typename T>
