@@ -6,10 +6,17 @@
 #include <tuple>
 #include <unordered_map>
 #include <vector>
+#include <list>
 #include <algorithm>
+#include <queue>
 
 namespace god
 {
+	using Coordinate = std::tuple<int32_t , int32_t , int32_t>;
+	struct CoordinateHash
+	{
+		size_t operator()( Coordinate const& coordinate ) const;
+	};
 	template <typename T>
 	struct Grid3D
 	{
@@ -19,11 +26,6 @@ namespace god
 		};
 
 		// size, x, y, z
-		using Coordinate = std::tuple<int32_t , int32_t , int32_t>;
-		struct CoordinateHash
-		{
-			size_t operator()( Coordinate const& coordinate ) const;
-		};
 		// a GridLayer is a grid corresponding to a specific cell size
 		using GridLayer = std::unordered_map<Coordinate , Cell , CoordinateHash>;
 		using Grid = std::unordered_map<uint32_t , GridLayer>;
@@ -38,6 +40,9 @@ namespace god
 		template <typename FN , typename...ARGS>
 		void RunOver ( float granularity , Coordinate const& coord , FN fn , ARGS...args );
 
+		// pathfinding
+		std::vector<Coordinate> GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 );
+
 	private:
 		Grid m_grid;
 
@@ -45,8 +50,7 @@ namespace god
 		uint32_t NormGran ( float granularity );
 	};
 
-	template<typename T>
-	inline size_t Grid3D<T>::CoordinateHash::operator()( Coordinate const& coordinate ) const
+	inline size_t CoordinateHash::operator()( Coordinate const& coordinate ) const
 	{
 		size_t seed { 0 };
 		HashCombine ( seed , std::get<0> ( coordinate ) );
@@ -99,6 +103,156 @@ namespace god
 		{
 			Insert ( granularity , to , value );
 		}
+	}
+
+	struct AStarNode
+	{
+		//Coordinate m_coordinate;
+		int m_g { 1'000'000 } , m_h { 0 } , m_f { 0 };
+		bool m_open { false } , m_close { false };
+		Coordinate m_parent {};
+
+		int GetF () const
+		{
+			return m_g + m_h;
+		}
+	};
+
+	/*struct AStarNodeCompare
+	{
+		bool operator()( AStarNode const& node1 , AStarNode const& node2 )
+		{
+			return node1.m_f < node2.m_f;
+		}
+	};*/
+
+	using AStarGrid = std::unordered_map<Coordinate , AStarNode , CoordinateHash>;
+
+	template<typename T>
+	inline std::vector<Coordinate> Grid3D<T>::GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 )
+	{
+		// max iterations if no solution found
+		int32_t max_iteration = 1000;
+		int32_t iteration { 0 };
+
+		// A* algorithm
+		GridLayer grid = m_grid[ NormGran ( granularity ) ];
+
+		// check if target is occupied
+		if ( grid.find ( c2 ) != grid.end () )
+		{
+			if ( grid[ c2 ].m_values.size () > 0 )
+			{
+				return std::vector<Coordinate> ();
+			}
+		}
+
+		AStarGrid astar_grid;
+
+		// initialize the open list
+		astar_grid.insert ( { c1, AStarNode () } );
+		astar_grid[ c1 ].m_g = 0;
+		astar_grid[ c1 ].m_open = true;
+
+		// loop open list
+		bool search { true };
+		while ( search )
+		{
+			if ( ++iteration > max_iteration )
+			{
+				std::cout << "Pathfinding too far, exceeded iterations." << std::endl;
+				break;
+			}
+
+			search = false;
+
+			// pop lowest f value node off the open and add to close list
+			Coordinate lowest_f_coordinate;
+			int lowest_f = 1'000'000;
+			for ( auto const& node : astar_grid )
+			{
+				if ( node.second.m_open )
+				{
+					search = true;
+					if ( node.second.GetF () < lowest_f )
+					{
+						lowest_f = node.second.GetF ();
+						lowest_f_coordinate = node.first;
+					}
+				}
+			}
+
+			if ( search == false )
+			{
+				break;
+			}
+
+			AStarNode& current_node = astar_grid[ lowest_f_coordinate ];
+			current_node.m_open = false;
+			current_node.m_close = true;
+
+			// if current node == end node we have reached
+			if ( lowest_f_coordinate == c2 )
+			{
+				Coordinate current_coordinate = lowest_f_coordinate;
+				std::vector<Coordinate> out;
+
+				while ( current_coordinate != c1 )
+				{
+					out.push_back ( astar_grid[ current_coordinate ].m_parent );
+					current_coordinate = astar_grid[ current_coordinate ].m_parent;
+				}
+
+				std::reverse ( out.begin () , out.end () );
+
+				out.push_back ( c2 );
+
+				return out;
+			}
+
+			// loop through neighbours, assuming no diagonal movement
+			Coordinate neighbours[ 4 ]
+			{
+				{ std::get<0> ( lowest_f_coordinate ) - 1 , std::get<1> ( lowest_f_coordinate ), std::get<2> ( lowest_f_coordinate ) },
+				{ std::get<0> ( lowest_f_coordinate ) + 1 , std::get<1> ( lowest_f_coordinate ), std::get<2> ( lowest_f_coordinate ) },
+				{ std::get<0> ( lowest_f_coordinate ) , std::get<1> ( lowest_f_coordinate ), std::get<2> ( lowest_f_coordinate ) + 1 },
+				{ std::get<0> ( lowest_f_coordinate ) , std::get<1> ( lowest_f_coordinate ), std::get<2> ( lowest_f_coordinate ) - 1 }
+			};
+			astar_grid.insert ( { neighbours[ 0 ] , AStarNode () } );
+			astar_grid.insert ( { neighbours[ 1 ] , AStarNode () } );
+			astar_grid.insert ( { neighbours[ 2 ] , AStarNode () } );
+			astar_grid.insert ( { neighbours[ 3 ] , AStarNode () } );
+
+			// for each neighbour
+			for ( auto i = 0; i < 4; ++i )
+			{
+				Coordinate& neighbour_coordinate = neighbours[ i ];
+				// if in close or not traversable, for now treat any occupied cell as untraversable
+				if ( astar_grid[ neighbour_coordinate ].m_close || ( grid.find ( neighbour_coordinate ) != grid.end () && grid[ neighbour_coordinate ].m_values.size () > 0 ) )
+				{
+					continue;
+				}
+
+				int new_g_cost = astar_grid[ lowest_f_coordinate ].m_g + 1;
+
+				// if not in open or new g cost lower than old
+				auto& neighbour_node = astar_grid[ neighbour_coordinate ];
+				if ( new_g_cost < neighbour_node.m_g || !neighbour_node.m_open )
+				{
+					neighbour_node.m_g = new_g_cost;
+					neighbour_node.m_h = abs ( std::get<0> ( neighbour_coordinate ) - std::get<0> ( c2 ) ) +
+						abs ( std::get<1> ( neighbour_coordinate ) - std::get<1> ( c2 ) );
+					neighbour_node.m_parent = lowest_f_coordinate;
+
+					if ( !neighbour_node.m_open )
+					{
+						astar_grid[ neighbour_coordinate ].m_open = true;
+					}
+				}
+			}
+		}
+
+		return std::vector<Coordinate> ();
 	}
 
 	template<typename T>

@@ -1,1 +1,29 @@
-{"Entity1":{"Type":"Default","Script Components":{"C_TestAI":{},"C_System3":{"p":13.399999618530273}},"Engine Components":{},"Children":{}},"Entity2":{"Type":"Default","Script Components":{"C_System3":{"p":13.399999618530273}},"Engine Components":{},"Children":{}}}
+{
+    "Entity1": {
+        "Type": "Default",
+        "Script Components": {
+            "C_System2": {
+                "o": 13.399999618530273
+            },
+            "C_System3": {
+                "p": 13.399999618530273
+            },
+            "C_TestAI": {}
+        },
+        "Engine Components": {},
+        "Children": {}
+    },
+    "Entity2": {
+        "Type": "Default",
+        "Script Components": {
+            "C_System2": {
+                "o": 13.399999618530273
+            },
+            "C_System3": {
+                "p": 13.399999618530273
+            }
+        },
+        "Engine Components": {},
+        "Children": {}
+    }
+}

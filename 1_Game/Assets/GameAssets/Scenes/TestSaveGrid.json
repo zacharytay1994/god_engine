@@ -1,1 +1,154 @@
-{"RabbitTile":{"Type":"Prefab","Transform":{"position_x":1.0,"position_y":-4.0,"position_z":3.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0},"Grid Cell":{"cell_x":0,"cell_y":-2,"cell_z":1,"cell_size":1.0}},"Tile3":{"Type":"Prefab","Transform":{"position_x":-3.6000001430511475,"position_y":-7.200000286102295,"position_z":-6.800000190734863,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0},"Grid Cell":{"cell_x":-5,"cell_y":-9,"cell_z":-9,"cell_size":0.4000000059604645}},"NewObject":{"Type":"Default","Script Components":{},"Engine Components":{"Transform":{"position_x":5.028752326965332,"position_y":0.0,"position_z":-6.426181316375732,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0},"Renderable3D":{"model uid":1068777295,"diffuse uid":3916083164,"specular uid":652207713}},"Children":{"BlockBunny":{"Type":"Prefab","Transform":{"position_x":-3.0,"position_y":0.0,"position_z":1.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.5,"scale_y":0.5,"scale_z":0.5},"Grid Cell":{"cell_x":-2,"cell_y":0,"cell_z":0,"cell_size":1.0}},"BlockBunny":{"Type":"Prefab","Transform":{"position_x":3.0,"position_y":0.0,"position_z":1.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.5,"scale_y":0.5,"scale_z":0.5},"Grid Cell":{"cell_x":1,"cell_y":0,"cell_z":0,"cell_size":1.0}},"BlockBunny":{"Type":"Prefab","Transform":{"position_x":11.0,"position_y":0.0,"position_z":11.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.5,"scale_y":0.5,"scale_z":0.5}},"BagWithSquare":{"Type":"Prefab","Transform":{"position_x":20.5,"position_y":2.0,"position_z":-4.900000095367432,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0}},"BagWithSquare":{"Type":"Prefab","Transform":{"position_x":4.099999904632568,"position_y":2.0,"position_z":4.900000095367432,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0},"Grid Cell":{"cell_x":20,"cell_y":10,"cell_z":24,"cell_size":0.10000000149011612}}}}}
+{
+    "RabbitTile": {
+        "Type": "Prefab",
+        "Transform": {
+            "position_x": 1.0,
+            "position_y": -4.0,
+            "position_z": 3.0,
+            "rotation_x": 0.0,
+            "rotation_y": -0.0,
+            "rotation_z": 0.0,
+            "scale_x": 1.0,
+            "scale_y": 1.0,
+            "scale_z": 1.0
+        },
+        "Grid Cell": {
+            "cell_x": 0,
+            "cell_y": -2,
+            "cell_z": 1,
+            "cell_size": 1.0
+        }
+    },
+    "Tile3": {
+        "Type": "Prefab",
+        "Transform": {
+            "position_x": -3.6000001430511475,
+            "position_y": -7.200000286102295,
+            "position_z": -6.800000190734863,
+            "rotation_x": 0.0,
+            "rotation_y": -0.0,
+            "rotation_z": 0.0,
+            "scale_x": 1.0,
+            "scale_y": 1.0,
+            "scale_z": 1.0
+        },
+        "Grid Cell": {
+            "cell_x": -5,
+            "cell_y": -9,
+            "cell_z": -9,
+            "cell_size": 0.4000000059604645
+        }
+    },
+    "NewObject": {
+        "Type": "Default",
+        "Script Components": {},
+        "Engine Components": {
+            "Transform": {
+                "position_x": 5.028752326965332,
+                "position_y": 0.0,
+                "position_z": -6.426181316375732,
+                "rotation_x": 0.0,
+                "rotation_y": -0.0,
+                "rotation_z": 0.0,
+                "scale_x": 1.0,
+                "scale_y": 1.0,
+                "scale_z": 1.0
+            },
+            "Renderable3D": {
+                "model uid": 1068777295,
+                "diffuse uid": 3916083164,
+                "specular uid": 652207713
+            }
+        },
+        "Children": {
+            "BlockBunny": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": -3.0,
+                    "position_y": 0.0,
+                    "position_z": 1.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.5,
+                    "scale_y": 0.5,
+                    "scale_z": 0.5
+                },
+                "Grid Cell": {
+                    "cell_x": -2,
+                    "cell_y": 0,
+                    "cell_z": 0,
+                    "cell_size": 1.0
+                }
+            },
+            "BlockBunny": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": 3.0,
+                    "position_y": 0.0,
+                    "position_z": 1.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.5,
+                    "scale_y": 0.5,
+                    "scale_z": 0.5
+                },
+                "Grid Cell": {
+                    "cell_x": 1,
+                    "cell_y": 0,
+                    "cell_z": 0,
+                    "cell_size": 1.0
+                }
+            },
+            "BlockBunny": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": 11.0,
+                    "position_y": 0.0,
+                    "position_z": 11.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.5,
+                    "scale_y": 0.5,
+                    "scale_z": 0.5
+                }
+            },
+            "BagWithSquare": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": 20.5,
+                    "position_y": 2.0,
+                    "position_z": -4.900000095367432,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 1.0,
+                    "scale_y": 1.0,
+                    "scale_z": 1.0
+                }
+            },
+            "BagWithSquare": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": 4.099999904632568,
+                    "position_y": 2.0,
+                    "position_z": 4.900000095367432,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 1.0,
+                    "scale_y": 1.0,
+                    "scale_z": 1.0
+                },
+                "Grid Cell": {
+                    "cell_x": 20,
+                    "cell_y": 10,
+                    "cell_z": 24,
+                    "cell_size": 0.10000000149011612
+                }
+            }
+        }
+    }
+}
