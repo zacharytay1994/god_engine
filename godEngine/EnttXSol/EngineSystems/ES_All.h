@@ -4,7 +4,12 @@
 #include "ES_Example.h"
 #include "ES_Audio.h"
 #include "ES_Grid.h"
-#include "ES_Physics.h"
+
+
+
+#include "Physics/ES_Dynamic.h"
+#include "Physics/ES_Shape.h"
+#include "Physics/ES_Static.h"
 
 namespace god
 {
@@ -15,18 +20,19 @@ namespace god
 		if ( !isPause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystem );
-			
 			enttxsol.RunEngineSystem ( engineResources , AudioSystem );
+
+
 		}
 		
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
-
-
 		//Physics
-		enttxsol.RunEngineSystem(engineResources, UpdateBase);
-		enttxsol.RunEngineSystem(engineResources, UpdateStatic);
-		enttxsol.RunEngineSystem(engineResources, UpdateDynamic);
+		enttxsol.RunEngineSystem(engineResources, ShapeUpdate);
+		enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
+		enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);
 		//
+
+
 	}
 
 	// runs at the start of a frame, i.e. runs before EngineSystems()
@@ -35,7 +41,13 @@ namespace god
 		if ( !enttxsol.m_pause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameStart );
+
+
 		}
+		enttxsol.RunEngineSystem(engineResources, RigidStaticFrameBegin);
+		enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameBegin);
+			
+
 	}
 
 	// runs at the end of a frame, i.e. runs after EngineSystems()
@@ -45,7 +57,11 @@ namespace god
 		if ( !enttxsol.m_pause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameEnd );
+
 		}
+
+		//physics
+		enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
 	}
 
 	// runs at the start just after loading the scene

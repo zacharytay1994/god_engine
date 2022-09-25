@@ -28,9 +28,7 @@ namespace god
 			transport->release();
 		}
 		mFoundation->release();
-		///mFoundation->release();
-		
-		//mDefaultAllocatorCallback.
+
 	}
 	void PhysicsSystem::Init()
 	{
@@ -38,81 +36,43 @@ namespace god
 		mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
 		if (!mFoundation) throw("PxCreateFoundation failed!");
 
-		
-		//PVD
-		mPvd = PxCreatePvd(*mFoundation);
-		physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
-		mPvd->connect(*transport, physx::PxPvdInstrumentationFlag::eALL);
-
-
-
+		CreatePVD();
 	
 		mToleranceScale.length = 1;        // typical length of an object
 		mToleranceScale.speed = 98.1;         // typical speed of an object, gravity*1s is a reasonable choice
 		mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, mToleranceScale, true, mPvd);
 		if (!mPhysics)
 			std::cerr << "Failed to Create PhysX Instance" << std::endl;
+		else
+		{
 
 
-
-		physx::PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-		sceneDesc.gravity = physx::PxVec3(0.0f, -98.11f, 0.0f);
-		mDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
-		if (!mDispatcher)
-			std::cerr << "PxDefaultCpuDispatcherCreate failed!" << std::endl;
-
-
-		sceneDesc.cpuDispatcher = mDispatcher;
-		sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-		sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eABP;//Automatic box pruning
-		
-		mScene = mPhysics->createScene(sceneDesc);
+			physx::PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
+			sceneDesc.gravity = physx::PxVec3(0.0f, -98.11f, 0.0f);
+			mDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
+			if (!mDispatcher)
+				std::cerr << "PxDefaultCpuDispatcherCreate failed!" << std::endl;
 
 
-		//// create table material
-		//mMaterial = mPhysics->createMaterial(0.3f, 0.3f, 0.7f);
-		////create plane
-		//physx::PxRigidStatic* groundPlane = PxCreatePlane(*mPhysics, physx::PxPlane(0, 0, 1, 50), *mMaterial);
-		//mScene->addActor(*groundPlane);
+			sceneDesc.cpuDispatcher = mDispatcher;
+			sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+			sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eABP;//Automatic box pruning
 
-		//
-		////Shape can be attached to multiple actors
-		////Shape needs to contain PxGeometry and ref to PxMaterial
-		//physx::PxShape* tableshape = mPhysics->createShape(physx::PxBoxGeometry(500.f, 500.f, 2.f), *mMaterial);
-		//
-		////physx::PxRigidActorExt::createExclusiveShape()
-		////table
-		//physx::PxTransform t(physx::PxVec3(0));
-		//physx::PxRigidStatic* table = mPhysics->createRigidStatic(physx::PxTransform(0.f, 10.f, 0.f));
-	
-		//table->attachShape(*tableshape);
-		//
-		//mScene->addActor(*table);
-		//tableshape->release();
-		//
-		//dice
-		// create dice material
-/*		physx::PxMaterial* DiceMaterial = mPhysics->createMaterial(0.3f, 0.3f, 0.8f);
-		physx::PxShape* diceshape = mPhysics->createShape(physx::PxBoxGeometry(15.f, 15.f, 15.f), *DiceMaterial);
-		
+			mScene = mPhysics->createScene(sceneDesc);
 
-		physx::PxRigidDynamic* body = mPhysics->createRigidDynamic(physx::PxTransform(0.f, 0.f, 200.f));
-
-		body->setAngularVelocity(physx::PxVec3(1.4f,1.4f,1.4f), true);
-		body->attachShape(*diceshape);
-		physx::PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-		mScene->addActor(*body);
-
-		diceshape->release()*/;
-
-		std::cout << "Bound Physics" << std::endl;
+			SetupPVD();
 
 
+			std::cout << "Physics Initialised" << std::endl;
+			
+
+		}
 	}
 
-	void PhysicsSystem::Update(float dt)
+	void PhysicsSystem::Update(float dt , bool pause)
 	{
-
+		if (pause)
+			return;
 		//mStepSize is 1/60 Physics at 60fps by default
 		mAccumulator += dt;
 		if (mAccumulator < mStepSize)
@@ -137,7 +97,13 @@ namespace god
 		}
 
 	}
-
+	void PhysicsSystem::CreatePVD()
+	{
+		//PVD
+		mPvd = PxCreatePvd(*mFoundation);
+		physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
+		mPvd->connect(*transport, physx::PxPvdInstrumentationFlag::eALL);
+	}
 
 	void PhysicsSystem::SetupPVD()
 	{

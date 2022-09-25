@@ -10,26 +10,59 @@ in vec4 vFragPosLightSpace;
 uniform vec3 uViewPosition;
 
 // material properties
-struct Material 
+struct sMaterial 
 {
     sampler2D diffuse_map;
     sampler2D specular_map;
     float shininess;
 };
 
-uniform Material uMaterial;
+uniform sMaterial uMaterial;
 
 // light properties
-struct Light 
+struct sLight 
 {
     vec3 position;
     vec3 colour;
+
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
 };
 
-uniform Light uLight;
+struct sDirectionalLight 
+{
+    vec3 direction;
+    vec3 colour;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+struct sSpotLight 
+{
+    vec3 direction;
+    vec3 position;  
+    vec3 viewPos;
+
+    float cutOff;
+    float outerCutOff;
+  
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+	
+    float constant;
+    float linear;
+    float quadratic;
+
+
+};
+
+uniform sLight              uPointLight;
+uniform sDirectionalLight   uDirectionalLight;
+uniform sSpotLight          uSpotLight;
 
 //skybox
 uniform samplerCube uSkybox; //--
@@ -72,19 +105,19 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     return shadow;
 }
 
-vec3 LightValue()
+vec3 PointLight()
 {
     vec3 normal = normalize(vNormal);
-    vec3 light_direction = normalize(uLight.position - vWorldPos);
+    vec3 light_direction = normalize(uPointLight.position - vWorldPos);
     vec3 view_direction = normalize(uViewPosition - vWorldPos);
     vec3 reflect_direction = reflect(-light_direction, normal);
 
     // ambient
-    vec4 ambient = vec4((uLight.colour * uLight.ambient), 1.0) * texture(uMaterial.diffuse_map, vUV);
+    vec4 ambient = vec4((uPointLight.colour * uPointLight.ambient), 1.0) * texture(uMaterial.diffuse_map, vUV);
 
     // diffuse
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
-    vec4 diffuse = vec4((uLight.colour * uLight.diffuse), 1.0) * (diffuse_scalar * texture(uMaterial.diffuse_map, vUV));
+    vec4 diffuse = vec4((uPointLight.colour * uPointLight.diffuse), 1.0) * (diffuse_scalar * texture(uMaterial.diffuse_map, vUV));
 
     // cubemap reflection
     vec3 I = normalize (vWorldPos - uViewPosition) ; //--
@@ -102,7 +135,75 @@ vec3 LightValue()
     return vec3((ambient + (1.0 - shadow) * (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
 }
 
+
+vec3 DirectLight()
+{
+    // ambient
+    vec3 ambient = uDirectionalLight.ambient * texture(uMaterial.diffuse_map, vUV).rgb;
+
+    // diffuse
+	vec3 normal = normalize(vNormal);
+    vec3 light_direction = normalize(-uDirectionalLight.direction);
+    float diffuse_scalar = max(dot(normal, light_direction), 0.0);
+    vec3 diffuse = uDirectionalLight.diffuse * diffuse_scalar * texture(uMaterial.diffuse_map, vUV).rgb;
+
+    // specular
+    vec3 view_direction = normalize(uViewPosition - vWorldPos);
+    vec3 reflect_direction = reflect(-light_direction, normal);
+    float specular_scalar = pow(max(dot(view_direction, reflect_direction), 0.0), uMaterial.shininess);
+    vec3 specular = uDirectionalLight.specular * specular_scalar * texture(uMaterial.specular_map, vUV).rgb;
+
+    return vec3 ( ambient + diffuse + specular ) ;
+}
+
+vec3 SpotLight()
+{
+    // ambient
+    vec3 ambient = uSpotLight.ambient * texture(uMaterial.diffuse_map, vUV).rgb;
+
+    // diffuse
+	vec3 normal = normalize(vNormal);
+    vec3 light_direction = normalize(uSpotLight.position - vWorldPos);
+    float diffuse_scalar = max(dot(normal, light_direction), 0.0);
+    vec3 diffuse = uSpotLight.diffuse * diffuse_scalar * texture(uMaterial.diffuse_map, vUV).rgb;
+
+    // specular
+    vec3 view_direction = normalize(uSpotLight.viewPos - vWorldPos);
+    vec3 reflect_direction = reflect(-light_direction, normal);
+    float specular_scalar = pow(max(dot(view_direction, reflect_direction), 0.0), uMaterial.shininess);
+    vec3 specular = uSpotLight.specular * specular_scalar * texture(uMaterial.specular_map, vUV).rgb;
+
+    // spotlight (soft edges)
+    float theta = dot(light_direction, normalize(-uSpotLight.direction)); 
+    float epsilon = (uSpotLight.cutOff - uSpotLight.outerCutOff);
+    float intensity = clamp ((theta - uSpotLight.outerCutOff)/epsilon, 0.0 ,1.0);
+    diffuse  *= intensity;
+    specular *= intensity;
+
+    // attenuation
+    float distance    = length(uSpotLight.position - vWorldPos);
+    float attenuation = 1.0 / (uSpotLight.constant + uSpotLight.linear * distance + uSpotLight.quadratic * (distance * distance));  
+
+    ambient  *= attenuation; 
+    diffuse   *= attenuation;
+    specular *= attenuation;   
+        
+    return vec3 ( ambient + diffuse + specular ) ;
+}
+
 void main()
 {
-    fFragColor = vec4(LightValue(),1.0);
+    // vec3 light_value{0,0,0};
+    // for (int i = 0; i < number_of_point_light; ++i)
+    // {
+    //     light_value += uPointLight[i];
+    // }
+    // // concatenate all directional lights
+    // for (int i = 0; i < number_of_directional_light; ++i)
+    // {
+    //     light_value += uDirectionalLight[i];
+    // }
+    
+    // concatenate all point lights
+    fFragColor = vec4(PointLight() + DirectLight() + SpotLight() , 1.0);
 }
