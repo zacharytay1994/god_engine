@@ -130,80 +130,74 @@ namespace god
 		// use the shader
 		// m_flat_shader.Use ();
 
-		for (auto const &data : scene.m_render_data)
+		for ( auto const& data : scene.m_instanced_render_data )
 		{
-			if (data.Active())
+			// Make it so the stencil test always passes
+			glStencilFunc ( GL_ALWAYS , 1 , 0xFF );
+			// Enable modifying of the stencil buffer
+			glStencilMask ( 0xFF );
+
+			// Draw the normal model
+			m_textured_shader.Use ();
+
+			// projection matrix
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uProjection" , projection );
+
+			// view matrix
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , view );
+
+			// set uniforms for fragment shader
+			// set view position
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uViewPosition" , camera_position );
+
+			// set material
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			std::get<1> ( textures.Get ( data.first.m_diffuse_id ) ).Bind ( 0 );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.specular_map" , 1 );
+			std::get<1> ( textures.Get ( data.first.m_specular_id ) ).Bind ( 1 );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.shininess" , data.first.m_shininess );
+
+			// set light
+			OGLLight light;
+			light.m_position = { 0.0f, 100.0f, 0.0f };
+			light.m_ambient = { 0.8f, 0.8f, 0.8f };
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.position" , light.m_position );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.colour" , light.m_colour );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.ambient" , light.m_ambient );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.diffuse" , light.m_diffuse );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.specular" , light.m_specular );
+
+			// draw model
+			for ( auto& mesh : m_models[ data.first.m_model_id ] )
 			{
-				// Make it so the stencil test always passes
-				glStencilFunc(GL_ALWAYS, 1, 0xFF);
-				// Enable modifying of the stencil buffer
-				glStencilMask(0xFF);
-
-				// Draw the normal model
-				m_textured_shader.Use();
-
-				// projection matrix
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uProjection", projection);
-
-				// view matrix
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uView", view);
-
-				// set uniforms for vertex shader
-				// set model transform
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uModel", data.m_model_transform);
-
-				// set uniforms for fragment shader
-				// set view position
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uViewPosition", camera_position);
-
-				// set material
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uMaterial.diffuse_map", 0);
-				std::get<1>(textures.Get(data.m_diffuse_id)).Bind(0);
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uMaterial.specular_map", 1);
-				std::get<1>(textures.Get(data.m_specular_id)).Bind(1);
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uMaterial.shininess", data.m_shininess);
-
-				// set light
-				OGLLight light;
-				light.m_position = {0.0f, 100.0f, 0.0f};
-				light.m_ambient = {0.8f, 0.8f, 0.8f};
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uLight.position", light.m_position);
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uLight.colour", light.m_colour);
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uLight.ambient", light.m_ambient);
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uLight.diffuse", light.m_diffuse);
-				OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uLight.specular", light.m_specular);
-
-				// draw model
-				for (auto const &mesh : m_models[data.m_model_id])
-				{
-					mesh.Draw(GL_TRIANGLES);
-				}
-
-				// Make it so only the pixels without the value 1 pass the test
-				glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-				// Disable modifying of the stencil buffer
-				glStencilMask(0x00);
-				// Disable the depth buffer
-				glDisable(GL_DEPTH_TEST);
-
-				m_single_colour_outline_shader.Use();
-				OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uProjection", projection);
-				OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uView", view);
-				OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uModel", data.m_model_transform);
-				OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uOutlining", 0.01f);
-
-				for (auto const &mesh : m_models[data.m_model_id])
-				{
-					mesh.Draw(GL_TRIANGLES);
-				}
-
-				// Enable modifying of the stencil buffer
-				glStencilMask(0xFF);
-				// Clear stencil buffer
-				glStencilFunc(GL_ALWAYS, 0, 0xFF);
-				// Enable the depth buffer
-				glEnable(GL_DEPTH_TEST);
+				mesh.SetTransformData ( data.second );
+				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
+
+			// Make it so only the pixels without the value 1 pass the test
+			glStencilFunc ( GL_NOTEQUAL , 1 , 0xFF );
+			// Disable modifying of the stencil buffer
+			glStencilMask ( 0x00 );
+			// Disable the depth buffer
+			glDisable ( GL_DEPTH_TEST );
+
+			m_single_colour_outline_shader.Use ();
+			OGLShader::SetUniform ( m_single_colour_outline_shader.GetShaderID () , "uProjection" , projection );
+			OGLShader::SetUniform ( m_single_colour_outline_shader.GetShaderID () , "uView" , view );
+			OGLShader::SetUniform ( m_single_colour_outline_shader.GetShaderID () , "uOutlining" , 0.01f );
+
+			for ( auto& mesh : m_models[ data.first.m_model_id ] )
+			{
+				mesh.SetTransformData ( data.second );
+				mesh.DrawInstanced ( GL_TRIANGLES );
+			}
+
+			// Enable modifying of the stencil buffer
+			glStencilMask ( 0xFF );
+			// Clear stencil buffer
+			glStencilFunc ( GL_ALWAYS , 0 , 0xFF );
+			// Enable the depth buffer
+			glEnable ( GL_DEPTH_TEST );
 		}
 
 		// unuse the bound shader

@@ -172,11 +172,6 @@ namespace god
 			window.SwapWindowBuffers ();
 			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
 
-			if ( window.KeyDown ( GLFW_KEY_P ) )
-			{
-				auto path = grid[ -1 ].GetPathAStar ( 1.0f , { 0,0,0 } , { 4,0,0 } );
-			}
-
 			// free camera update
 			/*camera.FreeCamera ( 0.02f ,
 				true ,
