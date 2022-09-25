@@ -100,6 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioAPI.h" />
+    <ClInclude Include="Audio\Internal\SoundManager.h" />
     <ClInclude Include="Editor\Editor.h" />
     <ClInclude Include="Editor\EngineResources.h" />
     <ClInclude Include="Editor\OpenGLEditor.h" />
@@ -136,8 +137,11 @@
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Dynamic.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Shape.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Physics.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_ScenePopulate.h" />
     <ClInclude Include="EnttXSol\EnttXSol.h" />
     <ClInclude Include="EnttXSol\Internal\godEntity.h" />
+    <ClInclude Include="EnttXSol\LuaFunctionDefinitions.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="godEngine.h" />
     <ClInclude Include="imgui\imconfig.h" />
@@ -172,6 +176,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Audio\AudioAPI.cpp" />
+    <ClCompile Include="Audio\Internal\SoundManager.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Editor\Editor.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
@@ -193,6 +198,10 @@
     <ClCompile Include="EnttXSol\Internal\godEntity.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="EnttXSol\LuaFunctionDefinitions.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

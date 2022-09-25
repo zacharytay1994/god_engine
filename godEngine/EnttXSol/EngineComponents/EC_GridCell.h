@@ -12,6 +12,7 @@ namespace god
 
 		// not saved, used to change cell in Grid3D
 		int32_t m_cell_ox { 0 } , m_cell_oy { 0 } , m_cell_oz { 0 };
+		bool m_initialized { false };
 	};
 	template <>
 	inline void NewLuaType<GridCell> ( sol::state& luaState , std::string const& name )

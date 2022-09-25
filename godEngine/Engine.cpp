@@ -67,22 +67,25 @@ namespace god
 		float scene_camera_zoom_distance{20.0f};
 		glm::vec3 scene_camera_position_offset{0.0f};
 
+		// setup FMOD system
+		AudioAPI audio_api;
+
 		// setup resources
 		Asset3DManager assets_3d;
 		InsertAllAsset3DsFromConfig(AssetPath::File_ModelsConfig, AssetPath::Folder_BuildModels, assets_3d);
 		OGLTextureManager ogl_textures;
-		InsertEngineOGLTextures(ogl_textures); // temp solution to insert engine textures, might change
-		InsertAllOGLTexturesFromConfig(AssetPath::File_TexturesConfig, AssetPath::Folder_RawTextures, ogl_textures);
+		InsertEngineOGLTextures ( ogl_textures ); // temp solution to insert engine textures, might change
+		InsertAllOGLTexturesFromConfig ( AssetPath::File_TexturesConfig , AssetPath::Folder_RawTextures , ogl_textures );
+		SoundManager sound_assets;
+		InsertAllSoundsFromConfig(AssetPath::File_SoundsConfig, AssetPath::Folder_BuildSounds, sound_assets);
 
 		opengl.BuildOGLModels(assets_3d);
 
-		AudioAPI audio_api;
 
 		// setup ecs and scripting
 		EnttXSol enttxsol;
-		enttxsol.BindEngineComponents<EngineComponents>();
-		enttxsol.BindEngineSystemUpdate(EngineSystems, EngineSystemsInit, EngineSystemsCleanup);
-		enttxsol.SetupBindings();
+		enttxsol.BindEngineComponents< EngineComponents > ();
+		enttxsol.BindEngineSystemUpdate ( EngineSystems , EngineSystemsInit , EngineSystemsCleanup );
 
 		// setup scene
 		Scene scene;
@@ -94,16 +97,19 @@ namespace god
 		ImGuiOpenGLEditor ogl_editor(window);
 
 		// engine resources used by imgui as defined in EditorResourcesDefinition.h
-		EngineResources engine_resources(
+		EngineResources engine_resources (
 			window,
 			opengl,
 			camera,
 			assets_3d,
 			ogl_textures,
-			godPhysicsSystem,
-			grid
-
+			grid,
+			sound_assets,
+			godPhysicsSystem ,
+			scene
 		);
+
+		RegisterLuaCPP ( enttxsol , engine_resources );
 
 		// imgui editor windows
 		EditorWindows<EngineResources> editor_windows;
@@ -181,17 +187,16 @@ namespace god
 			SystemTimer::StartTimeSegment("Editor");
 			ogl_editor.BeginFrame();
 			// pass scene view the renderpass texture
-			editor_windows.GetWindow<EW_SceneView>()->SetRenderpassTexture(first_renderpass.GetTexture());
-			// editor_windows.GetWindow<EW_SceneView>()->SetRenderpassTexture( opengl.m_depthmap );
-			editor_windows.Update(0.02f, engine_resources);
-			ogl_editor.Render();
+			editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( first_renderpass.GetTexture () );
+			editor_windows.Update ( 0.02f , engine_resources );
+			ogl_editor.Render ();
+			ogl_editor.EndFrame ();
+			SystemTimer::EndTimeSegment ( "Editor" );
 
-			ogl_editor.EndFrame();
-			SystemTimer::EndTimeSegment("Editor");
+			SystemTimer::StartTimeSegment ( "Window Buffer Swap" );
+			window.SwapWindowBuffers ();
+			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
 
-			SystemTimer::StartTimeSegment("Window Buffer Swap");
-			window.SwapWindowBuffers();
-			SystemTimer::EndTimeSegment("Window Buffer Swap");
 			// free camera update
 			camera.FreeCamera(0.02f,
 							  true,

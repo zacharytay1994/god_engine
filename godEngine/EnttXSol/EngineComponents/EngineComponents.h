@@ -42,7 +42,12 @@ namespace god
 	}
 
 	template <typename T>
-	void Assign ( T& val , rapidjson::Value& jsonObj , std::string const& name ) {};
+	void Assign ( T& val , rapidjson::Value& jsonObj , std::string const& name ) 
+	{
+		( val );
+		( jsonObj );
+		( name );
+	};
 
 	template<>
 	inline void Assign<int> ( int& val , rapidjson::Value& jsonObj , std::string const& name )

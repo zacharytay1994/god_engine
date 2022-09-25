@@ -92,6 +92,7 @@ namespace god
 		glfwWindowHint ( GLFW_CONTEXT_VERSION_MINOR , 5 );
 		glfwWindowHint ( GLFW_OPENGL_PROFILE , GLFW_OPENGL_CORE_PROFILE );
 
+
 		m_window = glfwCreateWindow ( m_width , m_height , "God Engine" , NULL , NULL );
 		if ( m_window == NULL )
 		{
@@ -100,6 +101,7 @@ namespace god
 			return;
 		}
 		glfwMakeContextCurrent ( m_window );
+		glfwSwapInterval ( 0 );
 
 		glfwSetWindowUserPointer ( m_window , this );
 		glfwSetFramebufferSizeCallback ( m_window , GLFWFramebufferSizeCallback );

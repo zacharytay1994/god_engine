@@ -2,6 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\0_InternalDependencies\glad\src\glad.c" />
+    <ClCompile Include="Audio\AudioAPI.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Editor\Editor.cpp" />
     <ClCompile Include="Editor\OpenGLEditor.cpp" />
@@ -33,8 +34,10 @@
     <ClCompile Include="OpenGL\Advance\CubeMap.cpp" />
     <ClCompile Include="OpenGL\Advance\ShadowMap.cpp" />
     <ClCompile Include="OpenGL\Internal\OGLDebug.cpp" />
+    <ClCompile Include="EnttXSol\LuaFunctionDefinitions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Audio\AudioAPI.h" />
     <ClInclude Include="Editor\Editor.h" />
     <ClInclude Include="Editor\EngineResources.h" />
     <ClInclude Include="Editor\OpenGLEditor.h" />
@@ -51,6 +54,8 @@
     <ClInclude Include="Editor\Window\TestWindow.h" />
     <ClInclude Include="Editor\Window\TestWindow2.h" />
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_AudioListener.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\EC_AudioSource.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_EntityData.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_GridCell.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Renderable3D.h" />
@@ -59,6 +64,7 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_All.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
     <ClInclude Include="EnttXSol\EnttXSol.h" />
@@ -101,6 +107,8 @@
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Shape.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Dynamic.h" />
+    <ClInclude Include="EnttXSol\LuaFunctionDefinitions.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_ScenePopulate.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

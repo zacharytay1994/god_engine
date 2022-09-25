@@ -28,7 +28,8 @@ namespace god
 		{
 			Model ,
 			Texture ,
-			Count
+			Count ,
+			Sound
 		};
 		AssetType m_asset_type { AssetType::Count };
 
@@ -161,6 +162,54 @@ namespace god
 				ImGui::EndChild ();
 
 				ImGui::EndTabItem ();
+			}
+
+			if (ImGui::BeginTabItem("Sounds"))
+			{
+				if (m_asset_type != AssetType::Sound)
+				{
+					m_asset_type = AssetType::Sound;
+					Clear();
+				}
+
+				if (ImGui::Button("Browse Sounds", { ImGui::GetWindowWidth() , 0.0f }))
+				{
+					m_asset_paths = OpenWindowDialogMulti(L"Sound Files", L"*.mp3;*.wav;*.aif;*.ogg");
+
+					// default asset names
+					m_asset_names.resize(m_asset_paths.size());
+					for (size_t i = 0; i < m_asset_paths.size(); ++i)
+					{
+						size_t last_slash = m_asset_paths[i].find_last_of('\\') + 1;
+						size_t last_dot = m_asset_paths[i].find_last_of('.');
+						m_asset_names[i] = m_asset_paths[i].substr(last_slash, last_dot - last_slash);
+					}
+				}
+
+				ImGui::BeginChild("Paths", { ImGui::GetWindowWidth() - 20, ImGui::GetWindowHeight() - 190 }, false, ImGuiWindowFlags_HorizontalScrollbar);
+				for (size_t i = 0; i < m_asset_paths.size(); ++i)
+				{
+					ImGui::PushID(static_cast<int>(i));
+
+					ImGui::Separator();
+
+					ImGui::Text("%d. %s", i + 1, m_asset_paths[i].c_str());
+
+					if (asset_manager->SoundNameExists(m_asset_names[i]))
+					{
+						importable = false;
+						ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f, 0.0f, 0.0f, 1.0f });
+						ImGui::Text("** Name already used!");
+						ImGui::PopStyleColor();
+					}
+
+					ImGui::InputText(":Name", &m_asset_names[i]);
+
+					ImGui::PopID();
+				}
+				ImGui::EndChild();
+
+				ImGui::EndTabItem();
 			}
 
 			ImGui::EndTabBar ();
@@ -324,9 +373,60 @@ namespace god
 
 				break;
 			}
+			case (AssetType::Sound):
+			{
+				// STEP - Serialze
+				rapidjson::Document document;
+				document.SetObject();
+				god::ReadJSON(document, File_SoundsConfig);
+
+				for (size_t i = 0; i < m_asset_paths.size(); ++i)
+				{
+					rapidjson::Value value;
+					value.SetObject();
+
+					std::string sound_path = m_asset_paths[i];
+					std::string asset_name = m_asset_names[i];
+
+					// serialize sound file name
+					std::string sound_name = sound_path.substr(sound_path.find_last_of('\\') + 1, sound_path.size());
+					RapidJSON::JSONifyToValue(value, document, "Raw", sound_name);
+
+					// serialize sound path name
+					RapidJSON::JSONifyToValue(value, document, "Source", sound_path);
+
+					// serialize edit time
+					RapidJSON::JSONifyToValue(value, document, "Last Edited", GetDateTimeString());
+
+					// generate uid at time of creation
+					auto ms_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() + i;
+					auto uid = std::hash<unsigned long long>{} (ms_since_epoch);
+					RapidJSON::JSONifyToValue(value, document, "UID", static_cast<uint32_t>(uid));
+
+					if (document.HasMember(asset_name.c_str()) && document[asset_name.c_str()].IsArray())
+					{
+						// for unique id implementation next time
+						//document[ m_asset_name.c_str () ].PushBack ( value , document.GetAllocator () );
+						document[asset_name.c_str()][0] = value;
+					}
+					else
+					{
+						RapidJSON::JSONifyValues(document, asset_name, value);
+					}
+
+					god::WriteJSON(document, File_SoundsConfig);
+
+					// STEP - File Setup
+					god::FolderHelper::CopyFileToFolder(sound_path, (Folder_BuildSounds).c_str());
+				}
+
+				InsertAllSoundsFromConfig(AssetPath::File_SoundsConfig, AssetPath::Folder_BuildSounds, editorResources.Get< SoundManager >().get());
+
+				break;
+			}
 			}
 
-			m_flip_model_UVs = true;
+			//m_flip_model_UVs = true;
 			Clear ();
 		}
 

@@ -19,9 +19,7 @@ namespace god
 		 void Init();
 		 void Update(float dt, bool pause);
 
-
-
-
+		
 
 		 physx::PxPhysics* const GetPhysics() const;
 		 physx::PxScene* const GetPhysicsScene() const;

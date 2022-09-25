@@ -235,7 +235,7 @@ namespace god
 				grid_cell->m_cell_z = m_cell_z;
 				grid_cell->m_cell_size = m_cell_size;
 
-				grid[ m_selected ].Insert ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } , entity );
+				//grid[ m_selected ].Insert ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } , entity );
 			}
 		}
 

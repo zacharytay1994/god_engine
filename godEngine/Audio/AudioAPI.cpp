@@ -3,6 +3,15 @@
 
 namespace god
 {
+	Sound::Sound() : m_sound_sample{ nullptr }, m_name{}, m_file_name{}, m_channel{ nullptr }
+	{
+	}
+
+	Sound::Sound(std::string const& soundPath)
+	{
+		AudioAPI::LoadSound(soundPath.c_str(), *this);
+	}
+
 	FMOD::System* AudioAPI::m_FMOD_system;
 	FMOD::ChannelGroup* AudioAPI::m_master_channel_group;
 	FMOD::SoundGroup* AudioAPI::m_master_sound_group;
@@ -13,7 +22,7 @@ namespace god
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
 
-		m_FMOD_system->init(64, FMOD_INIT_NORMAL, NULL);
+		m_FMOD_system->init(MAX_SOUND_CHANNELS, FMOD_INIT_NORMAL, NULL);
 
 		result = m_FMOD_system->getMasterChannelGroup(&m_master_channel_group);
 		if (result != FMOD_OK)
@@ -44,6 +53,13 @@ namespace god
 		FMOD_RESULT result = m_FMOD_system->createSound(filePath, FMOD_DEFAULT, 0, &sound.m_sound_sample);
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
+
+		std::string path{ filePath };
+		size_t last_slash = path.find_last_of('\\') + 1;
+		size_t last_dot = path.find_last_of('.');
+
+		sound.m_file_name = filePath;
+		sound.m_name = path.substr(last_slash, last_dot - last_slash);
 	}
 
 	void AudioAPI::UnloadSound(FMOD::Sound* sound)
@@ -73,15 +89,29 @@ namespace god
 		sound.m_channel->setPitch(pitch);
 	}
 
-	void AudioAPI::Play(FMOD::Sound* sound)
-	{
-		m_FMOD_system->playSound(sound, NULL, false, NULL);
-	}
-
-	void AudioAPI::Play(Sound& sound)
+	void AudioAPI::PlaySound(Sound& sound)
 	{
 		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, &sound.m_channel);
 		sound.m_played = true;
+	}
+
+	void AudioAPI::PauseSound(Sound& sound, bool paused)
+	{
+		sound.m_channel->setPaused(paused);
+	}
+
+	void AudioAPI::StopSound(Sound& sound)
+	{
+		sound.m_channel->stop();
+	}
+
+	void AudioAPI::ResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
+	{
+		for (auto& asset : assets)
+		{
+			Sound& sound = const_cast<Sound&>(std::get<1>(asset));
+			sound.m_played = false;
+		}
 	}
 
 	void AudioAPI::PauseAll()
@@ -97,6 +127,5 @@ namespace god
 	void AudioAPI::StopAll()
 	{
 		m_master_channel_group->stop();
-		//m_master_sound_group->stop();
 	}
 }

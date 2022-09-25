@@ -64,42 +64,7 @@ namespace god
 
 
 			std::cout << "Physics Initialised" << std::endl;
-			//// create table material
-			//mMaterial = mPhysics->createMaterial(0.3f, 0.3f, 0.7f);
-			////create plane
-			//physx::PxRigidStatic* groundPlane = PxCreatePlane(*mPhysics, physx::PxPlane(0, 0, 1, 50), *mMaterial);
-			//mScene->addActor(*groundPlane);
-
-			//
-			////Shape can be attached to multiple actors
-			////Shape needs to contain PxGeometry and ref to PxMaterial
-			//physx::PxShape* tableshape = mPhysics->createShape(physx::PxBoxGeometry(500.f, 500.f, 2.f), *mMaterial);
-			//
-			////physx::PxRigidActorExt::createExclusiveShape()
-			////table
-			//physx::PxTransform t(physx::PxVec3(0));
-			//physx::PxRigidStatic* table = mPhysics->createRigidStatic(physx::PxTransform(0.f, 10.f, 0.f));
-
-			//table->attachShape(*tableshape);
-			//
-			//mScene->addActor(*table);
-			//tableshape->release();
-			//
-			//dice
-			// create dice material
-	/*		physx::PxMaterial* DiceMaterial = mPhysics->createMaterial(0.3f, 0.3f, 0.8f);
-			physx::PxShape* diceshape = mPhysics->createShape(physx::PxBoxGeometry(15.f, 15.f, 15.f), *DiceMaterial);
-
-
-			physx::PxRigidDynamic* body = mPhysics->createRigidDynamic(physx::PxTransform(0.f, 0.f, 200.f));
-
-			body->setAngularVelocity(physx::PxVec3(1.4f,1.4f,1.4f), true);
-			body->attachShape(*diceshape);
-			physx::PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-			mScene->addActor(*body);
-
-			diceshape->release()*/;
-
+			
 
 		}
 	}
