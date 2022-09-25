@@ -19,13 +19,15 @@ namespace god
 		{};
 		~PhysicsMaterial()
 		{
-			if (p_material)
-				p_material->release();
+			//if (p_material)
+			//	p_material->release();
 		};
 	};
 	template <>
 	inline void NewLuaType<PhysicsMaterial>(sol::state& luaState, std::string const& name)
 	{
+		UNREFERENCED_PARAMETER(luaState);
+		UNREFERENCED_PARAMETER(name);
 	}
 	template<>
 	inline void ComponentInspector::operator() < PhysicsMaterial > (entt::entity entity, entt::registry& registry, int& imguiUniqueID, EngineResources& editorResources)
@@ -42,8 +44,9 @@ namespace god
 				ImGui::InputFloat("StaticFriction", &component.StaticFriction);
 				ImGui::InputFloat("DynamicFriction", &component.DynamicFriction);
 				ImGui::InputFloat("Restitution", &component.Restitution);
-
-				ImGui::Checkbox("Update Material", &component.updatematerial);
+				if(ImGui::SmallButton("Update Material" ) )
+					component.updatematerial=true;
+				
 			
 			});
 	}

@@ -32,12 +32,15 @@ namespace god
 
 		bool ModelNameExists ( std::string const& name );
 		bool TextureNameExists ( std::string const& name );
+		bool SoundNameExists ( std::string const& name );
 
 	private:
 		rapidjson::Document m_document_models;
 		rapidjson::Document m_document_textures;
+		rapidjson::Document m_document_sounds;
 		std::string m_selected_model { "" };
 		std::string m_selected_texture { "" };
+		std::string m_selected_sound { "" };
 		std::string m_to_delete { "" };
 
 		// model editing
@@ -50,6 +53,7 @@ namespace god
 
 		rapidjson::Value& GetModelDocumentValue ( char const* key );
 		rapidjson::Value& GetTextureDocumentValue ( char const* key );
+		rapidjson::Value& GetSoundDocumentValue ( char const* key );
 	};
 }
 
@@ -443,6 +447,181 @@ namespace god
 				ImGui::EndTabItem ();
 			}
 
+			/*! ****************************************************************************************************************
+			 * @brief
+			 * : Manage Sounds
+			*/
+
+			if (ImGui::BeginTabItem("Sounds"))
+			{
+				// display models config in a list view
+				if (ImGui::BeginListBox("##Sounds", { ImGui::GetWindowWidth(), 100.0f }))
+				{
+					if (m_document_sounds.IsObject())
+					{
+						for (auto& sounds : m_document_sounds.GetObject())
+						{
+							if (m_selected_sound.empty() || ImGui::Selectable(sounds.name.GetString(), m_selected_sound == sounds.name.GetString()))
+							{
+								m_selected_sound = sounds.name.GetString();
+							}
+						}
+					}
+					ImGui::EndListBox();
+				}
+
+
+				ImGui::Separator();
+				ImGui::Text("Properties: ");
+				if (m_selected_sound.empty())
+				{
+					ImGui::Text("No asset selected.");
+				}
+				else
+				{
+					ImGui::BeginChild("SoundProperties", { ImGui::GetWindowWidth() - 20, 150 }, true, ImGuiWindowFlags_HorizontalScrollbar);
+					ImGui::Text("Sound Name : %s", m_selected_sound.c_str());
+
+					for (auto& m : m_document_sounds[m_selected_sound.c_str()].GetArray()[0].GetObject())
+					{
+						if (m.value.IsString())
+						{
+							ImGui::Text("%s : %s", m.name.GetString(), m.value.GetString());
+						}
+						else if (m.value.IsNumber())
+						{
+							ImGui::Text("%s : %u", m.name.GetString(), static_cast<unsigned long long>(m.value.GetUint()));
+						}
+					}
+					ImGui::EndChild();
+				}
+
+				float popup_width{ 400.0f };
+				float popup_height{ 400.0f };
+				ImGui::SetNextWindowSize({ popup_width, 400.0f });
+				if (ImGui::BeginPopup("EditSound"))
+				{
+					ImGui::BeginChild("New Properties", { ImGui::GetWindowWidth() - 15.0f, popup_height - 100.0f }, true, ImGuiWindowFlags_HorizontalScrollbar);
+
+					ImGui::Text("New Properties");
+					ImGui::Text("Name:");
+					ImGui::SetNextItemWidth(popup_width - 30.0f);
+
+					bool editable{ true };
+					if (m_edit_name != m_selected_sound && SoundNameExists(m_edit_name))
+					{
+						editable = false;
+						ImGui::PushStyleColor(ImGuiCol_Text, { 1.0f, 0.0f, 0.0f, 1.0f });
+						ImGui::Text("** Name already used!");
+						ImGui::PopStyleColor();
+					}
+
+					ImGui::InputText("##SoundEditName", &m_edit_name);
+
+					ImGui::Text("Current Raw:");
+					ImGui::Text(m_edit_current_raw.c_str());
+
+					if (ImGui::Button("Edit Raw", { popup_width - 30.0f, 0.0f }))
+					{
+						std::string new_src = god::OpenWindowDialog(L"Sound Files", L"*.mp3;*.wav;*.aif;*.ogg");
+						if (!new_src.empty())
+						{
+							m_edit_src = new_src;
+							m_edit_raw = m_edit_src.substr(m_edit_src.find_last_of('\\') + 1, m_edit_src.size());
+							m_edit_new_src = true;
+						}
+					}
+
+					ImGui::Text("New Raw:");
+					if (m_edit_new_src)
+					{
+						ImGui::Text(m_edit_src.c_str());
+					}
+					else
+					{
+						ImGui::Text("- None -");
+					}
+
+					ImGui::EndChild();
+
+					if (ImGui::Button("Apply", { popup_width, 0.0f }) && editable)
+					{
+						if (m_document_sounds.HasMember(m_selected_sound.c_str()))
+						{
+							auto& assets_sound = editorResources.Get<SoundManager>().get();
+
+							// set new name
+							rapidjson::Value::MemberIterator value = m_document_sounds.FindMember(m_selected_sound.c_str());
+							value->name.SetString(m_edit_name.c_str(), m_document_sounds.GetAllocator());
+
+							// update name in loaded resource
+							if (assets_sound.Has(m_selected_sound))
+							{
+								assets_sound.UpdateName(m_selected_sound, m_edit_name, assets_sound.GetID(m_selected_sound));
+							}
+
+							m_selected_sound = m_edit_name;
+
+
+							// if diff source, set new raw and source and rebuild sound
+							if (m_edit_new_src)
+							{
+								GetSoundDocumentValue("Raw").SetString(m_edit_raw.c_str(), m_document_sounds.GetAllocator());
+								GetSoundDocumentValue("Source").SetString(m_edit_src.c_str(), m_document_sounds.GetAllocator());
+
+								if (assets_sound.Has(m_selected_sound))
+								{
+									auto& sound = assets_sound.Get(m_edit_name);
+									assets_sound.SetResource(assets_sound.GetID(m_edit_name), { std::get<0>(sound), Sound(AssetPath::Folder_BuildSounds + m_edit_raw) });
+								}
+							}
+
+							// update last edited date and time
+							GetSoundDocumentValue("Last Edited").SetString(GetDateTimeString().c_str(), m_document_sounds.GetAllocator());
+
+							god::FolderHelper::CopyFileToFolder(m_edit_src, AssetPath::Folder_BuildSounds);
+
+							// update json
+							god::WriteJSON(m_document_sounds, AssetPath::File_SoundsConfig);
+						}
+
+						ImGui::CloseCurrentPopup();
+
+					}
+					ImGui::EndPopup();
+				}
+
+				if (ImGui::Button("Edit", { ImGui::GetWindowWidth(), 0.0f })
+					&& !m_selected_sound.empty())
+				{
+					m_edit_name = m_selected_sound;
+					m_edit_raw = GetSoundDocumentValue("Raw").GetString();
+					m_edit_current_raw = m_edit_raw;
+					m_edit_src = GetSoundDocumentValue("Source").GetString();
+					m_edit_new_src = false;
+					ImGui::OpenPopup("EditSound");
+				}
+
+				if (ImGui::BeginPopup("SoundConfirmDelete"))
+				{
+					ImGui::Text("Delete %s?", m_selected_sound.c_str());
+					if (ImGui::Button("Yes", { 200.0f, 0.0f }))
+					{
+						m_document_sounds.RemoveMember(m_document_sounds.FindMember(m_selected_sound.c_str()));
+						god::WriteJSON(m_document_sounds, AssetPath::File_SoundsConfig);
+						ReloadConfig();
+						m_selected_sound = { "" };
+					}
+					ImGui::EndPopup();
+				}
+
+				if (!m_selected_sound.empty() && ImGui::Button("Delete", { ImGui::GetWindowWidth(), 0.0f }))
+				{
+					ImGui::OpenPopup("SoundConfirmDelete");
+				}
+				ImGui::EndTabItem();
+			}
+
 			ImGui::EndTabBar ();
 		}
 
@@ -473,6 +652,8 @@ namespace god
 		god::ReadJSON ( m_document_models , AssetPath::File_ModelsConfig );
 		m_document_textures.SetObject ();
 		god::ReadJSON ( m_document_textures , AssetPath::File_TexturesConfig );
+		m_document_sounds.SetObject();
+		god::ReadJSON(m_document_sounds, AssetPath::File_SoundsConfig);
 	}
 
 	template<typename EDITOR_RESOURCES>
@@ -494,6 +675,19 @@ namespace god
 		if ( m_document_textures.IsObject () )
 		{
 			if ( m_document_textures.FindMember ( name.c_str () ) != m_document_textures.MemberEnd () )
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline bool EW_AssetManager<EDITOR_RESOURCES>::SoundNameExists(std::string const& name)
+	{
+		if (m_document_sounds.IsObject())
+		{
+			if (m_document_sounds.FindMember(name.c_str()) != m_document_sounds.MemberEnd())
 			{
 				return true;
 			}
@@ -532,6 +726,23 @@ namespace god
 		{
 			RapidJSON::JSONifyToValue ( m_document_textures[ m_selected_texture.c_str () ].GetArray ()[ 0 ] , m_document_textures , key , std::string ( "" ) );
 			return m_document_textures[ m_selected_texture.c_str () ].GetArray ()[ 0 ][ key ];
+		}
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline rapidjson::Value& EW_AssetManager<EDITOR_RESOURCES>::GetSoundDocumentValue(char const* key)
+	{
+		assert((m_document_sounds.IsObject() && !m_selected_sound.empty())
+			&& "EW_AssetManager::GetSoundDocumentValue - INVALID QUERY, m_document_sounds not object or m_selected_sound.empty!");
+
+		if (m_document_sounds[m_selected_sound.c_str()].GetArray()[0].HasMember(key))
+		{
+			return m_document_sounds[m_selected_sound.c_str()].GetArray()[0][key];
+		}
+		else
+		{
+			RapidJSON::JSONifyToValue(m_document_sounds[m_selected_sound.c_str()].GetArray()[0], m_document_sounds, key, std::string(""));
+			return m_document_sounds[m_selected_sound.c_str()].GetArray()[0][key];
 		}
 	}
 }

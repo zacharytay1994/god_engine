@@ -9,7 +9,7 @@ namespace god
 	struct PhysicsShape
 	{
 
-		//eSPHERE,
+		//	eSPHERE,
 		//	ePLANE,
 		//	eCAPSULE,
 		//	eBOX,
@@ -18,19 +18,21 @@ namespace god
 			//Non serialize data
 			physx::PxShape* p_shape;
 			bool updatePhysicsShape;
-
+			bool locktoscale;
 		//Ctor
-		PhysicsShape() : extents{ physx::PxVec3(20.f,20.f,20.f) }, p_shape{ nullptr }, updatePhysicsShape{ true }
+		PhysicsShape() : extents{ physx::PxVec3(20.f,20.f,20.f) }, p_shape{ nullptr }, updatePhysicsShape{ true }, locktoscale{false}
 		{};
 		~PhysicsShape() 
 		{
-			if(p_shape)
-				p_shape->release();
+			//if(p_shape)
+			//	p_shape->release();
 		};
 	};
 	template <>
 	inline void NewLuaType<PhysicsShape>(sol::state& luaState, std::string const& name)
 	{
+		UNREFERENCED_PARAMETER(luaState);
+		UNREFERENCED_PARAMETER(name);
 	}
 	template<>
 	inline void ComponentInspector::operator() < PhysicsShape > (entt::entity entity, entt::registry& registry, int& imguiUniqueID, EngineResources& editorResources)
@@ -43,11 +45,14 @@ namespace god
 				ImGui::Text("PhysicsShape Component");
 				ImGui::Separator();
 
-				ImGui::InputFloat("x_extent", &component.extents.x);
-				ImGui::InputFloat("y_extent", &component.extents.y);
-				ImGui::InputFloat("z_extent", &component.extents.z);
+				ImGui::InputFloat("x extent", &component.extents.x);
+				ImGui::InputFloat("y extent", &component.extents.y);
+				ImGui::InputFloat("z extent", &component.extents.z);
 
-				ImGui::Checkbox("Update Shape", &component.updatePhysicsShape);
+				if(ImGui::SmallButton("Update Shape"))
+					component.updatePhysicsShape=true;
+
+				ImGui::Checkbox("Lock Extents to Scale", &component.locktoscale);
 
 
 			});
@@ -61,6 +66,7 @@ namespace god
 		RapidJSON::JSONifyToValue(value, document, "x extent", component.extents.x);
 		RapidJSON::JSONifyToValue(value, document, "y extent", component.extents.y);
 		RapidJSON::JSONifyToValue(value, document, "z extent", component.extents.z);
+		RapidJSON::JSONifyToValue(value, document, "scale lock", component.locktoscale);
 	}
 
 	template<>
@@ -71,6 +77,7 @@ namespace god
 		AssignIfExist(jsonObj, component.extents.x, "x extent");
 		AssignIfExist(jsonObj, component.extents.y, "y extent");
 		AssignIfExist(jsonObj, component.extents.z, "z extent");
+		AssignIfExist(jsonObj, component.locktoscale, "scale lock");
 	}
 
 	/*

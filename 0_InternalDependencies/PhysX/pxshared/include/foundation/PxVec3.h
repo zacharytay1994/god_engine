@@ -33,7 +33,7 @@
 /** \addtogroup foundation
 @{
 */
-
+#include <glm/glm/vec3.hpp>
 #include "foundation/PxMath.h"
 
 #if !PX_DOXYGEN
@@ -86,6 +86,11 @@ class PxVec3
 	{
 	}
 
+	PX_CUDA_CALLABLE PX_FORCE_INLINE PxVec3(glm::vec3 v) : x(v.x), y(v.y), z(v.z)
+	{
+	}
+
+
 	/**
 	\brief Copy ctor.
 	*/
@@ -105,6 +110,18 @@ class PxVec3
 		z = p.z;
 		return *this;
 	}
+
+	/**
+	\brief Assignment operator
+	*/
+	PX_CUDA_CALLABLE PX_FORCE_INLINE PxVec3& operator=(const glm::vec3& p)
+	{
+		x = p.x;
+		y = p.y;
+		z = p.z;
+		return *this;
+	}
+
 
 	/**
 	\brief element access

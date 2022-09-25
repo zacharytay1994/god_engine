@@ -13,7 +13,7 @@ namespace god
 		"PhysicsShape",
 		"RigidStatic",
 		"RigidDynamic",
-		"AudioSource", 
-		"GridCell"
+		"AudioListener",
+		"AudioSource"
 	};
 }

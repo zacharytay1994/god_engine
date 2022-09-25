@@ -35,6 +35,8 @@
 */
 
 #include "foundation/PxVec3.h"
+
+
 #if !PX_DOXYGEN
 namespace physx
 {
@@ -75,6 +77,9 @@ class PxQuat
 	PX_CUDA_CALLABLE PX_FORCE_INLINE PxQuat(float nx, float ny, float nz, float nw) : x(nx), y(ny), z(nz), w(nw)
 	{
 	}
+
+
+
 
 	/**
 	\brief Creates from angle-axis representation.
@@ -320,6 +325,9 @@ class PxQuat
 		w = p.w;
 		return *this;
 	}
+
+
+
 
 	PX_CUDA_CALLABLE PX_FORCE_INLINE PxQuat& operator*=(const PxQuat& q)
 	{

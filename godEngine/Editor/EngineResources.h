@@ -3,10 +3,12 @@
 #include <godUtility/Structures.h>
 #include <godUtility/Utility.h>
 #include <godUtility/Grid3D.h>
+#include <godUtility/Scene.h>
 #include <godCamera/Camera.h>
 #include "../Window/GLFWWindow.h"
 #include "../OpenGL/OpenGL.h"
 #include "../OpenGL/Internal/OGLTexture.h"
+#include "../Audio/Internal/SoundManager.h"
 #include "../Physics/godPhysics.h"
 
 namespace god
@@ -26,7 +28,9 @@ namespace god
 		Camera ,
 		Asset3DManager ,
 		OGLTextureManager ,
-		PhysicsSystem,
-		EntityGrid
+		EntityGrid ,
+		SoundManager ,
+		PhysicsSystem ,
+		Scene
 	>;
 }
