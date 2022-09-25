@@ -73,9 +73,9 @@ namespace god
 
 		// Calculation for shadow map
 		m_light_space_matrix =
-			glm::ortho( -35.0f, 35.0f, -35.0f, 35.0f, 1.0f, 50.0f ) *
+			glm::ortho( -10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 20.0f ) *
 			glm::lookAt(
-			glm::vec3( 15.0f, 20.0f, -15.0f ),
+			glm::vec3( 10.0f, 10.0f, 10.0f ),
 			glm::vec3( 0.0f, 0.0f, 0.0f ),
 			glm::vec3( 0.0f, 1.0f, 0.0f ) );
 
@@ -204,12 +204,23 @@ namespace god
 			// set view position
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uViewPosition" , camera_position );
 
+			// Set uniform for shadowmap lighting
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
+
 			// set material
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
 			std::get<1> ( textures.Get ( data.first.m_diffuse_id ) ).Bind ( 0 );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.specular_map" , 1 );
 			std::get<1> ( textures.Get ( data.first.m_specular_id ) ).Bind ( 1 );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.shininess" , data.first.m_shininess );
+
+			// Set reflection
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSkybox" , 2 );
+			m_cubemap.Bind ( 2 );
+
+			// Set shadowmap
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uShadowMap" , 3 );
+			m_shadowmap.Bind ( 3 );
 
 			// set light
 			OGLLight light;
@@ -356,28 +367,20 @@ namespace god
 	void OpenGL::FirstPassRenderToDepthmap( Scene const& scene, glm::mat4 const& projection, glm::mat4 const& view, glm::vec3 const& camera_position, OGLTextureManager& textures )
 	{
 		m_shadowmap.EnableDepthMap();
-		for ( auto const& data : scene.m_render_data )
+		for ( auto const& data : scene.m_instanced_render_data )
 		{
-			if ( data.Active() )
+			// Draw the normal model
+			m_depthmap_shader.Use ();
+
+			OGLShader::SetUniform ( m_depthmap_shader.GetShaderID () ,
+				"uLightSpaceMatrix" ,
+				m_light_space_matrix );
+
+			// Draw model
+			for ( auto& mesh : m_models[ data.first.m_model_id ] )
 			{
-				// Draw the normal model
-				m_depthmap_shader.Use();
-
-				// Set uniforms for vertex shader
-				// Set model transform
-				OGLShader::SetUniform( m_depthmap_shader.GetShaderID(),
-									   "uModel",
-									   data.m_model_transform );
-
-				OGLShader::SetUniform( m_depthmap_shader.GetShaderID(),
-									   "uLightSpaceMatrix",
-									   m_light_space_matrix );
-
-				// Draw model
-				for ( auto const& mesh : m_models[data.m_model_id] )
-				{
-					mesh.Draw( GL_TRIANGLES );
-				}
+				mesh.SetTransformData ( data.second );
+				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
 		}
 		m_shadowmap.DisableDepthMap();
