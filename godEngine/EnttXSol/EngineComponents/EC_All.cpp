@@ -14,6 +14,7 @@ namespace god
 		"RigidStatic",
 		"RigidDynamic",
 		"AudioListener",
-		"AudioSource"
+		"AudioSource" ,
+		"PointLight"
 	};
 }

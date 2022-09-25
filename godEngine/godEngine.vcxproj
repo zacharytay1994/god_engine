@@ -130,6 +130,7 @@
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Material.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Shape.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Render\EC_PointLight.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_All.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />

@@ -14,4 +14,6 @@ namespace god
 		glm::mat4 const& perspectiveMatrix , glm::mat4 const& viewMatrix );
 
 	GODUTILITY_API bool IntersectLineSegmentPlane ( glm::vec3 const& a , glm::vec3 const& b , glm::vec3 const& n , float d , glm::vec3& p );
+
+	GODUTILITY_API float LengthSq ( glm::vec3 const& v );
 }

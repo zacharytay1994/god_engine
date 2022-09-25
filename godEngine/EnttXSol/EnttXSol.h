@@ -404,6 +404,7 @@ namespace god
 	template<typename S , typename T , typename R>
 	inline void EnttXSol::PopulateScene ( S& scene )
 	{
+		// add objects to scene
 		scene.ClearInstancedScene ();
 		for ( uint32_t i = 0; i < m_entities.Size (); ++i )
 		{
@@ -411,6 +412,14 @@ namespace god
 			{
 				RecursivePopulateScene<S , T , R> ( scene , i );
 			}
+		}
+
+		// add point light to scene
+		scene.m_point_light_data.clear ();
+		for ( auto&& [entity , transform , pointlight] : GetView<Transform , PointLight> ().each () )
+		{
+			scene.AddPointLight ( { glm::vec3 ( transform.m_parent_transform * glm::vec4 ( transform.m_position, 1.0f ) ),
+				pointlight.m_colour, pointlight.m_ambient, pointlight.m_diffuse, pointlight.m_specular } );
 		}
 	}
 

@@ -24,10 +24,25 @@ namespace god
 			float		m_shininess { 0.0f };
 		};
 
+		struct PointLightData
+		{
+			glm::vec3 m_position;
+			glm::vec3 m_colour;
+			glm::vec3 m_ambient;
+			glm::vec3 m_diffuse;
+			glm::vec3 m_specular;
+
+			GODUTILITY_API PointLightData& operator=( PointLightData const& rhs );
+		};
+
 		std::unordered_map<InstancedRenderData , std::vector<glm::mat4> , InstancedRenderData> m_instanced_render_data;
+		std::vector<PointLightData> m_point_light_data;
+
 
 		GODUTILITY_API		Scene ();
 		GODUTILITY_API void	AddInstancedObject ( InstancedRenderData const& data , glm::mat4 const& transform );
 		GODUTILITY_API void	ClearInstancedScene ();
+
+		GODUTILITY_API void AddPointLight ( PointLightData const& pld );
 	};
 }

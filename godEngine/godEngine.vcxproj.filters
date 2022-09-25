@@ -31,6 +31,10 @@
     <ClCompile Include="Window\GLFWWindow.cpp" />
     <ClCompile Include="Window\SystemTimer.cpp" />
     <ClCompile Include="EnttXSol\LuaFunctionDefinitions.cpp" />
+    <ClCompile Include="Audio\Internal\SoundManager.cpp" />
+    <ClCompile Include="OpenGL\Advance\CubeMap.cpp" />
+    <ClCompile Include="OpenGL\Advance\ShadowMap.cpp" />
+    <ClCompile Include="OpenGL\Internal\OGLDebug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioAPI.h" />
@@ -96,6 +100,11 @@
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
     <ClInclude Include="EnttXSol\LuaFunctionDefinitions.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_ScenePopulate.h" />
+    <ClInclude Include="Audio\Internal\SoundManager.h" />
+    <ClInclude Include="OpenGL\Advance\CubeMap.h" />
+    <ClInclude Include="OpenGL\Advance\ShadowMap.h" />
+    <ClInclude Include="OpenGL\Internal\OGLDebug.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Render\EC_PointLight.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -245,12 +254,6 @@
     <ClInclude Include="Physics\godPhysics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGL\Advance\CubeMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\Advance\ShadowMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EnttXSol\EngineComponents\EC_GridCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -258,9 +261,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EnttXSol\EngineComponents\EC_EntityData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\Internal\OGLDebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -341,15 +341,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="imgui\ImGuizmo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\Advance\CubeMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\Advance\ShadowMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\Internal\OGLDebug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
