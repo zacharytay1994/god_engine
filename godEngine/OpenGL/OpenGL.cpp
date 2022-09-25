@@ -231,11 +231,17 @@ namespace god
 			);
 			for ( auto const& light : scene.m_point_light_data )
 			{
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.position" , light.m_position );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.colour" , light.m_colour );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.ambient" , light.m_ambient );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.diffuse" , light.m_diffuse );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLight.specular" , light.m_specular );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uPointLight.position" , light.m_position );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uPointLight.colour" , light.m_colour );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uPointLight.ambient" , light.m_ambient );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uPointLight.diffuse" , light.m_diffuse );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uPointLight.specular" , light.m_specular );
+
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDirectionalLight.direction" , -light.m_position );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDirectionalLight.colour" , light.m_colour );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDirectionalLight.ambient" , light.m_ambient );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDirectionalLight.diffuse" , light.m_diffuse );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDirectionalLight.specular" , light.m_specular );
 			}
 			// Set point light
 			// OGLLight light;
@@ -248,12 +254,12 @@ namespace god
 			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uPointLight.diffuse", light.m_diffuse);
 			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uPointLight.specular", light.m_specular);
 
-			// // Set directional light
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.direction", light.m_direction);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.colour", light.m_colour);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.ambient", light.m_ambient);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.diffuse", light.m_diffuse);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.specular", light.m_specular);
+			 // Set directional light
+			 /*OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.direction", light.m_direction);
+			 OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.colour", light.m_colour);
+			 OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.ambient", light.m_ambient);
+			 OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.diffuse", light.m_diffuse);
+			 OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.specular", light.m_specular);*/
 
 			// // Set spot light
 			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.direction", camera_front);
