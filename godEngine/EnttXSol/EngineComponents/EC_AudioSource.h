@@ -1,23 +1,20 @@
 #pragma once
 
 #include "EngineComponents.h"
-#include "../../Audio/AudioAPI.h"
 
 namespace god
 {
 	/* ENGINE COMPONENTS */
 	struct AudioSource
 	{
-		// audio clip reference
-		Sound m_sound;
-		std::string m_file;
-
 		// geometry for occlusion
 
-		//int m_channel_group;
+		//int m_channel_group; // to seperate sounds into different categories
 
-		int m_source_id{ -1 };
-		//int m_listener_id{ -1 }; // output
+		bool m_3d_sound{ false };
+
+		int m_sound_id{ -1 };
+		//int m_source_id{ -1 };
 
 		bool m_mute{ false };
 		bool m_loop{ false };
@@ -32,9 +29,8 @@ namespace god
 	inline void NewLuaType<AudioSource>(sol::state& luaState, std::string const& name)
 	{
 		RegisterLuaType<AudioSource>(luaState, name,
-			"file", &AudioSource::m_file,
-			"source_id", &AudioSource::m_source_id,
-			//"listener_id", &AudioSource::m_listener_id,
+			"sound_id", &AudioSource::m_sound_id,
+			//"source_id", &AudioSource::m_source_id,
 			"mute", &AudioSource::m_mute,
 			"loop", &AudioSource::m_loop,
 			"play_on_awake", &AudioSource::m_play_on_awake,
@@ -50,12 +46,38 @@ namespace god
 		RegisterInspector<AudioSource, EngineResources>(entity, registry, imguiUniqueID, editorResources,
 			[](AudioSource& component, EngineResources& resources)
 			{
-				(resources);
+				auto& sounds = resources.Get<SoundManager>();
+				auto& sound_manager = sounds.get();
+
 				ImGui::Separator();
 				ImGui::Text("Audio Source");
 				ImGui::Separator();
 
-				//ImGui::ListBox("Output", &component.m_listener_id, nullptr, 0, 5);
+				if (ImGui::BeginPopup("Sound Select"))
+				{
+					for (auto const& asset : sounds.get().GetIDs())
+					{
+						if (ImGui::Selectable(asset.first.c_str()))
+						{
+							if (component.m_sound_id != -1)
+							{
+								Sound& sound = std::get<1>(sound_manager.Get(component.m_sound_id));
+								if (sound.m_channel)
+									AudioAPI::StopSound(sound);
+							}
+
+							component.m_sound_id = asset.second;
+							ImGui::CloseCurrentPopup();
+						}
+					}
+					ImGui::EndPopup();
+				}
+
+				ImGui::Text(" Audio Clip : ");
+				if (ImGui::Button(sounds.get().GetName(component.m_sound_id).c_str(), { ImGui::GetWindowWidth(),0 }))
+				{
+					ImGui::OpenPopup("Sound Select");
+				}
 
 				ImGui::Checkbox("Mute", &component.m_mute);
 				ImGui::Checkbox("Loop", &component.m_loop);
@@ -73,9 +95,8 @@ namespace god
 	{
 		(engineResources);
 		// serialize
-		RapidJSON::JSONifyToValue(value, document, "file", component.m_file);
-		RapidJSON::JSONifyToValue(value, document, "source_id", component.m_source_id);
-		//RapidJSON::JSONifyToValue(value, document, "listener_id", component.m_listener_id);
+		RapidJSON::JSONifyToValue(value, document, "sound_id", component.m_sound_id);
+		//RapidJSON::JSONifyToValue(value, document, "source_id", component.m_source_id);
 		RapidJSON::JSONifyToValue(value, document, "mute", component.m_mute);
 		RapidJSON::JSONifyToValue(value, document, "loop", component.m_loop);
 		RapidJSON::JSONifyToValue(value, document, "play_on_awake", component.m_play_on_awake);
@@ -90,9 +111,8 @@ namespace god
 	{
 		(engineResources);
 		// deserialize
-		AssignIfExist(jsonObj, component.m_file, "file");
-		AssignIfExist(jsonObj, component.m_source_id, "source_id");
-		//AssignIfExist(jsonObj, component.m_listener_id, "listener_id");
+		AssignIfExist(jsonObj, component.m_sound_id, "sound_id");
+		//AssignIfExist(jsonObj, component.m_source_id, "source_id");
 		AssignIfExist(jsonObj, component.m_mute, "mute");
 		AssignIfExist(jsonObj, component.m_loop, "loop");
 		AssignIfExist(jsonObj, component.m_play_on_awake, "play_on_awake");

@@ -8,6 +8,8 @@
 #include "../Window/GLFWWindow.h"
 #include "../OpenGL/OpenGL.h"
 #include "../OpenGL/Internal/OGLTexture.h"
+#include "../Audio/Internal/SoundManager.h"
+#include "../Physics/godPhysics.h"
 
 namespace god
 {
@@ -27,6 +29,8 @@ namespace god
 		Asset3DManager ,
 		OGLTextureManager ,
 		EntityGrid ,
+		SoundManager ,
+		PhysicsSystem ,
 		Scene
 	>;
 }

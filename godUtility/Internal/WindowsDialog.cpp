@@ -19,7 +19,7 @@ namespace god
 			if ( SUCCEEDED ( hr ) )
 			{
 				COMDLG_FILTERSPEC ComDlgFS[ 1 ] = { {fileType, fileExt} };
-				IFileOpenDialog* p_dialog;
+				IFileOpenDialog* p_dialog{};
 
 				hr = CoCreateInstance ( CLSID_FileOpenDialog , NULL , CLSCTX_ALL ,
 					IID_IFileOpenDialog , reinterpret_cast< void** >( &p_dialog ) );
@@ -83,7 +83,7 @@ namespace god
 			if ( SUCCEEDED ( hr ) )
 			{
 				COMDLG_FILTERSPEC ComDlgFS[ 1 ] = { {fileType, fileExt} };
-				IFileOpenDialog* p_dialog;
+				IFileOpenDialog* p_dialog{};
 
 				hr = CoCreateInstance ( CLSID_FileOpenDialog , NULL , CLSCTX_ALL ,
 					IID_IFileOpenDialog , reinterpret_cast< void** >( &p_dialog ) );

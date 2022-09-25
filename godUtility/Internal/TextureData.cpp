@@ -9,9 +9,9 @@
 
 namespace god
 {
-	TextureData::TextureData ( std::string const& texturePath )
+	TextureData::TextureData ( std::string const& texturePath , bool setFlip)
 	{
-		stbi_set_flip_vertically_on_load ( true );
+		stbi_set_flip_vertically_on_load ( setFlip );
 		m_data = stbi_load ( texturePath.c_str () , &m_width , &m_height , &m_channels , 0 );
 	}
 
