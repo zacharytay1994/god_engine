@@ -73,6 +73,9 @@ namespace god
 		OGLShader m_cubemap_shader;
 		OGLShader m_depthmap_shader;
 
+		int m_max_point_lights { 5 };
+		int m_max_directional_lights { 5 };
+
 		// models - vector of vector of OGLMesh because 1 model can consist of more than 1 mesh
 		std::vector<std::vector<OGLMesh>> m_models;
 		std::unordered_map<std::string, OGLModelID> m_model_ids;
