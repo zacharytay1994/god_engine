@@ -118,6 +118,8 @@
     <ClInclude Include="OpenGL\Advance\ShadowMap.h" />
     <ClInclude Include="OpenGL\Internal\OGLDebug.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_PointLight.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_Physics.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Render\EC_DirectionalLight.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

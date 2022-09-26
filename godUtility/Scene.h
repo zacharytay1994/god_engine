@@ -35,8 +35,20 @@ namespace god
 			GODUTILITY_API PointLightData& operator=( PointLightData const& rhs );
 		};
 
+		struct DirectionalLightData
+		{
+			glm::vec3 m_position;
+			glm::vec3 m_colour;
+			glm::vec3 m_ambient;
+			glm::vec3 m_diffuse;
+			glm::vec3 m_specular;
+
+			GODUTILITY_API DirectionalLightData& operator=( DirectionalLightData const& rhs );
+		};
+
 		std::unordered_map<InstancedRenderData , std::vector<glm::mat4> , InstancedRenderData> m_instanced_render_data;
 		std::vector<PointLightData> m_point_light_data;
+		std::vector<DirectionalLightData> m_directional_light_data;
 
 
 		GODUTILITY_API		Scene ();
@@ -44,5 +56,6 @@ namespace god
 		GODUTILITY_API void	ClearInstancedScene ();
 
 		GODUTILITY_API void AddPointLight ( PointLightData const& pld );
+		GODUTILITY_API void AddDirectionalLight ( DirectionalLightData  const& dld );
 	};
 }

@@ -20,77 +20,77 @@ namespace god
 {
 	OpenGL::Lines OpenGL::m_lines {};
 
-	OpenGL::OpenGL(HWND windowHandle, int width, int height)
-		: m_screen_width{width},
-		  m_screen_height{height},
-		  m_window_device_context{GetDC(windowHandle)}
+	OpenGL::OpenGL ( HWND windowHandle , int width , int height )
+		: m_screen_width { width } ,
+		m_screen_height { height } ,
+		m_window_device_context { GetDC ( windowHandle ) }
 	{
 		// Load opengl functions with glad
-		if (!gladLoadGL())
+		if ( !gladLoadGL () )
 		{
 			std::cerr << "Failed to initialize GLAD" << std::endl;
 			return;
 		}
 
-		ResizeViewport(width, height);
+		ResizeViewport ( width , height );
 
 		// OpenGl debug features
 		int flags;
 		// Features of contexts can be detected via context flags
-		glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+		glGetIntegerv ( GL_CONTEXT_FLAGS , &flags );
 		// Check if the context is a debug context
-		if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+		if ( flags & GL_CONTEXT_FLAG_DEBUG_BIT )
 		{
 			OGLDebug::EnableOpenGLDebugging ();
 			std::cout << "Debug Mode" << std::endl;
 		}
 
 		// Create flat shader
-		m_flat_shader.InitializeFromFile(
-			"Assets/EngineAssets/OpenGLShaders/flatcolour.vs",
-			"Assets/EngineAssets/OpenGLShaders/flatcolour.fs");
+		m_flat_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/flatcolour.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/flatcolour.fs" );
 
 		// Create textured shader
-		m_textured_shader.InitializeFromFile(
-			"Assets/EngineAssets/OpenGLShaders/texturemaps.vs",
-			"Assets/EngineAssets/OpenGLShaders/texturemaps.fs");
+		m_textured_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/texturemaps.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/texturemaps.fs" );
 
-		m_single_colour_outline_shader.InitializeFromFile(
-			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.vs",
-			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.fs");
+		m_single_colour_outline_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.fs" );
 
 		// Create cubemap shader
-		m_cubemap_shader.InitializeFromFile(
-			"Assets/EngineAssets/OpenGLShaders/skybox.vs",
-			"Assets/EngineAssets/OpenGLShaders/skybox.fs");
+		m_cubemap_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/skybox.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/skybox.fs" );
 
 		// Create depthmap shader
-		m_depthmap_shader.InitializeFromFile(
-			"Assets/EngineAssets/OpenGLShaders/depthmap.vs",
-			"Assets/EngineAssets/OpenGLShaders/depthmap.fs");
+		m_depthmap_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/depthmap.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/depthmap.fs" );
 
 		// Calculation for shadow map
 		m_light_space_matrix =
-			glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 20.0f) *
-			glm::lookAt(
-				glm::vec3(10.0f, 10.0f, 10.0f),
-				glm::vec3(0.0f, 0.0f, 0.0f),
-				glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::ortho ( -10.0f , 10.0f , -10.0f , 10.0f , 1.0f , 20.0f ) *
+			glm::lookAt (
+				glm::vec3 ( 10.0f , 10.0f , 10.0f ) ,
+				glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
+				glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
 
 		// opengl settings
 		// glEnable( GL_CULL_FACE );
 		// Enables the Depth Buffer
-		glEnable(GL_DEPTH_TEST);
+		glEnable ( GL_DEPTH_TEST );
 		// Enables the Stencil Buffer
-		glEnable(GL_STENCIL_TEST);
+		glEnable ( GL_STENCIL_TEST );
 		// Sets rules for outcomes of stecil tests
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilOp ( GL_KEEP , GL_KEEP , GL_REPLACE );
 
 		// glEnable ( GL_DEPTH_TEST );
-		SetLineWidth(m_default_line_size);
+		SetLineWidth ( m_default_line_size );
 
 		// Temp line rendering code
-		constexpr int MAX_POINTS{1000};
+		constexpr int MAX_POINTS { 1000 };
 		char const line_vs[] = {
 			"#version 430 core\n"
 			"layout ( location = 0 ) in vec3 aPos;\n"
@@ -102,7 +102,7 @@ namespace god
 			"{\n"
 			"gl_Position = uProjection * uView * vec4(aPos, 1.0);\n"
 			"vColour = aColour;\n"
-			"}\n"};
+			"}\n" };
 
 		char const line_fs[] = {
 			"#version 430 core\n"
@@ -111,29 +111,29 @@ namespace god
 			"void main ()\n"
 			"{\n"
 			"fFragColor = vColour;\n"
-			"}\n"};
+			"}\n" };
 
-		m_line_shader.InitializeFromCode(line_vs, line_fs);
-		m_lines_mesh.m_vertices.resize(MAX_POINTS);
-		m_lines_mesh.m_indices.resize(MAX_POINTS);
-		m_lines_mesh.Initialize();
+		m_line_shader.InitializeFromCode ( line_vs , line_fs );
+		m_lines_mesh.m_vertices.resize ( MAX_POINTS );
+		m_lines_mesh.m_indices.resize ( MAX_POINTS );
+		m_lines_mesh.Initialize ();
 
 		// Creating cube map
 		m_cubemap.Initialize ();
 		std::string skybox_model_path = "Assets/GameAssets/2DAssets/Raw/Skybox/";
 		// All the faces of the cubemap (make sure they are in this exact order)
-		std::string facesCubemap[6] =
-			{
-				skybox_model_path + "right.jpg",
-				skybox_model_path + "left.jpg",
-				skybox_model_path + "top.jpg",
-				skybox_model_path + "bottom.jpg",
-				skybox_model_path + "front.jpg",
-				skybox_model_path + "back.jpg"};
-		m_cubemap.CubeTexture(facesCubemap);
+		std::string facesCubemap[ 6 ] =
+		{
+			skybox_model_path + "right.jpg",
+			skybox_model_path + "left.jpg",
+			skybox_model_path + "top.jpg",
+			skybox_model_path + "bottom.jpg",
+			skybox_model_path + "front.jpg",
+			skybox_model_path + "back.jpg" };
+		m_cubemap.CubeTexture ( facesCubemap );
 
 		// Creating shadow map
-		m_shadowmap.Initialize(2048, 2048);
+		m_shadowmap.Initialize ( 2048 , 2048 );
 
 		glCheckError ();
 		std::cout << "OpenGL constructed." << std::endl;
@@ -146,242 +146,256 @@ namespace god
 
 	void OpenGL::ClearColour () const
 	{
-		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glClearColor ( 0.2f , 0.2f , 0.2f , 1.0f );
+		glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 	}
 
-	void OpenGL::BuildOGLModels(Asset3DManager const &asset3DManager)
+	void OpenGL::BuildOGLModels ( Asset3DManager const& asset3DManager )
 	{
 		// Clear current mesh list
 		m_models.clear ();
 
 		// Copy meshes
-		for (auto const &asset : asset3DManager.GetResources())
+		for ( auto const& asset : asset3DManager.GetResources () )
 		{
-			m_models.emplace_back();
-			BuildOGLMeshesFromAssimpMeshes(m_models.back(), std::get<1>(asset).m_model.m_meshes);
+			m_models.emplace_back ();
+			BuildOGLMeshesFromAssimpMeshes ( m_models.back () , std::get<1> ( asset ).m_model.m_meshes );
 		}
 
 		// Copy mesh ids
 		m_model_ids = asset3DManager.GetIDs ();
 	}
 
-	void OpenGL::UpdateOGLModel(ResourceID id, Asset3DManager const &asset3DManager)
+	void OpenGL::UpdateOGLModel ( ResourceID id , Asset3DManager const& asset3DManager )
 	{
-		m_models[id].clear();
-		BuildOGLMeshesFromAssimpMeshes(m_models[id], std::get<1>(asset3DManager.Get(id)).m_model.m_meshes);
+		m_models[ id ].clear ();
+		BuildOGLMeshesFromAssimpMeshes ( m_models[ id ] , std::get<1> ( asset3DManager.Get ( id ) ).m_model.m_meshes );
 		// Copy mesh ids
 		m_model_ids = asset3DManager.GetIDs ();
 	}
 
-	void OpenGL::RenderScene (Scene& scene,
-						   glm::mat4 const& projection, 
-						   glm::mat4 const& view, 
-						   glm::vec3 const& camera_position,
-						   OGLTextureManager& textures ,
-						   glm::vec3 const& camera_front )
+	void OpenGL::RenderScene ( Scene& scene ,
+		glm::mat4 const& projection ,
+		glm::mat4 const& view ,
+		glm::vec3 const& camera_position ,
+		OGLTextureManager& textures ,
+		glm::vec3 const& camera_front )
 	{
 		glViewport ( 0 , 0 , m_screen_width , m_screen_height );
 		ClearColour ();
 
-		for (auto const &data : scene.m_instanced_render_data)
+		for ( auto const& data : scene.m_instanced_render_data )
 		{
 			// Make it so the stencil test always passes
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);
+			glStencilFunc ( GL_ALWAYS , 1 , 0xFF );
 			// Enable modifying of the stencil buffer
-			glStencilMask(0xFF);
+			glStencilMask ( 0xFF );
 
 			// Draw the normal model
-			m_textured_shader.Use();
+			m_textured_shader.Use ();
 
 			// projection matrix
-			OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uProjection", projection);
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uProjection" , projection );
 
 			// view matrix
-			OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uView", view);
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , view );
 
 			// set uniforms for fragment shader
 			// set view position
-			OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uViewPosition", camera_position);
-
-			// Set uniform for shadowmap lighting
-			OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uLightSpaceMatrix", m_light_space_matrix);
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uViewPosition" , camera_position );
 
 			// set material
-			OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uMaterial.diffuse_map", 0);
-			std::get<1>(textures.Get(data.first.m_diffuse_id)).Bind(0);
-			OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uMaterial.specular_map", 1);
-			std::get<1>(textures.Get(data.first.m_specular_id)).Bind(1);
-			OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uMaterial.shininess", data.first.m_shininess);
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			std::get<1> ( textures.Get ( data.first.m_diffuse_id ) ).Bind ( 0 );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.specular_map" , 1 );
+			std::get<1> ( textures.Get ( data.first.m_specular_id ) ).Bind ( 1 );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.shininess" , data.first.m_shininess );
 
 			// Set reflection
-			OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSkybox", 2);
-			m_cubemap.Bind(2);
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSkybox" , 2 );
+			m_cubemap.Bind ( 2 );
 
 			// Set shadowmap
-			OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uShadowMap", 3);
-			m_shadowmap.Bind(3);
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uShadowMap" , 3 );
+			m_shadowmap.Bind ( 3 );
 
-			// sort light by distance to camera
+			// render point lights
 			std::sort ( scene.m_point_light_data.begin () , scene.m_point_light_data.end () ,
 				[&camera_position]( Scene::PointLightData const& pld1 , Scene::PointLightData const& pld2 )
 				{
-					return LengthSq ( pld1.m_position - camera_position) < LengthSq ( pld2.m_position - camera_position );
+					return LengthSq ( pld1.m_position - camera_position ) < LengthSq ( pld2.m_position - camera_position );
 				}
 			);
-			for ( auto const& light : scene.m_point_light_data )
+			int num_point_light = scene.m_point_light_data.size () > 5 ? 5 : scene.m_point_light_data.size ();
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uNumPointLight" , num_point_light );
+			for ( auto i = 0; i < num_point_light; ++i )
 			{
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uPointLight.position" , light.m_position );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uPointLight.colour" , light.m_colour );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uPointLight.ambient" , light.m_ambient );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uPointLight.diffuse" , light.m_diffuse );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uPointLight.specular" , light.m_specular );
+				auto const& light = scene.m_point_light_data[ i ];
 
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDirectionalLight.direction" , -light.m_position );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDirectionalLight.colour" , light.m_colour );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDirectionalLight.ambient" , light.m_ambient );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDirectionalLight.diffuse" , light.m_diffuse );
-				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDirectionalLight.specular" , light.m_specular );
+				// max 5 point lights as defined in the shader
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].position" ).c_str () , light.m_position );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].colour" ).c_str () , light.m_colour );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].ambient" ).c_str () , light.m_ambient );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].diffuse" ).c_str () , light.m_diffuse );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].specular" ).c_str () , light.m_specular );
+
 			}
-			// Set point light
-			// OGLLight light;
-			// light.m_position = {1.5f, 7.0f, 1.5f};
-			// light.m_ambient = {0.5f, 0.5f, 0.5f};
 
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uPointLight.position", light.m_position);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uPointLight.colour", light.m_colour);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uPointLight.ambient", light.m_ambient);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uPointLight.diffuse", light.m_diffuse);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uPointLight.specular", light.m_specular);
+			// render directional lights
+			std::sort ( scene.m_directional_light_data.begin () , scene.m_directional_light_data.end () ,
+				[&camera_position]( Scene::DirectionalLightData const& dld1 , Scene::DirectionalLightData const& dld2 )
+				{
+					return LengthSq ( dld1.m_position - camera_position ) < LengthSq ( dld2.m_position - camera_position );
+				}
+			);
+			int num_directional_light = scene.m_directional_light_data.size () > 5 ? 5 : scene.m_directional_light_data.size ();
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uNumDirectionalLight" , num_directional_light );
+			for ( auto i = 0; i < num_directional_light; ++i )
+			{
+				auto const& light = scene.m_directional_light_data[ i ];
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].position" ).c_str () , light.m_position );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].direction" ).c_str () , -glm::normalize ( light.m_position ) );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].colour" ).c_str () , light.m_colour );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].ambient" ).c_str () , light.m_ambient );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].diffuse" ).c_str () , light.m_diffuse );
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].specular" ).c_str () , light.m_specular );
 
-			 // Set directional light
-			 /*OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.direction", light.m_direction);
-			 OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.colour", light.m_colour);
-			 OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.ambient", light.m_ambient);
-			 OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.diffuse", light.m_diffuse);
-			 OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uDirectionalLight.specular", light.m_specular);*/
+				m_light_space_matrix =
+					glm::ortho ( -20.0f , 20.0f , -20.0f , 20.0f , 1.0f , 20.0f ) *
+					glm::lookAt (
+						glm::vec3 ( light.m_position ) ,
+						glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
+						glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
 
-			// // Set spot light
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.direction", camera_front);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.position", camera_position);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.ambient", light.m_ambient);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.diffuse", light.m_diffuse);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.specular", light.m_specular);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.cutOff", light.m_cutOff);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.outerCutOff", light.m_outerCutOff);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.constant", light.m_constant);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.linear", light.m_linear);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.quadratic", light.m_quadratic);
-			// OGLShader::SetUniform(m_textured_shader.GetShaderID(), "uSpotLight.viewPos", camera_position);
+				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
+			}
+
+			//// Set point light
+			//OGLLight light;
+			//light.m_position = { 1.5f, 7.0f, 1.5f };
+			//light.m_ambient = { 0.5f, 0.5f, 0.5f };
+
+			//// Set spot light
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.direction" , camera_front );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.position" , camera_position );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.ambient" , light.m_ambient );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.diffuse" , light.m_diffuse );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.specular" , light.m_specular );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.cutOff" , light.m_cutOff );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.outerCutOff" , light.m_outerCutOff );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.constant" , light.m_constant );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.linear" , light.m_linear );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.quadratic" , light.m_quadratic );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.viewPos" , camera_position );
 
 			// draw model
-			for (auto &mesh : m_models[data.first.m_model_id])
+			for ( auto& mesh : m_models[ data.first.m_model_id ] )
 			{
-				mesh.SetTransformData(data.second);
-				mesh.DrawInstanced(GL_TRIANGLES);
+				mesh.SetTransformData ( data.second );
+				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
 
 			// Make it so only the pixels without the value 1 pass the test
-			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+			glStencilFunc ( GL_NOTEQUAL , 1 , 0xFF );
 			// Disable modifying of the stencil buffer
-			glStencilMask(0x00);
+			glStencilMask ( 0x00 );
 			// Disable the depth buffer
-			glDisable(GL_DEPTH_TEST);
+			glDisable ( GL_DEPTH_TEST );
 
-			m_single_colour_outline_shader.Use();
-			OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uProjection", projection);
-			OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uView", view);
-			OGLShader::SetUniform(m_single_colour_outline_shader.GetShaderID(), "uOutlining", 0.01f);
+			m_single_colour_outline_shader.Use ();
+			OGLShader::SetUniform ( m_single_colour_outline_shader.GetShaderID () , "uProjection" , projection );
+			OGLShader::SetUniform ( m_single_colour_outline_shader.GetShaderID () , "uView" , view );
+			OGLShader::SetUniform ( m_single_colour_outline_shader.GetShaderID () , "uOutlining" , 0.01f );
 
-			for (auto &mesh : m_models[data.first.m_model_id])
+			for ( auto& mesh : m_models[ data.first.m_model_id ] )
 			{
-				mesh.SetTransformData(data.second);
-				mesh.DrawInstanced(GL_TRIANGLES);
+				mesh.SetTransformData ( data.second );
+				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
 
 			// Enable modifying of the stencil buffer
-			glStencilMask(0xFF);
+			glStencilMask ( 0xFF );
 			// Clear stencil buffer
-			glStencilFunc(GL_ALWAYS, 0, 0xFF);
+			glStencilFunc ( GL_ALWAYS , 0 , 0xFF );
 			// Enable the depth buffer
-			glEnable(GL_DEPTH_TEST);
+			glEnable ( GL_DEPTH_TEST );
 		}
 
 		// Draw skybox as last
-		m_cubemap.CubeMapEnableDepth();
-		m_cubemap_shader.Use();
-		OGLShader::SetUniform(m_cubemap_shader.GetShaderID(), "view", view);
-		OGLShader::SetUniform(m_cubemap_shader.GetShaderID(), "projection", projection);
-		OGLShader::SetUniform(m_cubemap_shader.GetShaderID(), "camera", camera_position);
-		m_cubemap.Bind();
-		m_cubemap.Draw();
-		m_cubemap.UnBind();
-		m_cubemap.CubeMapDisableDepth();
+		m_cubemap.CubeMapEnableDepth ();
+		m_cubemap_shader.Use ();
+		OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "view" , view );
+		OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "projection" , projection );
+		OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "camera" , camera_position );
+		m_cubemap.Bind ();
+		m_cubemap.Draw ();
+		m_cubemap.UnBind ();
+		m_cubemap.CubeMapDisableDepth ();
 
 		// Unuse the bound shader
 		OGLShader::UnUse ();
 	}
 
-	void OpenGL::ResizeViewport(int width, int height)
+	void OpenGL::ResizeViewport ( int width , int height )
 	{
 		m_screen_width = width;
 		m_screen_height = height;
-		glViewport(0, 0, width, height);
+		glViewport ( 0 , 0 , width , height );
 		std::cout << "OpenGL viewport resized x:" << width << " y: " << height << std::endl;
 	}
 
-	void OpenGL::DrawLine(glm::vec3 const &a, glm::vec3 const &b, glm::vec4 const &c, float size)
+	void OpenGL::DrawLine ( glm::vec3 const& a , glm::vec3 const& b , glm::vec4 const& c , float size )
 	{
-		m_lines[size].push_back({a, b, c, size});
+		m_lines[ size ].push_back ( { a, b, c, size } );
 	}
 
-	void OpenGL::RenderLines(glm::mat4 const &projection, glm::mat4 const &view)
+	void OpenGL::RenderLines ( glm::mat4 const& projection , glm::mat4 const& view )
 	{
 		m_line_shader.Use ();
 
-		m_line_shader.SetUniform(m_line_shader.GetShaderID(), "uProjection", projection);
-		m_line_shader.SetUniform(m_line_shader.GetShaderID(), "uView", view);
+		m_line_shader.SetUniform ( m_line_shader.GetShaderID () , "uProjection" , projection );
+		m_line_shader.SetUniform ( m_line_shader.GetShaderID () , "uView" , view );
 
-		for (auto const &line_group : m_lines)
+		for ( auto const& line_group : m_lines )
 		{
 			m_lines_mesh.m_indices.clear ();
 			m_lines_mesh.m_vertices.clear ();
 
-			for (auto const &line : line_group.second)
+			for ( auto const& line : line_group.second )
 			{
-				OGLMesh::OGLVertex start, end;
-				start.m_position = std::get<0>(line);
-				end.m_position = std::get<1>(line);
-				start.m_colour = std::get<2>(line);
-				end.m_colour = std::get<2>(line);
+				OGLMesh::OGLVertex start , end;
+				start.m_position = std::get<0> ( line );
+				end.m_position = std::get<1> ( line );
+				start.m_colour = std::get<2> ( line );
+				end.m_colour = std::get<2> ( line );
 
-				m_lines_mesh.m_indices.push_back(static_cast<Index3D>(m_lines_mesh.m_vertices.size()));
-				m_lines_mesh.m_vertices.push_back(start);
-				m_lines_mesh.m_indices.push_back(static_cast<Index3D>(m_lines_mesh.m_vertices.size()));
-				m_lines_mesh.m_vertices.push_back(end);
+				m_lines_mesh.m_indices.push_back ( static_cast< Index3D >( m_lines_mesh.m_vertices.size () ) );
+				m_lines_mesh.m_vertices.push_back ( start );
+				m_lines_mesh.m_indices.push_back ( static_cast< Index3D >( m_lines_mesh.m_vertices.size () ) );
+				m_lines_mesh.m_vertices.push_back ( end );
 			}
 
-			m_lines_mesh.SetData();
-			SetLineWidth(line_group.first);
-			m_lines_mesh.Draw(GL_LINES);
+			m_lines_mesh.SetData ();
+			SetLineWidth ( line_group.first );
+			m_lines_mesh.Draw ( GL_LINES );
 		}
 
 		OGLShader::UnUse ();
 		m_lines.clear ();
 	}
 
-	void OpenGL::SetLineWidth(float size)
+	void OpenGL::SetLineWidth ( float size )
 	{
-		glLineWidth(size);
+		glLineWidth ( size );
 	}
 
-	OGLMesh OpenGL::BuildOGLMeshFromAssimpMesh(Mesh3D const &mesh3d) const
+	OGLMesh OpenGL::BuildOGLMeshFromAssimpMesh ( Mesh3D const& mesh3d ) const
 	{
 		OGLMesh mesh;
 
 		// copy vertices
-		mesh.m_vertices.resize(mesh3d.m_vertices.size());
-		for (auto i = 0; i < mesh3d.m_vertices.size(); ++i)
+		mesh.m_vertices.resize ( mesh3d.m_vertices.size () );
+		for ( auto i = 0; i < mesh3d.m_vertices.size (); ++i )
 		{
 			mesh.m_vertices[ i ].m_position = mesh3d.m_vertices[ i ].m_position;
 			mesh.m_vertices[ i ].m_uv = mesh3d.m_vertices[ i ].m_uv;
@@ -398,31 +412,31 @@ namespace god
 		return mesh;
 	}
 
-	void OpenGL::BuildOGLMeshesFromAssimpMeshes(std::vector<OGLMesh> &oglMeshes, std::vector<Mesh3D> const &meshes3D) const
+	void OpenGL::BuildOGLMeshesFromAssimpMeshes ( std::vector<OGLMesh>& oglMeshes , std::vector<Mesh3D> const& meshes3D ) const
 	{
-		for (auto &mesh : meshes3D)
+		for ( auto& mesh : meshes3D )
 		{
-			oglMeshes.emplace_back(BuildOGLMeshFromAssimpMesh(mesh));
+			oglMeshes.emplace_back ( BuildOGLMeshFromAssimpMesh ( mesh ) );
 		}
 	}
 
-	void OpenGL::FirstPassRenderToDepthmap(Scene const &scene, glm::mat4 const &projection, glm::mat4 const &view, glm::vec3 const &camera_position, OGLTextureManager &textures)
+	void OpenGL::FirstPassRenderToDepthmap ( Scene const& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures )
 	{
-		m_shadowmap.EnableDepthMap();
-		for (auto const &data : scene.m_instanced_render_data)
+		m_shadowmap.EnableDepthMap ();
+		for ( auto const& data : scene.m_instanced_render_data )
 		{
 			// Draw the normal model
-			m_depthmap_shader.Use();
+			m_depthmap_shader.Use ();
 
-			OGLShader::SetUniform(m_depthmap_shader.GetShaderID(),
-								  "uLightSpaceMatrix",
-								  m_light_space_matrix);
+			OGLShader::SetUniform ( m_depthmap_shader.GetShaderID () ,
+				"uLightSpaceMatrix" ,
+				m_light_space_matrix );
 
 			// Draw model
-			for (auto &mesh : m_models[data.first.m_model_id])
+			for ( auto& mesh : m_models[ data.first.m_model_id ] )
 			{
-				mesh.SetTransformData(data.second);
-				mesh.DrawInstanced(GL_TRIANGLES);
+				mesh.SetTransformData ( data.second );
+				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
 		}
 		m_shadowmap.DisableDepthMap ();

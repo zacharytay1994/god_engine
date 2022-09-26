@@ -421,6 +421,14 @@ namespace god
 			scene.AddPointLight ( { glm::vec3 ( transform.m_parent_transform * glm::vec4 ( transform.m_position, 1.0f ) ),
 				pointlight.m_colour, pointlight.m_ambient, pointlight.m_diffuse, pointlight.m_specular } );
 		}
+
+		// add directional light to scene
+		scene.m_directional_light_data.clear ();
+		for ( auto&& [entity , transform , directionallight] : GetView<Transform , DirectionalLight> ().each () )
+		{
+			scene.AddDirectionalLight ( { glm::vec3 ( transform.m_parent_transform * glm::vec4 ( transform.m_position, 1.0f ) ),
+				directionallight.m_colour, directionallight.m_ambient, directionallight.m_diffuse, directionallight.m_specular } );
+		}
 	}
 
 	template<typename S , typename T , typename R>

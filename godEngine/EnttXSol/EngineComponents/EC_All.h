@@ -9,6 +9,7 @@
 #include "EC_GridCell.h"
 
 #include "Render/EC_PointLight.h"
+#include "Render/EC_DirectionalLight.h"
 
 #include "Physics/EC_Material.h"
 #include "Physics/EC_Shape.h"
@@ -34,7 +35,8 @@ namespace god
 			RigidDynamic ,
 			AudioListener ,
 			AudioSource ,
-			PointLight
+			PointLight ,
+			DirectionalLight
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};
