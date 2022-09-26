@@ -5,8 +5,6 @@
 #include <fmod.hpp>
 #include <fmod_errors.h>
 
-#define MAX_SOUND_CHANNELS 64
-
 namespace god
 {
 	struct Sound
@@ -28,9 +26,11 @@ namespace god
 		AudioAPI();
 		~AudioAPI();
 
+		void Update();
+
 	public:
-		//static void Create3DReverb(FMOD::Reverb3D** reverb);
-		//static void SetReverbPreset(FMOD::Reverb3D* reverb);
+		static void Create3DReverb(FMOD::Reverb3D** reverb);
+		static void SetReverbPreset(FMOD::Reverb3D* reverb);
 
 		//void CreateChannelGroup();
 

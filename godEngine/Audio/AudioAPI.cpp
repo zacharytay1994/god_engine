@@ -24,7 +24,7 @@ namespace god
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
 
-		m_FMOD_system->init(MAX_SOUND_CHANNELS, FMOD_INIT_NORMAL, NULL);
+		m_FMOD_system->init(FMOD_MAX_CHANNEL_WIDTH, FMOD_INIT_NORMAL, NULL);
 
 		result = m_FMOD_system->getMasterChannelGroup(&m_master_channel_group);
 		if (result != FMOD_OK)
@@ -42,28 +42,33 @@ namespace god
 		m_FMOD_system->release();
 	}
 
-	//void AudioAPI::Create3DReverb(FMOD::Reverb3D** reverb)
-	//{
-	//	FMOD_RESULT result = m_FMOD_system->createReverb3D(reverb);
-	//	if (result != FMOD_OK)
-	//		assert(FMOD_ErrorString(result));
+	void AudioAPI::Update()
+	{
+		m_FMOD_system->update();
+	}
 
-	//	SetReverbPreset(*reverb);
-	//}
+	void AudioAPI::Create3DReverb(FMOD::Reverb3D** reverb)
+	{
+		FMOD_RESULT result = m_FMOD_system->createReverb3D(reverb);
+		if (result != FMOD_OK)
+			assert(FMOD_ErrorString(result));
 
-	//void AudioAPI::SetReverbPreset(FMOD::Reverb3D* reverb)
-	//{
-	//	FMOD_REVERB_PROPERTIES prop = FMOD_PRESET_CAVE;
-	//	reverb->setProperties(&prop);
+		SetReverbPreset(*reverb);
+	}
 
-	//	FMOD_VECTOR pos = { -10.0f, 0.0f, 0.0f };
-	//	float mindist = 10.0f;
-	//	float maxdist = 20.0f;
-	//	reverb->set3DAttributes(&pos, mindist, maxdist);
+	void AudioAPI::SetReverbPreset(FMOD::Reverb3D* reverb)
+	{
+		FMOD_REVERB_PROPERTIES prop = FMOD_PRESET_CONCERTHALL;
+		reverb->setProperties(&prop);
 
-	//	FMOD_VECTOR  listenerpos = { 0.0f, 0.0f, -1.0f };
-	//	m_FMOD_system->set3DListenerAttributes(0, &listenerpos, 0, 0, 0);
-	//}
+		FMOD_VECTOR pos = { -10.0f, 0.0f, 0.0f };
+		float mindist = 15.0f;
+		float maxdist = 20.0f;
+		reverb->set3DAttributes(&pos, mindist, maxdist);
+
+		FMOD_VECTOR  listenerpos = { 0.0f, 0.0f, -1.0f };
+		m_FMOD_system->set3DListenerAttributes(0, &listenerpos, 0, 0, 0);
+	}
 
 
 	void AudioAPI::LoadSound(const char* filePath, FMOD::Sound** sound)
