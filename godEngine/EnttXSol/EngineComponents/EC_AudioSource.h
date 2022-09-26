@@ -7,11 +7,11 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct AudioSource
 	{
-		// geometry for occlusion
-
 		//int m_channel_group; // to seperate sounds into different categories
+		bool m_played{ false };
 
-		bool m_3d_sound{ false };
+		bool m_3d_sound{ false }; // change to float like unity
+		float m_2d_to_3d{ 0.f }; // modifier value?
 
 		int m_sound_id{ -1 };
 		//int m_source_id{ -1 };
@@ -24,6 +24,9 @@ namespace god
 		float m_pitch{ 1.f };
 		//float m_min_distance;
 		//float m_max_distance;
+
+		int m_reverb_preset{ -1 };
+		FMOD::Reverb3D* m_reverb{ nullptr };
 	};
 	template <>
 	inline void NewLuaType<AudioSource>(sol::state& luaState, std::string const& name)
@@ -79,14 +82,74 @@ namespace god
 					ImGui::OpenPopup("Sound Select");
 				}
 
+				if (ImGui::Button("Play Sound"))
+				{
+					if (component.m_sound_id != -1)
+					{
+						Sound& sound = std::get<1>(sound_manager.Get(component.m_sound_id));
+						if (sound.m_channel)
+							AudioAPI::StopSound(sound);
+					}
+
+					component.m_played = false;
+				}
+
 				ImGui::Checkbox("Mute", &component.m_mute);
 				ImGui::Checkbox("Loop", &component.m_loop);
 				ImGui::Checkbox("Play On Awake", &component.m_play_on_awake);
 
-				ImGui::SliderFloat("Volume", &component.m_volume, 0.f, 1.f, "%.1f", 1.f);
-				ImGui::SliderFloat("Pitch", &component.m_pitch, 0.f, 1.5f, "%.1f", 1.f);
+				ImGui::SliderFloat("Volume", &component.m_volume, 0.f, 1.f, "%.01f", 1.f);
+				ImGui::SliderFloat("Pitch", &component.m_pitch, 0.f, 1.5f, "%.01f", 1.f);
 				//ImGui::InputFloat("Min Distance", &component.m_min_distance);
 				//ImGui::InputFloat("Max Distance", &component.m_max_distance);
+
+				//std::vector<std::tuple<int, std::string, FMOD_REVERB_PROPERTIES>> properties =
+				//{
+				//	{1, "Off", FMOD_PRESET_OFF},
+				//	{2, "Generic", FMOD_PRESET_GENERIC},
+				//	{3, "Padded Cell", FMOD_PRESET_PADDEDCELL},
+				//	{4, "Room", FMOD_PRESET_ROOM},
+				//	{5, "Bathroom", FMOD_PRESET_BATHROOM},
+				//	{6, "Living Room", FMOD_PRESET_LIVINGROOM},
+				//	{7, "Stone Room", FMOD_PRESET_STONEROOM},
+				//	{8, "Auditorium", FMOD_PRESET_AUDITORIUM},
+				//	{9, "Concert Hall", FMOD_PRESET_CONCERTHALL},
+				//	{10, "Cave", FMOD_PRESET_CAVE},
+				//	{11, "Arena", FMOD_PRESET_ARENA},
+				//	{12, "Hanger", FMOD_PRESET_HANGAR},
+				//	{13, "Carpetted Hallway", FMOD_PRESET_CARPETTEDHALLWAY},
+				//	{14, "Hallway", FMOD_PRESET_HALLWAY},
+				//	{15, "Stone Corridor", FMOD_PRESET_STONECORRIDOR},
+				//	{16, "Alley", FMOD_PRESET_ALLEY},
+				//	{17, "Forest", FMOD_PRESET_FOREST},
+				//	{18, "City", FMOD_PRESET_CITY},
+				//	{19, "Mountains", FMOD_PRESET_MOUNTAINS},
+				//	{20, "Quarry", FMOD_PRESET_QUARRY},
+				//	{21, "Plain", FMOD_PRESET_PLAIN},
+				//	{22, "Parking Lot", FMOD_PRESET_PARKINGLOT},
+				//	{23, "Sewer Pipe", FMOD_PRESET_SEWERPIPE},
+				//	{24, "Underwater", FMOD_PRESET_UNDERWATER}
+				//};
+
+				//if (ImGui::BeginPopup("Reverb Select"))
+				//{
+				//	for (auto const& prop : properties)
+				//	{
+				//		if (ImGui::Selectable(std::get<1>(prop).c_str()))
+				//		{
+				//			component.m_reverb_preset = std::get<0>(prop);
+
+				//			ImGui::CloseCurrentPopup();
+				//		}
+				//	}
+				//	ImGui::EndPopup();
+				//}
+
+				//ImGui::Text(" Reverb Preset : ");
+				//if (ImGui::Button(sounds.get().GetName(component.m_sound_id).c_str(), { ImGui::GetWindowWidth(),0 }))
+				//{
+				//	ImGui::OpenPopup("Reverb Select");
+				//}
 			});
 	}
 
