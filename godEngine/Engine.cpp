@@ -124,7 +124,7 @@ namespace god
 		editor_windows.AddWindow<god::EW_TilemapEditor>(true, std::ref(enttxsol));
 
 		godPhysicsSystem.Init();
-		godPhysicsSystem.SetupPVD();
+	
 
 		while (!window.WindowShouldClose())
 		{
@@ -154,7 +154,8 @@ namespace god
 			enttxsol.PopulateScene<Scene, Transform, Renderable3D>(scene);
 			SystemTimer::EndTimeSegment("Populating Scene");
 
-			godPhysicsSystem.Update(delta_timer.m_dt);
+			//Physics Simulate update
+			godPhysicsSystem.Update(delta_timer.m_dt , enttxsol.m_pause);
 
 			// render scene
 			SystemTimer::StartTimeSegment("Rendering");
@@ -169,12 +170,17 @@ namespace god
 			// imgui pass
 			first_renderpass.Bind();
 
+			glm::vec3 camera_front = camera.m_look_at;
+			camera_front.y = 0;
+			camera_front = glm::normalize( camera_front );
+
 			opengl.RenderScene(
 				scene,
 				camera.GetPerpectiveProjectionMatrix(),
 				camera.GetCameraViewMatrix(),
 				camera.m_position,
-				ogl_textures);
+				ogl_textures,
+				camera_front);
 
 			opengl.RenderLines(
 				camera.GetPerpectiveProjectionMatrix(),
@@ -186,16 +192,16 @@ namespace god
 			SystemTimer::StartTimeSegment("Editor");
 			ogl_editor.BeginFrame();
 			// pass scene view the renderpass texture
-			editor_windows.GetWindow<EW_SceneView>()->SetRenderpassTexture(first_renderpass.GetTexture());
-			// editor_windows.GetWindow<EW_SceneView>()->SetRenderpassTexture( opengl.m_depthmap );
-			editor_windows.Update(0.02f, engine_resources);
-			ogl_editor.Render();
-			ogl_editor.EndFrame();
-			SystemTimer::EndTimeSegment("Editor");
+			editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( first_renderpass.GetTexture () );
+			editor_windows.Update ( 0.02f , engine_resources );
+			ogl_editor.Render ();
+			ogl_editor.EndFrame ();
+			SystemTimer::EndTimeSegment ( "Editor" );
 
-			SystemTimer::StartTimeSegment("Window Buffer Swap");
-			window.SwapWindowBuffers();
-			SystemTimer::EndTimeSegment("Window Buffer Swap");
+			SystemTimer::StartTimeSegment ( "Window Buffer Swap" );
+			window.SwapWindowBuffers ();
+			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
+
 			// free camera update
 			camera.FreeCamera(0.02f,
 							  true,

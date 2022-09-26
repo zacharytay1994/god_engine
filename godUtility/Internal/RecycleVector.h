@@ -18,7 +18,7 @@ namespace god
 		uint32_t Size ();
 		uint32_t FreeIDSize ();
 
-		ID Push ( T&& value );
+		ID Push ( T const& value );
 		bool Erase ( ID id );
 
 		void Clear ();
@@ -53,7 +53,7 @@ namespace god
 	}
 
 	template<typename T>
-	inline RecycleVector<T>::ID RecycleVector<T>::Push ( T&& value )
+	inline RecycleVector<T>::ID RecycleVector<T>::Push ( T const& value )
 	{
 		// if free ids available
 		if ( m_free_ids.empty () )

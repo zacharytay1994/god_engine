@@ -404,8 +404,7 @@ namespace god
 	template<typename S , typename T , typename R>
 	inline void EnttXSol::PopulateScene ( S& scene )
 	{
-		scene.ClearScene ();
-
+		scene.ClearInstancedScene ();
 		for ( uint32_t i = 0; i < m_entities.Size (); ++i )
 		{
 			if ( m_entities.Valid ( i ) && m_entities[ i ].m_parent_id == Entities::Null )
@@ -433,10 +432,8 @@ namespace god
 			// add to scene
 			if ( renderable.m_model_id != -1 )
 			{
-				auto& object = scene.GetSceneObject ( scene.AddSceneObject ( renderable.m_model_id , model_xform_cat ) );
-				object.m_diffuse_id = renderable.m_diffuse_id;
-				object.m_specular_id = renderable.m_specular_id;
-				object.m_shininess = renderable.m_shininess;
+				scene.AddInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+					renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
 			}
 
 			// populate scene with children

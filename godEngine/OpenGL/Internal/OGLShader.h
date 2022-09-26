@@ -48,10 +48,19 @@ namespace god
 
 	struct OGLLight
 	{
-		glm::vec3 m_position { 0.0f,0.0f,0.0f };
-		glm::vec3 m_colour { 1.0f,1.0f,1.0f };
-		glm::vec3 m_ambient { 0.2f, 0.2f, 0.2f };
-		glm::vec3 m_diffuse { 0.8f, 0.8f, 0.8f };
-		glm::vec3 m_specular { 1.0f, 1.0f, 1.0f };
+		glm::vec3 m_direction	{ 0.0f,-1.0f, 0.0f };
+		glm::vec3 m_position	{ 0.0f, 0.0f, 0.0f };
+
+		glm::vec3 m_colour		{ 1.0f, 1.0f, 1.0f };
+		glm::vec3 m_ambient		{ 0.2f, 0.2f, 0.2f };
+		glm::vec3 m_diffuse		{ 0.8f, 0.8f, 0.8f };
+		glm::vec3 m_specular	{ 1.0f, 1.0f, 1.0f };
+
+		float m_cutOff		{ glm::cos( glm::radians( 12.5f ) ) };
+		float m_outerCutOff	{ glm::cos( glm::radians( 17.5f ) ) };
+
+		float m_constant	{ 1.0f };
+		float m_linear		{ 0.09f };
+		float m_quadratic	{ 0.032f };
 	};
 }

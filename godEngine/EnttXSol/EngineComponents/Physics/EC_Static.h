@@ -25,7 +25,7 @@ namespace god
 			if (mScene)
 			{
 				mScene->removeActor(*p_RigidStatic);
-				p_RigidStatic->release();
+				//p_RigidStatic->release();
 			}
 
 		};
@@ -33,6 +33,8 @@ namespace god
 	template <>
 	inline void NewLuaType<RigidStatic>(sol::state& luaState, std::string const& name)
 	{
+		UNREFERENCED_PARAMETER(luaState);
+		UNREFERENCED_PARAMETER(name);
 	}
 	template<>
 	inline void ComponentInspector::operator() < RigidStatic > (entt::entity entity, entt::registry& registry, int& imguiUniqueID, EngineResources& editorResources)

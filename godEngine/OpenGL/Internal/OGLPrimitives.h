@@ -27,15 +27,22 @@ namespace god
 
 		using OGLVertices = std::vector<OGLVertex>;
 		using OGLIndices = std::vector<ruint>;
+		using OGLTransforms = std::vector<glm::mat4>;
 
 		OGLVertices		m_vertices;
 		OGLIndices		m_indices;
+		OGLTransforms	m_transforms;
+		uint32_t		m_transform_size { 0 };
 
 		void Initialize ();
 		void SetData ();
 		void Draw ( OGLEnum format ) const;
 
+		void SetTransformData ( std::vector<glm::mat4>const& transforms );
+		void DrawInstanced ( OGLEnum format ) const;
+
 	private:
 		unsigned int m_vao { OGLUNINITIALIZED } , m_vbo { OGLUNINITIALIZED } , m_ebo { OGLUNINITIALIZED };
+		unsigned int m_instanced_vbo { OGLUNINITIALIZED };
 	};
 }
