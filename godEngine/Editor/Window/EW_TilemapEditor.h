@@ -259,10 +259,10 @@ namespace god
 					GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( m_preview_id );
 					if ( grid_cell )
 					{
-						grid_cell->m_cell_x = m_cell_x;
+						/*grid_cell->m_cell_x = m_cell_x;
 						grid_cell->m_cell_y = m_cell_y;
 						grid_cell->m_cell_z = m_cell_z;
-						grid_cell->m_cell_size = m_cell_size;
+						grid_cell->m_cell_size = m_cell_size;*/
 					}
 				}
 			}

@@ -88,6 +88,7 @@ namespace god
 		);
 
 		Entities::ID CreateEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );
+		Entities::ID GetEntity ( std::string const& name );
 		void RemoveEntity ( Entities::ID entity );
 		void RemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity );
 

@@ -322,6 +322,19 @@ namespace god
 		return new_entity;
 	}
 
+	EnttXSol::Entities::ID EnttXSol::GetEntity ( std::string const& name )
+	{
+		// potential area for optimization looking for entity of name
+		for ( uint32_t i = 0; i < m_entities.Size (); ++i )
+		{
+			if ( m_entities[ i ].m_name == name )
+			{
+				return  i;
+			}
+		}
+		return Entities::Null;
+	}
+
 	void EnttXSol::RemoveEntity ( Entities::ID entity )
 	{
 		// detach parent if any from this entity

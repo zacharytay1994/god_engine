@@ -5,24 +5,22 @@
 #include "ES_Audio.h"
 #include "ES_Grid.h"
 
-
-
 #include "Physics/ES_Dynamic.h"
 #include "Physics/ES_Shape.h"
 #include "Physics/ES_Static.h"
+
+#include "Grid/ES_GridManipulate.h"
 
 namespace god
 {
 	// runs in the middle of a frame
 	void EngineSystems ( EnttXSol& enttxsol , EngineResources& engineResources , bool isPause )
 	{
-		
 		if ( !isPause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystem );
 			enttxsol.RunEngineSystem ( engineResources , AudioSystem );
-
-
+			enttxsol.RunEngineSystem ( engineResources , GridManipulateSystem );
 		}
 		
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
@@ -30,9 +28,6 @@ namespace god
 		enttxsol.RunEngineSystem(engineResources, ShapeUpdate);
 		enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
 		enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);
-		//
-
-
 	}
 
 	// runs at the start of a frame, i.e. runs before EngineSystems()
@@ -46,8 +41,6 @@ namespace god
 		}
 		enttxsol.RunEngineSystem(engineResources, RigidStaticFrameBegin);
 		enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameBegin);
-			
-
 	}
 
 	// runs at the end of a frame, i.e. runs after EngineSystems()
@@ -68,6 +61,7 @@ namespace god
 	void EngineSystemsInit ( EnttXSol& enttxsol , EngineResources& engineResources )
 	{
 		enttxsol.RunEngineSystem ( engineResources , ExampleSystemInit );
+		enttxsol.RunEngineSystem ( engineResources , GridManipulateInit );
 	}
 
 	// runs at the end before unloading the scene 

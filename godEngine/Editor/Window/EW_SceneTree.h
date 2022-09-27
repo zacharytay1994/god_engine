@@ -480,6 +480,10 @@ namespace god
 				auto last_dash = scene_path.find_last_of ( '/' );
 				auto last_dot = scene_path.find_last_of ( '.' );
 				std::string name = scene_path.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
+				// reset grid
+				EntityGrid& grid = engineResources.Get<EntityGrid> ().get (); // clear tilemap grid
+				grid = EntityGrid ();
+				// reload scene
 				m_enttxsol.DeserializeStateV2 ( engineResources , name );
 			}
 		}

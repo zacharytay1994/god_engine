@@ -64,4 +64,9 @@ namespace god
 	{
 		std::filesystem::remove ( filePath );
 	}
+
+	bool FileExists ( std::string const& folder , std::string const& file )
+	{
+		return std::filesystem::exists ( folder + file );
+	}
 }

@@ -16,6 +16,7 @@ namespace god
 		"AudioListener",
 		"AudioSource" ,
 		"PointLight" ,
-		"DirectionalLight"
+		"DirectionalLight" ,
+		"GridManipulate"
 	};
 }
