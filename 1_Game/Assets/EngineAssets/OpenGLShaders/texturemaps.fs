@@ -205,5 +205,6 @@ void main()
     // }
     
     // concatenate all point lights
-    fFragColor = vec4(PointLight() + DirectLight() + SpotLight() , 1.0);
+    fFragColor = vec4(PointLight() , 1.0);
+    //fFragColor = vec4(PointLight() + DirectLight() + SpotLight() , 1.0);
 }
