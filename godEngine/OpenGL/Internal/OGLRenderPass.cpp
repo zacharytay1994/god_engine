@@ -8,7 +8,8 @@
 
 namespace god
 {
-	OGLRenderPass::OGLRenderPass ( unsigned int width , unsigned int height )
+	OGLRenderPass::OGLRenderPass ( unsigned int width , unsigned int height,
+								   GLenum internalformat, GLenum format, GLenum type )
 	{
 		// create framebuffer object
 		glGenFramebuffers ( 1 , &m_framebuffer );
@@ -17,7 +18,7 @@ namespace god
 		// create texture
 		glGenTextures ( 1 , &m_texture_colour_buffer );
 		glBindTexture ( GL_TEXTURE_2D , m_texture_colour_buffer );
-		glTexImage2D ( GL_TEXTURE_2D , 0 , GL_RGB , width , height , 0 , GL_RGB , GL_UNSIGNED_BYTE , NULL );
+		glTexImage2D ( GL_TEXTURE_2D , 0 , internalformat, width , height , 0 , format, type, NULL );
 		glTexParameteri ( GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR );
 		glTexParameteri ( GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_LINEAR );
 		glBindTexture ( GL_TEXTURE_2D , 0 );
@@ -60,7 +61,7 @@ namespace god
 		glBindFramebuffer ( GL_FRAMEBUFFER , 0 );
 	}
 
-	unsigned int OGLRenderPass::GetTexture ()
+	unsigned int OGLRenderPass::GetTexture () const
 	{
 		return m_texture_colour_buffer;
 	}

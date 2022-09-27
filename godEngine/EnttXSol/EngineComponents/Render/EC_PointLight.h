@@ -36,10 +36,10 @@ namespace god
 				ImGui::Text ( "Point Light" );
 				ImGui::Separator ();
 
-				ImGui::DragFloat3 ( "Colour" , glm::value_ptr ( component.m_colour ) , 0.01f , 0.0f , 1.0f );
-				ImGui::DragFloat3 ( "Ambient" , glm::value_ptr ( component.m_ambient ) , 0.01f , 0.0f , 1.0f );
-				ImGui::DragFloat3 ( "Diffuse" , glm::value_ptr ( component.m_diffuse ) , 0.01f , 0.0f , 1.0f );
-				ImGui::DragFloat3 ( "Specular" , glm::value_ptr ( component.m_specular ) , 0.01f , 0.0f , 1.0f );
+				ImGui::DragFloat3 ( "Colour" , glm::value_ptr ( component.m_colour ) , 1.0f , 0.0f , 100.0f );
+				ImGui::DragFloat3 ( "Ambient" , glm::value_ptr ( component.m_ambient ) , 1.0f, 0.0f , 100.0f );
+				ImGui::DragFloat3 ( "Diffuse" , glm::value_ptr ( component.m_diffuse ) , 1.0f, 0.0f , 100.0f );
+				ImGui::DragFloat3 ( "Specular" , glm::value_ptr ( component.m_specular ) , 1.0f, 0.0f , 100.0f );
 			} );
 	}
 

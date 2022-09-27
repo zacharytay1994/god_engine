@@ -89,6 +89,8 @@ struct sFogParameters
 // fog
 uniform sFogParameters uFogParams;
 
+float light_max_distance = 100.0f;
+
 float getFogFactor(sFogParameters params, float fogCoordinate)
 {
 	float result = 0.0;
@@ -150,7 +152,9 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition)
 vec3 PointLight(int i)
 {
     vec3 normal = normalize(vNormal);
-    vec3 light_direction = normalize(uPointLight[i].position - vWorldPos);
+    vec3 light_to_frag = uPointLight[i].position - vWorldPos;
+    float light_distance = min(light_to_frag.x * light_to_frag.x + light_to_frag.y * light_to_frag.y + light_to_frag.z * light_to_frag.z, light_max_distance);
+    vec3 light_direction = normalize(light_to_frag);
     vec3 view_direction = normalize(uViewPosition - vWorldPos);
     vec3 reflect_direction = reflect(-light_direction, normal);
 
@@ -173,7 +177,7 @@ vec3 PointLight(int i)
 
     // calculate shadow
     // float shadow = ShadowCalculation(vFragPosLightSpace);
-    return vec3((ambient + (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
+    return vec3((ambient + ((light_max_distance - light_distance) / light_max_distance) * (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
     // return vec3((ambient + (1.0 - shadow) * (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
 }
 

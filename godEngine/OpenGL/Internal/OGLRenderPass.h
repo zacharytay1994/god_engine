@@ -1,15 +1,18 @@
 #pragma once
 
+#include <glad/glad.h>
+
 namespace god
 {
 	struct OGLRenderPass
 	{
-		OGLRenderPass ( unsigned int width , unsigned int height );
+		OGLRenderPass ( unsigned int width , unsigned int height ,
+						GLenum internalformat = GL_RGB, GLenum format = GL_RGB, GLenum type = GL_UNSIGNED_BYTE );
 
 		void Free ();
 		void Bind ();
 		void UnBind ();
-		unsigned int GetTexture ();
+		unsigned int GetTexture () const;
 		void UpdateWidth ( unsigned int width , unsigned int height );
 
 	private:

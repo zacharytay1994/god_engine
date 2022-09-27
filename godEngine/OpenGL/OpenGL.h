@@ -3,6 +3,7 @@
 #include "Internal/OGLShader.h"
 #include "Internal/OGLPrimitives.h"
 #include "Internal/OGLTexture.h"
+#include "Internal/OGLRenderPass.h"
 
 #include "Advance/CubeMap.h"
 #include "Advance/ShadowMap.h"
@@ -46,6 +47,8 @@ namespace god
 
 		void  ResizeViewport( int width, int height );
 
+		void RenderTonemap( OGLRenderPass const& hdrBuffer );
+
 		// temp line rendering
 		OGLShader m_line_shader;
 		OGLMesh m_lines_mesh;
@@ -72,6 +75,10 @@ namespace god
 		OGLShader m_single_colour_outline_shader;
 		OGLShader m_cubemap_shader;
 		OGLShader m_depthmap_shader;
+		OGLShader m_hdr_shader;
+
+		// hdr
+		OGLMesh m_square_mesh;
 
 		int m_max_point_lights { 5 };
 		int m_max_directional_lights { 5 };

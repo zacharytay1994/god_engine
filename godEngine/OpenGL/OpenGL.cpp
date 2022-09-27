@@ -135,6 +135,25 @@ namespace god
 		// Creating shadow map
 		m_shadowmap.Initialize ( 2048 , 2048 );
 
+		// m_square
+		m_square_mesh.m_vertices = {
+			{{ 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f }},  // top right
+			{{ 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f }},  // bottom right
+			{{-1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f }},  // bottom left
+			{{-1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f }}  // top left 
+		};
+		m_square_mesh.m_indices = {
+			0, 1, 3,   // first triangle
+			1, 2, 3    // second triangle
+		};
+		m_square_mesh.Initialize();
+
+		// load hdr shader
+		m_hdr_shader.InitializeFromFile(
+			"Assets/EngineAssets/OpenGLShaders/tonemap.vs",
+			"Assets/EngineAssets/OpenGLShaders/tonemap.fs" 
+		);
+
 		glCheckError ();
 		std::cout << "OpenGL constructed." << std::endl;
 	}
@@ -302,7 +321,7 @@ namespace god
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.65f,0.85f,0.90f} );
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearStart",  10.0f);
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearEnd", 100.0f );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.15f );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.05f );
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 2 );
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.isEnabled", true );
 
@@ -361,6 +380,19 @@ namespace god
 		m_screen_height = height;
 		glViewport ( 0 , 0 , width , height );
 		std::cout << "OpenGL viewport resized x:" << width << " y: " << height << std::endl;
+	}
+
+	void OpenGL::RenderTonemap( OGLRenderPass const& framebuffer )
+	{
+		m_hdr_shader.Use();
+
+		OGLShader::SetUniform( m_hdr_shader.GetShaderID(), "uHdrBuffer", 0 );
+		glActiveTexture( GL_TEXTURE0 );
+		glBindTexture( GL_TEXTURE_2D, framebuffer.GetTexture() );
+
+		m_square_mesh.Draw( GL_TRIANGLES );
+
+		OGLShader::UnUse();
 	}
 
 	void OpenGL::DrawLine ( glm::vec3 const& a , glm::vec3 const& b , glm::vec4 const& c , float size )
