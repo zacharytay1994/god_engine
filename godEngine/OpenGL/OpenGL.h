@@ -37,7 +37,7 @@ namespace god
 		// assimp bridge
 		void  BuildOGLModels( Asset3DManager const& asset3DManager );
 		void  UpdateOGLModel( ResourceID id, Asset3DManager const& asset3DManager );
-		void  RenderScene( Scene const& scene,
+		void  RenderScene( Scene& scene,
 						   glm::mat4 const& projection, 
 						   glm::mat4 const& view, 
 						   glm::vec3 const& camera_position,
@@ -72,6 +72,9 @@ namespace god
 		OGLShader m_single_colour_outline_shader;
 		OGLShader m_cubemap_shader;
 		OGLShader m_depthmap_shader;
+
+		int m_max_point_lights { 5 };
+		int m_max_directional_lights { 5 };
 
 		// models - vector of vector of OGLMesh because 1 model can consist of more than 1 mesh
 		std::vector<std::vector<OGLMesh>> m_models;

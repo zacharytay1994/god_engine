@@ -8,6 +8,9 @@
 #include "EC_AudioListener.h"
 #include "EC_GridCell.h"
 
+#include "Render/EC_PointLight.h"
+#include "Render/EC_DirectionalLight.h"
+
 #include "Physics/EC_Material.h"
 #include "Physics/EC_Shape.h"
 #include "Physics/EC_Static.h"
@@ -25,13 +28,15 @@ namespace god
 			EntityData ,
 			Transform ,
 			Renderable3D ,
-			GridCell,
-			PhysicsMaterial,
-			PhysicsShape,
-			RigidStatic,
-			RigidDynamic,
+			GridCell ,
+			PhysicsMaterial ,
+			PhysicsShape ,
+			RigidStatic ,
+			RigidDynamic ,
 			AudioListener ,
-			AudioSource
+			AudioSource ,
+			PointLight ,
+			DirectionalLight
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};

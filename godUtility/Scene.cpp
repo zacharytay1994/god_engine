@@ -23,6 +23,16 @@ namespace god
 		}
 	}
 
+	void Scene::AddPointLight ( PointLightData const& pld )
+	{
+		m_point_light_data.push_back ( pld );
+	}
+
+	void Scene::AddDirectionalLight ( DirectionalLightData const& dld )
+	{
+		m_directional_light_data.push_back ( dld );
+	}
+
 	size_t Scene::InstancedRenderData::operator()( InstancedRenderData const& data ) const
 	{
 		size_t seed { 0 };
@@ -39,5 +49,25 @@ namespace god
 			m_diffuse_id == rhs.m_diffuse_id &&
 			m_specular_id == rhs.m_specular_id &&
 			m_shininess == rhs.m_shininess;
+	}
+
+	Scene::PointLightData& Scene::PointLightData::operator=( PointLightData const& rhs )
+	{
+		m_position = rhs.m_position;
+		m_colour = rhs.m_colour;
+		m_ambient = rhs.m_ambient;
+		m_diffuse = rhs.m_diffuse;
+		m_specular = rhs.m_specular;
+		return *this;
+	}
+
+	Scene::DirectionalLightData& Scene::DirectionalLightData::operator=( DirectionalLightData const& rhs )
+	{
+		m_position = rhs.m_position;
+		m_colour = rhs.m_colour;
+		m_ambient = rhs.m_ambient;
+		m_diffuse = rhs.m_diffuse;
+		m_specular = rhs.m_specular;
+		return *this;
 	}
 }

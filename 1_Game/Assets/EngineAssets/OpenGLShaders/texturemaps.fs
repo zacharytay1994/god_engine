@@ -32,6 +32,7 @@ struct sLight
 
 struct sDirectionalLight 
 {
+    vec3 position; // for directional shadows
     vec3 direction;
     vec3 colour;
 
@@ -60,8 +61,12 @@ struct sSpotLight
 
 };
 
-uniform sLight              uPointLight;
-uniform sDirectionalLight   uDirectionalLight;
+uniform sLight              uPointLight[5];
+uniform int                 uNumPointLight;
+
+uniform sDirectionalLight   uDirectionalLight[5];
+uniform int                 uNumDirectionalLight;
+
 uniform sSpotLight          uSpotLight;
 
 //skybox
@@ -70,7 +75,7 @@ uniform samplerCube uSkybox; //--
 // shadowmap
 uniform sampler2D uShadowMap;
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -81,8 +86,8 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // calculate light position
-    vec3 light_dir = normalize(vec3(10.0f, 10.0f, 10.0f) - vWorldPos);
-    float bias = max(0.05 * (1.0 - dot(vNormal, light_dir)), 0.002);
+    vec3 light_dir = normalize(lightPosition - vWorldPos);
+    float bias = max(0.05 * (1.0 - dot(vNormal, light_dir)), 0.003);
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(uShadowMap, 0);
@@ -105,19 +110,19 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     return shadow;
 }
 
-vec3 PointLight()
+vec3 PointLight(int i)
 {
     vec3 normal = normalize(vNormal);
-    vec3 light_direction = normalize(uPointLight.position - vWorldPos);
+    vec3 light_direction = normalize(uPointLight[i].position - vWorldPos);
     vec3 view_direction = normalize(uViewPosition - vWorldPos);
     vec3 reflect_direction = reflect(-light_direction, normal);
 
     // ambient
-    vec4 ambient = vec4((uPointLight.colour * uPointLight.ambient), 1.0) * texture(uMaterial.diffuse_map, vUV);
+    vec4 ambient = vec4((uPointLight[i].colour * uPointLight[i].ambient), 1.0) * texture(uMaterial.diffuse_map, vUV);
 
     // diffuse
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
-    vec4 diffuse = vec4((uPointLight.colour * uPointLight.diffuse), 1.0) * (diffuse_scalar * texture(uMaterial.diffuse_map, vUV));
+    vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * texture(uMaterial.diffuse_map, vUV));
 
     // cubemap reflection
     vec3 I = normalize (vWorldPos - uViewPosition) ; //--
@@ -130,30 +135,30 @@ vec3 PointLight()
     vec4 specular = cubemap_colour * (specular_scalar * texture(uMaterial.specular_map, vUV));
 
     // calculate shadow
-    float shadow = ShadowCalculation(vFragPosLightSpace);
-
-    return vec3((ambient + (1.0 - shadow) * (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
+    // float shadow = ShadowCalculation(vFragPosLightSpace);
+    return vec3((ambient + (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
+    // return vec3((ambient + (1.0 - shadow) * (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
 }
 
 
-vec3 DirectLight()
+vec3 DirectLight(int i, float shadow)
 {
     // ambient
-    vec3 ambient = uDirectionalLight.ambient * texture(uMaterial.diffuse_map, vUV).rgb;
+    vec3 ambient = uDirectionalLight[i].ambient * texture(uMaterial.diffuse_map, vUV).rgb;
 
     // diffuse
 	vec3 normal = normalize(vNormal);
-    vec3 light_direction = normalize(-uDirectionalLight.direction);
+    vec3 light_direction = normalize(-uDirectionalLight[i].direction);
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
-    vec3 diffuse = uDirectionalLight.diffuse * diffuse_scalar * texture(uMaterial.diffuse_map, vUV).rgb;
+    vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * texture(uMaterial.diffuse_map, vUV).rgb;
 
     // specular
     vec3 view_direction = normalize(uViewPosition - vWorldPos);
     vec3 reflect_direction = reflect(-light_direction, normal);
     float specular_scalar = pow(max(dot(view_direction, reflect_direction), 0.0), uMaterial.shininess);
-    vec3 specular = uDirectionalLight.specular * specular_scalar * texture(uMaterial.specular_map, vUV).rgb;
+    vec3 specular = uDirectionalLight[i].specular * specular_scalar * texture(uMaterial.specular_map, vUV).rgb;
 
-    return vec3 ( ambient + diffuse + specular ) ;
+    return vec3 ( ambient + (1.0 - shadow) * (diffuse + specular) ) ;
 }
 
 vec3 SpotLight()
@@ -193,18 +198,27 @@ vec3 SpotLight()
 
 void main()
 {
-    // vec3 light_value{0,0,0};
-    // for (int i = 0; i < number_of_point_light; ++i)
-    // {
-    //     light_value += uPointLight[i];
-    // }
-    // // concatenate all directional lights
-    // for (int i = 0; i < number_of_directional_light; ++i)
-    // {
-    //     light_value += uDirectionalLight[i];
-    // }
-    
-    // concatenate all point lights
-    fFragColor = vec4(PointLight() , 1.0);
-    //fFragColor = vec4(PointLight() + DirectLight() + SpotLight() , 1.0);
+    // calculate shadow
+    vec3 light_position = normalize(vec3(0,0,0));
+    if (uNumDirectionalLight > 0)
+    {
+        light_position = uDirectionalLight[0].position;
+    }
+    float shadow = ShadowCalculation(vFragPosLightSpace, light_position);
+
+    // calculate point lights
+    vec3 point_lights_value = vec3(0,0,0);
+    for (int i = 0; i < uNumPointLight; ++i)
+    {
+        point_lights_value += PointLight(i);
+    }
+
+    // calculate directional lights
+    vec3 directional_lights_value = vec3(0,0,0);
+    for (int i = 0; i < 1; ++i)
+    {
+        directional_lights_value += DirectLight(i,shadow);
+    }
+
+    fFragColor = vec4((point_lights_value + directional_lights_value) , 1.0);
 }

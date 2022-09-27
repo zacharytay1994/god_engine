@@ -51,4 +51,9 @@ namespace god
 		}
 		return false;
 	}
+
+	float LengthSq ( glm::vec3 const& v )
+	{
+		return v.x * v.x + v.y * v.y + v.z * v.z;
+	}
 }
