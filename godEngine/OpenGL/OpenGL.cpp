@@ -296,6 +296,17 @@ namespace god
 			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.quadratic" , light.m_quadratic );
 			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.viewPos" , camera_position );
 
+
+
+			// Set Fog
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.65f,0.85f,0.90f} );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearStart",  10.0f);
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearEnd", 100.0f );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.15f );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 2 );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.isEnabled", true );
+
+
 			// draw model
 			for ( auto& mesh : m_models[ data.first.m_model_id ] )
 			{
@@ -436,7 +447,8 @@ namespace god
 			// Draw the normal model
 			m_depthmap_shader.Use ();
 
-			OGLShader::SetUniform ( m_depthmap_shader.GetShaderID () ,
+			OGLShader::SetUniform ( 
+				m_depthmap_shader.GetShaderID () ,
 				"uLightSpaceMatrix" ,
 				m_light_space_matrix );
 

@@ -7,6 +7,8 @@ in vec3 vNormal;
 in vec3 vWorldPos;
 in vec4 vFragPosLightSpace;
 
+smooth in vec4 vEyeSpacePosition;
+
 uniform vec3 uViewPosition;
 
 // material properties
@@ -57,8 +59,6 @@ struct sSpotLight
     float constant;
     float linear;
     float quadratic;
-
-
 };
 
 uniform sLight              uPointLight[5];
@@ -70,10 +70,47 @@ uniform int                 uNumDirectionalLight;
 uniform sSpotLight          uSpotLight;
 
 //skybox
-uniform samplerCube uSkybox; //--
+uniform samplerCube uSkybox;
 
 // shadowmap
 uniform sampler2D uShadowMap;
+
+struct sFogParameters
+{
+	vec3 color;
+	float linearStart;
+	float linearEnd;
+	float density;
+	
+	int equation;
+	bool isEnabled;
+};
+
+// fog
+uniform sFogParameters uFogParams;
+
+float getFogFactor(sFogParameters params, float fogCoordinate)
+{
+	float result = 0.0;
+
+    // linear interpolation
+	if(params.equation == 0)
+	{
+		float fogLength = params.linearEnd - params.linearStart;
+		result = (params.linearEnd - fogCoordinate) / fogLength;
+	}
+    //  won't make fog to appear linearly, but rather we use an exponential function
+	else if(params.equation == 1) {
+		result = exp(-params.density * fogCoordinate);
+	}
+    // similar to previous, but this time we'll use the power of density
+	else if(params.equation == 2) {
+		result = exp(-pow(params.density * fogCoordinate, 2.0));
+	}
+	
+	result = 1.0 - clamp(result, 0.0, 1.0);
+	return result;
+}
 
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition)
 {
@@ -221,4 +258,11 @@ void main()
     }
 
     fFragColor = vec4((point_lights_value + directional_lights_value) , 1.0);
+
+    // apply fog calculation only if fog is enabled
+    if(uFogParams.isEnabled)
+    {
+          float fogCoordinate = abs(vEyeSpacePosition.z / vEyeSpacePosition.w);
+          fFragColor = mix(fFragColor, vec4(uFogParams.color, 1.0), getFogFactor(uFogParams, fogCoordinate));
+    }
 }
