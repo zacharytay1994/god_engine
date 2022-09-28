@@ -18,6 +18,8 @@ namespace god
 		auto& grid_manipulate = std::get<1> ( components );
 		auto grid_root_entity = entt.GetEntity ( grid_manipulate.m_grid_root );
 
+		grid_manipulate.m_clicked = false;
+
 		EntityGrid& grid = engineResources.Get<EntityGrid> ().get ();
 		GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
 		Camera& camera = engineResources.Get<Camera> ().get ();
@@ -49,6 +51,12 @@ namespace god
 						{
 							transform->m_position = { ( std::get<0> ( cell ) + 0.5f ) * 2.0f, ( std::get<1> ( cell ) + 1 ) * 2.0f, ( std::get<2> ( cell ) + 0.5f ) * 2.0f };
 						}
+					}
+
+					if ( window.MouseLPressed () )
+					{
+						grid_manipulate.m_clicked = true;
+						grid_manipulate.m_last_clicked_cell = { std::get<0> ( cell ), std::get<1> ( cell ) + 1 , std::get<2> ( cell ) };
 					}
 				}
 			}

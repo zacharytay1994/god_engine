@@ -25,8 +25,18 @@ function S_StateMovePlayer(e)
                 component.Time = component.Time + GetDeltaTime()
             else
                 local pathfind = GetComponent(e, "C_Pathfind")
-                pathfind.x = 4
-                pathfind.Path = true;
+                
+                local gm_entity = GetEntity("GridManipulate")
+                if (gm_entity ~= -1) then
+                    local gm = GetGridManipulate(gm_entity)
+                    if (gm.clicked) then
+                        pathfind.x = gm.last_clicked_cell.x
+                        pathfind.y = gm.last_clicked_cell.y
+                        pathfind.z = gm.last_clicked_cell.z
+                        pathfind.Path = true
+                        print("move")
+                    end
+                end
             end
         end
     end

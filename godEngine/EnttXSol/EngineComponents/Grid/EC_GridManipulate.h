@@ -10,7 +10,17 @@ namespace god
 		std::string m_grid_root { "" };
 		std::string m_highlight_prefab { "None" };
 		uint32_t m_highlight_id { static_cast< uint32_t >( -1 ) };
+		bool m_clicked { false };
+		glm::ivec3 m_last_clicked_cell;
 	};
+
+	template <>
+	inline void NewLuaType<GridManipulate> ( sol::state& luaState , std::string const& name )
+	{
+		RegisterLuaType<GridManipulate> ( luaState , name ,
+			"clicked" , &GridManipulate::m_clicked ,
+			"last_clicked_cell" , &GridManipulate::m_last_clicked_cell );
+	}
 
 	template<>
 	inline void ComponentInspector::operator() < GridManipulate > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )

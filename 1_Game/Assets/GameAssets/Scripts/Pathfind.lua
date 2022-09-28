@@ -37,6 +37,9 @@ function S_Pathfind(e)
                     pathfind.Path = false
                     pathfind.Timer = 0.0 
                 end
+            else
+                pathfind.Path = true
+                pathfind.Timer = 0.0
             end
         end
     end

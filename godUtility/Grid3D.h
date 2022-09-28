@@ -107,7 +107,7 @@ namespace god
 		if ( m_grid.find ( gran ) != m_grid.end () )
 		{
 			auto const& gran_grid = m_grid.at ( gran );
-			if ( gran_grid.find ( coord ) != gran_grid.end () )
+			if ( gran_grid.find ( coord ) != gran_grid.end () && !gran_grid.at ( coord ).m_values.empty () )
 			{
 				return true;
 			}
@@ -287,7 +287,7 @@ namespace god
 		bool found { false };
 		for ( auto i = 0; i < depth && !found; ++i , start_layer -= stride.y )
 		{
-			if ( IntersectLineSegmentPlane ( start , end , { 0,1,0 } , start_layer , intersect ) )
+			if ( IntersectLineSegmentPlane ( start , end , { 0,1,0 } , start_layer + ( stride.y / 2.0f ) , intersect ) )
 			{
 				intersect -= origin;
 				cell_x = std::floor ( intersect.x / stride.x );
@@ -321,5 +321,22 @@ namespace god
 		}
 	}
 
-	using EntityGrid = std::unordered_map<uint32_t , Grid3D<uint32_t>>;
+	//using EntityGrid = std::unordered_map<uint32_t , Grid3D<uint32_t>>;
+
+	struct Grid3DCell
+	{
+		uint32_t m_entity_id;
+		bool m_solid;
+
+		Grid3DCell ( uint32_t entityID , bool solid = true )
+			:
+			m_entity_id ( entityID ) ,
+			m_solid ( solid )
+		{
+
+		}
+
+		operator uint32_t() const { return m_entity_id; }
+	};
+	using EntityGrid = std::unordered_map<uint32_t , Grid3D<Grid3DCell>>;
 }
