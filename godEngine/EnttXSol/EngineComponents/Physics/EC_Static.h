@@ -52,7 +52,11 @@ namespace god
 				ImGui::InputFloat("Offset y", &component.Offset.y);
 				ImGui::InputFloat("Offset z", &component.Offset.z);
 
-				ImGui::Checkbox("Update RigidStatic", &component.updateRigidStatic);
+
+				if (ImGui::SmallButton("Update RigidStatic"))
+				{
+					component.updateRigidStatic = true;
+				}
 
 			});
 	}

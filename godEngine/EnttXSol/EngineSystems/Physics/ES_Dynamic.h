@@ -62,7 +62,7 @@ namespace god
 			{
 
 			}
-			std::cout << " rigidstatic Updated\n";
+			std::cout << " rigid dynamic Updated\n";
 			rigiddynamic.updateRigidDynamic = false;
 
 		}
