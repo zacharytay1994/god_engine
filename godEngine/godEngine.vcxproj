@@ -138,6 +138,7 @@
     <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Dynamic.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Shape.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />

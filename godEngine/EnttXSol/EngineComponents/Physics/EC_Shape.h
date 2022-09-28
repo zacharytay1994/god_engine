@@ -14,13 +14,15 @@ namespace god
 		//	eCAPSULE,
 		//	eBOX,
 		physx::PxVec3 extents;
-		
+		bool locktoscale;
+
+
 			//Non serialize data
 			physx::PxShape* p_shape;
 			bool updatePhysicsShape;
-			bool locktoscale;
+
 		//Ctor
-		PhysicsShape() : extents{ physx::PxVec3(20.f,20.f,20.f) }, p_shape{ nullptr }, updatePhysicsShape{ true }, locktoscale{false}
+		PhysicsShape() : extents{ physx::PxVec3(20.f,20.f,20.f) }, p_shape{ nullptr }, updatePhysicsShape{ true }, locktoscale{true}
 		{};
 		~PhysicsShape() 
 		{
