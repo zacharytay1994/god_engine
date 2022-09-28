@@ -9,15 +9,17 @@ namespace god
 {
 	void AudioSystem(EnttXSol& entt, EngineResources& engineResources, std::tuple<EntityData&, AudioListener&> components)
 	{
-		(entt); (components);
+		(entt);
 
 		// NOTE: ONLY ONE AUDIO LISTENER ALLOWED
+		AudioListener& audio_listener = std::get<1>(components);
 
 		// engine resources access
 		SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
+		Camera& camera = engineResources.Get<Camera>().get();
 
 		// access entities with specific component
-		for (auto&& [entity, audio_source] : entt.GetView<AudioSource>().each())
+		for (auto&& [entity, audio_source, transform] : entt.GetView<AudioSource, Transform>().each())
 		{
 			if (audio_source.m_sound_id != -1)
 			{
@@ -45,7 +47,18 @@ namespace god
 				else
 				{
 					// 3d sound
-					// get transform component, fmod is left handed system (need to set listener attributes)
+					AudioAPI::GLMVectorToFMODVector(transform.m_position, audio_listener.m_position);
+					AudioAPI::GLMVectorToFMODVector(camera.m_look_at, audio_listener.m_forward);
+					AudioAPI::GLMVectorToFMODVector(camera.m_up, audio_listener.m_up);
+
+					// fmod is left handed system, convert to right handed system
+					audio_listener.m_position.z = -audio_listener.m_position.z;
+					audio_listener.m_forward.z = -audio_listener.m_forward.z;
+					audio_listener.m_up.z = -audio_listener.m_up.z;
+					audio_listener.m_velocity = FMOD_VECTOR(0.f, 0.f, 0.f);
+
+					// set FMOD listener attributes
+					AudioAPI::SetListenerAttributes(&audio_listener.m_position, &audio_listener.m_velocity, &audio_listener.m_forward, &audio_listener.m_up);
 				}
 			}
 		}

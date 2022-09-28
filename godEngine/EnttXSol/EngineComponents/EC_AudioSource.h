@@ -11,7 +11,7 @@ namespace god
 		bool m_played{ false };
 
 		bool m_3d_sound{ false }; // change to float like unity
-		float m_2d_to_3d{ 0.f }; // modifier value?
+		float m_spatial_blend{ 0.f }; // modifier value?
 
 		int m_sound_id{ -1 };
 		//int m_source_id{ -1 };

@@ -54,6 +54,12 @@ namespace god
 		static void ResumeAll();
 		static void StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets);
 
+	public:
+		static void SetListenerAttributes(const FMOD_VECTOR* position, const FMOD_VECTOR* velocity, const FMOD_VECTOR* forward, const FMOD_VECTOR* up);
+
+	public:
+		static void GLMVectorToFMODVector(const glm::vec3& input, FMOD_VECTOR& output);
+
 	private:
 		static FMOD::System* m_FMOD_system;
 		static FMOD::ChannelGroup* m_master_channel_group;

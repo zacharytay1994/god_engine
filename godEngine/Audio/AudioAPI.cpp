@@ -164,6 +164,7 @@ namespace god
 		m_channels.clear();
 	}
 
+
 	void AudioAPI::PauseAll()
 	{
 		m_master_channel_group->setPaused(true);
@@ -172,5 +173,19 @@ namespace god
 	void AudioAPI::ResumeAll()
 	{
 		m_master_channel_group->setPaused(false);
+	}
+
+
+	void AudioAPI::SetListenerAttributes(const FMOD_VECTOR* position, const FMOD_VECTOR* velocity, const FMOD_VECTOR* forward, const FMOD_VECTOR* up)
+	{
+		m_FMOD_system->set3DListenerAttributes(0, position, velocity, forward, up);
+	}
+
+
+	void AudioAPI::GLMVectorToFMODVector(const glm::vec3& input, FMOD_VECTOR& output)
+	{
+		output.x = input.x;
+		output.y = input.y;
+		output.z = input.z;
 	}
 }

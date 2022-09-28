@@ -7,12 +7,12 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct AudioListener
 	{
-		int m_listener_id{ -1 }; // output
+		int m_listener_id{ 0 }; // output
 
-		//glm::vec3 m_position;
-		//glm::vec3 m_velocity; // for doppler effects, not really needed?
-		//glm::vec3 m_forward;
-		//glm::vec3 m_up;
+		FMOD_VECTOR m_position;
+		FMOD_VECTOR m_velocity; // for doppler effects, not really needed?
+		FMOD_VECTOR m_forward;
+		FMOD_VECTOR m_up;
 	};
 	template <>
 	inline void NewLuaType<AudioListener>(sol::state& luaState, std::string const& name)
