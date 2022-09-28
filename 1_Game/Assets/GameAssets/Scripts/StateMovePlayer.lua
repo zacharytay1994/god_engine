@@ -30,6 +30,7 @@ function S_StateMovePlayer(e)
                 if (gm_entity ~= -1) then
                     local gm = GetGridManipulate(gm_entity)
                     if (gm.clicked) then
+                        print("hi")
                         pathfind.x = gm.last_clicked_cell.x
                         pathfind.y = gm.last_clicked_cell.y
                         pathfind.z = gm.last_clicked_cell.z

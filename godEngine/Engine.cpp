@@ -66,7 +66,10 @@ namespace god
 		// setup camera
 		Camera camera;
 		camera.UpdateAspectRatio(window.GetWindowWidth(), window.GetWindowHeight());
-		camera.m_pitch = -45.0f;
+		camera.m_pitch = -25.0f;
+		camera.m_yaw = 155.0f;
+		//camera.m_look_at = { 0,0,0 };
+		camera.m_position = { -2,7,-10 };
 		float scene_camera_zoom_distance{20.0f};
 		glm::vec3 scene_camera_position_offset{0.0f};
 
