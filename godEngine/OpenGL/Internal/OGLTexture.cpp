@@ -34,13 +34,13 @@ namespace god
 			if ( texture.GetChannels () == 4 )
 			{
 				//internal_format = GL_RGBA8;
-				internal_format = GL_SRGB_ALPHA; //--
+				internal_format = GL_SRGB8_ALPHA8; //--
 				data_format = GL_RGBA;
 			}
 			else if ( texture.GetChannels () == 3 )
 			{
 				//internal_format = GL_RGB8;
-				internal_format = GL_SRGB;
+				internal_format = GL_SRGB8;
 				data_format = GL_RGB;
 			}
 			else if ( texture.GetChannels () == 1 )

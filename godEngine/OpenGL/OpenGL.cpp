@@ -86,8 +86,6 @@ namespace god
 		// Sets rules for outcomes of stecil tests
 		glStencilOp ( GL_KEEP , GL_KEEP , GL_REPLACE );
 
-
-
 		// glEnable ( GL_DEPTH_TEST );
 		SetLineWidth ( m_default_line_size );
 
@@ -148,12 +146,28 @@ namespace god
 			0, 1, 3,   // first triangle
 			1, 2, 3    // second triangle
 		};
-		m_square_mesh.Initialize();
+		m_square_mesh.Initialize ();
 
 		// load hdr shader
-		m_hdr_shader.InitializeFromFile(
-			"Assets/EngineAssets/OpenGLShaders/tonemap.vs",
-			"Assets/EngineAssets/OpenGLShaders/tonemap.fs" 
+		m_hdr_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/tonemap.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/tonemap.fs"
+		);
+
+		// blur renderpasses
+		m_blur_pingpong_1.Initialize ( width , height );
+		m_blur_pingpong_2.Initialize ( width , height );
+
+		// blur shader
+		m_blur_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/blur.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/blur.fs"
+		);
+
+		// blend shader
+		m_blend_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/blend.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/blend.fs"
 		);
 
 		glCheckError ();
@@ -320,12 +334,12 @@ namespace god
 
 
 			// Set Fog
-			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.65f,0.85f,0.90f} );
-			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearStart",  10.0f);
-			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearEnd", 100.0f );
-			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.05f );
-			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 2 );
-			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.isEnabled", false );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.65f,0.85f,0.90f} );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearStart",  10.0f);
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearEnd", 100.0f );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.05f );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 2 );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.isEnabled", true );
 
 
 			// draw model
@@ -381,10 +395,11 @@ namespace god
 		m_screen_width = width;
 		m_screen_height = height;
 		glViewport ( 0 , 0 , width , height );
+
 		std::cout << "OpenGL viewport resized x:" << width << " y: " << height << std::endl;
 	}
 
-	void OpenGL::RenderTonemap( OGLRenderPass const& framebuffer )
+	/*void OpenGL::RenderTonemap( OGLRenderPass const& framebuffer )
 	{
 		m_hdr_shader.Use();
 
@@ -395,7 +410,7 @@ namespace god
 		m_square_mesh.Draw( GL_TRIANGLES );
 
 		OGLShader::UnUse();
-	}
+	}*/
 
 	void OpenGL::DrawLine ( glm::vec3 const& a , glm::vec3 const& b , glm::vec4 const& c , float size )
 	{
@@ -481,7 +496,7 @@ namespace god
 			// Draw the normal model
 			m_depthmap_shader.Use ();
 
-			OGLShader::SetUniform ( 
+			OGLShader::SetUniform (
 				m_depthmap_shader.GetShaderID () ,
 				"uLightSpaceMatrix" ,
 				m_light_space_matrix );
@@ -495,5 +510,71 @@ namespace god
 		}
 		m_shadowmap.DisableDepthMap ();
 		glCheckError ();
+	}
+
+	OGLRenderPass<1>& OpenGL::BlurTexture ( unsigned int texture )
+	{
+		bool horizontal = true , first_iteration = true;
+		int amount = 5;
+		m_blur_shader.Use ();
+		for ( unsigned int i = 0; i < amount; i++ )
+		{
+			if ( horizontal )
+			{
+				m_blur_pingpong_1.Bind ();
+				OGLShader::SetUniform ( m_blur_shader.GetShaderID () , "uHorizontal" , horizontal );
+				if ( first_iteration )
+				{
+					glActiveTexture ( GL_TEXTURE0 );
+					glBindTexture ( GL_TEXTURE_2D , texture );
+				}
+				else
+				{
+					glActiveTexture ( GL_TEXTURE0 );
+					glBindTexture ( GL_TEXTURE_2D , m_blur_pingpong_2.GetTexture () );
+				}
+			}
+			else
+			{
+				m_blur_pingpong_2.Bind ();
+				OGLShader::SetUniform ( m_blur_shader.GetShaderID () , "uHorizontal" , horizontal );
+				if ( first_iteration )
+				{
+					glActiveTexture ( GL_TEXTURE0 );
+					glBindTexture ( GL_TEXTURE_2D , texture );
+				}
+				else
+				{
+					glActiveTexture ( GL_TEXTURE0 );
+					glBindTexture ( GL_TEXTURE_2D , m_blur_pingpong_1.GetTexture () );
+				}
+			}
+
+			m_square_mesh.Draw ( GL_TRIANGLES );
+
+			horizontal = !horizontal;
+			if ( first_iteration )
+				first_iteration = false;
+		}
+		OGLShader::UnUse ();
+		glBindFramebuffer ( GL_FRAMEBUFFER , 0 );
+
+		return m_blur_pingpong_1;
+	}
+
+	void OpenGL::RenderBlendTextures ( unsigned int texture1 , unsigned int texture2 )
+	{
+		m_blend_shader.Use ();
+
+		OGLShader::SetUniform ( m_blend_shader.GetShaderID () , "uScene" , 0 );
+		glActiveTexture ( GL_TEXTURE0 );
+		glBindTexture ( GL_TEXTURE_2D , texture1 );
+		OGLShader::SetUniform ( m_blend_shader.GetShaderID () , "uBloomBlur" , 1 );
+		glActiveTexture ( GL_TEXTURE0 + 1 );
+		glBindTexture ( GL_TEXTURE_2D , texture2 );
+
+		m_square_mesh.Draw ( GL_TRIANGLES );
+
+		OGLShader::UnUse ();
 	}
 }

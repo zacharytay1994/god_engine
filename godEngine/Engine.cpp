@@ -56,9 +56,9 @@ namespace god
 		DeltaTimer delta_timer;
 		OpenGL opengl(window.GetWindowHandle(), window.GetWindowWidth(), window.GetWindowHeight());
 		OGLRenderPass imgui_renderpass( window.GetWindowWidth(), window.GetWindowHeight() );
-		//OGLRenderPass hdr_renderpass( window.GetWindowWidth(), window.GetWindowHeight(), GL_RGBA16F, GL_RGBA, GL_FLOAT );
-		OGLRenderPass hdr_renderpass( window.GetWindowWidth(), window.GetWindowHeight());
-		OGLRenderPass tonemap_renderpass(window.GetWindowWidth(), window.GetWindowHeight());
+		OGLRenderPass<2> hdr_renderpass( window.GetWindowWidth(), window.GetWindowHeight(), GL_RGBA16F, GL_RGBA, GL_FLOAT );
+		OGLRenderPass extra_renderpass( window.GetWindowWidth(), window.GetWindowHeight());
+		//OGLRenderPass tonemap_renderpass(window.GetWindowWidth(), window.GetWindowHeight());
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
 		PhysicsSystem godPhysicsSystem{};
@@ -142,8 +142,11 @@ namespace god
 				opengl.ResizeViewport(window.GetWindowWidth(), window.GetWindowHeight());
 				camera.UpdateAspectRatio(window.GetWindowWidth(), window.GetWindowHeight());
 				imgui_renderpass.UpdateWidth( window.GetWindowWidth(), window.GetWindowHeight() );
-				tonemap_renderpass.UpdateWidth(window.GetWindowWidth(), window.GetWindowHeight());
+				extra_renderpass.UpdateWidth(window.GetWindowWidth(), window.GetWindowHeight());
 				hdr_renderpass.UpdateWidth( window.GetWindowWidth(), window.GetWindowHeight() );
+
+				opengl.m_blur_pingpong_1.UpdateWidth ( window.GetWindowWidth () , window.GetWindowHeight () );
+				opengl.m_blur_pingpong_2.UpdateWidth ( window.GetWindowWidth () , window.GetWindowHeight () );
 			}
 
 			opengl.ClearColour();
@@ -203,13 +206,21 @@ namespace god
 
 			imgui_renderpass.UnBind();
 
+			auto& blur = opengl.BlurTexture ( hdr_renderpass.GetTexture (1) );
+
+			extra_renderpass.Bind ();
+			opengl.RenderBlendTextures ( imgui_renderpass.GetTexture () , blur.GetTexture () );
+			extra_renderpass.UnBind ();
+
 			SystemTimer::EndTimeSegment("Rendering");
 
 			// ... render imgui windows
 			SystemTimer::StartTimeSegment("Editor");
 			ogl_editor.BeginFrame();
 			// pass scene view the renderpass texture
-			editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( imgui_renderpass.GetTexture () );
+			//editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( imgui_renderpass.GetTexture () );
+			editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( extra_renderpass.GetTexture () );
+			//editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( opengl.m_blur_pingpong_1.GetTexture() );
 			editor_windows.Update ( 0.02f , engine_resources );
 			ogl_editor.Render ();
 			ogl_editor.EndFrame ();

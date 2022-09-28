@@ -1,6 +1,8 @@
 #version 430 core
 
-out vec4 fFragColor;
+// out vec4 fFragColor;
+layout (location = 0) out vec4 fFragColor;
+layout (location = 1) out vec4 fBrightColor;
 
 in vec2 vUV;
 in vec3 vNormal;
@@ -89,7 +91,7 @@ struct sFogParameters
 // fog
 uniform sFogParameters uFogParams;
 
-float light_max_distance = 100.0f;
+float light_max_distance = 5.0f;
 float gamma = 2.2;
 
 float getFogFactor(sFogParameters params, float fogCoordinate)
@@ -156,19 +158,18 @@ vec3 PointLight(int i)
     vec3 light_to_frag = uPointLight[i].position - vWorldPos;
     float light_distance = length(light_to_frag);
     float attenuation = 1.0 / light_distance;
-
-
+    float distance_clamp = max((1.0 - light_distance/light_max_distance),0.0);
 
     vec3 light_direction = normalize(light_to_frag);
     vec3 view_direction = normalize(uViewPosition - vWorldPos);
     vec3 reflect_direction = reflect(-light_direction, normal);
 
     // ambient
-    vec4 ambient = vec4((uPointLight[i].colour * uPointLight[i].ambient), 1.0) * texture(uMaterial.diffuse_map, vUV);
+    vec4 ambient = vec4((uPointLight[i].colour * uPointLight[i].ambient), 1.0) * texture(uMaterial.diffuse_map, vUV) * distance_clamp;
 
     // diffuse
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
-    diffuse_scalar  *= attenuation;
+    diffuse_scalar  *= attenuation * distance_clamp;
 
     vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * vec4(pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma)),1.0));
 
@@ -273,10 +274,17 @@ void main()
 
     fFragColor = vec4((point_lights_value + directional_lights_value) , 1.0);
 
+    float brightness = dot(fFragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+    // float brightness = dot(fFragColor.rgb, vec3(50.2126, 50.7152, 50.0722));
+    if(brightness > 10.0)
+        fBrightColor = vec4(fFragColor.rgb, 1.0);
+    else
+        fBrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+
     //apply fog calculation only if fog is enabled
-    // if(uFogParams.isEnabled)
-    // {
-    //       float fogCoordinate = abs(vEyeSpacePosition.z / vEyeSpacePosition.w);
-    //       fFragColor = mix(fFragColor, vec4(uFogParams.color, 1.0), getFogFactor(uFogParams, fogCoordinate));
-    // }
+    if(uFogParams.isEnabled)
+    {
+          float fogCoordinate = abs(vEyeSpacePosition.z / vEyeSpacePosition.w);
+          fFragColor = mix(fFragColor, vec4(uFogParams.color, 1.0), getFogFactor(uFogParams, fogCoordinate));
+    }
 }
