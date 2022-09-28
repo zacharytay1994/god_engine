@@ -90,7 +90,7 @@ namespace god
 		SetLineWidth ( m_default_line_size );
 
 		// Temp line rendering code
-		constexpr int MAX_POINTS { 1000 };
+		constexpr int MAX_POINTS { 10'000 };
 		char const line_vs[] = {
 			"#version 430 core\n"
 			"layout ( location = 0 ) in vec3 aPos;\n"

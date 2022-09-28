@@ -10,6 +10,8 @@
 #include <godUtility/FileIO.h>
 #include <godUtility/Internal/RapidJSONWrapper.h>
 
+#include "OGLDebug.h"
+
 #include <filesystem>
 // to bypass windows.h GetObject() macro definition
 #ifdef _MSC_VER
@@ -57,6 +59,8 @@ namespace god
 				
 			}
 			m_texture_id = TextureName;
+
+			glCheckError();
 		}
 		else
 		{
