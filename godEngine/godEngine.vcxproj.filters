@@ -122,6 +122,7 @@
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_DirectionalLight.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Grid\EC_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

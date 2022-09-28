@@ -30,7 +30,7 @@ namespace god
 				phymaterial.p_material->setStaticFriction(phymaterial.StaticFriction);
 				phymaterial.p_material->setRestitution(phymaterial.Restitution);
 			}
-			std::cout << " Material Updated\n";
+			//std::cout << " Material Updated\n";
 			phymaterial.updatematerial = false;
 
 		}
@@ -48,7 +48,7 @@ namespace god
 				physhape.p_shape->setGeometry(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z));
 				physhape.p_shape->setMaterials(&phymaterial.p_material, 1);
 			}
-			std::cout << " Shape Updated\n";
+			//std::cout << " Shape Updated\n";
 			physhape.updatePhysicsShape = false;
 		}
 

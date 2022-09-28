@@ -58,7 +58,7 @@ namespace god
 					transform.m_position.y + rigidstatic.Offset.y,
 					transform.m_position.z + rigidstatic.Offset.z));
 			}
-			std::cout << " rigidstatic Updated\n";
+			//std::cout << " rigid static Updated\n";
 			rigidstatic.updateRigidStatic = false;
 		}
 

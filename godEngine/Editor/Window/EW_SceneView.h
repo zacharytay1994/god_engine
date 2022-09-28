@@ -200,6 +200,8 @@ namespace god
 		auto tilemap_editor = this->Get<EW_TilemapEditor> ();
 		ImGui::Text ( "Parent: %d, CellX: %d, CellZ: %d" , tilemap_editor->m_selected , tilemap_editor->m_cell_x , tilemap_editor->m_cell_z );
 
+		PhysicsSystem& psystem = engineResources.Get<PhysicsSystem>().get();
+		ImGui::Checkbox("Debug Shapes", &psystem.debugdraw);
 
 		ImGui::End ();
 	}
