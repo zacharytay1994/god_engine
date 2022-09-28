@@ -66,4 +66,6 @@ namespace god
 
 		return glm::quat{quat.w, quat.x, quat.y, quat.z};
 	}
+
+
 }

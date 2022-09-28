@@ -10,6 +10,7 @@
 #include "Physics/ES_Dynamic.h"
 #include "Physics/ES_Shape.h"
 #include "Physics/ES_Static.h"
+#include "Physics/ES_Debug.h"
 
 namespace god
 {
@@ -62,6 +63,9 @@ namespace god
 
 		//physics
 		enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
+		enttxsol.RunEngineSystem(engineResources, DebugDynamic);
+		enttxsol.RunEngineSystem(engineResources, DebugStatic);
+		
 	}
 
 	// runs at the start just after loading the scene

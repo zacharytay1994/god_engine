@@ -126,7 +126,7 @@ namespace god
 
 				if ( ImGui::Button ( "Browse Textures" , { ImGui::GetWindowWidth () , 0.0f } ) )
 				{
-					m_asset_paths = OpenWindowDialogMulti ( L"Texture Files" , L"*.png;*.jpg" );
+					m_asset_paths = OpenWindowDialogMulti ( L"Texture Files" , L"*.png;*.jpg;*.dds*" );
 
 					// default asset names
 					m_asset_names.resize ( m_asset_paths.size () );

@@ -8,7 +8,7 @@ namespace god
 {
 	struct OGLTexture
 	{
-		OGLTexture ( std::string const& texturePath );
+		OGLTexture ( std::string const& texturePath, bool DDS = false );
 		void Free ();
 
 		void Bind ( uint32_t location ) const;
