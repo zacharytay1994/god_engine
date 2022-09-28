@@ -10,6 +10,9 @@ namespace god
 
 	void DebugDynamic(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic& > component)
 	{
+		PhysicsSystem& psystem = engineResources.Get<PhysicsSystem>().get();
+		if (!psystem.debugdraw)
+			return;
 		Transform& transform = std::get<1>(component);
 		//std::cout << "DebugDynamic\n";
 		glm::vec3 scale = glm::vec3{1.f,1.f,1.f};
@@ -72,6 +75,10 @@ namespace god
 
 	void DebugStatic(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
+		PhysicsSystem& psystem = engineResources.Get<PhysicsSystem>().get();
+		if (!psystem.debugdraw)
+			return;
+
 		Transform& transform = std::get<1>(component);
 		//std::cout << "DebugDynamic\n";
 		glm::vec3 scale = glm::vec3{ 1.f,1.f,1.f };
