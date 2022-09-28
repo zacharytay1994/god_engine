@@ -12,6 +12,8 @@ namespace god
 		mScene = nullptr;
 		mPvd = nullptr;
 
+		debugdraw = false;
+
 		std::cout << "Physics Constructed" << std::endl;
 	}
 	PhysicsSystem::~PhysicsSystem()
