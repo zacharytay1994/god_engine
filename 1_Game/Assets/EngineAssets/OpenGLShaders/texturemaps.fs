@@ -90,6 +90,7 @@ struct sFogParameters
 uniform sFogParameters uFogParams;
 
 float light_max_distance = 100.0f;
+float gamma = 2.2;
 
 float getFogFactor(sFogParameters params, float fogCoordinate)
 {
@@ -153,7 +154,11 @@ vec3 PointLight(int i)
 {
     vec3 normal = normalize(vNormal);
     vec3 light_to_frag = uPointLight[i].position - vWorldPos;
-    float light_distance = min(light_to_frag.x * light_to_frag.x + light_to_frag.y * light_to_frag.y + light_to_frag.z * light_to_frag.z, light_max_distance);
+    float light_distance = length(light_to_frag);
+    float attenuation = 1.0 / light_distance;
+
+
+
     vec3 light_direction = normalize(light_to_frag);
     vec3 view_direction = normalize(uViewPosition - vWorldPos);
     vec3 reflect_direction = reflect(-light_direction, normal);
@@ -163,7 +168,9 @@ vec3 PointLight(int i)
 
     // diffuse
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
-    vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * texture(uMaterial.diffuse_map, vUV));
+    diffuse_scalar  *= attenuation;
+
+    vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * vec4(pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma)),1.0));
 
     // cubemap reflection
     vec3 I = normalize (vWorldPos - uViewPosition) ; //--
@@ -173,7 +180,10 @@ vec3 PointLight(int i)
 
     // specular
     float specular_scalar = pow(max(dot(view_direction, reflect_direction), 0.0), uMaterial.shininess);
+    specular_scalar *= attenuation;
     vec4 specular = cubemap_colour * (specular_scalar * texture(uMaterial.specular_map, vUV));
+
+
 
     // calculate shadow
     // float shadow = ShadowCalculation(vFragPosLightSpace);
@@ -191,7 +201,7 @@ vec3 DirectLight(int i, float shadow)
 	vec3 normal = normalize(vNormal);
     vec3 light_direction = normalize(-uDirectionalLight[i].direction);
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
-    vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * texture(uMaterial.diffuse_map, vUV).rgb;
+    vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma));
 
     // specular
     vec3 view_direction = normalize(uViewPosition - vWorldPos);
@@ -263,10 +273,10 @@ void main()
 
     fFragColor = vec4((point_lights_value + directional_lights_value) , 1.0);
 
-    // apply fog calculation only if fog is enabled
-    if(uFogParams.isEnabled)
-    {
-          float fogCoordinate = abs(vEyeSpacePosition.z / vEyeSpacePosition.w);
-          fFragColor = mix(fFragColor, vec4(uFogParams.color, 1.0), getFogFactor(uFogParams, fogCoordinate));
-    }
+    //apply fog calculation only if fog is enabled
+    // if(uFogParams.isEnabled)
+    // {
+    //       float fogCoordinate = abs(vEyeSpacePosition.z / vEyeSpacePosition.w);
+    //       fFragColor = mix(fFragColor, vec4(uFogParams.color, 1.0), getFogFactor(uFogParams, fogCoordinate));
+    // }
 }

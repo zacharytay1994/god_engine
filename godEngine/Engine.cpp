@@ -56,7 +56,8 @@ namespace god
 		DeltaTimer delta_timer;
 		OpenGL opengl(window.GetWindowHandle(), window.GetWindowWidth(), window.GetWindowHeight());
 		OGLRenderPass imgui_renderpass( window.GetWindowWidth(), window.GetWindowHeight() );
-		OGLRenderPass hdr_renderpass( window.GetWindowWidth(), window.GetWindowHeight(), GL_RGBA16F, GL_RGBA, GL_FLOAT );
+		//OGLRenderPass hdr_renderpass( window.GetWindowWidth(), window.GetWindowHeight(), GL_RGBA16F, GL_RGBA, GL_FLOAT );
+		OGLRenderPass hdr_renderpass( window.GetWindowWidth(), window.GetWindowHeight());
 		OGLRenderPass tonemap_renderpass(window.GetWindowWidth(), window.GetWindowHeight());
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 

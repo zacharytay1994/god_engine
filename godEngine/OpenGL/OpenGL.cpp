@@ -86,6 +86,8 @@ namespace god
 		// Sets rules for outcomes of stecil tests
 		glStencilOp ( GL_KEEP , GL_KEEP , GL_REPLACE );
 
+
+
 		// glEnable ( GL_DEPTH_TEST );
 		SetLineWidth ( m_default_line_size );
 
@@ -318,12 +320,12 @@ namespace god
 
 
 			// Set Fog
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.65f,0.85f,0.90f} );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearStart",  10.0f);
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearEnd", 100.0f );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.05f );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 2 );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.isEnabled", true );
+			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.65f,0.85f,0.90f} );
+			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearStart",  10.0f);
+			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearEnd", 100.0f );
+			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.05f );
+			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 2 );
+			//OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.isEnabled", false );
 
 
 			// draw model
