@@ -130,8 +130,6 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Grid\EC_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Dynamic.h" />
-    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Material.h" />
-    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Shape.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_DirectionalLight.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_PointLight.h" />
@@ -142,10 +140,9 @@
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Dynamic.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Shape.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Physics.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_ScenePopulate.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
     <ClInclude Include="EnttXSol\EnttXSol.h" />
     <ClInclude Include="EnttXSol\Internal\godEntity.h" />
     <ClInclude Include="EnttXSol\LuaFunctionDefinitions.h" />

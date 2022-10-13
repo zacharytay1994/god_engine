@@ -9,8 +9,6 @@ namespace god
 		"Transform",
 		"Renderable3D",
 		"GridCell",
-		"PhysicsMaterial",
-		"PhysicsShape",
 		"RigidStatic",
 		"RigidDynamic",
 		"AudioListener",
