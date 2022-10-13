@@ -53,10 +53,6 @@ namespace god
 				ImGui::InputFloat("Offset z", &component.Offset.z);
 
 
-				if (ImGui::SmallButton("Update RigidStatic"))
-				{
-					component.updateRigidStatic = true;
-				}
 
 			});
 	}

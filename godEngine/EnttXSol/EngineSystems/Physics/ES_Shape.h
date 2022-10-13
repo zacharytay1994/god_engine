@@ -41,14 +41,31 @@ namespace god
 			if (physhape.p_shape == nullptr)
 			{
 				//exclusive shape (can be modified)
-				physhape.p_shape = mPhysics->createShape(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z), *phymaterial.p_material, true);
+				
+
+				switch (physhape.shapeid)
+				{
+				case PhysicsShape::Cube:
+					physhape.p_shape = mPhysics->createShape(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z), *phymaterial.p_material, true);
+					physhape.p_shape->setMaterials(&phymaterial.p_material, 1);
+					break;
+				case PhysicsShape::Sphere:
+					physhape.p_shape = mPhysics->createShape(physx::PxSphereGeometry(physhape.extents.x), *phymaterial.p_material, true);
+					physhape.p_shape->setMaterials(&phymaterial.p_material, 1);
+					break;
+				case PhysicsShape::Capsule:
+					physhape.p_shape = mPhysics->createShape(physx::PxCapsuleGeometry(physhape.extents.x, physhape.extents.y), *phymaterial.p_material, true);
+					physhape.p_shape->setMaterials(&phymaterial.p_material, 1);
+					break;
+				case PhysicsShape::Plane:
+					physhape.p_shape = mPhysics->createShape(physx::PxPlaneGeometry(), *phymaterial.p_material, true);
+					physhape.p_shape->setMaterials(&phymaterial.p_material, 1);
+					break;
+				}
+
+
 			}
-			else
-			{
-				physhape.p_shape->setGeometry(physx::PxBoxGeometry(physhape.extents.x, physhape.extents.y, physhape.extents.z));
-				physhape.p_shape->setMaterials(&phymaterial.p_material, 1);
-			}
-			//std::cout << " Shape Updated\n";
+			
 			physhape.updatePhysicsShape = false;
 		}
 

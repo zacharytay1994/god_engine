@@ -36,11 +36,7 @@ namespace god
 		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
 
-		if (rigiddynamic.Active == false)
-		{
-			mScene->removeActor(*rigiddynamic.p_RigidDynamic);
-		
-		}
+
 
 		
 		if (rigiddynamic.updateRigidDynamic)
@@ -73,7 +69,11 @@ namespace god
 	{
 		Transform& transform = std::get<1>(component);
 		RigidDynamic& rigiddynamic = std::get<2>(component);
+		if (rigiddynamic.Active == false)
+		{
+			rigiddynamic.mScene->removeActor(*rigiddynamic.p_RigidDynamic);
 
+		}
 		if (entt.m_pause)
 		{
 			return;

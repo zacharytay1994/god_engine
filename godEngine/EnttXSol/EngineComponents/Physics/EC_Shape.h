@@ -15,6 +15,11 @@ namespace god
 		//	eBOX,
 		physx::PxVec3 extents;
 		bool locktoscale;
+		enum shapetype 
+		{
+			Cube, Sphere, Capsule, Plane
+		};
+		int shapeid;	
 
 
 			//Non serialize data
@@ -22,7 +27,7 @@ namespace god
 			bool updatePhysicsShape;
 
 		//Ctor
-		PhysicsShape() : extents{ physx::PxVec3(20.f,20.f,20.f) }, p_shape{ nullptr }, updatePhysicsShape{ true }, locktoscale{true}
+			PhysicsShape() :shapeid{ 0 }, extents { physx::PxVec3(20.f, 20.f, 20.f) }, p_shape{ nullptr }, updatePhysicsShape{ true }, locktoscale{ true }
 		{};
 		~PhysicsShape() 
 		{
@@ -47,15 +52,53 @@ namespace god
 				ImGui::Text("PhysicsShape Component");
 				ImGui::Separator();
 
-				ImGui::InputFloat("x extent", &component.extents.x);
-				ImGui::InputFloat("y extent", &component.extents.y);
-				ImGui::InputFloat("z extent", &component.extents.z);
 
-				if(ImGui::SmallButton("Update Shape"))
-					component.updatePhysicsShape=true;
+				int selected_shape = component.shapeid;
+				const char* names[] = { "Cube", "Sphere", "Capsule","Plane"};
+				char buf[64];
+				sprintf_s(buf, "%s###", names[selected_shape]); // ### operator override ID ignoring the preceding label
+				if (ImGui::Button(buf))
+				{
+					ImGui::OpenPopup("shape popup");
+				}
+				//ImGui::TextUnformatted( names[selected_shape] );
+				if (ImGui::BeginPopup("shape popup"))
+				{
+					//ImGui::Text("Shape type");
+					//ImGui::Separator();
+					for (int i = 0; i < IM_ARRAYSIZE(names); i++)
+						if (ImGui::Selectable(names[i]))
+						{
+							selected_shape = i;
+							component.shapeid = i;
+							ImGui::CloseCurrentPopup();
+						}
+					ImGui::EndPopup();
+				}
+
+				switch (component.shapeid)
+				{
+					case PhysicsShape::Cube	:
+						ImGui::InputFloat("X Extent", &component.extents.x);
+						ImGui::InputFloat("Y Extent", &component.extents.y);
+						ImGui::InputFloat("Z Extent", &component.extents.z);
+						break;
+					case PhysicsShape::Sphere:
+						ImGui::InputFloat("Radius", &component.extents.x);
+						break;
+					case PhysicsShape::Capsule:
+						ImGui::InputFloat("Radius", &component.extents.x);
+						ImGui::InputFloat("Half Height", &component.extents.y);
+						break;
+					case PhysicsShape::Plane:
+						ImGui::InputFloat("X Normal", &component.extents.x);
+						ImGui::InputFloat("Y Normal", &component.extents.y);
+						ImGui::InputFloat("Z Normal", &component.extents.z);
+						break;
+				}
+
 
 				ImGui::Checkbox("Lock Extents to Scale", &component.locktoscale);
-
 
 			});
 	}
@@ -69,6 +112,7 @@ namespace god
 		RapidJSON::JSONifyToValue(value, document, "y extent", component.extents.y);
 		RapidJSON::JSONifyToValue(value, document, "z extent", component.extents.z);
 		RapidJSON::JSONifyToValue(value, document, "scale lock", component.locktoscale);
+		RapidJSON::JSONifyToValue(value, document, "shapeid", component.shapeid);
 	}
 
 	template<>
@@ -80,6 +124,7 @@ namespace god
 		AssignIfExist(jsonObj, component.extents.y, "y extent");
 		AssignIfExist(jsonObj, component.extents.z, "z extent");
 		AssignIfExist(jsonObj, component.locktoscale, "scale lock");
+		AssignIfExist(jsonObj, component.shapeid, "shapeid");
 	}
 
 	/*

@@ -63,10 +63,7 @@ namespace god
 
 				ImGui::InputFloat("Density", &component.Density);
 
-				if (ImGui::SmallButton("Update RigidDynamic") )
-				{
-					component.updateRigidDynamic = true;
-				}
+
 
 			});
 	}
