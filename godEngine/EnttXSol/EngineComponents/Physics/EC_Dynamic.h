@@ -26,16 +26,19 @@ namespace god
 
 
 		//Non serialize data
-		physx::PxMaterial* p_material{ nullptr };
+		physx::PxTriangleMesh* p_trimesh;
+		physx::PxMaterial* p_material;
 		physx::PxShape* p_shape;	
-		physx::PxRigidDynamic* p_RigidDynamic{ nullptr };
+		physx::PxRigidDynamic* p_RigidDynamic;
+
 		bool updateRigidDynamic{ true };
-		physx::PxScene* mScene{ nullptr };
+		physx::PxScene* mScene;
 
 		//Ctor
 		RigidDynamic() :  
+			p_material{ nullptr }, p_RigidDynamic{ nullptr }, mScene{ nullptr }, p_trimesh{nullptr},
 			shapeid{ 0 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, p_shape{ nullptr },  locktoscale{ true },
-			StaticFriction{ 0.5f }, DynamicFriction{ 0.5f }, Restitution{ 0.5f }, p_material{ nullptr }, 
+			StaticFriction{ 0.5f }, DynamicFriction{ 0.5f }, Restitution{ 0.5f }, 
 			AngularVelocity{ 0.f,0.f,0.f }, LinearVelocity{ 0.f,0.f,0.f }, Density{ 1.f }
 		{};
 
@@ -73,7 +76,7 @@ namespace god
 
 
 				int selected_shape = component.shapeid;
-				const char* names[] = { "Cube", "Sphere", "Capsule","Plane" };
+				const char* names[] = { "Cube", "Sphere", "Capsule","Triangle Mesh" };
 				char buf[64];
 				sprintf_s(buf, "%s###", names[selected_shape]); // ### operator override ID ignoring the preceding label
 				if (ImGui::Button(buf))

@@ -2,7 +2,7 @@
 
 #include "../../EngineComponents/EC_All.h"
 #include "../../EnttXSol.h"
-
+using namespace physx;
 namespace god
 {
 	void RigidDynamicFrameBegin(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic& > component)
@@ -19,16 +19,16 @@ namespace god
 			}
 		}
 	}
-	void RigidDynamicUpdate(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&,  RigidDynamic& > component)
+	void RigidDynamicUpdate(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&,  RigidDynamic&, Renderable3D& > component)
 	{
 		Transform& transform = std::get<1>(component);
-
+		Renderable3D& renderable = std::get<3>(component);
 		RigidDynamic& rigiddynamic = std::get<2>(component);
 
 		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
+		physx::PxCooking* mCooking = engineResources.Get<PhysicsSystem>().get().GetCooking();
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
-
-
+		Asset3DManager& assetmgr = engineResources.Get<Asset3DManager>().get();
 
 		
 		if (rigiddynamic.updateRigidDynamic)
@@ -56,42 +56,45 @@ namespace god
 					rigiddynamic.p_shape = mPhysics->createShape(physx::PxCapsuleGeometry(rigiddynamic.extents.x, rigiddynamic.extents.y), *rigiddynamic.p_material, true);
 					rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
 					break;
+
 				case RigidDynamic::TriangleMesh:
-					/*
-					using namespace physx;
+					std::vector<Vertex3D> vertexes = std::get<1>(assetmgr.Get(renderable.m_model_id)).m_model.m_meshes[0].m_vertices;
+					std::vector< uint32_t> indices = std::get<1>(assetmgr.Get(renderable.m_model_id)).m_model.m_meshes[0].m_indices;
+					std::vector<glm::vec3> points;
+					for (auto const& vertex : vertexes)
+					{
+						points.push_back( vertex.m_position );
+					}
+					PxTriangleMeshDesc meshDesc;
+					meshDesc.points.count = points.size();
+					meshDesc.points.stride = sizeof(glm::vec3);
+					meshDesc.points.data = &(points.front() );
+
+					meshDesc.triangles.count = indices.size();
+					meshDesc.triangles.stride = 3 * sizeof(uint32_t);
+					meshDesc.triangles.data = &(indices.front() );
+
+					PxDefaultMemoryOutputStream writeBuffer;
+					PxTriangleMeshCookingResult::Enum result;
+					bool status = mCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
+					if (!status)
+						std::cerr << "Failed to cook triangle mesh\n";
+
+					PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+					rigiddynamic.p_trimesh = mPhysics->createTriangleMesh(readBuffer);
 					
-					PxTriangleMeshGeometry triGeom;
-					triGeom.triangleMesh = triangleMesh;
-					physx::PxTriangleMeshGeometry()
-					rigiddynamic.p_shape = mPhysics->createShape(physx::PxCapsuleGeometry(rigiddynamic.extents.x, rigiddynamic.extents.y), *rigiddynamic.p_material, true);
+					PxMeshScale scale(PxVec3(rigiddynamic.extents.x, rigiddynamic.extents.y, rigiddynamic.extents.z), PxQuat(PxIdentity));
+					rigiddynamic.p_shape = mPhysics->createShape(physx::PxTriangleMeshGeometry(rigiddynamic.p_trimesh, scale), *rigiddynamic.p_material, true);
 					rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
-					*/
+
 					break;
+					
 				}
 			}
 
-			physx::PxRigidDynamic* meshActor = mPhysics->createRigidDynamic(physx::PxTransform(1.0f,1.f,1.f));
-			physx::PxShape* meshShape;
-			if (meshActor)
-			{
-				meshActor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
-
-			
-
-				physx::PxTriangleMeshGeometry triGeom;
-				triGeom.triangleMesh = triangleMesh;
-				meshShape = physx::PxRigidActorExt::createExclusiveShape(*meshActor, triGeom,
-				*rigiddynamic.p_material);
-				mScene->addActor(*meshActor);
-
-				PxConvexMeshGeometry convexGeom = PxConvexMeshGeometry(convexBox);
-				convexShape = PxRigidActorExt::createExclusiveShape(*meshActor, convexGeom,
-					defaultMaterial);
-
-
-
 			if (rigiddynamic.p_RigidDynamic == nullptr)
 			{
+
 				rigiddynamic.p_RigidDynamic = mPhysics->createRigidDynamic(physx::PxTransform(transform.m_position.x,
 					transform.m_position.y, transform.m_position.z));
 
@@ -111,7 +114,27 @@ namespace god
 		if (rigiddynamic.locktoscale)
 		{
 			rigiddynamic.extents = transform.m_scale;
-			rigiddynamic.p_shape->setGeometry(physx::PxBoxGeometry(rigiddynamic.extents.x, rigiddynamic.extents.y, rigiddynamic.extents.z));
+			switch (rigiddynamic.shapeid)
+			{
+			case RigidDynamic::Cube:
+				rigiddynamic.p_shape->setGeometry(physx::PxBoxGeometry(rigiddynamic.extents.x, rigiddynamic.extents.y, rigiddynamic.extents.z));
+				rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
+				break;
+			case RigidDynamic::Sphere:
+				rigiddynamic.p_shape->setGeometry(physx::PxSphereGeometry(rigiddynamic.extents.x));
+				rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
+				break;
+			case RigidDynamic::Capsule:
+				rigiddynamic.p_shape->setGeometry(physx::PxCapsuleGeometry(rigiddynamic.extents.x, rigiddynamic.extents.y));
+				rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
+				break;
+
+			case RigidDynamic::TriangleMesh:
+				PxMeshScale scale(PxVec3(rigiddynamic.extents.x, rigiddynamic.extents.y, rigiddynamic.extents.z), PxQuat(PxIdentity));
+				rigiddynamic.p_shape->setGeometry(physx::PxTriangleMeshGeometry(rigiddynamic.p_trimesh, scale) );
+				rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
+			}
+			
 		}
 
 	}

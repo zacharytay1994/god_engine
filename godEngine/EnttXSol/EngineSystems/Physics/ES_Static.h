@@ -85,7 +85,26 @@ namespace god
 		if (rigidstatic.locktoscale)
 		{
 			rigidstatic.extents = transform.m_scale;
-			rigidstatic.p_shape->setGeometry(physx::PxBoxGeometry(rigidstatic.extents.x, rigidstatic.extents.y, rigidstatic.extents.z));
+
+			switch (rigidstatic.shapeid)
+			{
+			case RigidStatic::Cube:
+				rigidstatic.p_shape->setGeometry(physx::PxBoxGeometry(rigidstatic.extents.x, rigidstatic.extents.y, rigidstatic.extents.z));
+				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
+				break;
+			case RigidStatic::Sphere:
+				rigidstatic.p_shape->setGeometry(physx::PxSphereGeometry(rigidstatic.extents.x));
+				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
+				break;
+			case RigidStatic::Capsule:
+				rigidstatic.p_shape->setGeometry(physx::PxCapsuleGeometry(rigidstatic.extents.x, rigidstatic.extents.y));
+				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
+				break;
+
+			}
+
+
+			
 		}
 
 		rigidstatic.p_RigidStatic->setGlobalPose(physx::PxTransform(transform.m_position.x + rigidstatic.Offset.x,
