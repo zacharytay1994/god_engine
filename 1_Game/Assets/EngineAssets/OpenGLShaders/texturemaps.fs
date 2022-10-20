@@ -1,11 +1,15 @@
 #version 430 core
 
-out vec4 fFragColor;
+// out vec4 fFragColor;
+layout (location = 0) out vec4 fFragColor;
+layout (location = 1) out vec4 fBrightColor;
 
 in vec2 vUV;
 in vec3 vNormal;
 in vec3 vWorldPos;
 in vec4 vFragPosLightSpace;
+
+smooth in vec4 vEyeSpacePosition;
 
 uniform vec3 uViewPosition;
 
@@ -57,8 +61,6 @@ struct sSpotLight
     float constant;
     float linear;
     float quadratic;
-
-
 };
 
 uniform sLight              uPointLight[5];
@@ -70,10 +72,50 @@ uniform int                 uNumDirectionalLight;
 uniform sSpotLight          uSpotLight;
 
 //skybox
-uniform samplerCube uSkybox; //--
+uniform samplerCube uSkybox;
 
 // shadowmap
 uniform sampler2D uShadowMap;
+
+struct sFogParameters
+{
+	vec3 color;
+	float linearStart;
+	float linearEnd;
+	float density;
+	
+	int equation;
+	bool isEnabled;
+};
+
+// fog
+uniform sFogParameters uFogParams;
+
+float light_max_distance = 5.0f;
+float gamma = 2.2;
+
+float getFogFactor(sFogParameters params, float fogCoordinate)
+{
+	float result = 0.0;
+
+    // linear interpolation
+	if(params.equation == 0)
+	{
+		float fogLength = params.linearEnd - params.linearStart;
+		result = (params.linearEnd - fogCoordinate) / fogLength;
+	}
+    //  won't make fog to appear linearly, but rather we use an exponential function
+	else if(params.equation == 1) {
+		result = exp(-params.density * fogCoordinate);
+	}
+    // similar to previous, but this time we'll use the power of density
+	else if(params.equation == 2) {
+		result = exp(-pow(params.density * fogCoordinate, 2.0));
+	}
+	
+	result = 1.0 - clamp(result, 0.0, 1.0);
+	return result;
+}
 
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition)
 {
@@ -113,16 +155,23 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightPosition)
 vec3 PointLight(int i)
 {
     vec3 normal = normalize(vNormal);
-    vec3 light_direction = normalize(uPointLight[i].position - vWorldPos);
+    vec3 light_to_frag = uPointLight[i].position - vWorldPos;
+    float light_distance = length(light_to_frag);
+    float attenuation = 1.0 / light_distance;
+    float distance_clamp = max((1.0 - light_distance/light_max_distance),0.0);
+
+    vec3 light_direction = normalize(light_to_frag);
     vec3 view_direction = normalize(uViewPosition - vWorldPos);
     vec3 reflect_direction = reflect(-light_direction, normal);
 
     // ambient
-    vec4 ambient = vec4((uPointLight[i].colour * uPointLight[i].ambient), 1.0) * texture(uMaterial.diffuse_map, vUV);
+    vec4 ambient = vec4((uPointLight[i].colour * uPointLight[i].ambient), 1.0) * texture(uMaterial.diffuse_map, vUV) * distance_clamp;
 
     // diffuse
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
-    vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * texture(uMaterial.diffuse_map, vUV));
+    diffuse_scalar  *= attenuation * distance_clamp;
+
+    vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * vec4(pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma)),1.0));
 
     // cubemap reflection
     vec3 I = normalize (vWorldPos - uViewPosition) ; //--
@@ -132,11 +181,14 @@ vec3 PointLight(int i)
 
     // specular
     float specular_scalar = pow(max(dot(view_direction, reflect_direction), 0.0), uMaterial.shininess);
+    specular_scalar *= attenuation;
     vec4 specular = cubemap_colour * (specular_scalar * texture(uMaterial.specular_map, vUV));
+
+
 
     // calculate shadow
     // float shadow = ShadowCalculation(vFragPosLightSpace);
-    return vec3((ambient + (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
+    return vec3((ambient + ((light_max_distance - light_distance) / light_max_distance) * (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
     // return vec3((ambient + (1.0 - shadow) * (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
 }
 
@@ -150,7 +202,7 @@ vec3 DirectLight(int i, float shadow)
 	vec3 normal = normalize(vNormal);
     vec3 light_direction = normalize(-uDirectionalLight[i].direction);
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
-    vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * texture(uMaterial.diffuse_map, vUV).rgb;
+    vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma));
 
     // specular
     vec3 view_direction = normalize(uViewPosition - vWorldPos);
@@ -221,4 +273,18 @@ void main()
     }
 
     fFragColor = vec4((point_lights_value + directional_lights_value) , 1.0);
+
+    float brightness = dot(fFragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+    // float brightness = dot(fFragColor.rgb, vec3(50.2126, 50.7152, 50.0722));
+    if(brightness > 10.0)
+        fBrightColor = vec4(fFragColor.rgb, 1.0);
+    else
+        fBrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+
+    //apply fog calculation only if fog is enabled
+    if(uFogParams.isEnabled)
+    {
+          float fogCoordinate = abs(vEyeSpacePosition.z / vEyeSpacePosition.w);
+          fFragColor = mix(fFragColor, vec4(uFogParams.color, 1.0), getFogFactor(uFogParams, fogCoordinate));
+    }
 }

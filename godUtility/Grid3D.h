@@ -2,6 +2,7 @@
 
 #include "godUtility.h"
 #include "Internal/Miscellaneous.h"
+#include "Math.h"
 
 #include <tuple>
 #include <unordered_map>
@@ -35,6 +36,7 @@ namespace god
 		bool EraseValue ( float granularity , Coordinate const& coord , T const& value );
 		std::vector<T> const& Get ( float granularity , Coordinate const& coord ) const;
 		std::vector<T>& Get ( float granularity , Coordinate const& coord );
+		bool Has ( float granularity , Coordinate const& coord ) const;
 		void ChangeCell ( T const& value , float granularity , Coordinate const& from , Coordinate const& to );
 
 		template <typename FN , typename...ARGS>
@@ -43,11 +45,13 @@ namespace god
 		// pathfinding
 		std::vector<Coordinate> GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 );
 
+		bool RayCastToGrid ( Coordinate& coordinate , glm::vec3 const& origin , glm::vec3 const& scale , float granularity , glm::vec3 const& start , glm::vec3 const& end , int depth = 100 );
+
 	private:
 		Grid m_grid;
 
 		// used to normalize the granularity of a grid accurate to 4dp, to counter the effects of floating point error
-		uint32_t NormGran ( float granularity );
+		uint32_t NormGran ( float granularity ) const;
 	};
 
 	inline size_t CoordinateHash::operator()( Coordinate const& coordinate ) const
@@ -94,6 +98,21 @@ namespace god
 	inline std::vector<T>& Grid3D<T>::Get ( float granularity , Coordinate const& coord )
 	{
 		return m_grid[ NormGran ( granularity ) ][ coord ].m_values;
+	}
+
+	template<typename T>
+	inline bool Grid3D<T>::Has ( float granularity , Coordinate const& coord ) const
+	{
+		uint32_t gran = NormGran ( granularity );
+		if ( m_grid.find ( gran ) != m_grid.end () )
+		{
+			auto const& gran_grid = m_grid.at ( gran );
+			if ( gran_grid.find ( coord ) != gran_grid.end () && !gran_grid.at ( coord ).m_values.empty () )
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	template<typename T>
@@ -256,7 +275,37 @@ namespace god
 	}
 
 	template<typename T>
-	inline uint32_t Grid3D<T>::NormGran ( float granularity )
+	inline bool Grid3D<T>::RayCastToGrid ( Coordinate& coordinate , glm::vec3 const& origin , glm::vec3 const& scale , float granularity , glm::vec3 const& start , glm::vec3 const& end , int depth )
+	{
+		// start plane
+		auto difference = start - origin;
+		glm::vec3 stride = scale * 2.0f * granularity;
+		int num_layers = difference.y / stride.y;
+		float start_layer = origin.y + num_layers * stride.y;
+		glm::vec3 intersect;
+		int cell_x , cell_y , cell_z;
+		bool found { false };
+		for ( auto i = 0; i < depth && !found; ++i , start_layer -= stride.y )
+		{
+			if ( IntersectLineSegmentPlane ( start , end , { 0,1,0 } , start_layer + ( stride.y / 2.0f ) , intersect ) )
+			{
+				intersect -= origin;
+				cell_x = std::floor ( intersect.x / stride.x );
+				cell_y = num_layers - i;
+				cell_z = std::floor ( intersect.z / stride.z );
+
+				if ( Has ( granularity , { cell_x, cell_y, cell_z } ) )
+				{
+					coordinate = { cell_x, cell_y, cell_z };
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	template<typename T>
+	inline uint32_t Grid3D<T>::NormGran ( float granularity ) const
 	{
 		// cell granularity accurate to 4 decimal place
 		return static_cast< uint32_t >( granularity * 1000 );
@@ -272,5 +321,22 @@ namespace god
 		}
 	}
 
-	using EntityGrid = std::unordered_map<uint32_t , Grid3D<uint32_t>>;
+	//using EntityGrid = std::unordered_map<uint32_t , Grid3D<uint32_t>>;
+
+	struct Grid3DCell
+	{
+		uint32_t m_entity_id;
+		bool m_solid;
+
+		Grid3DCell ( uint32_t entityID , bool solid = true )
+			:
+			m_entity_id ( entityID ) ,
+			m_solid ( solid )
+		{
+
+		}
+
+		operator uint32_t() const { return m_entity_id; }
+	};
+	using EntityGrid = std::unordered_map<uint32_t , Grid3D<Grid3DCell>>;
 }

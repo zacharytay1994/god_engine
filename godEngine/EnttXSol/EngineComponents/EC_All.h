@@ -16,6 +16,8 @@
 #include "Physics/EC_Static.h"
 #include "Physics/EC_Dynamic.h"
 
+#include "Grid/EC_GridManipulate.h"
+
 #include <tuple>
 #include <string>
 #include <array>
@@ -36,7 +38,8 @@ namespace god
 			AudioListener ,
 			AudioSource ,
 			PointLight ,
-			DirectionalLight
+			DirectionalLight ,
+			GridManipulate
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};

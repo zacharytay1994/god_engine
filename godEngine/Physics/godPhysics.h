@@ -25,7 +25,8 @@ namespace god
 		 physx::PxScene* const GetPhysicsScene() const;
 		 std::map < std::string, physx::PxMaterial*>& GetMaterialContainer();
 
-		 
+
+		 bool debugdraw;
 	private:
 
 		//PhysX Visual Debugger
@@ -53,6 +54,7 @@ namespace god
 		uint16_t numSteps = 1;
 		float mStepSize = 1.0f / 60.0f;
 		
+
 	};
 
 }

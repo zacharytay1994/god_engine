@@ -21,7 +21,7 @@ function S_Pathfind(e)
         if (pathfind.Timer < pathfind.Interval) then
             pathfind.Timer = pathfind.Timer + GetDeltaTime()
         else
-            print("finding")
+            -- print("finding")
             pathfind.Timer = 0.0
             local current_cell = GetGridCell(e);
             -- if cell position not match, pathfind to cell
@@ -31,12 +31,15 @@ function S_Pathfind(e)
                     current_cell.x = path[2].x
                     current_cell.y = path[2].y
                     current_cell.z = path[2].z
-                    print("found")
+                    -- print("found")
                     print(current_cell.x, current_cell.y, current_cell.z)
                 else
                     pathfind.Path = false
                     pathfind.Timer = 0.0 
                 end
+            else
+                pathfind.Path = true
+                pathfind.Timer = 0.0
             end
         end
     end

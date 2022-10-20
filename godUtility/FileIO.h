@@ -28,4 +28,6 @@ namespace god
 		WindowsDialog::MODE mode = WindowsDialog::MODE::GETPATH , const char* dir = 0 );
 
 	void GODUTILITY_API DeleteFileAtPath ( std::string const& filePath );
+
+	bool GODUTILITY_API FileExists ( std::string const& folder , std::string const& file );
 }

@@ -347,7 +347,7 @@ namespace god
 
 					if ( ImGui::Button ( "Edit Raw" , { popup_width - 30.0f, 0.0f } ) )
 					{
-						std::string new_src = god::OpenWindowDialog ( L"Texture Files" , L"*.png;*.jpg" );
+						std::string new_src = god::OpenWindowDialog ( L"Texture Files" , L"*.png;*.jpg;*.dds*" );
 						if ( !new_src.empty () )
 						{
 							m_edit_src = new_src;

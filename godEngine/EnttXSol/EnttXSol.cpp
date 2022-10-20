@@ -8,6 +8,7 @@ namespace god
 	EnttXSol::EnttXSol ()
 	{
 		m_lua.open_libraries ( sol::lib::base );
+		m_lua.open_libraries ( sol::lib::math );
 		LoadScriptsFromFolder ();
 
 		// define lua functions
@@ -189,8 +190,12 @@ namespace god
 							// find Get... engine component lines
 							// identified with a "Get" and no "", more robust test might be neededs
 							std::string get_key { "Get" };
+							auto first_bracket = line.find_first_of ( '(' ) + 1;
+							auto first_argument = line.substr ( first_bracket , line.find_first_of ( ',' ) - first_bracket );
+							first_argument.erase ( std::remove_if ( first_argument.begin () , first_argument.end () , []( auto c ) { return std::isspace ( c ); } ) , first_argument.end () );
 							if ( line.find ( get_key ) != std::string::npos &&
-								line.find ( "\"" ) == std::string::npos )
+								line.find ( "\"" ) == std::string::npos &&
+								first_argument == "e" )
 							{
 								auto get = line.find ( get_key );
 								auto engine_component_name = line.substr ( get , line.size () - get );
@@ -320,6 +325,19 @@ namespace god
 		ed->m_parent_id = parent;
 
 		return new_entity;
+	}
+
+	EnttXSol::Entities::ID EnttXSol::GetEntity ( std::string const& name )
+	{
+		// potential area for optimization looking for entity of name
+		for ( uint32_t i = 0; i < m_entities.Size (); ++i )
+		{
+			if ( m_entities[ i ].m_name == name )
+			{
+				return  i;
+			}
+		}
+		return Entities::Null;
 	}
 
 	void EnttXSol::RemoveEntity ( Entities::ID entity )
