@@ -49,7 +49,9 @@ namespace god
 		double			MouseScrollDown ();
 
 		// gamepad input
-		void			setGamepad(bool connected) { m_gamepad_connected = connected; }
+		void			setGamepadConnect(bool connected) { m_gamepad_connected = connected; }
+		void			setGamepadPress(bool pressed) { m_gamepad_pressed = pressed; }
+		void			setGamepadReleased(bool released) { m_gamepad_released = released; }
 
 		bool			GamepadConnected();
 		bool			GamepadPressed();
@@ -85,7 +87,7 @@ namespace god
 		friend void GLFWMouseCallback ( GLFWwindow* window , int button , int action , int mods );
 		friend void GLFWScrollCallback ( GLFWwindow* window , double xOffset , double yOffset );
 
-		friend void GLFWJoystick_callback( int jid, int event);
+		friend void	GLFWJoystick_callback(int jid, int event);
 
 		void		SetViewportMouseCoordinates ( double x , double y );
 

@@ -88,7 +88,7 @@ namespace god
 		if (event == GLFW_CONNECTED)
 		{
 			// The joystick was connected
-			//setGamepad(true);
+			//setGamepadConnect(true);
 			std::cout << "Joystick is connected!\n";
 
 		}
@@ -96,6 +96,7 @@ namespace god
 		{
 			// The joystick was disconnected
 			//setGamepad(false);
+			//setGamepadConnect(false);
 			std::cout << "Joystick is disconnected!\n";
 		}
 
@@ -129,7 +130,7 @@ namespace god
 		glfwSetScrollCallback ( m_window , GLFWScrollCallback );
 
 		glfwSetJoystickCallback(GLFWJoystick_callback);
-
+		
 		present = glfwJoystickPresent(GLFW_JOYSTICK_1);
 		std::cout << "Joystick/Gamepad status: " << present << "\n";
 
@@ -389,6 +390,7 @@ namespace god
 	{
 		return m_gamepad_released;
 	}
+
 
 	void GLFWWindow::SetViewportMouseCoordinates ( double x , double y )
 	{
