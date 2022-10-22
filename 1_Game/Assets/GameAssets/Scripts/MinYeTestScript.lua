@@ -12,7 +12,9 @@ end
 --[IsSystem]
 function S_MinyeTestFunction(e)
     
-    if (Window.Keydown(GLFW_KEY_LEFT_CONTROL)) then
-        print("min")
+    --print("outside")
+    if (GetKeyDown(77) == true) then
+        print("input received")
     end
+
 end
