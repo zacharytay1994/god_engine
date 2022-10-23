@@ -94,7 +94,7 @@ namespace god
 
 		// GetKeyDown(key)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("GetKeyDown",
+		entt.RegisterLuaFunction("CheckKeyDown",
 			[&engineResources](int key)->bool
 			{
 				auto& window = engineResources.Get<GLFWWindow>().get();

@@ -1,7 +1,10 @@
+
+
+
 --[IsComponent]
 function C_MinyeTestFunction()
     local var = {
-        --[SerializeFloat]
+
         p = 13.4
     };
     return function()
