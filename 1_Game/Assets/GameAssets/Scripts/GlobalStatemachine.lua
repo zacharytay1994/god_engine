@@ -1,3 +1,8 @@
+-- GlobalStatemachine will manage higher-level states, such as:
+-- 1) StateCharacterTurn
+-- 2) StateRandomEvent
+-- where each of them will manage their own lower-level states such as StatePlayerMove / StateEnemyMove
+
 --[IsComponent]
 function C_GlobalStatemachine()
     local var = {
@@ -12,19 +17,24 @@ end
 --[IsSystem]
 function S_GlobalStatemachine(e)
     
-    local GlobalStatemachineEntity = GetEntity("GlobalStatemachine")
-    local GlobalStatemachineComponent = GetComponent(GlobalStatemachineEntity, "C_GlobalStatemachine")
+    -- getting entity and component
+    local globalStateMachineEntity = GetEntity("GlobalStatemachine")
+    local globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
     
     -- press 1 to change state to StateCharacterTurn
-    if (CheckKeyDown(49) == true) then
-        GlobalStatemachineComponent.CurrentState = "StateCharacterTurn"
+    if (CheckKeyPress(49) == true) then
+        globalStateMachineComponent.CurrentState = "StateCharacterTurn"
         print("CurrentState = StateCharacterTurn")
     end
 
     -- press 2 to change state to StateRandomEvent
-    if (CheckKeyDown(50) == true) then
-        GlobalStatemachineComponent.CurrentState = "StateRandomEvent"
+    if (CheckKeyPress(50) == true) then
+        globalStateMachineComponent.CurrentState = "StateRandomEvent"
         print("CurrentState = StateRandomEvent")
+    end
 
+    -- press J to print the current State
+    if (CheckKeyPress(74)) then
+        print(globalStateMachineComponent.CurrentState)
     end
 end

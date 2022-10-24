@@ -1,6 +1,7 @@
+-- This script allows the player to move, but only during the Player's turn.
+
 -- TODO:
--- 1) need to access character's EntityData component to check its ID against TurnOrderManager.currentTurn
---    line 25 and 26 does not work
+-- 1) Decrease Player's stamina as the Player moves.
 
 --[IsComponent]
 function C_StateMovePlayer()
@@ -17,16 +18,27 @@ end
 
 --[IsSystem]
 function S_StateMovePlayer(e)
+
     -- check if TurnOrderManager entity exists
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
+
     if (turnOrderManagerEntity ~= -1) then
-        local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
+
         -- do some state-only action here
         local entityDataComponent = GetEntityData(e)
-        if (turnOrderManagerComponent.currentTurn == entityDataComponent.ID) then
+        local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
+        local stateMovePlayerComponent = GetComponent(e, "C_StateMovePlayer")
+        
+        if (turnOrderManagerComponent.currentTurn == entityDataComponent.id) then
             -- action ...
-            if (component.Time < 1.0) then
-                component.Time = component.Time + GetDeltaTime()
+
+            -- press V to check if script passes currentTurn check
+            if (CheckKeyPress(86)) then
+                print("It is indeed the player's turn")
+            end
+
+            if (stateMovePlayerComponent.Time < 1.0) then
+                stateMovePlayerComponent.Time = stateMovePlayerComponent.Time + GetDeltaTime()
             else
                 local pathfind = GetComponent(e, "C_Pathfind")
                 

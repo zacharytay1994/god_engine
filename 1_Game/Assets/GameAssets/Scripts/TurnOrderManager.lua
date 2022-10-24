@@ -18,7 +18,11 @@ function C_TurnOrderManager()
         -- if set to true, will add all currently alive characters into the turnQueue
         buildTurnQueue = true,
 
-        currentTurn = 10,
+        -- currentTurn will be set to the ID number of whichever character's turn it currently is
+        currentTurn = 0,
+
+        -- indicates which character in the queue is performing their turn
+        queueIndex = 1,
 
         -- turnQueue is an array containing the Enitity IDs of all entities with a C_Character
         turnQueue = {}
@@ -31,56 +35,78 @@ end
 --[IsSystem]
 function S_TurnOrderManager(e)
     
+    -- getting TurnOrderManager entity and component
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
     local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
-    -- if (turnOrderManagerComponent.nextTurn == true) then
-    --     print("nextTurn has been set to true")  
-    -- else
-    --     print("nextTurn is false")  
-    -- end
     
-    local gs_entity = GetEntity("GlobalStatemachine")
-    local global_statemachine = GetComponent(gs_entity, "C_GlobalStatemachine")
-    if (global_statemachine.CurrentState == TurnOrderState) then
+    -- for checking if nextTurn is true or false, by pressing K
+    if (CheckKeyPress(75)) then
+        if (turnOrderManagerComponent.nextTurn == true) then
+            print("nextTurn is true")  
+        else
+            print("nextTurn is false")  
+        end
+    end
     
-        -- if starting a new turn cycle, build the 
-        if (buildTurnQueue == true) then 
-            -- TODO: add all remaining characters into the turnQueue
+    -- getting GlobalStatemachine entity and component
+    local globalStateMachineEntity = GetEntity("GlobalStatemachine")
+    local globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
 
-            -- hardcoded way of building the turnQueue. 44 is Player's ID, 100 is Enemy's ID
-            local component = GetComponent(e, "C_TurnOrderManager")
-            component.turnQueue = { 44, 100 }
-
-            print(component.turnQueue)
-
-            -- TODO: sort according to stamina
-
-            -- reset to false so it doesn't keep running this chunk
-            buildTurnQueue = false
+    -- only run the rest of this script if globalStateMachine allows it
+    if (globalStateMachineComponent.CurrentState == turnOrderManagerComponent.TurnOrderState) then
+            
+        -- press M to check whether the script passes the globalStateMachineComponent.CurrentState check
+        if (CheckKeyPress(77)) then
+            print("TurnOrderManager script entered main chunk")
+        end
+        -- press N to check whether buildTurnQueue is true or false
+        if (CheckKeyPress(78)) then
+            print("buildTurnQueue is ", turnOrderManagerComponent.buildTurnQueue)
+        end
+        -- press B to check ID of current active character
+        if (CheckKeyPress(66)) then
+            print("current active character is ", turnOrderManagerComponent.currentTurn)
         end
         
-        local i = 1
-        local component = GetComponent(e, "C_TurnOrderManager")
-        while (component.turnQueue[i] ~= nil) do
+        -- if starting a new turn cycle, build the turn queue 
+        if (turnOrderManagerComponent.buildTurnQueue == true) then        
+
+            -- TODO: add all remaining characters into the turnQueue (currently hard-coded)
+            local playerID = GetEntityData(GetEntity("Player")).id
+            local enemyID = GetEntityData(GetEntity("Enemy")).id
+
+            -- for some reason, tables don't work
+            -- table.insert(turnOrderManagerComponent.turnQueue, playerID)
+            -- table.insert(turnOrderManagerComponent.turnQueue, enemyID)
+            turnOrderManagerComponent.turnQueue[1] = playerID
+            turnOrderManagerComponent.turnQueue[2] = enemyID
+
+            -- TODO: sort all characters in turnQueue by remaining stamina
+
+            -- printing the turnQueue (currently hard-coded)
+            -- print(turnOrderManagerComponent.turnQueue[1])
+            -- print(turnOrderManagerComponent.turnQueue[2])
+
+            -- reset to false so it doesn't keep running this chunk
+            -- print("setting buildTurnQueue to false!")
+            turnOrderManagerComponent.buildTurnQueue = false
+        end
+     
+        if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
             
             -- TODO: allow current character do perform their turn
-            currentTurn = component.turnQueue[i]
+            turnOrderManagerComponent.currentTurn = turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]
 
-            if (nextTurn == true) then
-                nextTurn = false    
-                i = i + 1
+            if (turnOrderManagerComponent.nextTurn == true) then
+                turnOrderManagerComponent.nextTurn = false    
+                turnOrderManagerComponent.queueIndex = turnOrderManagerComponent.queueIndex + 1
             end
+        else
+            turnOrderManagerComponent.buildTurnQueue = true
+            turnOrderManagerComponent.queueIndex = 1
+            globalStateMachineComponent.CurrentState = "RandomEventState"
         end
-
-        buildTurnQueue = true
-
-        local gs_entity = GetEntity("GlobalStatemachine")
-        local global_statemachine = GetComponent(gs_entity, "C_GlobalStatemachine")
-        global_statemachine.CurrentState = "RandomEventState"
-
     end
-
-
 end
 
 
