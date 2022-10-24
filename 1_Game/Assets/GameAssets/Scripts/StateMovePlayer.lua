@@ -3,7 +3,7 @@ function C_StateMovePlayer()
     local var = {
         --[SerializeString]
         GlobalStatemachine = "GlobalStatemachine",
-        MovementState = "MovePlayer",
+        State = "MovePlayer",
         Time = 0.0
     }
     return function()
@@ -19,7 +19,7 @@ function S_StateMovePlayer(e)
     if (gs_entity ~= -1) then
         local global_statemachine = GetComponent(gs_entity, "C_GlobalStatemachine")
         -- do some state-only action here
-        if (global_statemachine.CurrentState == component.MovementState) then
+        if (global_statemachine.CurrentState == component.State) then
             -- action ...
             if (component.Time < 1.0) then
                 component.Time = component.Time + GetDeltaTime()
@@ -30,12 +30,10 @@ function S_StateMovePlayer(e)
                 if (gm_entity ~= -1) then
                     local gm = GetGridManipulate(gm_entity)
                     if (gm.clicked) then
-                        print("hi")
                         pathfind.x = gm.last_clicked_cell.x
                         pathfind.y = gm.last_clicked_cell.y
                         pathfind.z = gm.last_clicked_cell.z
                         pathfind.Path = true
-                        print("move")
                     end
                 end
             end

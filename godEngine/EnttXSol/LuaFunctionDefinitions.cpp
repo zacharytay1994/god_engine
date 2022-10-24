@@ -91,5 +91,20 @@ namespace god
 				return std::vector<glm::ivec3> ();
 			}
 		);
+
+		// Check if component exists
+		entt.RegisterLuaFunction ( "HasScriptComponent" ,
+			[&entt]( entt::entity e , std::string const& name )->bool
+			{
+				return entt.HasScriptComponent ( e , name );
+			}
+		);
+
+		entt.RegisterLuaFunction ( "HasEngineComponent" ,
+			[&entt]( entt::entity e , std::string const& name )->bool
+			{
+				return entt.HasEngineComponent ( e , name );
+			}
+		);
 	}
 }

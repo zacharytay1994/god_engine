@@ -118,6 +118,11 @@ namespace god
 		template<typename T>
 		void RemoveEngineComponent ( Entities::ID entity );
 
+		template<typename T>
+		bool HasEngineComponent ( entt::entity e );
+		bool HasEngineComponent ( entt::entity e , std::string const& name );
+		bool HasScriptComponent ( entt::entity e , std::string const& name );
+
 		std::unordered_map<std::string , Script> const& GetScripts () const;
 
 		// S = scene, T = transform, R = renderable
@@ -150,6 +155,12 @@ namespace god
 		{
 			template<typename T>
 			void operator () ( EnttXSol* enttxsol , Entities::ID e );
+		};
+
+		struct CheckEngineComponentFunctor
+		{
+			template<typename T>
+			void operator()( EnttXSol* enttxsol , entt::entity e , bool& b );
 		};
 
 		Entities m_entities;
@@ -402,6 +413,13 @@ namespace god
 		}
 	}
 
+	template<typename T>
+	inline bool EnttXSol::HasEngineComponent ( entt::entity e )
+	{
+		T* component = m_registry.try_get<T> ( e );
+		return component != nullptr;
+	}
+
 	template<typename S , typename T , typename R>
 	inline void EnttXSol::PopulateScene ( S& scene )
 	{
@@ -505,5 +523,11 @@ namespace god
 	inline void EnttXSol::AttachEngineComponentFunctor::operator()( EnttXSol* enttxsol , Entities::ID e )
 	{
 		enttxsol->AttachComponent<T> ( e );
+	}
+
+	template<typename T>
+	inline void EnttXSol::CheckEngineComponentFunctor::operator()( EnttXSol* enttxsol , entt::entity e , bool& b )
+	{
+		b = enttxsol->HasEngineComponent<T> ( e );
 	}
 }

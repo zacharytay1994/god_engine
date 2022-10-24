@@ -434,6 +434,23 @@ namespace god
 		T_Manip::RunOnType ( EngineComponents::Components () , componentID , AttachEngineComponentFunctor () , this , entity );
 	}
 
+	bool EnttXSol::HasEngineComponent ( entt::entity e , std::string const& name )
+	{
+		auto it = std::find ( EngineComponents::m_component_names.begin () , EngineComponents::m_component_names.end () , name );
+		if ( it != EngineComponents::m_component_names.end () )
+		{
+			bool check = false;
+			T_Manip::RunOnType ( EngineComponents::Components () , it - EngineComponents::m_component_names.begin () , CheckEngineComponentFunctor () , this , e , std::ref ( check ) );
+			return check;
+		}
+		return false;
+	}
+
+	bool EnttXSol::HasScriptComponent ( entt::entity e , std::string const& name )
+	{
+		return m_registry.storage<sol::table> ( entt::hashed_string ( name.c_str () ) ).contains ( e );
+	}
+
 	std::unordered_map<std::string , EnttXSol::Script> const& EnttXSol::GetScripts () const
 	{
 		return m_scripts;
