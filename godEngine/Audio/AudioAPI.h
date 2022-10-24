@@ -26,13 +26,14 @@ namespace god
 		AudioAPI();
 		~AudioAPI();
 
-		void Update();
+		static void Update();
 
 	public:
 		static void Create3DReverb(FMOD::Reverb3D** reverb);
 		static void SetReverbPreset(FMOD::Reverb3D* reverb);
 
-		//void CreateChannelGroup();
+		static FMOD::ChannelGroup* CreateChannelGroup(const char* name);
+		static void SetChannelGroup(int groupID, Sound& sound);
 
 	public:
 		static void LoadSound(const char* filePath, FMOD::Sound** sound);
@@ -56,9 +57,12 @@ namespace god
 
 	public:
 		static void SetListenerAttributes(const FMOD_VECTOR* position, const FMOD_VECTOR* velocity, const FMOD_VECTOR* forward, const FMOD_VECTOR* up);
+		static void SetSourceAttributes(Sound& sound, const FMOD_VECTOR* position, const FMOD_VECTOR* velocity);
 
 	public:
 		static void GLMVectorToFMODVector(const glm::vec3& input, FMOD_VECTOR& output);
+		static std::unordered_map<int, const char*>& GetChannelGroupNames();
+		static const char* GetChannelGroupName(int id);
 
 	private:
 		static FMOD::System* m_FMOD_system;
@@ -66,5 +70,8 @@ namespace god
 		static FMOD::SoundGroup* m_master_sound_group;
 
 		static std::vector<FMOD::Channel*> m_channels;
+		static std::unordered_map<int, FMOD::ChannelGroup*> m_channel_groups;
+
+		static std::unordered_map<int, const char*> m_channel_group_names;
 	};
 }

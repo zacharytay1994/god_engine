@@ -7,13 +7,18 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct AudioSource
 	{
-		//int m_channel_group; // to seperate sounds into different categories
+		const char* m_channel_group_name{ "" };
+		int m_channel_group_id{ 0 }; // to seperate sounds into different categories
+		
+		FMOD_VECTOR m_position;
+		FMOD_VECTOR m_velocity;
+
 		bool m_played{ false };
 
-		bool m_3d_sound{ false }; // change to float like unity
+		bool m_3d_sound{ true }; // change to float like unity
 		float m_spatial_blend{ 0.f }; // modifier value?
 
-		int m_sound_id{ -1 };
+		int m_sound_id{ -1 }; // multiple sounds?
 		//int m_source_id{ -1 };
 
 		bool m_mute{ false };
@@ -56,6 +61,7 @@ namespace god
 				ImGui::Text("Audio Source");
 				ImGui::Separator();
 
+				// select sound
 				if (ImGui::BeginPopup("Sound Select"))
 				{
 					for (auto const& asset : sounds.get().GetIDs())
@@ -82,6 +88,31 @@ namespace god
 					ImGui::OpenPopup("Sound Select");
 				}
 
+				// select sound group
+				if (ImGui::BeginPopup("Sound Group Select"))
+				{
+					for (auto const& name : AudioAPI::GetChannelGroupNames())
+					{
+						if (ImGui::Selectable(std::get<1>(name)))
+						{
+							component.m_channel_group_id = std::get<0>(name);
+							Sound& sound = std::get<1>(sound_manager.Get(component.m_sound_id));
+							if (sound.m_channel)
+								AudioAPI::SetChannelGroup(component.m_channel_group_id, sound);
+
+							ImGui::CloseCurrentPopup();
+						}
+					}
+					ImGui::EndPopup();
+				}
+
+				ImGui::Text(" Sound Group: ");
+				if (ImGui::Button(AudioAPI::GetChannelGroupName(component.m_channel_group_id), { ImGui::GetWindowWidth(),0 }))
+				{
+					ImGui::OpenPopup("Sound Group Select");
+				}
+
+				// manually play sound
 				if (ImGui::Button("Play Sound"))
 				{
 					if (component.m_sound_id != -1)
@@ -94,6 +125,7 @@ namespace god
 					component.m_played = false;
 				}
 
+				// modify other properties
 				ImGui::Checkbox("Mute", &component.m_mute);
 				ImGui::Checkbox("Loop", &component.m_loop);
 				ImGui::Checkbox("Play On Awake", &component.m_play_on_awake);

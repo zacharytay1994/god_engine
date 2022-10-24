@@ -168,8 +168,6 @@ namespace god
 			//Physics Simulate update
 			godPhysicsSystem.Update(delta_timer.m_dt , enttxsol.m_pause);
 
-			audio_api.Update();
-
 			// render scene
 			SystemTimer::StartTimeSegment("Rendering");
 			// depth map pass
@@ -266,6 +264,9 @@ namespace god
 			);*/
 
 			EngineSystemsFrameEnd(enttxsol, engine_resources);
+
+			// update FMOD system
+			AudioAPI::Update();
 
 			delta_timer.EndFrame();
 			SystemTimer::EndTimeSegment("Overall");

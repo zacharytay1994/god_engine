@@ -17,6 +17,12 @@ namespace god
 	FMOD::SoundGroup* AudioAPI::m_master_sound_group;
 
 	std::vector<FMOD::Channel*> AudioAPI::m_channels;
+	std::unordered_map<int, FMOD::ChannelGroup*> AudioAPI::m_channel_groups;
+
+	std::unordered_map<int, const char*> AudioAPI::m_channel_group_names =
+	{
+		{ 0, "Default" }, { 1, "Music" }, { 2, "SFX" }
+	};
 
 	AudioAPI::AudioAPI()
 	{
@@ -24,7 +30,7 @@ namespace god
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
 
-		m_FMOD_system->init(FMOD_MAX_CHANNEL_WIDTH, FMOD_INIT_NORMAL, NULL);
+		m_FMOD_system->init(FMOD_MAX_CHANNEL_WIDTH, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, NULL);
 
 		result = m_FMOD_system->getMasterChannelGroup(&m_master_channel_group);
 		if (result != FMOD_OK)
@@ -33,6 +39,14 @@ namespace god
 		result = m_FMOD_system->getMasterSoundGroup(&m_master_sound_group);
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
+
+		for (const auto& name : m_channel_group_names)
+		{
+			if (name.first == 0)
+				continue;
+
+			m_channel_groups.insert({ name.first, CreateChannelGroup(name.second) });
+		}
 
 		std::cerr << "AudioAPI created\n";
 	}
@@ -70,6 +84,22 @@ namespace god
 		m_FMOD_system->set3DListenerAttributes(0, &listenerpos, 0, 0, 0);
 	}
 
+	FMOD::ChannelGroup* AudioAPI::CreateChannelGroup(const char* name)
+	{
+		FMOD::ChannelGroup* channel_group = nullptr;
+
+		FMOD_RESULT result = m_FMOD_system->createChannelGroup(name, &channel_group);
+		if (result != FMOD_OK)
+			assert(FMOD_ErrorString(result));
+
+		return channel_group;
+	}
+
+	void AudioAPI::SetChannelGroup(int groupID, Sound& sound)
+	{
+		sound.m_channel->setChannelGroup(m_channel_groups.at(groupID));
+	}
+
 
 	void AudioAPI::LoadSound(const char* filePath, FMOD::Sound** sound)
 	{
@@ -81,7 +111,8 @@ namespace god
 	void AudioAPI::LoadSound(const char* filePath, Sound& sound)
 	{
 		// change the mode when creating sound
-		FMOD_MODE mode = FMOD_LOOP_OFF | FMOD_3D | FMOD_3D_HEADRELATIVE | FMOD_3D_INVERSEROLLOFF;
+		//FMOD_MODE mode = FMOD_LOOP_OFF | FMOD_3D | FMOD_3D_HEADRELATIVE | FMOD_3D_INVERSEROLLOFF;
+		FMOD_MODE mode = FMOD_3D;
 
 		FMOD_RESULT result = m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample);
 		if (result != FMOD_OK)
@@ -131,6 +162,8 @@ namespace god
 	{
 		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, &sound.m_channel);
 		sound.m_played = true;
+
+		//sound.m_channel->set3DMinMaxDistance(0.1f, 2.f);
 	}
 
 	void AudioAPI::PlaySound(Sound& sound, bool& played)
@@ -181,11 +214,34 @@ namespace god
 		m_FMOD_system->set3DListenerAttributes(0, position, velocity, forward, up);
 	}
 
+	void AudioAPI::SetSourceAttributes(Sound& sound, const FMOD_VECTOR* position, const FMOD_VECTOR* velocity)
+	{
+		sound.m_channel->set3DAttributes(position, velocity);
+	}
+
 
 	void AudioAPI::GLMVectorToFMODVector(const glm::vec3& input, FMOD_VECTOR& output)
 	{
 		output.x = input.x;
 		output.y = input.y;
 		output.z = input.z;
+	}
+
+	std::unordered_map<int, const char*>& AudioAPI::GetChannelGroupNames()
+	{
+		return m_channel_group_names;
+	}
+
+	const char* AudioAPI::GetChannelGroupName(int id)
+	{
+		for (auto const& name : m_channel_group_names)
+		{
+			if (name.first == id)
+			{
+				return name.second;
+			}
+		}
+
+		return "None";
 	}
 }
