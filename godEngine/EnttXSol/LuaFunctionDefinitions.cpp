@@ -91,5 +91,25 @@ namespace god
 				return std::vector<glm::ivec3> ();
 			}
 		);
+
+		// CheckKeyDown(key)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("CheckKeyDown",
+			[&engineResources](int key)->bool
+			{
+				auto& window = engineResources.Get<GLFWWindow>().get();
+				return window.KeyDown(key);
+			}
+		);
+
+		// CheckKeyPress(key)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("CheckKeyPress",
+			[&engineResources](int key)->bool
+			{
+				auto& window = engineResources.Get<GLFWWindow>().get();
+				return window.KeyPressed(key);
+			}
+		);
 	}
 }
