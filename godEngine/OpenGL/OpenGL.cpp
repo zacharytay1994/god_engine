@@ -334,11 +334,11 @@ namespace god
 
 
 			// Set Fog
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.65f,0.85f,0.90f} );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.45f,0.65f,0.90f} );
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearStart",  10.0f);
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearEnd", 100.0f );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.05f );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 2 );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.03f );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 0 );
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.isEnabled", true );
 
 
