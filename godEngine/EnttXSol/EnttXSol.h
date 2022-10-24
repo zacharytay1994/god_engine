@@ -122,6 +122,11 @@ namespace god
 		bool HasEngineComponent ( entt::entity e );
 		bool HasEngineComponent ( entt::entity e , std::string const& name );
 		bool HasScriptComponent ( entt::entity e , std::string const& name );
+		bool HasComponent ( entt::entity e , std::string const& name );
+
+		void GetEntitiesWithScriptComponent ( std::string const& name , std::vector<entt::entity>& container );
+		void GetEntitiesWithEngineComponent ( std::string const& name , std::vector<entt::entity>& container );
+		void GetEntitiesWithComponent ( std::string const& name , std::vector<entt::entity>& container );
 
 		std::unordered_map<std::string , Script> const& GetScripts () const;
 
