@@ -38,7 +38,7 @@ function S_PlayerEndTurn(e)
             if (turnOrderManagerComponent.currentTurn == playerID) then
                 
                 -- debug message, can comment if unneeded
-                print("Ending Player's turn!")
+                print("\n[PlayerEndTurn - START]\nEnding Player's turn!\n[PlayerEndTurn - END]\n\n")
                 
                 -- signal turnOrderManager to move on to the next character's turn
                 turnOrderManagerComponent.nextTurn = true
@@ -46,10 +46,3 @@ function S_PlayerEndTurn(e)
         end
     end
 end
-
---[[ PSEUDOCODE
-
-if player ends turn (either by pressing E or pressing an EndTurn button)
-    set TurnOrderManager.nextTurn = true;
-
---]]

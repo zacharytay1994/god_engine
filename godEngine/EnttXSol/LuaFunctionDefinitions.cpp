@@ -7,6 +7,7 @@
 
 #include <sol/sol.hpp>
 #include <glm/glm/glm.hpp>
+#include <glm/gtc/random.hpp>
 #include <functional>
 
 namespace god
@@ -130,6 +131,24 @@ namespace god
 			{
 				auto& window = engineResources.Get<GLFWWindow> ().get ();
 				return window.KeyPressed ( key );
+			}
+		);
+
+		// GenerateRandomProbability()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("GenerateRandomProbability",
+			[]()->float
+			{
+				return glm::linearRand(0.0f, 1.0f);
+			}
+		);
+
+		// GenerateRandomNumberInRange(minValue, maxValue)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("GenerateRandomNumberInRange",
+			[]( int minValue, int maxValue)->int
+			{
+				return glm::linearRand(minValue, maxValue);
 			}
 		);
 	}

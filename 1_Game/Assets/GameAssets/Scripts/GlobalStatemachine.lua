@@ -19,7 +19,9 @@ function S_GlobalStatemachine(e)
     
     -- getting entity and component
     local globalStateMachineEntity = GetEntity("GlobalStatemachine")
-    local globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
+    if (globalStateMachineEntity ~= -1) then 
+        local globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
+    end
     
     -- press 1 to change state to StateCharacterTurn
     if (CheckKeyPress(49) == true) then

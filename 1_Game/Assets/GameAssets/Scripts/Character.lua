@@ -39,8 +39,7 @@ function S_Character(e)
     if (turnOrderManagerEntity ~= -1) then
     
         -- getting TurnOrderManager component
-        local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
-        
+        local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")       
         -- getting this character's ID number
         local entityDataComponent = GetEntityData(e)
 

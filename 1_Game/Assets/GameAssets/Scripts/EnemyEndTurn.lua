@@ -3,7 +3,9 @@
 -- the next character's turn. 
 
 -- TODO:
--- 1) Enemies will end turn after performing a specific set of actions.
+-- 1) Get enemy to its turn automatically after it has performed its turn.
+--    Currently, the enemy's ends automatically after moving 1 tile.
+--    Will be implemented in a separate script.
 
 --[IsComponent]
 function C_EnemyEndTurn()
@@ -43,18 +45,13 @@ function S_EnemyEndTurn(e)
             if (turnOrderManagerComponent.currentTurn == enemyID) then
                 
                 -- debug message, can comment if unneeded
-                print("Ending enemy's turn!")
+                print("\n[EnemyEndTurn - START]\nEnding enemy's turn!")
                 
                 -- signal turnOrderManager to move on to the next character's turn
                 turnOrderManagerComponent.nextTurn = true
+
+                print("[EnemyEndTurn - END]\n\n")
             end
         end
     end
 end
-
---[[ PSEUDOCODE
-
-if player ends turn (either by pressing E or pressing an EndTurn button)
-    set TurnOrderManager.nextTurn = true;
-
---]]
