@@ -7,6 +7,7 @@
 
 #include <sol/sol.hpp>
 #include <glm/glm/glm.hpp>
+#include <functional>
 
 namespace god
 {
@@ -89,6 +90,46 @@ namespace god
 					return out;
 				}
 				return std::vector<glm::ivec3> ();
+			}
+		);
+
+		// HasComponent(e,name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "HasComponent" ,
+			[&entt]( entt::entity e , std::string const& name )->bool
+			{
+				return entt.HasComponent ( e , name );
+			}
+		);
+
+		// EntitiesWithComponent(name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "EntitiesWithComponent" ,
+			[&entt]( std::string const& name )->std::vector<entt::entity>
+			{
+				std::vector<entt::entity> entities;
+				entt.GetEntitiesWithComponent ( name , entities );
+				return entities;
+			}
+		);
+
+		// CheckKeyDown(key)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "CheckKeyDown" ,
+			[&engineResources]( int key )->bool
+			{
+				auto& window = engineResources.Get<GLFWWindow> ().get ();
+				return window.KeyDown ( key );
+			}
+		);
+
+		// CheckKeyPress(key)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "CheckKeyPress" ,
+			[&engineResources]( int key )->bool
+			{
+				auto& window = engineResources.Get<GLFWWindow> ().get ();
+				return window.KeyPressed ( key );
 			}
 		);
 	}

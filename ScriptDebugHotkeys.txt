@@ -1,0 +1,19 @@
+Useful keys:
+
+[In-game actions]
+E - End current character's turn
+R - End current enemy's turn
+
+[Character Script debugging]
+I - Print current characters' ID numbers
+L - print current characters' grid location
+
+[GlobalStatemachine debugging]
+J - Print current state of GlobalStatemachine
+
+[TurnOrderManager debugging]
+B - Press to check the ID of the current active character
+K - Press to check whether TurnOrderManager.nextTurn is true or false
+M - Press to check whether TurnOrderManager script goes into main chunk
+N - Press to check whether TurnOrderManager.buildTurnQueue is true or false
+V - Press to check whether StateMovePlayer script goes into main chunk
