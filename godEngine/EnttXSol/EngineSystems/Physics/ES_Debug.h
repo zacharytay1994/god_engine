@@ -26,7 +26,7 @@ namespace god
 
 		switch (rigiddynamic.shapeid)
 		{
-		case RigidDynamic::Cube :
+		case RigidDynamic::Cube:
 			glm::vec3 scale = glm::vec3{ 1.f,1.f,1.f };
 			glm::vec3 scale2 = glm::vec3{ 2.f,2.f,2.f };
 
@@ -43,8 +43,6 @@ namespace god
 			pt[2].x = pt[0].x;
 			pt[2].z = pt[1].z;
 
-
-
 			pt[3] = max;
 			pt[4] = max;
 			pt[5] = max;
@@ -53,8 +51,6 @@ namespace god
 			pt[4].z = max.z - scale2.z;
 			pt[5] = pt[3];
 			pt[5].z -= scale2.z;
-
-
 
 			//parent * local if got parent
 			for (auto& vert : pt)
@@ -75,16 +71,18 @@ namespace god
 			OpenGL::DrawLine(pt[3], pt[5]);
 			OpenGL::DrawLine(pt[4], pt[5]);
 
-
 			OpenGL::DrawLine(pt[1], pt[3]);
 			OpenGL::DrawLine(pt[2], max);
 			OpenGL::DrawLine(pt[4], pt[0]);
 			OpenGL::DrawLine(min, pt[5]);
 			break;
-		case RigidDynamic::Sphere :
-			
+		case RigidDynamic::Sphere:
+	
+			//float radius = rigiddynamic.extents.x;
 
+			std::cout << "lol";
 			break;
+	
 		case RigidDynamic::Capsule:
 
 

@@ -93,6 +93,7 @@ namespace god
 						{
 							selected_shape = i;
 							component.shapeid = i;
+							component.updateRigidDynamic = true;
 							ImGui::CloseCurrentPopup();
 						}
 					ImGui::EndPopup();
