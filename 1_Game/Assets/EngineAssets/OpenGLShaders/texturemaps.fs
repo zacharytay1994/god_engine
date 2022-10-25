@@ -71,11 +71,15 @@ uniform int                 uNumDirectionalLight;
 
 uniform sSpotLight          uSpotLight;
 
-//skybox
+// skybox
 uniform samplerCube uSkybox;
 
-// shadowmap
+// shadow map
 uniform sampler2D uShadowMap;
+
+// caustic map
+uniform sampler2D uCausticMap;
+uniform float uDT;
 
 struct sFogParameters
 {
@@ -250,6 +254,7 @@ vec3 SpotLight()
 
 void main()
 {
+    vec4 output_color = vec4(0);
     // calculate shadow
     vec3 light_position = normalize(vec3(0,0,0));
     if (uNumDirectionalLight > 0)
@@ -272,12 +277,12 @@ void main()
         directional_lights_value += DirectLight(i,shadow);
     }
 
-    fFragColor = vec4((point_lights_value + directional_lights_value) , 1.0);
+    output_color = vec4((point_lights_value + directional_lights_value) , 1.0);
 
-    float brightness = dot(fFragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-    // float brightness = dot(fFragColor.rgb, vec3(50.2126, 50.7152, 50.0722));
+    float brightness = dot(output_color.rgb, vec3(0.2126, 0.7152, 0.0722));
+    // float brightness = dot(output_color.rgb, vec3(50.2126, 50.7152, 50.0722));
     if(brightness > 10.0)
-        fBrightColor = vec4(fFragColor.rgb, 1.0);
+        fBrightColor = vec4(output_color.rgb, 1.0);
     else
         fBrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 
@@ -285,6 +290,26 @@ void main()
     if(uFogParams.isEnabled)
     {
           float fogCoordinate = abs(vEyeSpacePosition.z / vEyeSpacePosition.w);
-          fFragColor = mix(fFragColor, vec4(uFogParams.color, 1.0), getFogFactor(uFogParams, fogCoordinate));
+          output_color = mix(output_color, vec4(uFogParams.color, 1.0), getFogFactor(uFogParams, fogCoordinate));
     }
+
+    // apply toon shading
+    // float toon_shading_intensity = dot(output_color.xyz,normalize(vNormal));
+    // if (toon_shading_intensity > 0.25) 
+    //     output_color = vec4((output_color - mod( output_color , 0.1 )).xyz,1.0);
+    // else 
+    //     output_color = vec4(0.1,0.1,0.1,1.0);
+
+
+    // bind caustic 
+    float c_x = (vWorldPos.x + 10.0)/20.0;
+    float c_z = (vWorldPos.z + 10.0)/20.0;
+    // 8.0 frequecy || 12.0 amplitude || 0.8 speed
+    c_x += sin(c_z * 8.0 + uDT * 0.8) / 12.0;
+    c_x = sin(c_x + uDT * 0.01); 
+    vec3 caustic_color = vec3(texture(uCausticMap , vec2(c_x, c_z)).rgb);
+
+    output_color += vec4(caustic_color,1.0);
+    fFragColor = output_color   ;
 }
+
