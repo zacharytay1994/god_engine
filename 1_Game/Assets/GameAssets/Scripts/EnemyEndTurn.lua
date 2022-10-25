@@ -30,18 +30,24 @@ function S_EnemyEndTurn(e)
         -- getting EnemyEndTurn component
         local enemyEndTurnComponent = GetComponent(e, "C_EnemyEndTurn")
 
-        -- getting TurnOrderManager object and component
+        -- getting TurnOrderManager object
         local turnOrderManagerEntity = GetEntity(enemyEndTurnComponent.TurnOrderManager)
-        local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")        
+
+        -- checking whether turnOrderManager is nil
+        if (turnOrderManagerEntity ~= -1) then
         
-        -- only end the turn if it is actually the player's turn
-        if (turnOrderManagerComponent.currentTurn == enemyID) then
+            -- getting TurnOrderManager component
+            local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager") 
             
-            -- debug message, can comment if unneeded
-            print("Ending enemy's turn!")
-            
-            -- signal turnOrderManager to move on to the next character's turn
-            turnOrderManagerComponent.nextTurn = true
+            -- only end the turn if it is actually the player's turn
+            if (turnOrderManagerComponent.currentTurn == enemyID) then
+                
+                -- debug message, can comment if unneeded
+                print("Ending enemy's turn!")
+                
+                -- signal turnOrderManager to move on to the next character's turn
+                turnOrderManagerComponent.nextTurn = true
+            end
         end
     end
 end

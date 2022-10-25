@@ -27,16 +27,22 @@ function S_PlayerEndTurn(e)
 
         -- getting TurnOrderManager object and component
         local turnOrderManagerEntity = GetEntity(playerEndTurnComponent.TurnOrderManager)
-        local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")        
+              
+        -- checking whether turnOrderManager is nil
+        if (turnOrderManagerEntity ~= -1) then
+
+            -- getting TurnOrderManager component
+            local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")  
         
-        -- only end the turn if it is actually the player's turn
-        if (turnOrderManagerComponent.currentTurn == playerID) then
-            
-            -- debug message, can comment if unneeded
-            print("Ending Player's turn!")
-            
-            -- signal turnOrderManager to move on to the next character's turn
-            turnOrderManagerComponent.nextTurn = true
+            -- only end the turn if it is actually the player's turn
+            if (turnOrderManagerComponent.currentTurn == playerID) then
+                
+                -- debug message, can comment if unneeded
+                print("Ending Player's turn!")
+                
+                -- signal turnOrderManager to move on to the next character's turn
+                turnOrderManagerComponent.nextTurn = true
+            end
         end
     end
 end

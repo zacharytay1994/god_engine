@@ -34,28 +34,34 @@ function S_Character(e)
     
     -- getting TurnOrderManager entity to check whether it's this character's turn
     local turnOrderManagerEntity = GetEntity("TurnOrderManager") 
-    local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
-    
-    -- getting this character's ID number
-    local entityDataComponent = GetEntityData(e)
 
-    -- only run the rest of this script if it is currently this character's turn
-    if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then
+    -- checking whether turnOrderManager is nil
+    if (turnOrderManagerEntity ~= -1) then
     
-        -- press L to check character's coordinates on the grid
-        if (CheckKeyPress(76) == true) then
-            local cell = GetGridCell(e) -- note to self: cell ~= nil
-            print(cell.x, cell.y, cell.z)
-        end
+        -- getting TurnOrderManager component
+        local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
+        
+        -- getting this character's ID number
+        local entityDataComponent = GetEntityData(e)
 
-        -- press I to print character's ID number
-        if (CheckKeyPress(73) == true) then           
-            -- if (entityDataComponent ~= nil) then 
-            --     print("entityData is not nil")
-            -- else
-            --     print("entityData is nil")
-            -- end
-            print(entityDataComponent.id)
+        -- only run the rest of this script if it is currently this character's turn
+        if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then
+        
+            -- press L to check character's coordinates on the grid
+            if (CheckKeyPress(76) == true) then
+                local cell = GetGridCell(e) -- note to self: cell ~= nil
+                print(cell.x, cell.y, cell.z)
+            end
+
+            -- press I to print character's ID number
+            if (CheckKeyPress(73) == true) then           
+                -- if (entityDataComponent ~= nil) then 
+                --     print("entityData is not nil")
+                -- else
+                --     print("entityData is nil")
+                -- end
+                print(entityDataComponent.id)
+            end
         end
     end
 end
