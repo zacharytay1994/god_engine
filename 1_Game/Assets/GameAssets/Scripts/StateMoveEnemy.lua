@@ -3,7 +3,7 @@ function C_StateMoveEnemy()
     local var = {
         --[SerializeString]
         GlobalStatemachine = "GlobalStatemachine",
-        MovementState = "MoveEnemy",
+        State = "MoveEnemy",
         Time = 0.0
     }
     return function()
@@ -19,7 +19,7 @@ function S_StateMoveEnemy(e)
     if (gs_entity ~= -1) then
         local global_statemachine = GetComponent(gs_entity, "C_GlobalStatemachine")
         -- do some state-only action here
-        if (global_statemachine.CurrentState == component.MovementState) then
+        if (global_statemachine.CurrentState == component.State) then
             -- action ...
             if (component.Time < 1.0) then
                 component.Time = component.Time + GetDeltaTime()

@@ -434,6 +434,46 @@ namespace god
 		T_Manip::RunOnType ( EngineComponents::Components () , componentID , AttachEngineComponentFunctor () , this , entity );
 	}
 
+	bool EnttXSol::HasEngineComponent ( entt::entity e , std::string const& name )
+	{
+		auto it = std::find ( EngineComponents::m_component_names.begin () , EngineComponents::m_component_names.end () , name );
+		if ( it != EngineComponents::m_component_names.end () )
+		{
+			bool check = false;
+			T_Manip::RunOnType ( EngineComponents::Components () , it - EngineComponents::m_component_names.begin () , CheckEngineComponentFunctor () , this , e , std::ref ( check ) );
+			return check;
+		}
+		return false;
+	}
+
+	bool EnttXSol::HasScriptComponent ( entt::entity e , std::string const& name )
+	{
+		return m_registry.storage<sol::table> ( entt::hashed_string ( name.c_str () ) ).contains ( e );
+	}
+
+	bool EnttXSol::HasComponent ( entt::entity e , std::string const& name )
+	{
+		return HasScriptComponent ( e , name ) || HasEngineComponent ( e , name );
+	}
+
+	void EnttXSol::GetEntitiesWithScriptComponent ( std::string const& name , std::vector<entt::entity>& container )
+	{
+		auto view = GetView ( { name } , {} );
+		std::copy ( view.begin () , view.end () , std::back_inserter ( container ) );
+	}
+
+	void EnttXSol::GetEntitiesWithEngineComponent ( std::string const& name , std::vector<entt::entity>& container )
+	{
+		auto view = GetView ( {} , { name } );
+		std::copy ( view.begin () , view.end () , std::back_inserter ( container ) );
+	}
+
+	void EnttXSol::GetEntitiesWithComponent ( std::string const& name , std::vector<entt::entity>& container )
+	{
+		GetEntitiesWithScriptComponent ( name , container );
+		GetEntitiesWithEngineComponent ( name , container );
+	}
+
 	std::unordered_map<std::string , EnttXSol::Script> const& EnttXSol::GetScripts () const
 	{
 		return m_scripts;
