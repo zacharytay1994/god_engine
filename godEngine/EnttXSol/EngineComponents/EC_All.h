@@ -43,4 +43,9 @@ namespace god
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};
+
+	struct ActiveComponent
+	{
+		bool m_active { true };
+	};
 }

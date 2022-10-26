@@ -30,6 +30,7 @@
 #include <iostream>
 #include <functional>
 #include <type_traits>
+#include <queue>
 
 namespace god
 {
@@ -89,8 +90,8 @@ namespace god
 
 		Entities::ID CreateEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );
 		Entities::ID GetEntity ( std::string const& name );
-		void RemoveEntity ( Entities::ID entity );
-		void RemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity );
+		void RemoveEntity ( EntityGrid& grid , Entities::ID entity );
+		//void RemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity );
 
 		template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
 		void SerializeEngineComponents ( Entities::ID entity , int& imguiUniqueID , EDITOR_RESOURCES& resources );
@@ -105,6 +106,8 @@ namespace god
 
 		template<typename T>
 		void AttachComponent ( Entities::ID id );
+		template<typename T>
+		void RemoveComponent ( Entities::ID id );
 		template<typename T>
 		void AttachScript ( Entities::ID entity , std::string const& script );
 		template<typename T>
@@ -147,8 +150,10 @@ namespace god
 
 		EnttXSol::Entities::ID LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , bool persist = true , EntityGrid* grid = nullptr );
 		EnttXSol::Entities::ID LoadPrefabV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , bool root = false , EntityGrid* grid = nullptr );
+		EnttXSol::Entities::ID AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , glm::vec3 const& position = { 0,0,0 } , bool persist = true );
 
-		EnttXSol::Entities::ID AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , glm::vec3 const& position = { 0,0,0 } );
+		void QueueInstancePrefab ( std::string const& name , float x = 0.0f , float y = 0.0f , float z = 0.0f , Entities::ID parent = Entities::Null , bool grid = false );
+		EnttXSol::Entities::ID InstancePrefab ( EngineResources& engineResources , std::string const& name , Entities::ID parent = Entities::Null );
 
 		template<typename...COMPONENTS>
 		auto GetView ();
@@ -173,6 +178,9 @@ namespace god
 
 	private:
 		sol::state m_lua;
+
+		sol::load_result m_copy_table;
+
 		entt::registry m_registry;
 
 		// script identifiers
@@ -189,6 +197,7 @@ namespace god
 
 		std::unordered_map<std::string , Script> m_scripts;
 		std::unordered_map<std::string , sol::function> m_sol_functions;
+		std::unordered_map<std::string , Entities::ID> m_entity_pool;
 
 		void( *m_engine_update )( EnttXSol& , EngineResources& engineResources , bool ) = nullptr;
 		void( *m_engine_init )( EnttXSol& , EngineResources& engineResources ) = nullptr;
@@ -203,8 +212,14 @@ namespace god
 	private:
 		entt::runtime_view GetView ( std::vector<std::string> const& components , std::vector<std::string> const& engineComponents );
 
-		void RecursiveRemoveEntity ( Entities::ID entity );
-		void RecursiveRemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity );
+		void RecursiveRemoveEntity ( EntityGrid& grid , Entities::ID entity );
+		//void RecursiveRemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity );
+
+		std::queue<std::tuple<std::string , Entities::ID , float , float , float , bool>> m_instance_queue;
+		void SetEntityActive ( EnttXSol::Entities::ID entity , bool active );
+		void PrefabSetMaster ( EngineResources& engineResources , std::string const& fileName );
+		EnttXSol::Entities::ID InstancePrefabFromMaster ( std::string const& fileName , Entities::ID parent = Entities::Null );
+		Entities::ID MakeEntityCopy ( Entities::ID src , Entities::ID parent );
 
 		// register engine components with lua
 		struct BindCTypeToLua
@@ -318,10 +333,16 @@ namespace god
 	template<typename T>
 	inline void EnttXSol::AttachComponent ( Entities::ID id )
 	{
-		if ( !m_registry.all_of<T> ( m_entities[ id ].m_id ) )
+		if ( !m_registry.storage<T> ().contains ( m_entities[ id ].m_id ) )
 		{
 			m_registry.emplace<T> ( m_entities[ id ].m_id );
 		}
+	}
+
+	template<typename T>
+	inline void EnttXSol::RemoveComponent ( Entities::ID id )
+	{
+		m_registry.remove<T> ( m_entities[ id ].m_id );
 	}
 
 	template<typename T>
@@ -432,7 +453,7 @@ namespace god
 		scene.ClearInstancedScene ();
 		for ( uint32_t i = 0; i < m_entities.Size (); ++i )
 		{
-			if ( m_entities.Valid ( i ) && m_entities[ i ].m_parent_id == Entities::Null )
+			if ( m_entities.Valid ( i ) && m_entities[ i ].m_parent_id == Entities::Null && m_registry.storage<ActiveComponent> ().contains ( m_entities[ i ].m_id ) )
 			{
 				RecursivePopulateScene<S , T , R> ( scene , i );
 			}
@@ -440,7 +461,7 @@ namespace god
 
 		// add point light to scene
 		scene.m_point_light_data.clear ();
-		for ( auto&& [entity , transform , pointlight] : GetView<Transform , PointLight> ().each () )
+		for ( auto&& [entity , active , transform , pointlight] : GetView<Transform , PointLight> ().each () )
 		{
 			scene.AddPointLight ( { glm::vec3 ( transform.m_parent_transform * glm::vec4 ( transform.m_position, 1.0f ) ),
 				pointlight.m_colour, pointlight.m_ambient, pointlight.m_diffuse, pointlight.m_specular } );
@@ -448,7 +469,7 @@ namespace god
 
 		// add directional light to scene
 		scene.m_directional_light_data.clear ();
-		for ( auto&& [entity , transform , directionallight] : GetView<Transform , DirectionalLight> ().each () )
+		for ( auto&& [entity , active , transform , directionallight] : GetView<Transform , DirectionalLight> ().each () )
 		{
 			scene.AddDirectionalLight ( { glm::vec3 ( transform.m_parent_transform * glm::vec4 ( transform.m_position, 1.0f ) ),
 				directionallight.m_colour, directionallight.m_ambient, directionallight.m_diffuse, directionallight.m_specular } );
@@ -515,7 +536,7 @@ namespace god
 	template<typename ...COMPONENTS>
 	inline auto EnttXSol::GetView ()
 	{
-		return m_registry.view<COMPONENTS...> ();
+		return m_registry.view<ActiveComponent , COMPONENTS...> ();
 	}
 
 	template<typename T>
