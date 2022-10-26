@@ -153,6 +153,7 @@ namespace god
 		);
 		
 		// InstancePrefab(name,x,y,z)
+		// ==============================================================================================
 		entt.RegisterLuaFunction ( "InstancePrefab" ,
 			[&entt]( std::string const& name , float x , float y , float z )
 			{
@@ -161,6 +162,7 @@ namespace god
 		);
 
 		// InstancePrefabParented(parent,name,x,y,z)
+		// ==============================================================================================
 		entt.RegisterLuaFunction ( "InstancePrefabParented" ,
 			[&entt , &engineResources]( entt::entity e , std::string const& name , float x , float y , float z )
 			{
@@ -169,6 +171,7 @@ namespace god
 		);
 
 		// InstancePrefabOnGrid(name)
+		// ==============================================================================================
 		entt.RegisterLuaFunction ( "InstancePrefabOnGrid" ,
 			[&entt]( std::string const& name , int x , int y , int z )
 			{
@@ -177,6 +180,7 @@ namespace god
 		);
 
 		// InstancePrefabParentedOnGrid(name)
+		// ==============================================================================================
 		entt.RegisterLuaFunction ( "InstancePrefabParentedOnGrid" ,
 			[&entt]( entt::entity e , std::string const& name , int x , int y , int z )
 			{
@@ -185,6 +189,7 @@ namespace god
 		);
 
 		// RemoveInstance(e)
+		// ==============================================================================================
 		entt.RegisterLuaFunction ( "RemoveInstance" ,
 			[&entt , &engineResources]( entt::entity e )
 			{

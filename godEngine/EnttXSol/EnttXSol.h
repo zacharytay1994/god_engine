@@ -91,7 +91,6 @@ namespace god
 		Entities::ID CreateEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );
 		Entities::ID GetEntity ( std::string const& name );
 		void RemoveEntity ( EntityGrid& grid , Entities::ID entity );
-		//void RemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity );
 
 		template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
 		void SerializeEngineComponents ( Entities::ID entity , int& imguiUniqueID , EDITOR_RESOURCES& resources );

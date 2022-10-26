@@ -397,19 +397,6 @@ namespace god
 		RecursiveRemoveEntity ( grid , entity );
 	}
 
-	//void EnttXSol::RemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity )
-	//{
-	//	// detach parent if any from this entity
-	//	auto parent = m_entities[ entity ].m_parent_id;
-	//	if ( parent != Entities::Null )
-	//	{
-	//		auto it = std::find ( m_entities[ parent ].m_children.begin () , m_entities[ parent ].m_children.end () , entity );
-	//		m_entities[ parent ].m_children.erase ( it );
-	//	}
-	//	// remove all branches
-	//	RecursiveRemoveEntityFromGrid ( grid , entity );
-	//}
-
 	void EnttXSol::SerializeScriptComponents ( Entities::ID entity , int imguiUniqueID ,
 		void( *Header )( std::string const& name ) ,
 		SerializeFunction<bool> SerializeBool ,
@@ -1158,23 +1145,6 @@ namespace god
 		m_entities[ entity ].Destroy ( m_registry );
 		m_entities.Erase ( entity );
 	}
-
-	//void EnttXSol::RecursiveRemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity )
-	//{
-	//	while ( !m_entities[ entity ].m_children.empty () )
-	//	{
-	//		RemoveEntity ( m_entities[ entity ].m_children.front () );
-	//	}
-	//	// if it has GridCell component, remove it from the grid
-	//	EntityData* data = GetEngineComponent<EntityData> ( entity );
-	//	GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
-	//	if ( data && grid_cell )
-	//	{
-	//		grid[ data->m_parent_id ].EraseValue ( grid_cell->m_cell_size , { grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } , data->m_id );
-	//	}
-	//	m_entities[ entity ].Destroy ( m_registry );
-	//	m_entities.Erase ( entity );
-	//}
 
 	void EnttXSol::SetEntityActive ( EnttXSol::Entities::ID entity , bool active )
 	{
