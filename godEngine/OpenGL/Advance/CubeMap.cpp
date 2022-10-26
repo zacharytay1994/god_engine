@@ -100,12 +100,12 @@ namespace god
 			{
 				if ( texture.GetChannels() == 4 )
 				{
-					internal_format = GL_RGBA8;
+					internal_format = GL_SRGB8_ALPHA8;
 					data_format = GL_RGBA;
 				}
 				else if ( texture.GetChannels() == 3 )
 				{
-					internal_format = GL_RGB8;
+					internal_format = GL_SRGB8;
 					data_format = GL_RGB;
 				}
 				else if ( texture.GetChannels() == 1 )
@@ -113,7 +113,7 @@ namespace god
 					internal_format = GL_RGBA8;
 					data_format = GL_RED;
 				}
-				glTexImage2D
+				/*glTexImage2D
 				(
 					GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 					0,
@@ -124,6 +124,18 @@ namespace god
 					GL_RGB,
 					GL_UNSIGNED_BYTE,
 					texture.GetData()
+				);*/
+				glTexImage2D
+				(
+					GL_TEXTURE_CUBE_MAP_POSITIVE_X + i ,
+					0 ,
+					internal_format ,
+					texture.GetWidth () ,
+					texture.GetHeight () ,
+					0 ,
+					data_format ,
+					GL_UNSIGNED_BYTE ,
+					texture.GetData ()
 				);
 				texture.Free();
 			}

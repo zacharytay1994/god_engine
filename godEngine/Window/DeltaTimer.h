@@ -9,6 +9,7 @@ namespace god
 	{
 		static float m_dt;
 		static int m_fps;
+		static float m_acc_dt;
 
 		void StartFrame ();
 		void EndFrame ();

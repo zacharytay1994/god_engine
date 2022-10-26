@@ -1,1 +1,1 @@
-{"GlobalStatemachine":{"Type":"Default","Script Components":{"C_GlobalStatemachine":{"CurrentState":"MovePlayer"}},"Engine Components":{},"Children":{}}}
+{"GlobalStatemachine":{"Type":"Default","Script Components":{"C_GlobalStatemachine":{"CurrentState":"StateCharacterTurn"}},"Engine Components":{},"Children":{}}}
