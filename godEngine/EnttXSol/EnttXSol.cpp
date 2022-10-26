@@ -15,6 +15,22 @@ namespace god
 		// GetComponent(entity,componentname)
 		m_lua.set ( "sol_table" , sol::table () );
 		m_lua.set ( "entt_entity" , entt::entity () );
+
+		// lua copy table function
+		const auto& table_copy = R"(
+			local t = ...
+			local t2 = {}
+			for k,v in pairs(t) do
+				t2[k] = v
+			end
+			return t2
+		)";
+		m_copy_table = m_lua.load ( table_copy );
+		if ( !m_copy_table.valid () )
+		{
+			sol::error err = m_copy_table;
+			std::cerr << "failed to load string-based script into the program" << err.what () << std::endl;
+		}
 	}
 
 	void EnttXSol::Update ( EngineResources& engineResources )
@@ -39,6 +55,30 @@ namespace god
 				}
 			}
 		}
+
+		// create new instances
+		while ( !m_instance_queue.empty () )
+		{
+			auto& [name , parent , x , y , z , grid] = m_instance_queue.front ();
+			auto e = InstancePrefab ( engineResources , name , parent );
+			if ( grid )
+			{
+				AttachComponent<GridCell> ( e );
+				auto& grid_cell = m_registry.get<GridCell> ( m_entities[ e ].m_id );
+				grid_cell.m_cell_x = static_cast< uint32_t >( x );
+				grid_cell.m_cell_y = static_cast< uint32_t >( y );
+				grid_cell.m_cell_z = static_cast< uint32_t >( z );
+			}
+			else
+			{
+				Transform* transform = m_registry.try_get<Transform> ( m_entities[ e ].m_id );
+				if ( transform )
+				{
+					transform->m_position = { x,y,z };
+				}
+			}
+			m_instance_queue.pop ();
+		}
 	}
 
 	void EnttXSol::ClearEntt ( EngineResources& engineResources )
@@ -49,6 +89,7 @@ namespace god
 		}
 		m_registry.clear ();
 		m_entities.Clear ();
+		m_entity_pool.clear ();
 		m_pause = true;
 	}
 
@@ -324,6 +365,9 @@ namespace god
 		ed->m_id = new_entity;
 		ed->m_parent_id = parent;
 
+		// set as active entity
+		AttachComponent<ActiveComponent> ( new_entity );
+
 		return new_entity;
 	}
 
@@ -332,7 +376,7 @@ namespace god
 		// potential area for optimization looking for entity of name
 		for ( uint32_t i = 0; i < m_entities.Size (); ++i )
 		{
-			if ( m_entities[ i ].m_name == name )
+			if ( m_entities.Valid ( i ) && m_entities[ i ].m_name == name )
 			{
 				return  i;
 			}
@@ -340,7 +384,7 @@ namespace god
 		return Entities::Null;
 	}
 
-	void EnttXSol::RemoveEntity ( Entities::ID entity )
+	void EnttXSol::RemoveEntity ( EntityGrid& grid , Entities::ID entity )
 	{
 		// detach parent if any from this entity
 		auto parent = m_entities[ entity ].m_parent_id;
@@ -350,21 +394,21 @@ namespace god
 			m_entities[ parent ].m_children.erase ( it );
 		}
 		// remove all branches
-		RecursiveRemoveEntity ( entity );
+		RecursiveRemoveEntity ( grid , entity );
 	}
 
-	void EnttXSol::RemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity )
-	{
-		// detach parent if any from this entity
-		auto parent = m_entities[ entity ].m_parent_id;
-		if ( parent != Entities::Null )
-		{
-			auto it = std::find ( m_entities[ parent ].m_children.begin () , m_entities[ parent ].m_children.end () , entity );
-			m_entities[ parent ].m_children.erase ( it );
-		}
-		// remove all branches
-		RecursiveRemoveEntityFromGrid ( grid , entity );
-	}
+	//void EnttXSol::RemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity )
+	//{
+	//	// detach parent if any from this entity
+	//	auto parent = m_entities[ entity ].m_parent_id;
+	//	if ( parent != Entities::Null )
+	//	{
+	//		auto it = std::find ( m_entities[ parent ].m_children.begin () , m_entities[ parent ].m_children.end () , entity );
+	//		m_entities[ parent ].m_children.erase ( it );
+	//	}
+	//	// remove all branches
+	//	RecursiveRemoveEntityFromGrid ( grid , entity );
+	//}
 
 	void EnttXSol::SerializeScriptComponents ( Entities::ID entity , int imguiUniqueID ,
 		void( *Header )( std::string const& name ) ,
@@ -1006,14 +1050,14 @@ namespace god
 		return Entities::Null;
 	}
 
-	EnttXSol::Entities::ID EnttXSol::AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent , glm::vec3 const& position )
+	EnttXSol::Entities::ID EnttXSol::AddPrefabToScene ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent , glm::vec3 const& position , bool persist )
 	{
 		// if not null and no valid parent
 		if ( parent != Entities::Null && !m_entities.Valid ( parent ) )
 		{
 			return Entities::Null;
 		}
-		auto entity = LoadPrefabV2 ( engineResources , fileName , parent );
+		auto entity = LoadPrefabV2 ( engineResources , fileName , parent , persist );
 		Transform* transform = m_registry.try_get<Transform> ( m_entities[ entity ].m_id );
 		if ( transform )
 		{
@@ -1021,6 +1065,20 @@ namespace god
 			transform->m_position = position;
 		}
 		return entity;
+	}
+
+	void EnttXSol::QueueInstancePrefab ( std::string const& name , float x , float y , float z , Entities::ID parent , bool grid )
+	{
+		m_instance_queue.push ( { name , parent , x , y , z , grid } );
+	}
+
+	EnttXSol::Entities::ID EnttXSol::InstancePrefab ( EngineResources& engineResources , std::string const& name , Entities::ID parent )
+	{
+		if ( m_entity_pool.find ( name ) == m_entity_pool.end () )
+		{
+			PrefabSetMaster ( engineResources , name );
+		}
+		return InstancePrefabFromMaster ( name , parent );
 	}
 
 	void EnttXSol::LoadSystem ( std::string const& name )
@@ -1077,33 +1135,116 @@ namespace god
 					AppendEngineComponentToView () , std::ref ( m_registry ) , std::ref ( view ) );
 			}
 		}
+		// only get active components
+		view.iterate ( m_registry.storage<ActiveComponent> () );
 		return view;
 	}
 
-	void EnttXSol::RecursiveRemoveEntity ( Entities::ID entity )
+	void EnttXSol::RecursiveRemoveEntity ( EntityGrid& grid , Entities::ID entity )
 	{
 		while ( !m_entities[ entity ].m_children.empty () )
 		{
-			RemoveEntity ( m_entities[ entity ].m_children.front () );
+			RemoveEntity ( grid , m_entities[ entity ].m_children.front () );
 		}
-		m_entities[ entity ].Destroy ( m_registry );
-		m_entities.Erase ( entity );
-	}
 
-	void EnttXSol::RecursiveRemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity )
-	{
-		while ( !m_entities[ entity ].m_children.empty () )
-		{
-			RemoveEntity ( m_entities[ entity ].m_children.front () );
-		}
-		// if it has GridCell component, remove it from the grid
+		// might be able to optimize here
 		EntityData* data = GetEngineComponent<EntityData> ( entity );
 		GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
 		if ( data && grid_cell )
 		{
 			grid[ data->m_parent_id ].EraseValue ( grid_cell->m_cell_size , { grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } , data->m_id );
 		}
+
 		m_entities[ entity ].Destroy ( m_registry );
 		m_entities.Erase ( entity );
+	}
+
+	//void EnttXSol::RecursiveRemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity )
+	//{
+	//	while ( !m_entities[ entity ].m_children.empty () )
+	//	{
+	//		RemoveEntity ( m_entities[ entity ].m_children.front () );
+	//	}
+	//	// if it has GridCell component, remove it from the grid
+	//	EntityData* data = GetEngineComponent<EntityData> ( entity );
+	//	GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
+	//	if ( data && grid_cell )
+	//	{
+	//		grid[ data->m_parent_id ].EraseValue ( grid_cell->m_cell_size , { grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } , data->m_id );
+	//	}
+	//	m_entities[ entity ].Destroy ( m_registry );
+	//	m_entities.Erase ( entity );
+	//}
+
+	void EnttXSol::SetEntityActive ( EnttXSol::Entities::ID entity , bool active )
+	{
+		if ( active )
+		{
+			AttachComponent<ActiveComponent> ( entity );
+		}
+		else
+		{
+			RemoveComponent<ActiveComponent> ( entity );
+		}
+		for ( auto child : m_entities[ entity ].m_children )
+		{
+			SetEntityActive ( child , active );
+		}
+	}
+
+	void EnttXSol::PrefabSetMaster ( EngineResources& engineResources , std::string const& fileName )
+	{
+		auto entity = AddPrefabToScene ( engineResources , fileName , Entities::Null , { 0,0,0 } , false );
+		m_entity_pool[ fileName ] = entity;
+		SetEntityActive ( entity , false );
+	}
+
+	EnttXSol::Entities::ID EnttXSol::InstancePrefabFromMaster ( std::string const& fileName , Entities::ID parent )
+	{
+		return MakeEntityCopy ( m_entity_pool[ fileName ] , parent );
+	}
+
+	EnttXSol::Entities::ID EnttXSol::MakeEntityCopy ( Entities::ID src , Entities::ID parent )
+	{
+		// make new entity
+		auto new_entity = CreateEntity ( "" , parent );
+		auto& dst_entity = m_entities[ new_entity ];
+		auto& src_entity = m_entities[ src ];
+		dst_entity.m_name = src_entity.m_name;
+		if ( src_entity.m_type == Entity_::Type::Prefab )
+		{
+			dst_entity.m_type = Entity_::Type::Prefab;
+		}
+
+		// copy component 
+		for ( auto&& curr : m_registry.storage () )
+		{
+			if ( auto&& storage = curr.second; storage.contains ( m_entities[ src ].m_id ) && !storage.contains ( m_entities[ new_entity ].m_id ) )
+			{
+				// if its sol::table component, aka. script component, need special copy
+				if ( storage.type ().name () == typeid( sol::table ).name () )
+				{
+					sol::table new_table = m_copy_table ( *static_cast< sol::table* >( storage.get ( m_entities[ src ].m_id ) ) );
+					storage.emplace ( m_entities[ new_entity ].m_id , static_cast< void* >( &new_table ) );
+				}
+				else
+				{
+					storage.emplace ( m_entities[ new_entity ].m_id , storage.get ( m_entities[ src ].m_id ) );
+				}
+			}
+		}
+
+		// update entity data
+		auto& entity_data = m_registry.get<EntityData> ( m_entities[ new_entity ].m_id );
+		entity_data.m_id = new_entity;
+		entity_data.m_parent_id = parent;
+
+		// copy children
+		for ( auto& child : m_entities[ src ].m_children )
+		{
+			MakeEntityCopy ( child , new_entity );
+		}
+
+		return new_entity;
 	}
 }
