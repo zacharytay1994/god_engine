@@ -28,7 +28,10 @@ function C_TurnOrderManager()
         queueIndex = 1,
 
         -- turnQueue is an array containing all entities with a C_Character component
-        turnQueue = {}
+        turnQueue = {},
+
+        -- counts the number of turn cycles 
+        turnCycleCounter = 0
     };
     return function()
         return var
@@ -70,11 +73,18 @@ function S_TurnOrderManager(e)
         if (CheckKeyPress(66)) then
             print("current active character is ", turnOrderManagerComponent.currentTurn)
         end
+        -- press X to check the number of turn cycles so far
+        if (CheckKeyPress(88)) then
+            print("Currently at turn no.", turnOrderManagerComponent.turnCycleCounter)
+        end
         
         -- if starting a new turn cycle, build the turn queue 
         if (turnOrderManagerComponent.buildTurnQueue == true) then        
 
             print("\n[TurnOrderManager: buildTurnQueue - START]")
+
+            -- incrementing the turn counter
+            turnOrderManagerComponent.turnCycleCounter = turnOrderManagerComponent.turnCycleCounter + 1
             
             -- adding all entities with C_Character script into the turnQueue and print result
             print("Entities added into turnQueue:")
