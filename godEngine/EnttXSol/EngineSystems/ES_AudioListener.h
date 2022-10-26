@@ -10,41 +10,26 @@ namespace god
 		(entt);
 
 		// NOTE: ONLY ONE AUDIO LISTENER ALLOWED
-		EntityData& al_entity_data = std::get<0>(components);
 		AudioListener& audio_listener = std::get<1>(components);
 		Transform& al_transform = std::get<2>(components);
 
 		// engine resources access
 		SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
-		Camera& camera = engineResources.Get<Camera>().get();
 
 		// access entities with specific component
 		for (auto&& [entity, as_entity_data, audio_source, as_transform] : entt.GetView<EntityData, AudioSource, Transform>().each())
 		{
-			if (al_entity_data.m_id == as_entity_data.m_id)
-				continue;
-
 			if (audio_source.m_sound_id != -1)
 			{
 				auto& resource = sound_manager.Get(audio_source.m_sound_id);
 				Sound& sound = std::get<1>(resource);
 
-				//if (audio_source.m_reverb == nullptr)
-				//{
-				//	AudioAPI::Create3DReverb(&audio_source.m_reverb);
-				//}
-
 				AudioAPI::SetLoop(sound, audio_source.m_loop);
 
 				if (audio_source.m_play_on_awake && !audio_source.m_played) // modify a bit to check for m_play_on_awake
 				{
-					AudioAPI::PlaySound(sound, audio_source.m_played);
+					AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
 				}
-
-				AudioAPI::SetMute(sound, audio_source.m_mute);
-				AudioAPI::SetVolume(sound, audio_source.m_volume);
-				AudioAPI::SetPitch(sound, audio_source.m_pitch);
-
 			}
 		}
 

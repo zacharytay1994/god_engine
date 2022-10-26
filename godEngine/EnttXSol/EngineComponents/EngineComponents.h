@@ -62,6 +62,12 @@ namespace god
 	}
 
 	template<>
+	inline void Assign<bool> ( bool& val, rapidjson::Value& jsonObj, std::string const& name )
+	{
+		val = jsonObj[ name.c_str() ].GetBool ();
+	}
+
+	template<>
 	inline void Assign<uint32_t> ( uint32_t& val , rapidjson::Value& jsonObj , std::string const& name )
 	{
 		val = jsonObj[ name.c_str () ].GetUint ();

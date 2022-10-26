@@ -61,29 +61,6 @@ namespace god
 		m_FMOD_system->update();
 	}
 
-	void AudioAPI::Create3DReverb(FMOD::Reverb3D** reverb)
-	{
-		FMOD_RESULT result = m_FMOD_system->createReverb3D(reverb);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
-
-		SetReverbPreset(*reverb);
-	}
-
-	void AudioAPI::SetReverbPreset(FMOD::Reverb3D* reverb)
-	{
-		FMOD_REVERB_PROPERTIES prop = FMOD_PRESET_CONCERTHALL;
-		reverb->setProperties(&prop);
-
-		FMOD_VECTOR pos = { -10.0f, 0.0f, 0.0f };
-		float mindist = 15.0f;
-		float maxdist = 20.0f;
-		reverb->set3DAttributes(&pos, mindist, maxdist);
-
-		FMOD_VECTOR  listenerpos = { 0.0f, 0.0f, -1.0f };
-		m_FMOD_system->set3DListenerAttributes(0, &listenerpos, 0, 0, 0);
-	}
-
 	FMOD::ChannelGroup* AudioAPI::CreateChannelGroup(const char* name)
 	{
 		FMOD::ChannelGroup* channel_group = nullptr;
@@ -95,9 +72,25 @@ namespace god
 		return channel_group;
 	}
 
-	void AudioAPI::SetChannelGroup(int groupID, Sound& sound)
+	void AudioAPI::SetChannelGroup(int groupID, FMOD::Channel* channel)
 	{
-		sound.m_channel->setChannelGroup(m_channel_groups.at(groupID));
+		channel->setChannelGroup(m_channel_groups.at(groupID));
+	}
+
+	void AudioAPI::SetChannelGroupMute(int groupID, bool mute)
+	{
+		FMOD::ChannelGroup* channel_group = m_channel_groups.at(groupID);
+		channel_group->setMute(mute);
+
+		channel_group = nullptr;
+	}
+
+	void AudioAPI::SetChannelGroupVolume(int groupID, float volume)
+	{
+		FMOD::ChannelGroup* channel_group = m_channel_groups.at(groupID);
+		channel_group->setVolume(volume);
+
+		channel_group = nullptr;
 	}
 
 
@@ -126,11 +119,6 @@ namespace god
 		sound.m_name = path.substr(last_slash, last_dot - last_slash);
 	}
 
-	void AudioAPI::UnloadSound(FMOD::Sound* sound)
-	{
-		sound->release();
-	}
-
 	void AudioAPI::UnloadSound(Sound& sound)
 	{
 		sound.m_sound_sample->release();
@@ -143,35 +131,27 @@ namespace god
 		sound.m_sound_sample->setLoopCount(loop ? -1 : 0);
 	}
 
-	void AudioAPI::SetMute(Sound& sound, bool mute)
+	void AudioAPI::SetMute(FMOD::Channel* channel, bool mute)
 	{
-		sound.m_channel->setMute(mute);
+		channel->setMute(mute);
 	}
 
-	void AudioAPI::SetVolume(Sound& sound, float volume)
+	void AudioAPI::SetVolume(FMOD::Channel* channel, float volume)
 	{
-		sound.m_channel->setVolume(volume);
+		channel->setVolume(volume);
 	}
 
-	void AudioAPI::SetPitch(Sound& sound, float pitch)
+	void AudioAPI::SetPitch(FMOD::Channel* channel, float pitch)
 	{
-		sound.m_channel->setPitch(pitch);
+		channel->setPitch(pitch);
 	}
 
-	void AudioAPI::PlaySound(Sound& sound)
+	void AudioAPI::PlaySound(Sound& sound, FMOD::Channel** channel, bool& played)
 	{
-		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, &sound.m_channel);
-		sound.m_played = true;
-
-		//sound.m_channel->set3DMinMaxDistance(0.1f, 2.f);
-	}
-
-	void AudioAPI::PlaySound(Sound& sound, bool& played)
-	{
-		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, &sound.m_channel);
+		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, channel);
 		played = true;
 
-		m_channels.push_back(sound.m_channel);
+		m_channels.push_back(*channel);
 	}
 
 	void AudioAPI::PauseSound(Sound& sound, bool paused)
@@ -179,9 +159,9 @@ namespace god
 		sound.m_channel->setPaused(paused);
 	}
 
-	void AudioAPI::StopSound(Sound& sound)
+	void AudioAPI::StopSound(FMOD::Channel* channel)
 	{
-		sound.m_channel->stop();
+		channel->stop();
 	}
 
 	void AudioAPI::StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
@@ -214,9 +194,14 @@ namespace god
 		m_FMOD_system->set3DListenerAttributes(0, position, velocity, forward, up);
 	}
 
-	void AudioAPI::SetSourceAttributes(Sound& sound, const FMOD_VECTOR* position, const FMOD_VECTOR* velocity)
+	void AudioAPI::SetSourceAttributes(FMOD::Channel* channel, const FMOD_VECTOR* position, const FMOD_VECTOR* velocity)
 	{
-		sound.m_channel->set3DAttributes(position, velocity);
+		channel->set3DAttributes(position, velocity);
+	}
+
+	void AudioAPI::SetMinMaxDistance(FMOD::Channel* channel, float min, float max)
+	{
+		channel->set3DMinMaxDistance(min, max);
 	}
 
 

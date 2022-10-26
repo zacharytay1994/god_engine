@@ -7,45 +7,37 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct AudioSource
 	{
+		FMOD::Channel* m_channel{ nullptr };
 		const char* m_channel_group_name{ "" };
 		int m_channel_group_id{ 0 }; // to seperate sounds into different categories
-		
-		FMOD_VECTOR m_position;
-		FMOD_VECTOR m_velocity;
 
+		int m_sound_id{ -1 };
 		bool m_played{ false };
-
-		bool m_3d_sound{ true }; // change to float like unity
-		float m_spatial_blend{ 0.f }; // modifier value?
-
-		int m_sound_id{ -1 }; // multiple sounds?
-		//int m_source_id{ -1 };
 
 		bool m_mute{ false };
 		bool m_loop{ false };
 		bool m_play_on_awake{ true };
 
-		float m_volume{ 1.f }; // how loud from the audio listener (for now just adjust volume of sound)
+		float m_volume{ 1.f };
 		float m_pitch{ 1.f };
-		//float m_min_distance;
-		//float m_max_distance;
-
-		int m_reverb_preset{ -1 };
-		FMOD::Reverb3D* m_reverb{ nullptr };
-	};
+		float m_min_distance{ 1.f };
+		float m_max_distance{ 10.f };
+		
+		FMOD_VECTOR m_position;
+		FMOD_VECTOR m_velocity;
+ 	};
 	template <>
 	inline void NewLuaType<AudioSource>(sol::state& luaState, std::string const& name)
 	{
 		RegisterLuaType<AudioSource>(luaState, name,
 			"sound_id", &AudioSource::m_sound_id,
-			//"source_id", &AudioSource::m_source_id,
 			"mute", &AudioSource::m_mute,
 			"loop", &AudioSource::m_loop,
 			"play_on_awake", &AudioSource::m_play_on_awake,
 			"volume", &AudioSource::m_volume,
-			"pitch", &AudioSource::m_pitch
-			//"min_distance", &AudioSource::m_min_distance,
-			//"max_distance", &AudioSource::m_max_distance
+			"pitch", &AudioSource::m_pitch,
+			"min_distance", &AudioSource::m_min_distance,
+			"max_distance", &AudioSource::m_max_distance
 			);
 	}
 	template<>
@@ -55,7 +47,6 @@ namespace god
 			[](AudioSource& component, EngineResources& resources)
 			{
 				auto& sounds = resources.Get<SoundManager>();
-				auto& sound_manager = sounds.get();
 
 				ImGui::Separator();
 				ImGui::Text("Audio Source");
@@ -70,9 +61,8 @@ namespace god
 						{
 							if (component.m_sound_id != -1)
 							{
-								Sound& sound = std::get<1>(sound_manager.Get(component.m_sound_id));
-								if (sound.m_channel)
-									AudioAPI::StopSound(sound);
+								if (component.m_channel)
+									AudioAPI::StopSound(component.m_channel);
 							}
 
 							component.m_sound_id = asset.second;
@@ -96,9 +86,8 @@ namespace god
 						if (ImGui::Selectable(std::get<1>(name)))
 						{
 							component.m_channel_group_id = std::get<0>(name);
-							Sound& sound = std::get<1>(sound_manager.Get(component.m_sound_id));
-							if (sound.m_channel)
-								AudioAPI::SetChannelGroup(component.m_channel_group_id, sound);
+							if (component.m_channel)
+								AudioAPI::SetChannelGroup(component.m_channel_group_id, component.m_channel);
 
 							ImGui::CloseCurrentPopup();
 						}
@@ -117,9 +106,8 @@ namespace god
 				{
 					if (component.m_sound_id != -1)
 					{
-						Sound& sound = std::get<1>(sound_manager.Get(component.m_sound_id));
-						if (sound.m_channel)
-							AudioAPI::StopSound(sound);
+						if (component.m_channel)
+							AudioAPI::StopSound(component.m_channel);
 					}
 
 					component.m_played = false;
@@ -132,56 +120,8 @@ namespace god
 
 				ImGui::SliderFloat("Volume", &component.m_volume, 0.f, 1.f, "%.01f", 1.f);
 				ImGui::SliderFloat("Pitch", &component.m_pitch, 0.f, 1.5f, "%.01f", 1.f);
-				//ImGui::InputFloat("Min Distance", &component.m_min_distance);
-				//ImGui::InputFloat("Max Distance", &component.m_max_distance);
-
-				//std::vector<std::tuple<int, std::string, FMOD_REVERB_PROPERTIES>> properties =
-				//{
-				//	{1, "Off", FMOD_PRESET_OFF},
-				//	{2, "Generic", FMOD_PRESET_GENERIC},
-				//	{3, "Padded Cell", FMOD_PRESET_PADDEDCELL},
-				//	{4, "Room", FMOD_PRESET_ROOM},
-				//	{5, "Bathroom", FMOD_PRESET_BATHROOM},
-				//	{6, "Living Room", FMOD_PRESET_LIVINGROOM},
-				//	{7, "Stone Room", FMOD_PRESET_STONEROOM},
-				//	{8, "Auditorium", FMOD_PRESET_AUDITORIUM},
-				//	{9, "Concert Hall", FMOD_PRESET_CONCERTHALL},
-				//	{10, "Cave", FMOD_PRESET_CAVE},
-				//	{11, "Arena", FMOD_PRESET_ARENA},
-				//	{12, "Hanger", FMOD_PRESET_HANGAR},
-				//	{13, "Carpetted Hallway", FMOD_PRESET_CARPETTEDHALLWAY},
-				//	{14, "Hallway", FMOD_PRESET_HALLWAY},
-				//	{15, "Stone Corridor", FMOD_PRESET_STONECORRIDOR},
-				//	{16, "Alley", FMOD_PRESET_ALLEY},
-				//	{17, "Forest", FMOD_PRESET_FOREST},
-				//	{18, "City", FMOD_PRESET_CITY},
-				//	{19, "Mountains", FMOD_PRESET_MOUNTAINS},
-				//	{20, "Quarry", FMOD_PRESET_QUARRY},
-				//	{21, "Plain", FMOD_PRESET_PLAIN},
-				//	{22, "Parking Lot", FMOD_PRESET_PARKINGLOT},
-				//	{23, "Sewer Pipe", FMOD_PRESET_SEWERPIPE},
-				//	{24, "Underwater", FMOD_PRESET_UNDERWATER}
-				//};
-
-				//if (ImGui::BeginPopup("Reverb Select"))
-				//{
-				//	for (auto const& prop : properties)
-				//	{
-				//		if (ImGui::Selectable(std::get<1>(prop).c_str()))
-				//		{
-				//			component.m_reverb_preset = std::get<0>(prop);
-
-				//			ImGui::CloseCurrentPopup();
-				//		}
-				//	}
-				//	ImGui::EndPopup();
-				//}
-
-				//ImGui::Text(" Reverb Preset : ");
-				//if (ImGui::Button(sounds.get().GetName(component.m_sound_id).c_str(), { ImGui::GetWindowWidth(),0 }))
-				//{
-				//	ImGui::OpenPopup("Reverb Select");
-				//}
+				ImGui::InputFloat("Min Distance", &component.m_min_distance);
+				ImGui::InputFloat("Max Distance", &component.m_max_distance);
 			});
 	}
 
@@ -191,14 +131,13 @@ namespace god
 		(engineResources);
 		// serialize
 		RapidJSON::JSONifyToValue(value, document, "sound_id", component.m_sound_id);
-		//RapidJSON::JSONifyToValue(value, document, "source_id", component.m_source_id);
 		RapidJSON::JSONifyToValue(value, document, "mute", component.m_mute);
 		RapidJSON::JSONifyToValue(value, document, "loop", component.m_loop);
 		RapidJSON::JSONifyToValue(value, document, "play_on_awake", component.m_play_on_awake);
 		RapidJSON::JSONifyToValue(value, document, "volume", component.m_volume);
 		RapidJSON::JSONifyToValue(value, document, "pitch", component.m_pitch);
-		//RapidJSON::JSONifyToValue(value, document, "min_distance", component.m_min_distance);
-		//RapidJSON::JSONifyToValue(value, document, "max_distance", component.m_max_distance);
+		RapidJSON::JSONifyToValue(value, document, "min_distance", component.m_min_distance);
+		RapidJSON::JSONifyToValue(value, document, "max_distance", component.m_max_distance);
 	}
 
 	template<>
@@ -207,13 +146,12 @@ namespace god
 		(engineResources);
 		// deserialize
 		AssignIfExist(jsonObj, component.m_sound_id, "sound_id");
-		//AssignIfExist(jsonObj, component.m_source_id, "source_id");
 		AssignIfExist(jsonObj, component.m_mute, "mute");
 		AssignIfExist(jsonObj, component.m_loop, "loop");
 		AssignIfExist(jsonObj, component.m_play_on_awake, "play_on_awake");
 		AssignIfExist(jsonObj, component.m_volume, "volume");
 		AssignIfExist(jsonObj, component.m_pitch, "pitch");
-		//AssignIfExist(jsonObj, component.m_min_distance, "min_distance");
-		//AssignIfExist(jsonObj, component.m_max_distance, "max_distance");
+		AssignIfExist(jsonObj, component.m_min_distance, "min_distance");
+		AssignIfExist(jsonObj, component.m_max_distance, "max_distance");
 	}
 }
