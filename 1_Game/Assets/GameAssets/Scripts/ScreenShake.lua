@@ -9,8 +9,10 @@
 function C_ScreenShake()
     local var = {
         
+        --[SerializeString]
+        ScreenShake = "ScreenShake",
+        
         -- duration of the shake
-        --[SerializeFloat]
         duration = 0.0,
 
         -- the magnitude of the shake
@@ -23,7 +25,6 @@ function C_ScreenShake()
         timer = 0.0,
 
         -- bool to activate the shake
-        --[SerializeBool]
         doScreenShake = false
     }
     return function()

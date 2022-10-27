@@ -16,9 +16,9 @@ function C_Character()
         --[SerializeInt]
         currentHP = 10,
         --[SerializeInt]
-        maxStamina = 10,
+        maxStamina = 7,
         --[SerializeInt]
-        currentStamina = 10,
+        currentStamina = 7,
         --[SerializeInt]
         strength = 10 ,
         --[SerializeInt]
