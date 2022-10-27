@@ -46,7 +46,7 @@ namespace god
 		{
 			if (mScene)
 			{
-				mScene->removeActor(*p_RigidDynamic);
+				//mScene->removeActor(*p_RigidDynamic);
 				//p_RigidDynamic->release();
 			}
 

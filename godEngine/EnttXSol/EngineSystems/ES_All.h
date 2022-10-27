@@ -2,8 +2,10 @@
 
 #include "../EnttXSol.h"
 #include "ES_Example.h"
-#include "ES_Audio.h"
 #include "ES_Grid.h"
+
+#include "ES_AudioSource.h"
+#include "ES_AudioListener.h"
 
 #include "Physics/ES_Dynamic.h"
 
@@ -20,8 +22,8 @@ namespace god
 		if ( !isPause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystem );
-			enttxsol.RunEngineSystem ( engineResources , AudioSystem );
 			enttxsol.RunEngineSystem ( engineResources , GridManipulateSystem );
+			enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
 		}
 		
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
@@ -37,7 +39,7 @@ namespace god
 		if ( !enttxsol.m_pause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameStart );
-
+			enttxsol.RunEngineSystem ( engineResources , AudioSourceSystem );
 
 		}
 		enttxsol.RunEngineSystem(engineResources, RigidStaticFrameBegin);
@@ -58,7 +60,7 @@ namespace god
 		enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
 		enttxsol.RunEngineSystem(engineResources, DebugDynamic);
 		enttxsol.RunEngineSystem(engineResources, DebugStatic);
-		
+
 	}
 
 	// runs at the start just after loading the scene
@@ -66,6 +68,7 @@ namespace god
 	{
 		enttxsol.RunEngineSystem ( engineResources , ExampleSystemInit );
 		enttxsol.RunEngineSystem ( engineResources , GridManipulateInit );
+
 	}
 
 	// runs at the end before unloading the scene 

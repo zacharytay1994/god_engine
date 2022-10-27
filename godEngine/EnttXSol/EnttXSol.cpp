@@ -1108,6 +1108,12 @@ namespace god
 	entt::runtime_view EnttXSol::GetView ( std::vector<std::string> const& scriptComponents , std::vector<std::string> const& engineComponents )
 	{
 		entt::runtime_view view {};
+		if ( scriptComponents.empty () && engineComponents.empty () )
+		{
+			return view;
+		}
+
+		// if there are components to get
 		for ( auto const& component : scriptComponents )
 		{
 			view.iterate ( GetStorage<sol::table> ( component ) );

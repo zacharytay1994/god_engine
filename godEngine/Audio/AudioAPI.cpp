@@ -17,6 +17,12 @@ namespace god
 	FMOD::SoundGroup* AudioAPI::m_master_sound_group;
 
 	std::vector<FMOD::Channel*> AudioAPI::m_channels;
+	std::unordered_map<int, FMOD::ChannelGroup*> AudioAPI::m_channel_groups;
+
+	std::unordered_map<int, const char*> AudioAPI::m_channel_group_names =
+	{
+		{ 0, "Default" }, { 1, "Music" }, { 2, "SFX" }
+	};
 
 	AudioAPI::AudioAPI()
 	{
@@ -24,7 +30,7 @@ namespace god
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
 
-		m_FMOD_system->init(FMOD_MAX_CHANNEL_WIDTH, FMOD_INIT_NORMAL, NULL);
+		m_FMOD_system->init(FMOD_MAX_CHANNEL_WIDTH, FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED, NULL);
 
 		result = m_FMOD_system->getMasterChannelGroup(&m_master_channel_group);
 		if (result != FMOD_OK)
@@ -33,6 +39,14 @@ namespace god
 		result = m_FMOD_system->getMasterSoundGroup(&m_master_sound_group);
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
+
+		for (const auto& name : m_channel_group_names)
+		{
+			if (name.first == 0)
+				continue;
+
+			m_channel_groups.insert({ name.first, CreateChannelGroup(name.second) });
+		}
 
 		std::cerr << "AudioAPI created\n";
 	}
@@ -47,27 +61,36 @@ namespace god
 		m_FMOD_system->update();
 	}
 
-	void AudioAPI::Create3DReverb(FMOD::Reverb3D** reverb)
+	FMOD::ChannelGroup* AudioAPI::CreateChannelGroup(const char* name)
 	{
-		FMOD_RESULT result = m_FMOD_system->createReverb3D(reverb);
+		FMOD::ChannelGroup* channel_group = nullptr;
+
+		FMOD_RESULT result = m_FMOD_system->createChannelGroup(name, &channel_group);
 		if (result != FMOD_OK)
 			assert(FMOD_ErrorString(result));
 
-		SetReverbPreset(*reverb);
+		return channel_group;
 	}
 
-	void AudioAPI::SetReverbPreset(FMOD::Reverb3D* reverb)
+	void AudioAPI::SetChannelGroup(int groupID, FMOD::Channel* channel)
 	{
-		FMOD_REVERB_PROPERTIES prop = FMOD_PRESET_CONCERTHALL;
-		reverb->setProperties(&prop);
+		channel->setChannelGroup(m_channel_groups.at(groupID));
+	}
 
-		FMOD_VECTOR pos = { -10.0f, 0.0f, 0.0f };
-		float mindist = 15.0f;
-		float maxdist = 20.0f;
-		reverb->set3DAttributes(&pos, mindist, maxdist);
+	void AudioAPI::SetChannelGroupMute(int groupID, bool mute)
+	{
+		FMOD::ChannelGroup* channel_group = m_channel_groups.at(groupID);
+		channel_group->setMute(mute);
 
-		FMOD_VECTOR  listenerpos = { 0.0f, 0.0f, -1.0f };
-		m_FMOD_system->set3DListenerAttributes(0, &listenerpos, 0, 0, 0);
+		channel_group = nullptr;
+	}
+
+	void AudioAPI::SetChannelGroupVolume(int groupID, float volume)
+	{
+		FMOD::ChannelGroup* channel_group = m_channel_groups.at(groupID);
+		channel_group->setVolume(volume);
+
+		channel_group = nullptr;
 	}
 
 
@@ -81,7 +104,8 @@ namespace god
 	void AudioAPI::LoadSound(const char* filePath, Sound& sound)
 	{
 		// change the mode when creating sound
-		FMOD_MODE mode = FMOD_LOOP_OFF | FMOD_3D | FMOD_3D_HEADRELATIVE | FMOD_3D_INVERSEROLLOFF;
+		//FMOD_MODE mode = FMOD_LOOP_OFF | FMOD_3D | FMOD_3D_HEADRELATIVE | FMOD_3D_INVERSEROLLOFF;
+		FMOD_MODE mode = FMOD_3D;
 
 		FMOD_RESULT result = m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample);
 		if (result != FMOD_OK)
@@ -93,11 +117,6 @@ namespace god
 
 		sound.m_file_name = filePath;
 		sound.m_name = path.substr(last_slash, last_dot - last_slash);
-	}
-
-	void AudioAPI::UnloadSound(FMOD::Sound* sound)
-	{
-		sound->release();
 	}
 
 	void AudioAPI::UnloadSound(Sound& sound)
@@ -112,33 +131,27 @@ namespace god
 		sound.m_sound_sample->setLoopCount(loop ? -1 : 0);
 	}
 
-	void AudioAPI::SetMute(Sound& sound, bool mute)
+	void AudioAPI::SetMute(FMOD::Channel* channel, bool mute)
 	{
-		sound.m_channel->setMute(mute);
+		channel->setMute(mute);
 	}
 
-	void AudioAPI::SetVolume(Sound& sound, float volume)
+	void AudioAPI::SetVolume(FMOD::Channel* channel, float volume)
 	{
-		sound.m_channel->setVolume(volume);
+		channel->setVolume(volume);
 	}
 
-	void AudioAPI::SetPitch(Sound& sound, float pitch)
+	void AudioAPI::SetPitch(FMOD::Channel* channel, float pitch)
 	{
-		sound.m_channel->setPitch(pitch);
+		channel->setPitch(pitch);
 	}
 
-	void AudioAPI::PlaySound(Sound& sound)
+	void AudioAPI::PlaySound(Sound& sound, FMOD::Channel** channel, bool& played)
 	{
-		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, &sound.m_channel);
-		sound.m_played = true;
-	}
-
-	void AudioAPI::PlaySound(Sound& sound, bool& played)
-	{
-		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, &sound.m_channel);
+		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, channel);
 		played = true;
 
-		m_channels.push_back(sound.m_channel);
+		m_channels.push_back(*channel);
 	}
 
 	void AudioAPI::PauseSound(Sound& sound, bool paused)
@@ -146,9 +159,9 @@ namespace god
 		sound.m_channel->setPaused(paused);
 	}
 
-	void AudioAPI::StopSound(Sound& sound)
+	void AudioAPI::StopSound(FMOD::Channel* channel)
 	{
-		sound.m_channel->stop();
+		channel->stop();
 	}
 
 	void AudioAPI::StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
@@ -164,6 +177,7 @@ namespace god
 		m_channels.clear();
 	}
 
+
 	void AudioAPI::PauseAll()
 	{
 		m_master_channel_group->setPaused(true);
@@ -172,5 +186,47 @@ namespace god
 	void AudioAPI::ResumeAll()
 	{
 		m_master_channel_group->setPaused(false);
+	}
+
+
+	void AudioAPI::SetListenerAttributes(const FMOD_VECTOR* position, const FMOD_VECTOR* velocity, const FMOD_VECTOR* forward, const FMOD_VECTOR* up)
+	{
+		m_FMOD_system->set3DListenerAttributes(0, position, velocity, forward, up);
+	}
+
+	void AudioAPI::SetSourceAttributes(FMOD::Channel* channel, const FMOD_VECTOR* position, const FMOD_VECTOR* velocity)
+	{
+		channel->set3DAttributes(position, velocity);
+	}
+
+	void AudioAPI::SetMinMaxDistance(FMOD::Channel* channel, float min, float max)
+	{
+		channel->set3DMinMaxDistance(min, max);
+	}
+
+
+	void AudioAPI::GLMVectorToFMODVector(const glm::vec3& input, FMOD_VECTOR& output)
+	{
+		output.x = input.x;
+		output.y = input.y;
+		output.z = input.z;
+	}
+
+	std::unordered_map<int, const char*>& AudioAPI::GetChannelGroupNames()
+	{
+		return m_channel_group_names;
+	}
+
+	const char* AudioAPI::GetChannelGroupName(int id)
+	{
+		for (auto const& name : m_channel_group_names)
+		{
+			if (name.first == id)
+			{
+				return name.second;
+			}
+		}
+
+		return "None";
 	}
 }
