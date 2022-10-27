@@ -10,6 +10,7 @@
 -- 1) Damage characters standing on affected tiles
 -- 2) Any characters on moving tiles should move along with the tiles
 -- 3) Implement UI to warn player of earthquake every turn
+-- 4) Add screen shake
 
 --[IsComponent]
 function C_RandomEventEarthquake()
@@ -118,7 +119,7 @@ function S_RandomEventEarthquake(e)
             print("\n[RandomEventEarthquake - START]")
 
             -- get a list of all tiles
-            local tileList = EntitiesWithComponent("C_FloorTile")
+            local tileList = EntitiesWithScriptComponent("C_FloorTile")
             print("number of tiles", #tileList)
 
             -- iterate through each tile in tileList
