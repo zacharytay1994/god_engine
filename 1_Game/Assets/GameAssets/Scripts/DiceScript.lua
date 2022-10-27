@@ -3,6 +3,7 @@ function C_DiceScript()
     local var = {
 		--[SerializeString]
 		fodder_text = "DiceScript is attached!",
+		is_rolling = false,
 	
 		position_x = 0.0,
 		position_y = 0.0,
@@ -19,8 +20,17 @@ end
 
 --[IsSystem]
 function S_DiceScript(e)
-	local transform = GetTransform(e)
 	local c_dice = GetComponent(e, "C_DiceScript")
+	if (c_dice.is_rolling == false) then
+		math.randomseed(os.time())
+		c_dice.is_rolling = true
+		rotation_x = math.random
+		rotation_y = math.random
+		rotation_z = math.random
+	end
+	
+	local transform = GetTransform(e)
+	
 	if (c_dice.position_x == transform.position.x) then 
 		if (c_dice.position_y == transform.position.y) then
 			if (c_dice.position_z == transform.position.z) then
