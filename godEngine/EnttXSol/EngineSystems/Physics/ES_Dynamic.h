@@ -8,19 +8,26 @@ namespace god
 	void RigidDynamicFrameBegin(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic& > component)
 	{
 		
-		if (entt.m_pause)
+		if (!entt.m_pause)
 		{
-			Transform& transform = std::get<1>(component);
-			RigidDynamic& rigiddynamic = std::get<2>(component);
-
-			if (rigiddynamic.p_RigidDynamic)
-			{
-				rigiddynamic.p_RigidDynamic->setGlobalPose(ConvertToPhysXTransform(transform.m_position, transform.m_rotation));
-			}
+			return;
 		}
+		Transform& transform = std::get<1>(component);
+		RigidDynamic& rigiddynamic = std::get<2>(component);
+
+		if (rigiddynamic.p_RigidDynamic)
+		{
+			rigiddynamic.p_RigidDynamic->setGlobalPose(ConvertToPhysXTransform(transform.m_position, transform.m_rotation));
+		}
+		
 	}
 	void RigidDynamicUpdate(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&,  RigidDynamic&, Renderable3D& > component)
 	{
+		if (!entt.m_pause)
+		{
+			return;
+		}
+
 		Transform& transform = std::get<1>(component);
 		Renderable3D& renderable = std::get<3>(component);
 		RigidDynamic& rigiddynamic = std::get<2>(component);
@@ -29,8 +36,7 @@ namespace god
 		physx::PxCooking* mCooking = engineResources.Get<PhysicsSystem>().get().GetCooking();
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
 		Asset3DManager& assetmgr = engineResources.Get<Asset3DManager>().get();
-
-		
+				
 		if (rigiddynamic.updateRigidDynamic)
 		{
 			rigiddynamic.p_RigidDynamic = nullptr;
@@ -87,7 +93,6 @@ namespace god
 				PxMeshScale scale(PxVec3(rigiddynamic.extents.x, rigiddynamic.extents.y, rigiddynamic.extents.z), PxQuat(PxIdentity));
 				rigiddynamic.p_shape = mPhysics->createShape(physx::PxTriangleMeshGeometry(rigiddynamic.p_trimesh, scale), *rigiddynamic.p_material, true);
 				rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
-
 				break;
 
 			}
@@ -137,6 +142,11 @@ namespace god
 
 	void RigidDynamicFrameEnd(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic& > component)
 	{
+		if (!entt.m_pause)
+		{
+			return;
+		}
+
 		Transform& transform = std::get<1>(component);
 		RigidDynamic& rigiddynamic = std::get<2>(component);
 		if (rigiddynamic.Active == false)
@@ -144,10 +154,7 @@ namespace god
 			rigiddynamic.mScene->removeActor(*rigiddynamic.p_RigidDynamic);
 
 		}
-		if (entt.m_pause)
-		{
-			return;
-		}
+
 
 		if (rigiddynamic.p_RigidDynamic)
 		{

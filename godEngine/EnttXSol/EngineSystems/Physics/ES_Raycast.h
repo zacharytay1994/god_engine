@@ -7,13 +7,7 @@ namespace god
 {
 
 
-	/**
-	 *	Only Draws the respective debug shapes
-	 *
-	 * \param entt
-	 * \param engineResources
-	 * \param component
-	 */
+
 	void RayCastDynamic(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic& > component)
 	{
 
@@ -22,7 +16,7 @@ namespace god
 		EntityData& edata = std::get<0>(component);
 		if (rigiddynamic.p_RigidDynamic == psystem.GetRayCastMouse())
 		{
-			std::cout << "raycast: " << edata.m_id << std::endl;
+			//std::cout << "raycast: " << edata.m_id << std::endl;
 
 		}
 	}
@@ -34,7 +28,7 @@ namespace god
 		EntityData& edata = std::get<0>(component);
 		if (rigidstatic.p_RigidStatic == psystem.GetRayCastMouse())
 		{
-			std::cout << "raycast: " << edata.m_id << std::endl;
+			//std::cout << "raycast: " << edata.m_id << std::endl;
 
 		}
 

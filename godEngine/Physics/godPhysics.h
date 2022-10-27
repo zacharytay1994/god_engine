@@ -4,7 +4,7 @@
 
 #include "PxPhysicsAPI.h"
 #include "PhysicUtils.h"
-
+#include "../PhysX/physx/snippets/snippetutils/SnippetUtils.h"
 #include <godCamera/Camera.h>
 #include "../Window/GLFWWindow.h"
 
@@ -14,6 +14,9 @@
 
 namespace god
 {
+	using namespace physx;
+
+
 	struct PhysicsSystem
 	{
 	public:
@@ -35,7 +38,7 @@ namespace god
 
 		GLFWWindow* mWindow; 
 		Camera* mCamera;
-
+		
 
 		//PhysX Visual Debugger
 		void CreatePVD();
@@ -59,13 +62,17 @@ namespace god
 
 		physx::PxPvd* mPvd;
 
-
+		bool mRunning;
 		float mAccumulator = 0.0f;
 		uint16_t numSteps = 1;
 		float mStepSize = 1.0f / 60.0f;
 		
 
 	};
+
+
+	
+
 
 }
 

@@ -28,11 +28,14 @@ namespace god
 		
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
 		//Physics
-		enttxsol.RunEngineSystem(engineResources, RayCastDynamic);
-		enttxsol.RunEngineSystem(engineResources, RayCastStatic);
+		if (isPause)
+		{
+			enttxsol.RunEngineSystem(engineResources, RayCastDynamic);
+			enttxsol.RunEngineSystem(engineResources, RayCastStatic);
 
-		enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
-		enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);
+			enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
+			enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);
+		}
 	}
 
 	// runs at the start of a frame, i.e. runs before EngineSystems()
@@ -44,8 +47,11 @@ namespace god
 			enttxsol.RunEngineSystem ( engineResources , AudioSourceSystem );
 
 		}
-		enttxsol.RunEngineSystem(engineResources, RigidStaticFrameBegin);
-		enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameBegin);
+		if (enttxsol.m_pause)
+		{
+			enttxsol.RunEngineSystem(engineResources, RigidStaticFrameBegin);
+			enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameBegin);
+		}
 	}
 
 	// runs at the end of a frame, i.e. runs after EngineSystems()
@@ -57,12 +63,13 @@ namespace god
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameEnd );
 
 		}
-
-		//physics
-		enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
-		enttxsol.RunEngineSystem(engineResources, DebugDynamic);
-		enttxsol.RunEngineSystem(engineResources, DebugStatic);
-
+		if (enttxsol.m_pause)
+		{
+			//physics
+			enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
+			enttxsol.RunEngineSystem(engineResources, DebugDynamic);
+			enttxsol.RunEngineSystem(engineResources, DebugStatic);
+		}
 	}
 
 	// runs at the start just after loading the scene
