@@ -24,7 +24,8 @@ namespace god
 	OGLTexture::OGLTexture (std::string const& texturePath, bool DDS)
 	{
 		DDS = (std::filesystem::path(texturePath).extension().string() == ".dds");
-		if (DDS)
+		isDDs = DDS;
+		if (isDDs)
 		{
 			char const* dds_path = texturePath.c_str();
 
@@ -37,11 +38,13 @@ namespace god
 			gli::gl GL(gli::gl::PROFILE_GL33);
 			gli::gl::format const Format = GL.translate(DDS_Texture.format(), DDS_Texture.swizzles());
 			GLenum Target = GL.translate(DDS_Texture.target());
-			//assert(gli::is_compressed(DDS_Texture.format()) && Target == gli::TARGET_2D);
+			assert(gli::is_compressed(DDS_Texture.format()) && Target == gli::gl::target::TARGET_2D);
 
 			GLuint TextureName = 0;
+			
 			glGenTextures(1, &TextureName);
 			glBindTexture(Target, TextureName);
+			
 			glTexParameteri(Target, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(Target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(DDS_Texture.levels() - 1));
 			glTexParameteriv(Target, GL_TEXTURE_SWIZZLE_RGBA, &Format.Swizzles[0]);
@@ -51,7 +54,9 @@ namespace god
 				glm::tvec3<GLsizei> Extent(DDS_Texture.extent(Level));
 
 				glTexStorage2D(Target, static_cast<GLint>(DDS_Texture.levels()), Format.Internal, Extent.x, Extent.y);
-
+				
+				int errorCode = glGetError();
+				std::cout << errorCode << std::endl;
 				glCompressedTexSubImage2D(
 					Target, static_cast<GLint>(Level), 0, 0, Extent.x, Extent.y,
 					Format.Internal, static_cast<GLsizei>(DDS_Texture.size(Level)), DDS_Texture.data(0, 0, Level));
@@ -60,7 +65,7 @@ namespace god
 			}
 			m_texture_id = TextureName;
 
-			glCheckError();
+			
 		}
 		else
 		{
@@ -131,6 +136,9 @@ namespace god
 	{
 		// insert "none" image
 		manager.Insert ( "None" , { 0, OGLTexture ( "Assets/EngineAssets/Textures/test.dds" , true ) } );
+
+		int errorCode = glGetError();
+		std::cout << errorCode << std::endl;
 	}
 
 	void InsertAllOGLTexturesFromConfig ( std::string const& configPath , std::string const& assetFolderPath , OGLTextureManager& manager )
@@ -138,6 +146,7 @@ namespace god
 		rapidjson::Document m_document_models;
 		m_document_models.SetObject ();
 		god::ReadJSON ( m_document_models , configPath );
+		
 		if ( m_document_models.IsObject () )
 		{
 			for ( auto& model : m_document_models.GetObject () )
@@ -146,11 +155,19 @@ namespace god
 				{
 					if ( model.value[ 0 ].HasMember ( "UID" ) )
 					{
+						
 						manager.Insert ( model.name.GetString () , { model.value[ 0 ][ "UID" ].GetUint (), OGLTexture ( assetFolderPath + model.value.GetArray ()[ 0 ][ "Raw" ].GetString () ) } );
+						int errorCode = glGetError();
+						std::cout << errorCode << std::endl;
+						if (errorCode == 1282)
+						{
+							std::cout << "lol\n";
+						}
 					}
 					else
 					{
-						manager.Insert ( model.name.GetString () , { 0, OGLTexture ( assetFolderPath + model.value.GetArray ()[ 0 ][ "Raw" ].GetString () ) } );
+						manager.Insert ( model.name.GetString () , { 0, OGLTexture ( assetFolderPath + model.value.GetArray ()[ 0 ][ "Raw" ].GetString ()) } );
+						
 					}
 				}
 			}
