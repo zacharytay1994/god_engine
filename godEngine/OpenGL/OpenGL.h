@@ -67,6 +67,8 @@ namespace god
 		OGLRenderPass<1>& BlurTexture ( unsigned int texture );
 		void RenderBlendTextures ( unsigned int texture1 , unsigned int texture2 );
 
+		std::vector<std::vector<OGLMesh>> getMesh() { return m_models; }
+
 		// blur 
 		OGLRenderPass<1> m_blur_pingpong_1;
 		OGLRenderPass<1> m_blur_pingpong_2;
