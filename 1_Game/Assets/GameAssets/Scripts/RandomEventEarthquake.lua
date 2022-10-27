@@ -127,6 +127,7 @@ function S_RandomEventEarthquake(e)
                 
                 -- get a random number between 0 and 1
                 local randomProb = GenerateRandomProbability()
+                --print(randomProb)
 
                 -- if this tile is affected by the earthquake (limit to floor0 tiles because higher tiles may end up floating)
                 if (randomProb <= randomEventEarthquakeComponent.earthquakeTileRate and (GetGridCell(tileList[i]).y == 0)) then
