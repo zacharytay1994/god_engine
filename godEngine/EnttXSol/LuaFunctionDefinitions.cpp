@@ -103,13 +103,24 @@ namespace god
 			}
 		);
 
-		// EntitiesWithComponent(name)
+		// EntitiesWithEngineComponents(name)
 		// ==============================================================================================
-		entt.RegisterLuaFunction ( "EntitiesWithComponent" ,
+		entt.RegisterLuaFunction ( "EntitiesWithEngineComponent" ,
 			[&entt]( std::string const& name )->std::vector<entt::entity>
 			{
 				std::vector<entt::entity> entities;
-				entt.GetEntitiesWithComponent ( name , entities );
+				entt.GetEntitiesWithEngineComponent ( name , entities );
+				return entities;
+			}
+		);
+
+		// EntitiesWithScriptComponents(name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "EntitiesWithScriptComponent" ,
+			[&entt]( std::string const& name )->std::vector<entt::entity>
+			{
+				std::vector<entt::entity> entities;
+				entt.GetEntitiesWithScriptComponent ( name , entities );
 				return entities;
 			}
 		);

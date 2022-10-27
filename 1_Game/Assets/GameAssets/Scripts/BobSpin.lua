@@ -20,9 +20,9 @@ function S_BobSpin(e)
     transform.position.y = math.sin(bob_spin.BobCounter) / 2.0
 
     if CheckKeyPress(65) then
-        InstancePrefabParented("DownArrow", e)
-    end
-    if CheckKeyPress(66) then
-        RemoveInstance(e)
+        local entities = EntitiesWithScriptComponent("C_Character")
+        for k=1, #entities do
+            print(entities[k])
+        end
     end
 end
