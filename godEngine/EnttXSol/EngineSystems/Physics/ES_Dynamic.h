@@ -40,77 +40,68 @@ namespace god
 				rigiddynamic.p_material = mPhysics->createMaterial(rigiddynamic.StaticFriction, rigiddynamic.DynamicFriction, rigiddynamic.Restitution);
 			}
 
-			//if (rigiddynamic.p_shape == nullptr)
+			//exclusive shape (can be modified)
+			switch (rigiddynamic.shapeid)
 			{
-				//if (rigiddynamic.p_RigidDynamic == nullptr)
+			case RigidDynamic::Cube:
+				rigiddynamic.p_shape = mPhysics->createShape(physx::PxBoxGeometry(rigiddynamic.extents.x, rigiddynamic.extents.y, rigiddynamic.extents.z), *rigiddynamic.p_material, true);
+				rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
+				break;
+			case RigidDynamic::Sphere:
+
+				rigiddynamic.p_shape = mPhysics->createShape(physx::PxSphereGeometry(rigiddynamic.extents.x), *rigiddynamic.p_material, true);
+				rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
+				break;
+			case RigidDynamic::Capsule:
+
+				rigiddynamic.p_shape = mPhysics->createShape(physx::PxCapsuleGeometry(rigiddynamic.extents.x, rigiddynamic.extents.y), *rigiddynamic.p_material, true);
+				rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
+				break;
+
+			case RigidDynamic::TriangleMesh:
+				std::vector<Vertex3D> vertexes = std::get<1>(assetmgr.Get(renderable.m_model_id)).m_model.m_meshes[0].m_vertices;
+				std::vector< uint32_t> indices = std::get<1>(assetmgr.Get(renderable.m_model_id)).m_model.m_meshes[0].m_indices;
+				std::vector<glm::vec3> points;
+				for (auto const& vertex : vertexes)
 				{
-					//exclusive shape (can be modified)
-					switch (rigiddynamic.shapeid)
-					{
-					case RigidDynamic::Cube:
-						rigiddynamic.p_shape = mPhysics->createShape(physx::PxBoxGeometry(rigiddynamic.extents.x, rigiddynamic.extents.y, rigiddynamic.extents.z), *rigiddynamic.p_material, true);
-						rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
-						break;
-					case RigidDynamic::Sphere:
-
-						rigiddynamic.p_shape = mPhysics->createShape(physx::PxSphereGeometry(rigiddynamic.extents.x), *rigiddynamic.p_material, true);
-						rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
-						break;
-					case RigidDynamic::Capsule:
-
-						rigiddynamic.p_shape = mPhysics->createShape(physx::PxCapsuleGeometry(rigiddynamic.extents.x, rigiddynamic.extents.y), *rigiddynamic.p_material, true);
-						rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
-						break;
-
-					case RigidDynamic::TriangleMesh:
-						std::vector<Vertex3D> vertexes = std::get<1>(assetmgr.Get(renderable.m_model_id)).m_model.m_meshes[0].m_vertices;
-						std::vector< uint32_t> indices = std::get<1>(assetmgr.Get(renderable.m_model_id)).m_model.m_meshes[0].m_indices;
-						std::vector<glm::vec3> points;
-						for (auto const& vertex : vertexes)
-						{
-							points.push_back(vertex.m_position);
-						}
-						PxTriangleMeshDesc meshDesc;
-						meshDesc.points.count = points.size();
-						meshDesc.points.stride = sizeof(glm::vec3);
-						meshDesc.points.data = &(points.front());
-
-						meshDesc.triangles.count = indices.size();
-						meshDesc.triangles.stride = 3 * sizeof(uint32_t);
-						meshDesc.triangles.data = &(indices.front());
-
-						PxDefaultMemoryOutputStream writeBuffer;
-						PxTriangleMeshCookingResult::Enum result;
-						bool status = mCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
-						if (!status)
-							std::cerr << "Failed to cook triangle mesh\n";
-
-						PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
-						rigiddynamic.p_trimesh = mPhysics->createTriangleMesh(readBuffer);
-
-						PxMeshScale scale(PxVec3(rigiddynamic.extents.x, rigiddynamic.extents.y, rigiddynamic.extents.z), PxQuat(PxIdentity));
-						rigiddynamic.p_shape = mPhysics->createShape(physx::PxTriangleMeshGeometry(rigiddynamic.p_trimesh, scale), *rigiddynamic.p_material, true);
-						rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
-
-						break;
-
-					}
-
-					rigiddynamic.p_RigidDynamic = mPhysics->createRigidDynamic(physx::PxTransform(transform.m_position.x,
-						transform.m_position.y, transform.m_position.z));
-
-					rigiddynamic.mScene = mScene;
-
-					rigiddynamic.p_RigidDynamic->attachShape(*rigiddynamic.p_shape);
-					rigiddynamic.p_RigidDynamic->setAngularVelocity(physx::PxVec3(rigiddynamic.AngularVelocity.x, rigiddynamic.AngularVelocity.y, rigiddynamic.AngularVelocity.z), true);
-					physx::PxRigidBodyExt::updateMassAndInertia(*rigiddynamic.p_RigidDynamic, rigiddynamic.Density);
-
-					mScene->addActor(*rigiddynamic.p_RigidDynamic);
+					points.push_back(vertex.m_position);
 				}
-				
+				PxTriangleMeshDesc meshDesc;
+				meshDesc.points.count = points.size();
+				meshDesc.points.stride = sizeof(glm::vec3);
+				meshDesc.points.data = &(points.front());
+
+				meshDesc.triangles.count = indices.size();
+				meshDesc.triangles.stride = 3 * sizeof(uint32_t);
+				meshDesc.triangles.data = &(indices.front());
+
+				PxDefaultMemoryOutputStream writeBuffer;
+				PxTriangleMeshCookingResult::Enum result;
+				bool status = mCooking->cookTriangleMesh(meshDesc, writeBuffer, &result);
+				if (!status)
+					std::cerr << "Failed to cook triangle mesh\n";
+
+				PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
+				rigiddynamic.p_trimesh = mPhysics->createTriangleMesh(readBuffer);
+
+				PxMeshScale scale(PxVec3(rigiddynamic.extents.x, rigiddynamic.extents.y, rigiddynamic.extents.z), PxQuat(PxIdentity));
+				rigiddynamic.p_shape = mPhysics->createShape(physx::PxTriangleMeshGeometry(rigiddynamic.p_trimesh, scale), *rigiddynamic.p_material, true);
+				rigiddynamic.p_shape->setMaterials(&rigiddynamic.p_material, 1);
+
+				break;
+
 			}
 
-			
+			rigiddynamic.p_RigidDynamic = mPhysics->createRigidDynamic(physx::PxTransform(transform.m_position.x,
+				transform.m_position.y, transform.m_position.z));
+
+			rigiddynamic.mScene = mScene;
+
+			rigiddynamic.p_RigidDynamic->attachShape(*rigiddynamic.p_shape);
+			rigiddynamic.p_RigidDynamic->setAngularVelocity(physx::PxVec3(rigiddynamic.AngularVelocity.x, rigiddynamic.AngularVelocity.y, rigiddynamic.AngularVelocity.z), true);
+			physx::PxRigidBodyExt::updateMassAndInertia(*rigiddynamic.p_RigidDynamic, rigiddynamic.Density);
+
+			mScene->addActor(*rigiddynamic.p_RigidDynamic);
 
 			rigiddynamic.updateRigidDynamic = false;
 

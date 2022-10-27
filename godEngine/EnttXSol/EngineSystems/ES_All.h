@@ -6,7 +6,7 @@
 #include "ES_Grid.h"
 
 #include "Physics/ES_Dynamic.h"
-
+#include "Physics/ES_RayCast.h"
 #include "Physics/ES_Static.h"
 #include "Physics/ES_Debug.h"
 
@@ -26,6 +26,8 @@ namespace god
 		
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
 		//Physics
+		enttxsol.RunEngineSystem(engineResources, RayCastDynamic);
+		enttxsol.RunEngineSystem(engineResources, RayCastStatic);
 
 		enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
 		enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);

@@ -1,0 +1,43 @@
+#pragma once
+
+#include "../../EngineComponents/EC_All.h"
+#include "../../EnttXSol.h"
+#include "../../../OpenGL/OpenGL.h"
+namespace god
+{
+
+
+	/**
+	 *	Only Draws the respective debug shapes
+	 *
+	 * \param entt
+	 * \param engineResources
+	 * \param component
+	 */
+	void RayCastDynamic(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic& > component)
+	{
+
+		PhysicsSystem& psystem = engineResources.Get<PhysicsSystem>().get();
+		RigidDynamic& rigiddynamic = std::get<2>(component);
+		EntityData& edata = std::get<0>(component);
+		if (rigiddynamic.p_RigidDynamic == psystem.GetRayCastMouse())
+		{
+			std::cout << "raycast: " << edata.m_id << std::endl;
+
+		}
+	}
+
+	void RayCastStatic(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
+	{
+		PhysicsSystem& psystem = engineResources.Get<PhysicsSystem>().get();
+		RigidStatic& rigidstatic = std::get<2>(component);
+		EntityData& edata = std::get<0>(component);
+		if (rigidstatic.p_RigidStatic == psystem.GetRayCastMouse())
+		{
+			std::cout << "raycast: " << edata.m_id << std::endl;
+
+		}
+
+	}
+
+}

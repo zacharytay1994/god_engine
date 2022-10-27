@@ -1,9 +1,13 @@
 #pragma once
 
+
+
 #include "PxPhysicsAPI.h"
 #include "PhysicUtils.h"
 
-#include <map>
+#include <godCamera/Camera.h>
+#include "../Window/GLFWWindow.h"
+
 
 #define PVD_HOST "127.0.0.1"
 
@@ -16,25 +20,29 @@ namespace god
 
 		PhysicsSystem();
 		~PhysicsSystem();
-		 void Init();
-		 void Update(float dt, bool pause);
-
+		void Init(GLFWWindow* window, Camera* cam);
+		void Update(float dt, bool pause);
 		
+		void Raycast();
+		physx::PxRigidActor* const GetRayCastMouse() const;
 
-		 physx::PxPhysics* const GetPhysics() const;
-		 physx::PxCooking* const GetCooking() const;
-		 physx::PxScene* const GetPhysicsScene() const;
-		 std::map < std::string, physx::PxMaterial*>& GetMaterialContainer();
+		physx::PxPhysics* const GetPhysics() const;
+		physx::PxCooking* const GetCooking() const;
+		physx::PxScene* const GetPhysicsScene() const;
 
-
-		 bool debugdraw;
+		bool debugdraw;
 	private:
+
+		GLFWWindow* mWindow; 
+		Camera* mCamera;
+
 
 		//PhysX Visual Debugger
 		void CreatePVD();
 		void SetupPVD();
 
-		std::map < std::string, physx::PxMaterial*> MaterialContainer;
+		physx::PxRigidActor* mRayCastMouse;
+		
 
 		physx::PxDefaultAllocator      mDefaultAllocatorCallback;
 		physx::PxDefaultErrorCallback  mDefaultErrorCallback;

@@ -40,7 +40,7 @@ namespace god
 		{
 			if (mScene)
 			{
-				mScene->removeActor(*p_RigidStatic);
+				//mScene->removeActor(*p_RigidStatic);
 				//p_RigidStatic->release();
 			}
 

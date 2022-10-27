@@ -1,5 +1,7 @@
 #include "../pch.h"
 #include "godPhysics.h"
+#include "../editor/engineresources.h"
+
 #include <assert.h>
 namespace god
 {
@@ -9,7 +11,7 @@ namespace god
 		mFoundation = nullptr;
 		mCooking = nullptr;
 		mPhysics = nullptr;
-
+		mRayCastMouse = nullptr;
 		mScene = nullptr;
 		mPvd = nullptr;
 
@@ -33,12 +35,14 @@ namespace god
 		mFoundation->release();
 
 	}
-	void PhysicsSystem::Init()
+	void PhysicsSystem::Init(GLFWWindow* window, Camera* cam)
 	{
 		// Fouundation (required)
 		mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
 		if (!mFoundation) throw("PxCreateFoundation failed!");
 
+		mWindow = window;
+		mCamera = cam;
 
 		CreatePVD();
 	
@@ -70,10 +74,8 @@ namespace god
 
 			SetupPVD();
 
-
 			std::cout << "Bound Physics" << std::endl;
 			
-
 		}
 	}
 
@@ -93,7 +95,7 @@ namespace god
 			mAccumulator -= mStepSize;
 			mScene->simulate(mStepSize);
 			mScene->fetchResults(true);
-
+			Raycast();
 		}
 		if (mAccumulator > 1.0f)
 		{
@@ -124,10 +126,45 @@ namespace god
 		}
 	}
 
+	void PhysicsSystem::Raycast()
+	{
+
+		glm::vec3 ray_dir = ViewportToWorldRay(
+			{ mWindow->ViewportMouseX(), mWindow->ViewportMouseY() },
+			mWindow->GetWindowWidth(),
+			mWindow->GetWindowHeight(),
+			mCamera->GetPerpectiveProjectionMatrix(),
+			mCamera->GetCameraViewMatrix());
+
+		
+		physx::PxVec3 origin = mCamera->m_position;                 // [in] Ray origin
+		physx::PxVec3 unitDir = ray_dir;                // [in] Normalized ray direction
+		physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
+		physx::PxRaycastBuffer hit;                 // [out] Raycast results
+		
+		// Raycast against all static & dynamic objects (no filtering)
+		// The main result from this call is the closest hit, stored in the 'hit.block' structure
+		bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
+		if (hit.hasBlock)
+		{
+			mRayCastMouse = hit.block.actor;
+		}
+		else
+		{
+			mRayCastMouse = nullptr;
+		}
+	}
+
+	physx::PxRigidActor* const PhysicsSystem::GetRayCastMouse() const
+	{
+		return mRayCastMouse;
+	}
+
 	physx::PxPhysics* const PhysicsSystem::GetPhysics() const
 	{
 		return mPhysics;
 	}
+
 
 	physx::PxCooking* const PhysicsSystem::GetCooking() const
 	{
@@ -139,9 +176,6 @@ namespace god
 		return mScene;
 	}
 
-	std::map<std::string, physx::PxMaterial*>& PhysicsSystem::GetMaterialContainer()
-	{
-		return MaterialContainer;
-	}
+
 
 }
