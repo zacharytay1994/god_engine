@@ -178,7 +178,6 @@ namespace god
 
 	private:
 		sol::state m_lua;
-
 		sol::load_result m_copy_table;
 
 		entt::registry m_registry;
@@ -198,6 +197,8 @@ namespace god
 		std::unordered_map<std::string , Script> m_scripts;
 		std::unordered_map<std::string , sol::function> m_sol_functions;
 		std::unordered_map<std::string , Entities::ID> m_entity_pool;
+
+		bool m_on_load { true };
 
 		void( *m_engine_update )( EnttXSol& , EngineResources& engineResources , bool ) = nullptr;
 		void( *m_engine_init )( EnttXSol& , EngineResources& engineResources ) = nullptr;

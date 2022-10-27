@@ -41,17 +41,47 @@ namespace god
 			m_engine_update ( *this , engineResources , m_pause );
 		}
 
+		// on load scene
+		if ( m_on_load )
+		{
+			// for each system, run its init function whether it exists or not, might be UDB? not sure. Will fix when issues arise.
+			std::string on_load_identifier { "OnLoad_" };
+			for ( auto const& script : m_scripts )
+			{
+				for ( auto const& system : script.second.m_systems )
+				{
+					auto first = system.first.find_first_of ( "_" );
+					if ( first != std::string::npos )
+					{
+						GetView ( system.second.m_used_script_components , system.second.m_used_engine_components ).each ( m_lua[ on_load_identifier + system.first.substr ( first + 1 , system.first.size () - first ) ] );
+					}
+				}
+			}
+			m_on_load = false;
+		}
+
 		if ( !m_pause )
 		{
 			// update script systems
 			// for each script in loaded scripts
+			std::string frame_start_identifier { "FrameStart_" };
+			std::string frame_end_identifier { "FrameEnd_" };
 			for ( auto const& script : m_scripts )
 			{
 				// run system with views created by their used components,
 				// i.e. process all entities
 				for ( auto const& system : script.second.m_systems )
 				{
+					auto first = system.first.find_first_of ( "_" );
+					if ( first != std::string::npos )
+					{
+						GetView ( system.second.m_used_script_components , system.second.m_used_engine_components ).each ( m_lua[ frame_start_identifier + system.first.substr ( first + 1 , system.first.size () - first ) ] );
+					}
 					GetView ( system.second.m_used_script_components , system.second.m_used_engine_components ).each ( m_sol_functions[ system.first ] );
+					if ( first != std::string::npos )
+					{
+						GetView ( system.second.m_used_script_components , system.second.m_used_engine_components ).each ( m_lua[ frame_end_identifier + system.first.substr ( first + 1 , system.first.size () - first ) ] );
+					}
 				}
 			}
 		}
@@ -91,6 +121,7 @@ namespace god
 		m_entities.Clear ();
 		m_entity_pool.clear ();
 		m_pause = true;
+		m_on_load = true;
 	}
 
 	void EnttXSol::NewScriptTemplate ( std::string const& newScript )
