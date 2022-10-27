@@ -1,22 +1,51 @@
-
+-- Going through a list of all Tiles, each tile has a 10% chance of getting moved. 
+-- If a tile is to be moved, some of its surrounding tiles will also move.
+-- Each moved tile has a 50% chance of moving up and 50% chance of moving down.
+-- Max number of moved tiles will be 3, so as not to change the map too much.
+-- Any character standing on a moving tile will received damage.
+-- If there are tiles above a tile that is moving, those tiles on top will not be affected.
+-- Earthquake will only affect tiles on floor0, so players will have to get to higher ground within 3 turns to avoid damage.
 
 -- TODO:
--- 1) Set RandomEventManager.eventHappening = false at the end of the earthquake
+-- 1) Damage characters standing on affected tiles
+-- 2) Any characters on moving tiles should move along with the tiles
+-- 3) Implement UI to warn player of earthquake every turn
 
 --[IsComponent]
 function C_RandomEventEarthquake()
     local var = {
-        -- --[SerializeString]
-        -- TurnOrderManager = "TurnOrderManager",
-
-        -- -- name of the TurnOrder state, to be checked against GlobalStatemachine's CurrentState
-        -- StateRandomEvent = "StateRandomEvent",
-
-        -- -- probability of a randomevent occuring 
-        -- randomEventRate = 0.25,
+        --[SerializeString]
+        RandomEventManager = "RandomEventManager",
         
-        -- -- list of possible randomevents
-        -- randomEventList = { "eventEarthquake", "eventTsunami" }
+        -- name of random event
+        RandomEvent = "eventEarthquake",
+
+        -- probability of the earthquake affecting each tile
+        earthquakeTileRate = 0.1,
+
+        -- -- probability of an effected tile moving up or down
+        tileDirectionRate = 0.5,
+        
+        -- max number of affected tiles
+        maxAffectedTiles = 3,
+
+        -- counts the number of affected tiles for this earthquake
+        affectedTilesCounter = 0,
+
+        -- number of turns before earthquake happens
+        eventCountdown = 3,
+
+        -- earthquake will occur at the start of this turn no.
+        earthquakeExecuteTurn = 0,
+
+        -- turn no. of the turn when the countdown started
+        startOfCountdown = 0,
+
+        -- bool to run earthquake initialization once
+        earthquakeInitialized = false, 
+
+        -- remind the player about earthquake every turn
+        playerWarned = false
     };
     return function()
         return var
@@ -26,97 +55,184 @@ end
 --[IsSystem]
 function S_RandomEventEarthquake(e)
     
-    -- -- getting TurnOrderManager entity and component
-    -- local stateRandomEventEntity = GetEntity("TurnOrderManager")
-    -- local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
-    
-    -- -- for checking if nextTurn is true or false, by pressing K
-    -- if (CheckKeyPress(75)) then
-    --     if (turnOrderManagerComponent.nextTurn == true) then
-    --         print("nextTurn is true")  
-    --     else
-    --         print("nextTurn is false")  
-    --     end
-    -- end
-    
-    -- -- getting GlobalStatemachine entity and component
-    -- local globalStateMachineEntity = GetEntity("GlobalStatemachine")
-    -- local globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
+    -- getting RandomEventManager
+    local randomEventManagerEntity = GetEntity("RandomEventManager")
+    if (randomEventManagerEntity ~= -1) then
+        randomEventManagerComponent = GetComponent(randomEventManagerEntity, "C_RandomEventManager")
+    end
 
-    -- -- only run the rest of this script if globalStateMachine allows it
-    -- if (globalStateMachineComponent.CurrentState == turnOrderManagerComponent.TurnOrderState) then
+    -- getting C_RandomEventEarthquake component
+    local randomEventEarthquakeComponent = GetComponent(randomEventManagerEntity, "C_RandomEventEarthquake")
+
+    -- only go on if RandomEventManager says the current event is an earthquake
+    if (randomEventManagerComponent.currentEvent == randomEventEarthquakeComponent.RandomEvent) then 
             
-    --     -- press M to check whether the script passes the globalStateMachineComponent.CurrentState check
-    --     if (CheckKeyPress(77)) then
-    --         print("TurnOrderManager script entered main chunk")
-    --     end
-    --     -- press N to check whether buildTurnQueue is true or false
-    --     if (CheckKeyPress(78)) then
-    --         print("buildTurnQueue is ", turnOrderManagerComponent.buildTurnQueue)
-    --     end
-    --     -- press B to check ID of current active character
-    --     if (CheckKeyPress(66)) then
-    --         print("current active character is ", turnOrderManagerComponent.currentTurn)
-    --     end
-        
-    --     -- if starting a new turn cycle, build the turn queue 
-    --     if (turnOrderManagerComponent.buildTurnQueue == true) then        
+        -- getting TurnOrderManager to check the turn counter
+        local turnOrderManagerEntity = GetEntity("TurnOrderManager")
+        if (turnOrderManagerEntity ~= -1) then
+            turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
+        end
 
-    --         -- adding all entities with C_Character script into the turnQueue and print result
-    --         print("Entities added into turnQueue:")
-    --         turnOrderManagerComponent.turnQueue = EntitiesWithComponent("C_Character")
-    --         for k = 1, #turnOrderManagerComponent.turnQueue do              
-    --             print(GetEntityData(turnOrderManagerComponent.turnQueue[k]).id)
-    --         end
-    --         print() -- print line break
+        -- determine the turn no. to execute the earthquake
+        if (randomEventEarthquakeComponent.earthquakeInitialized == false) then
+            
+            -- earthquakeExecuteTurn will be current turn number + eventCountdown
+            randomEventEarthquakeComponent.earthquakeExecuteTurn = turnOrderManagerComponent.turnCycleCounter + randomEventEarthquakeComponent.eventCountdown
 
-    --         -- TODO: sort all characters in turnQueue by remaining stamina
+            -- storing the turn number of the turn where the earthquake was confirmed
+            randomEventEarthquakeComponent.startOfCountdown = turnOrderManagerComponent.turnCycleCounter
+            
+            -- set earthquakeInitialized to true so script will not overwrite earthquakeExecuteTurn
+            randomEventEarthquakeComponent.earthquakeInitialized = true
+            
+            print("\n[Earthquake announcement - START]")
+            print("Current turn is turn no.", turnOrderManagerComponent.turnCycleCounter)
+            print("Earthquake will execute on turn no.", randomEventEarthquakeComponent.earthquakeExecuteTurn)
+            print("[Earthquake announcement - END]\n\n")
+        end
 
-    --         -- reset to false so it doesn't keep running this chunk
-    --         turnOrderManagerComponent.buildTurnQueue = false
+        --countdown, warn the player, let them know how many more turns until earthquake
+        if (randomEventEarthquakeComponent.playerWarned == false) then 
+            
+            -- insert UI to warn player here
+            
+            -- for now, just print a message
+            print("\n[Earthquake warning - START]")
+            print("EARTHQUAKE HAPPENING IN", randomEventEarthquakeComponent.eventCountdown, "TURNS")
+            print("[Earthquake warning - END]\n\n")
 
-    --         print("turnQueue has been built, setting buildTurnQueue to false!")
-    --     end
-     
-    --     -- while there are still characters who have not taken their turn for this cycle
-    --     if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
-                     
-    --         -- TODO: allow current character do perform their turn
-    --         turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
+            -- reset playerWarned, and decrement eventCountdown
+            randomEventEarthquakeComponent.playerWarned = true
+            randomEventEarthquakeComponent.eventCountdown = randomEventEarthquakeComponent.eventCountdown - 1
+        end
 
-    --         -- turnOrderManagerComponent.nextTurn will be toggled to true when the current active character ends their turn
-    --         if (turnOrderManagerComponent.nextTurn == true) then
-    --             -- reset to false
-    --             turnOrderManagerComponent.nextTurn = false    
-    --             -- increment queueIndex (next character in turnQueue will become active)
-    --             turnOrderManagerComponent.queueIndex = turnOrderManagerComponent.queueIndex + 1
-    --         end
-    --     -- once all characters have taken their turn, reset variables and change global state to randomevents 
-    --     else          
-    --         turnOrderManagerComponent.buildTurnQueue = true
-    --         turnOrderManagerComponent.queueIndex = 1
-    --         globalStateMachineComponent.CurrentState = "RandomEventState"
-    --     end
-    -- end
+        -- if the turnCycleCounter has increased, warn the player again
+        if (randomEventEarthquakeComponent.startOfCountdown ~= turnOrderManagerComponent.turnCycleCounter) then 
+            randomEventEarthquakeComponent.startOfCountdown = turnOrderManagerComponent.turnCycleCounter
+            randomEventEarthquakeComponent.playerWarned = false
+        end
+
+        -- when it's time to execute the earthquake
+        if (turnOrderManagerComponent.turnCycleCounter == randomEventEarthquakeComponent.earthquakeExecuteTurn) then 
+            
+            print("\n[RandomEventEarthquake - START]")
+
+            -- get a list of all tiles
+            local tileList = EntitiesWithComponent("C_FloorTile")
+            print("number of tiles", #tileList)
+
+            -- iterate through each tile in tileList
+            for i = 1, #tileList do
+                
+                -- get a random number between 0 and 1
+                local randomProb = GenerateRandomProbability()
+
+                -- if this tile is affected by the earthquake (limit to floor0 tiles because higher tiles may end up floating)
+                if (randomProb <= randomEventEarthquakeComponent.earthquakeTileRate and (GetGridCell(tileList[i]).y == 0)) then
+                    
+                    -- create a new list to contain tiles that will be moved
+                    local affectedTileList = { tileList[i] }
+                    -- print("1. number of tiles in affectedTileList:", #affectedTileList) -- this should print 1
+                    
+                    -- getting the x,y,z grid coordinates for the center tile
+                    local mainTileCoordinates = GetGridCell(tileList[i])
+                    print("mainTileCoordinates:", mainTileCoordinates.x, mainTileCoordinates.y, mainTileCoordinates.z)
+
+                    -- manually add surrounding tiles into affectedTileList, by iterating through tileList again to look for tiles with correct coords
+                    for k = 1, #tileList do
+                        
+                        -- get the coordinates for each tile
+                        adjacentTileCoordinates = GetGridCell(tileList[k])
+                        
+                        -- if this tile is not in the same y-axis, then just skip it
+                        if (adjacentTileCoordinates.y == mainTileCoordinates.y) then
+                            
+                            -- compare x and z (8 scenarios)
+                            if ((adjacentTileCoordinates.x == mainTileCoordinates.x and adjacentTileCoordinates.z == mainTileCoordinates.z - 1) or -- behind
+                                (adjacentTileCoordinates.x == mainTileCoordinates.x and adjacentTileCoordinates.z == mainTileCoordinates.z + 1) or -- in front
+                                (adjacentTileCoordinates.z == mainTileCoordinates.z and adjacentTileCoordinates.x == mainTileCoordinates.x - 1) or -- right
+                                (adjacentTileCoordinates.z == mainTileCoordinates.z and adjacentTileCoordinates.x == mainTileCoordinates.x + 1)) then -- left
+                                --(adjacentTileCoordinates.x == mainTileCoordinates.x + 1 and adjacentTileCoordinates.z == mainTileCoordinates.z + 1) or -- front + left
+                                --(adjacentTileCoordinates.x == mainTileCoordinates.x - 1 and adjacentTileCoordinates.z == mainTileCoordinates.z + 1) or -- front + right
+                                --(adjacentTileCoordinates.x == mainTileCoordinates.x + 1 and adjacentTileCoordinates.z == mainTileCoordinates.z - 1) or -- behind + left
+                                --(adjacentTileCoordinates.x == mainTileCoordinates.x - 1 and adjacentTileCoordinates.z == mainTileCoordinates.z - 1)) then -- behind + right
+                                print("inserting a tile in affectedTileList", adjacentTileCoordinates.x, adjacentTileCoordinates.y, adjacentTileCoordinates.z)
+                                affectedTileList[#affectedTileList+1] = tileList[k]
+                            end 
+                        end
+                    end
+
+                    print("2. number of tiles in affectedTileList:", #affectedTileList, "\n")
+
+                    -- get another randomprob to determine move up or down
+                    local directionProb = GenerateRandomProbability()
+
+                    -- for each tile in affectedTileList, move either up or down, according to directionProb
+                    for j = 1, #affectedTileList do 
+                        
+                        -- GridCell component for each tile
+                        local tileGridCell = GetGridCell(affectedTileList[j])
+
+                        -- make the tile go up or down, according to directionProb
+                        if (directionProb >= randomEventEarthquakeComponent.tileDirectionRate) then 
+                            -- go up
+                            tileGridCell.y = tileGridCell.y + 1
+                        else
+                            -- go down
+                            tileGridCell.y = tileGridCell.y - 1
+                        end
+                    end
+                    
+                    -- increment number of affected tiles
+                    randomEventEarthquakeComponent.affectedTilesCounter = randomEventEarthquakeComponent.affectedTilesCounter + 1
+                end
+
+                -- break the loop after hitting the cap for affected tiles
+                if (randomEventEarthquakeComponent.affectedTilesCounter == randomEventEarthquakeComponent.maxAffectedTiles) then
+                    print("Maximum affected tiles hit! Breaking loop") 
+                    break
+                end
+            end
+
+            -- reset variables
+            randomEventEarthquakeComponent.affectedTilesCounter = 0
+            randomEventEarthquakeComponent.eventCountdown = 3
+            randomEventEarthquakeComponent.earthquakeExecuteTurn = 0
+            randomEventEarthquakeComponent.startOfCountdown = 0
+            randomEventEarthquakeComponent.earthquakeInitialized = false
+            randomEventEarthquakeComponent.playerWarned = false
+
+            -- reset randomeventmanager.currentEvent
+            randomEventManagerComponent.currentEvent = nil
+
+            print("RandomEventEarthquake - END]\n\n")
+        end
+    end
 end
-
-
 
 
 --[[ PSEUDOCODE
 
-if starting a new turn cycle
-    init the turnQueue array
-    buildTurnQueue = false
+if (RandomEventManager.currentEvent = eventEarthquake)
+{
+    tileList = a list of all tiles
+    
+    for each tile in tileList
+    {
+        if (randomprob <= 0.1)
+        {
+            1. tile will be affected! 
+            2. push this tile and its surrounding 8 tiles into another list
+            3. get another randomprob to determine move up or down
+            4. for each tile in this new list, move either up or down, according to no. 3
+            5. ++affecttiles
+        }        
 
-if (GlobalStatemachine.CurrentState = CharacterTurn)
-    while not every character has performed their turn
-        perform turn
-        if (nextTurn)
-            nextTurn = false
-            go to next character
+        if affectedtiles >= 3, stop
+    }
 
-buildTurnQueue = true
-GlobalStatemachine.CurrentState = RandomEventState
+    reset variables
+    reset randomeventmanager.currentEvent
+}
 
 --]]

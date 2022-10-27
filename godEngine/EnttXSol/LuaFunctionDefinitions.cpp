@@ -196,5 +196,27 @@ namespace god
 				entt.RemoveEntity ( engineResources.Get<EntityGrid> ().get () , entt.GetEngineComponent<EntityData> ( e )->m_id );
 			}
 		);
+
+		// Screenshake(duration) - doesn't work
+		// ==============================================================================================
+		//entt.RegisterLuaFunction("Screenshake",
+		//	[&engineResources](float duration)->float
+		//	{
+		//		auto& camera = engineResources.Get<Camera>().get();
+
+		//		float amplitude = 10.0f;
+		//		float amplitudeChange = -1.0f;
+		//		float timer = 0.0f;
+
+		//		while (amplitude > 0)
+		//		{
+		//			timer += DeltaTimer::m_dt;
+		//			amplitude += amplitudeChange * DeltaTimer::m_dt;
+		//			camera.m_position.y += glm::sin(amplitude);
+		//		}
+		//		
+		//		return 0.0f;
+		//	}
+		//);
 	}
 }

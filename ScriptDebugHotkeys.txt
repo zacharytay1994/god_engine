@@ -17,6 +17,7 @@ K - Press to check whether TurnOrderManager.nextTurn is true or false
 M - Press to check whether TurnOrderManager script goes into main chunk
 N - Press to check whether TurnOrderManager.buildTurnQueue is true or false
 V - Press to check whether StateMovePlayer script goes into main chunk
+X - Press to check which turn number we are at
 
 [RandomEventManager debugging]
 M - Press to check whether RandomEventManager script goes into main chunk, and test GenerateRandomProbability()
