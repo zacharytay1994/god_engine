@@ -110,6 +110,10 @@ namespace god
 			ImGui::PushID ( imguiUniqueID++ );
 			auto& component = registry.get<T> ( entity );
 			gui ( component , editorResources );
+			if ( ImGui::Button ( "Remove" ) )
+			{
+				registry.remove<T> ( entity );
+			}
 			ImGui::PopID ();
 		}
 	}
