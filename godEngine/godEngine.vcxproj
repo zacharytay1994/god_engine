@@ -134,10 +134,11 @@
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_DirectionalLight.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_PointLight.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_All.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_AudioListener.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_AudioSource.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Dynamic.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Physics.h" />

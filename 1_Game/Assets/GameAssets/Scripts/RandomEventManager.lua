@@ -7,7 +7,7 @@
 -- before changing GlobalStatemachine.CurrentState to CharacterTurnState.
 
 -- TODO:
--- 1) Run specific randomevent scripts after they have been selected
+-- 1) Implement eventTsunami and eventVolcano
 
 --[IsComponent]
 function C_RandomEventManager()
@@ -22,10 +22,11 @@ function C_RandomEventManager()
         randomEventRate = 0.25,
 
         -- false if there is no random event occuring at the moment
-        eventHappening = false,
+        currentEvent = nil,
         
         -- list of possible randomevents
-        randomEventList = { "eventEarthquake", "eventTsunami", "eventVolcano" }
+        -- randomEventList = { "eventEarthquake", "eventTsunami", "eventVolcano" }
+        randomEventList = { "eventEarthquake" }
     };
     return function()
         return var
@@ -65,21 +66,24 @@ function S_RandomEventManager(e)
         end
         
         -- only allow random event if no other random event is occuring
-        if (randomEventManagerComponent.eventHappening == false) then
+        if (randomEventManagerComponent.currentEvent == nil) then
             print("\n[RandomEventManager - START]")
-            if (GenerateRandomProbability() < 0.25) then
+            if (GenerateRandomProbability() < randomEventManagerComponent.randomEventRate) then
                 print("RandomEvent activated! 25% chance.")
-                print("Activated random event:", randomEventManagerComponent.randomEventList[GenerateRandomNumberInRange(1, #randomEventManagerComponent.randomEventList)])
-                randomEventManagerComponent.eventHappening = true
+                
+                local randomNumber = GenerateRandomNumberInRange(1, #randomEventManagerComponent.randomEventList)
+                print("Activated random event:", randomEventManagerComponent.randomEventList[randomNumber])
+                randomEventManagerComponent.currentEvent = randomEventManagerComponent.randomEventList[randomNumber]
+                print("Double-checking: randomEventManagerComponent.currentEvent =", randomEventManagerComponent.currentEvent)
                 -- TODO: randomly pick an event and run that script
+                print("[RandomEventManager - END]\n\n")
             else
-                print("RandomEvent not activated! 75% chance.")            
+                print("RandomEvent not activated! 75% chance.")
+                print("[RandomEventManager - END]\n\n")            
             end
         end
         
-        globalStateMachineComponent.CurrentState = "StateCharacterTurn"
-        print("CurrentState = StateCharacterTurn")
-        print("[RandomEventManager - END]\n\n")
+        globalStateMachineComponent.CurrentState = "StateCharacterTurn"        
     end
 end
 
