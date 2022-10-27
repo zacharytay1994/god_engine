@@ -22,6 +22,7 @@ namespace god
 		
 
 		 physx::PxPhysics* const GetPhysics() const;
+		 physx::PxCooking* const GetCooking() const;
 		 physx::PxScene* const GetPhysicsScene() const;
 		 std::map < std::string, physx::PxMaterial*>& GetMaterialContainer();
 
@@ -42,6 +43,7 @@ namespace god
 		physx::PxTolerancesScale       mToleranceScale;
 
 		physx::PxFoundation* mFoundation ;
+		physx::PxCooking* mCooking;
 		physx::PxPhysics* mPhysics;
 
 		physx::PxScene* mScene;

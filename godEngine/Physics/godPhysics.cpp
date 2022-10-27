@@ -7,6 +7,7 @@ namespace god
 	{
 		mDispatcher = nullptr;
 		mFoundation = nullptr;
+		mCooking = nullptr;
 		mPhysics = nullptr;
 
 		mScene = nullptr;
@@ -21,7 +22,7 @@ namespace god
 		mScene->release();
 		mDispatcher->release();
 		mPhysics->release();
-
+		mCooking->release();
 		if (mPvd)
 		{
 			physx::PxPvdTransport* transport = mPvd->getTransport();
@@ -38,17 +39,22 @@ namespace god
 		mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
 		if (!mFoundation) throw("PxCreateFoundation failed!");
 
+
 		CreatePVD();
 	
 		mToleranceScale.length = 1;        // typical length of an object
 		mToleranceScale.speed = 98.1;         // typical speed of an object, gravity*1s is a reasonable choice
 		mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, mToleranceScale, true, mPvd);
+
+
 		if (!mPhysics)
 			std::cerr << "Failed to Create PhysX Instance" << std::endl;
 		else
 		{
-
-
+			mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, physx::PxCookingParams(mToleranceScale));
+			if (!mCooking)
+				std::cerr << "PxCreateCooking failed!" << std::endl;
+			
 			physx::PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 			sceneDesc.gravity = physx::PxVec3(0.0f, -98.11f, 0.0f);
 			mDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
@@ -121,6 +127,11 @@ namespace god
 	physx::PxPhysics* const PhysicsSystem::GetPhysics() const
 	{
 		return mPhysics;
+	}
+
+	physx::PxCooking* const PhysicsSystem::GetCooking() const
+	{
+		return mCooking;
 	}
 
 	physx::PxScene* const PhysicsSystem::GetPhysicsScene() const

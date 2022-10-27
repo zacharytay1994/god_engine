@@ -19,13 +19,11 @@ namespace god
 		}
 	}
 
-	void RigidStaticUpdate(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, PhysicsMaterial&, PhysicsShape&, RigidStatic& > component)
+	void RigidStaticUpdate(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
 
 		Transform& transform = std::get<1>(component);
-		PhysicsMaterial& phymaterial = std::get<2>(component);
-		PhysicsShape& physhape = std::get<3>(component);
-		RigidStatic& rigidstatic = std::get<4>(component);
+		RigidStatic& rigidstatic = std::get<2>(component);
 
 		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
@@ -39,6 +37,34 @@ namespace god
 
 		if (rigidstatic.updateRigidStatic)
 		{
+			if (rigidstatic.p_material == nullptr)
+			{
+				rigidstatic.p_material = mPhysics->createMaterial(rigidstatic.StaticFriction, rigidstatic.DynamicFriction, rigidstatic.Restitution);
+			}
+			if (rigidstatic.p_shape == nullptr)
+			{
+				//exclusive shape (can be modified)
+
+
+				switch (rigidstatic.shapeid)
+				{
+				case RigidStatic::Cube:
+					rigidstatic.p_shape = mPhysics->createShape(physx::PxBoxGeometry(rigidstatic.extents.x, rigidstatic.extents.y, rigidstatic.extents.z), *rigidstatic.p_material, true);
+					rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
+					break;
+				case RigidStatic::Sphere:
+					rigidstatic.p_shape = mPhysics->createShape(physx::PxSphereGeometry(rigidstatic.extents.x), *rigidstatic.p_material, true);
+					rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
+					break;
+				case RigidStatic::Capsule:
+					rigidstatic.p_shape = mPhysics->createShape(physx::PxCapsuleGeometry(rigidstatic.extents.x, rigidstatic.extents.y), *rigidstatic.p_material, true);
+					rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
+					break;
+
+				}
+
+
+			}
 			if (rigidstatic.p_RigidStatic == nullptr)
 			{
 				rigidstatic.p_RigidStatic = mPhysics->createRigidStatic(physx::PxTransform(
@@ -47,21 +73,43 @@ namespace god
 					transform.m_position.z + rigidstatic.Offset.z));
 
 				rigidstatic.mScene = mScene;
-				rigidstatic.p_RigidStatic->attachShape(*physhape.p_shape);
+				rigidstatic.p_RigidStatic->attachShape(*rigidstatic.p_shape);
 
 				mScene->addActor(*rigidstatic.p_RigidStatic);
 
 			}
-			else
-			{
-				rigidstatic.p_RigidStatic->setGlobalPose(physx::PxTransform(transform.m_position.x + rigidstatic.Offset.x,
-					transform.m_position.y + rigidstatic.Offset.y,
-					transform.m_position.z + rigidstatic.Offset.z));
-			}
-			//std::cout << " rigid static Updated\n";
+			
 			rigidstatic.updateRigidStatic = false;
 		}
 
+		if (rigidstatic.locktoscale)
+		{
+			rigidstatic.extents = transform.m_scale;
+
+			switch (rigidstatic.shapeid)
+			{
+			case RigidStatic::Cube:
+				rigidstatic.p_shape->setGeometry(physx::PxBoxGeometry(rigidstatic.extents.x, rigidstatic.extents.y, rigidstatic.extents.z));
+				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
+				break;
+			case RigidStatic::Sphere:
+				rigidstatic.p_shape->setGeometry(physx::PxSphereGeometry(rigidstatic.extents.x));
+				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
+				break;
+			case RigidStatic::Capsule:
+				rigidstatic.p_shape->setGeometry(physx::PxCapsuleGeometry(rigidstatic.extents.x, rigidstatic.extents.y));
+				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
+				break;
+
+			}
+
+
+			
+		}
+
+		rigidstatic.p_RigidStatic->setGlobalPose(physx::PxTransform(transform.m_position.x + rigidstatic.Offset.x,
+			transform.m_position.y + rigidstatic.Offset.y,
+			transform.m_position.z + rigidstatic.Offset.z));
 
 	}
 
