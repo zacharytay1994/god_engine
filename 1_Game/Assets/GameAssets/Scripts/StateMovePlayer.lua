@@ -21,7 +21,6 @@ function S_StateMovePlayer(e)
 
     -- check if TurnOrderManager entity exists
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
-
     if (turnOrderManagerEntity ~= -1) then
 
         -- do some state-only action here

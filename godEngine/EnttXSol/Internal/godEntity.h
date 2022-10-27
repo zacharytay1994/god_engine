@@ -13,7 +13,7 @@ namespace god
 
 		enum class Type
 		{
-			Default,
+			Default ,
 			Prefab
 		};
 		Type m_type { Type::Default };
@@ -23,7 +23,7 @@ namespace god
 		std::string m_name { "" };
 		std::vector<ContainerID> m_children;
 		bool m_persist_in_scene { true };
-
+		bool m_active { true };
 		Entity_ () = default;
 		Entity_ ( entt::registry& registry , std::string const& name , ContainerID parent , Type type = Type::Default );
 

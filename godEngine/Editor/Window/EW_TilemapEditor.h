@@ -38,7 +38,7 @@ namespace god
 
 		EnttXSol::Entities::ID m_preview_id { EnttXSol::Entities::Null };
 
-		void ClearPreview ();
+		void ClearPreview ( EDITOR_RESOURCES& engineResources );
 	};
 }
 
@@ -225,7 +225,7 @@ namespace god
 				// erase entities in cell
 				if ( m_replace_cell )
 				{
-					grid[ m_selected ].RunOver ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } , [ &grid ]( uint32_t e , EnttXSol& entt ) { entt.RemoveEntityFromGrid ( grid , e ); } , std::ref ( m_enttxsol ) );
+					grid[ m_selected ].RunOver ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } , [&grid]( uint32_t e , EnttXSol& entt ) { entt.RemoveEntity ( grid , e ); } , std::ref ( m_enttxsol ) );
 				}
 
 				m_enttxsol.AttachComponent<GridCell> ( entity );
@@ -303,7 +303,7 @@ namespace god
 			m_y_level = 0;
 			if ( m_preview_id != EnttXSol::Entities::Null && m_enttxsol.m_entities.Valid ( m_preview_id ) )
 			{
-				m_enttxsol.RemoveEntity ( m_preview_id );
+				m_enttxsol.RemoveEntity ( grid , m_preview_id );
 			}
 			// if there is a selected prefab brush load the selected prefab as a preview
 			if ( m_selected_prefab != "-None-" )
@@ -311,8 +311,9 @@ namespace god
 				m_preview_id = m_enttxsol.AddPrefabToScene ( engineResources , m_selected_prefab , m_selected ,
 					{ ( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size,
 					static_cast< float >( m_cell_y ) * m_true_cell_size,
-					( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size } );
-				m_enttxsol.m_entities[ m_preview_id ].m_persist_in_scene = false;
+					( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size } ,
+					false );
+				//m_enttxsol.m_entities[ m_preview_id ].m_persist_in_scene = false;
 			}
 		}
 
@@ -324,7 +325,7 @@ namespace god
 			{
 				if ( m_preview_id != EnttXSol::Entities::Null && m_enttxsol.m_entities.Valid ( m_preview_id ) )
 				{
-					m_enttxsol.RemoveEntity ( m_preview_id );
+					m_enttxsol.RemoveEntity ( grid , m_preview_id );
 					m_preview_id = EnttXSol::Entities::Null;
 				}
 				m_selected_prefab = "-None-";
@@ -341,7 +342,7 @@ namespace god
 					// remove old preview if any
 					if ( m_preview_id != EnttXSol::Entities::Null && m_enttxsol.m_entities.Valid ( m_preview_id ) )
 					{
-						m_enttxsol.RemoveEntity ( m_preview_id );
+						m_enttxsol.RemoveEntity ( grid , m_preview_id );
 						m_preview_id = EnttXSol::Entities::Null;
 					}
 
@@ -353,8 +354,9 @@ namespace god
 						m_preview_id = m_enttxsol.AddPrefabToScene ( engineResources , m_selected_prefab , m_selected ,
 							{ ( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size,
 							static_cast< float >( m_cell_y ) * m_true_cell_size,
-							( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size } );
-						m_enttxsol.m_entities[ m_preview_id ].m_persist_in_scene = false;
+							( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size } ,
+							false );
+						//m_enttxsol.m_entities[ m_preview_id ].m_persist_in_scene = false;
 					}
 
 					ImGui::CloseCurrentPopup ();
@@ -373,11 +375,11 @@ namespace god
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline void EW_TilemapEditor<EDITOR_RESOURCES>::ClearPreview ()
+	inline void EW_TilemapEditor<EDITOR_RESOURCES>::ClearPreview ( EDITOR_RESOURCES& engineResources )
 	{
 		if ( m_preview_id != EnttXSol::Entities::Null && m_enttxsol.m_entities.Valid ( m_preview_id ) )
 		{
-			m_enttxsol.RemoveEntity ( m_preview_id );
+			m_enttxsol.RemoveEntity ( engineResources.Get<EntityGrid> ().get () , m_preview_id );
 			m_preview_id = EnttXSol::Entities::Null;
 		}
 		m_selected_prefab = "-None-";

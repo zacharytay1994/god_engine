@@ -3,6 +3,9 @@
 -- While GlobalStatemachine.CurrentState is CharacterTurnState, this script will be responsible for switching to each 
 -- character's turn, before changing GlobalStatemachine.CurrentState to RandomEventState.
 
+-- TODO:
+-- 1) Sort the turnQueue by remaining stamina
+
 --[IsComponent]
 function C_TurnOrderManager()
     local var = {
@@ -21,10 +24,10 @@ function C_TurnOrderManager()
         -- currentTurn will be set to the ID number of whichever character's turn it currently is
         currentTurn = 0,
 
-        -- indicates which character in the queue is performing their turn
+        -- indicates which character in the queue is performing their turn (lua index starts from 1, not 0)
         queueIndex = 1,
 
-        -- turnQueue is an array containing the Enitity IDs of all entities with a C_Character
+        -- turnQueue is an array containing all entities with a C_Character component
         turnQueue = {}
     };
     return function()
@@ -71,40 +74,47 @@ function S_TurnOrderManager(e)
         -- if starting a new turn cycle, build the turn queue 
         if (turnOrderManagerComponent.buildTurnQueue == true) then        
 
-            -- TODO: add all remaining characters into the turnQueue (currently hard-coded)
-            local playerID = GetEntityData(GetEntity("Player")).id
-            local enemyID = GetEntityData(GetEntity("Enemy")).id
-
-            -- for some reason, tables don't work
-            -- table.insert(turnOrderManagerComponent.turnQueue, playerID)
-            -- table.insert(turnOrderManagerComponent.turnQueue, enemyID)
-            turnOrderManagerComponent.turnQueue[1] = playerID
-            turnOrderManagerComponent.turnQueue[2] = enemyID
+            print("\n[TurnOrderManager: buildTurnQueue - START]")
+            
+            -- adding all entities with C_Character script into the turnQueue and print result
+            print("Entities added into turnQueue:")
+            turnOrderManagerComponent.turnQueue = EntitiesWithComponent("C_Character")
+            for k = 1, #turnOrderManagerComponent.turnQueue do              
+                print(GetEntityData(turnOrderManagerComponent.turnQueue[k]).id)
+            end
+            print() -- print line break
 
             -- TODO: sort all characters in turnQueue by remaining stamina
 
-            -- printing the turnQueue (currently hard-coded)
-            -- print(turnOrderManagerComponent.turnQueue[1])
-            -- print(turnOrderManagerComponent.turnQueue[2])
-
             -- reset to false so it doesn't keep running this chunk
-            -- print("setting buildTurnQueue to false!")
             turnOrderManagerComponent.buildTurnQueue = false
+
+            print("[TurnOrderManager: buildTurnQueue - END]\n\n")
         end
      
+        -- while there are still characters who have not taken their turn for this cycle
         if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
-            
+                     
             -- TODO: allow current character do perform their turn
-            turnOrderManagerComponent.currentTurn = turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]
+            turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
 
+            -- turnOrderManagerComponent.nextTurn will be toggled to true when the current active character ends their turn
             if (turnOrderManagerComponent.nextTurn == true) then
+                -- reset to false
                 turnOrderManagerComponent.nextTurn = false    
+                -- increment queueIndex (next character in turnQueue will become active)
                 turnOrderManagerComponent.queueIndex = turnOrderManagerComponent.queueIndex + 1
             end
-        else
+        -- once all characters have taken their turn, reset variables and change global state to randomevents 
+        else          
             turnOrderManagerComponent.buildTurnQueue = true
             turnOrderManagerComponent.queueIndex = 1
-            globalStateMachineComponent.CurrentState = "RandomEventState"
+            turnOrderManagerComponent.currentTurn = 0
+
+            globalStateMachineComponent.CurrentState = "StateRandomEvent"
+            print("\n[TurnOrderManager - END]")
+            print("CurrentState = StateRandomEvent")
+            print("[TurnOrderManager - END]\n\n")
         end
     end
 end
