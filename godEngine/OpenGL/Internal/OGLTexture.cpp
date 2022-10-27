@@ -135,10 +135,9 @@ namespace god
 	void InsertEngineOGLTextures ( OGLTextureManager& manager )
 	{
 		// insert "none" image
-		manager.Insert ( "None" , { 0, OGLTexture ( "Assets/EngineAssets/Textures/test.dds" , true ) } );
+		manager.Insert ( "None" , { 0, OGLTexture ( "Assets/EngineAssets/Textures/BlackTexture.png" ) } );
+		manager.Insert("myddstest", { 1, OGLTexture("Assets/EngineAssets/Textures/test.dds" , true) });
 
-		int errorCode = glGetError();
-		std::cout << errorCode << std::endl;
 	}
 
 	void InsertAllOGLTexturesFromConfig ( std::string const& configPath , std::string const& assetFolderPath , OGLTextureManager& manager )
