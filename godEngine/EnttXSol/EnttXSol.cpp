@@ -402,7 +402,8 @@ namespace god
 		SerializeFunction<bool> SerializeBool ,
 		SerializeFunction<int> SerializeInt ,
 		SerializeFunction<float> SerializeFloat ,
-		SerializeFunction<std::string> SerializeString )
+		SerializeFunction<std::string> SerializeString ,
+		void( *RemoveCallback )( entt::registry& , entt::entity , int i , std::string const& name ) )
 	{
 		auto entt_id = m_entities[ entity ].m_id;
 		int i { imguiUniqueID };
@@ -413,10 +414,11 @@ namespace god
 				auto& storage = m_registry.storage<sol::table> ( entt::hashed_string ( component.first.c_str () ) );
 				if ( storage.contains ( entt_id ) )
 				{
-					if ( !component.second.m_serialize_attributes.empty () )
+					/*if ( !component.second.m_serialize_attributes.empty () )
 					{
 						Header ( component.first );
-					}
+					}*/
+					Header ( component.first );
 					auto& table = storage.get ( entt_id );
 					for ( auto const& attribute : component.second.m_serialize_attributes )
 					{
@@ -455,6 +457,8 @@ namespace god
 						}
 						++i;
 					}
+					// remove entity callback
+					RemoveCallback ( m_registry , m_entities[ entity ].m_id , i , component.first );
 				}
 			}
 		}
