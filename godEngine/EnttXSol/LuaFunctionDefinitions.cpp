@@ -197,26 +197,22 @@ namespace god
 			}
 		);
 
-		// Screenshake(duration) - doesn't work
+		// FindCameraObject()
 		// ==============================================================================================
-		//entt.RegisterLuaFunction("Screenshake",
-		//	[&engineResources](float duration)->float
-		//	{
-		//		auto& camera = engineResources.Get<Camera>().get();
+		entt.RegisterLuaFunction("FindCameraObject",
+			[&engineResources]()->god::Camera
+			{
+				return engineResources.Get<Camera>().get();
+			}
+		);
 
-		//		float amplitude = 10.0f;
-		//		float amplitudeChange = -1.0f;
-		//		float timer = 0.0f;
-
-		//		while (amplitude > 0)
-		//		{
-		//			timer += DeltaTimer::m_dt;
-		//			amplitude += amplitudeChange * DeltaTimer::m_dt;
-		//			camera.m_position.y += glm::sin(amplitude);
-		//		}
-		//		
-		//		return 0.0f;
-		//	}
-		//);
+		// Sin(value)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("Sin",
+			[](float value)->float
+			{
+				return glm::sin(value);
+			}
+		);
 	}
 }
