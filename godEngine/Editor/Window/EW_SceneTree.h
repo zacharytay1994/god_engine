@@ -191,7 +191,8 @@ namespace god
 				if ( m_selected_remove != EnttXSol::Entities::Null )
 				{
 					// if entity if part of grid
-					GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( m_selected_remove );
+					m_enttxsol.RemoveEntity ( engineResources.Get<EntityGrid> ().get () , m_selected_remove );
+					/*GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( m_selected_remove );
 					if ( grid_cell )
 					{
 						m_enttxsol.RemoveEntityFromGrid ( engineResources.Get<EntityGrid> ().get () , m_selected_remove );
@@ -199,7 +200,7 @@ namespace god
 					else
 					{
 						m_enttxsol.RemoveEntity ( m_selected_remove );
-					}
+					}*/
 					m_selected_entity = EnttXSol::Entities::Null;
 					m_selected_remove = EnttXSol::Entities::Null;
 				}
@@ -221,7 +222,7 @@ namespace god
 			{
 				if ( ImGui::Button ( "New Scene" , { ImGui::GetWindowWidth () , 0.0f } ) )
 				{
-					this->Get<EW_TilemapEditor> ()->ClearPreview ();
+					this->Get<EW_TilemapEditor> ()->ClearPreview ( engineResources );
 					Reset ();
 					m_enttxsol.ClearEntt ( engineResources );
 					m_selected_scene = -1;
@@ -244,7 +245,7 @@ namespace god
 						m_selected_scene = i;
 						if ( ImGui::Selectable ( "Load" ) )
 						{
-							this->Get<EW_TilemapEditor> ()->ClearPreview ();
+							this->Get<EW_TilemapEditor> ()->ClearPreview ( engineResources );
 							EntityGrid& grid = engineResources.Get<EntityGrid> ().get (); // clear tilemap grid
 							grid = EntityGrid ();
 							Reset ();
@@ -253,9 +254,9 @@ namespace god
 							m_select_hierarchy_tab = true;
 
 							// stopping and resetting all the sounds 
-							SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
-							auto& sounds = sound_manager.GetResources();
-							AudioAPI::StopAndResetAll(sounds);
+							SoundManager& sound_manager = engineResources.Get<SoundManager> ().get ();
+							auto& sounds = sound_manager.GetResources ();
+							AudioAPI::StopAndResetAll ( sounds );
 						}
 						this->ToolTipOnHover ( "Loads the scene up as the current scene." );
 
@@ -470,7 +471,7 @@ namespace god
 	{
 		if ( m_selected_scene < static_cast< int >( m_scene_list.size () ) )
 		{
-			this->Get<EW_TilemapEditor> ()->ClearPreview ();
+			this->Get<EW_TilemapEditor> ()->ClearPreview ( engineResources );
 			Reset ();
 			m_enttxsol.ClearEntt ( engineResources );
 			engineResources.Get<EntityGrid> ().get () = EntityGrid ();

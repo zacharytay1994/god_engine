@@ -151,5 +151,50 @@ namespace god
 				return glm::linearRand(minValue, maxValue);
 			}
 		);
+		
+		// InstancePrefab(name,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "InstancePrefab" ,
+			[&entt]( std::string const& name , float x , float y , float z )
+			{
+				entt.QueueInstancePrefab ( name , x , y , z );
+			}
+		);
+
+		// InstancePrefabParented(parent,name,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "InstancePrefabParented" ,
+			[&entt , &engineResources]( entt::entity e , std::string const& name , float x , float y , float z )
+			{
+				entt.QueueInstancePrefab ( name , x , y , z , entt.GetEngineComponent<EntityData> ( e )->m_id );
+			}
+		);
+
+		// InstancePrefabOnGrid(name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "InstancePrefabOnGrid" ,
+			[&entt]( std::string const& name , int x , int y , int z )
+			{
+				entt.QueueInstancePrefab ( name , x , y , z , EnttXSol::Entities::Null , true );
+			}
+		);
+
+		// InstancePrefabParentedOnGrid(name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "InstancePrefabParentedOnGrid" ,
+			[&entt]( entt::entity e , std::string const& name , int x , int y , int z )
+			{
+				entt.QueueInstancePrefab ( name , x , y , z , entt.GetEngineComponent<EntityData> ( e )->m_id , true );
+			}
+		);
+
+		// RemoveInstance(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "RemoveInstance" ,
+			[&entt , &engineResources]( entt::entity e )
+			{
+				entt.RemoveEntity ( engineResources.Get<EntityGrid> ().get () , entt.GetEngineComponent<EntityData> ( e )->m_id );
+			}
+		);
 	}
 }
