@@ -1,0 +1,17 @@
+Link : https://github.com/Microsoft/DirectXTex/wiki/Texconv
+
+Use Command line to convert any format to DDS
+
+1) Under file directory, type "cmd" then enter
+
+2) copy this command line " texconv -pow2 -f BC1_UNORM cat.jpg " (without the " ")
+[change the picture naming convention aka cat.jpg accordingly]
+
+To convert all the .png files in the C:\Textures directory tree to dds files written into the current working directory
+3) copy this command line " texconv -r C:\Textures\*.png " (without the " ")
+
+extra info
+-hflip: Perform horizonal flip of image
+-vflip: Perform horizonal flip of image
+-BC1 to store three-component color data using a 5:6:5 color (5 bits red, 6 bits green, 5 bits blue). This is true even if the data also contains 1-bit alpha. Assuming a 4×4 texture using the largest data format possible, the BC1 format reduces the memory required from 48 bytes (16 colors × 3 components/color × 1 byte/component) to 8 bytes of memory.
+-BC5(can replace with BC1) is ideal for storing floating-point data in the range of [0 to 1]

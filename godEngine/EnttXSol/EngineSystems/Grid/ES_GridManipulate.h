@@ -33,7 +33,7 @@ namespace god
 		glm::vec3 a = camera.m_position , b = camera.m_position + ray_dir * 1000.0f;
 		glm::vec3 intersect;
 
-		if ( grid_root_entity != EnttXSol::Entities::Null )
+		/*if ( grid_root_entity != EnttXSol::Entities::Null )
 		{
 			Transform* grid_transform = entt.GetEngineComponent<Transform> ( grid_root_entity );
 			if ( grid_transform )
@@ -60,7 +60,7 @@ namespace god
 					}
 				}
 			}
-		}
+		}*/
 	}
 
 	void GridManipulateInit ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , GridManipulate&> components )

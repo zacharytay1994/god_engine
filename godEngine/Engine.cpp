@@ -140,7 +140,7 @@ namespace god
 			window.PollEvents();
 
 			// window resize changes
-			if (window.Resized())
+			if (window.Resized() && !window.WindowsMinimized())
 			{
 				opengl.ResizeViewport(window.GetWindowWidth(), window.GetWindowHeight());
 				camera.UpdateAspectRatio(window.GetWindowWidth(), window.GetWindowHeight());

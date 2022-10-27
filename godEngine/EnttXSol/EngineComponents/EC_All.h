@@ -11,8 +11,7 @@
 #include "Render/EC_PointLight.h"
 #include "Render/EC_DirectionalLight.h"
 
-#include "Physics/EC_Material.h"
-#include "Physics/EC_Shape.h"
+
 #include "Physics/EC_Static.h"
 #include "Physics/EC_Dynamic.h"
 
@@ -31,8 +30,6 @@ namespace god
 			Transform ,
 			Renderable3D ,
 			GridCell ,
-			PhysicsMaterial ,
-			PhysicsShape ,
 			RigidStatic ,
 			RigidDynamic ,
 			AudioListener ,
@@ -42,5 +39,10 @@ namespace god
 			GridManipulate
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
+	};
+
+	struct ActiveComponent
+	{
+		bool m_active { true };
 	};
 }

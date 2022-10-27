@@ -97,19 +97,16 @@
     <ClInclude Include="Window\GLFWWindow.h" />
     <ClInclude Include="Window\DeltaTimer.h" />
     <ClInclude Include="Window\SystemTimer.h" />
-    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Material.h" />
-    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Shape.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Dynamic.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
     <ClInclude Include="Audio\AudioAPI.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_AudioListener.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_AudioSource.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_AudioListener.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_AudioSource.h" />
     <ClInclude Include="OpenGL\Advance\CubeMap.h" />
     <ClInclude Include="OpenGL\Advance\ShadowMap.h" />
     <ClInclude Include="OpenGL\Internal\OGLDebug.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Shape.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Dynamic.h" />
     <ClInclude Include="EnttXSol\LuaFunctionDefinitions.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_ScenePopulate.h" />
@@ -123,7 +120,8 @@
     <ClInclude Include="EnttXSol\EngineComponents\Grid\EC_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\ES_AudioSource.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_DynamicMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
