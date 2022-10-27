@@ -26,6 +26,10 @@ namespace god
 			"y" , &glm::ivec3::y ,
 			"z" , &glm::ivec3::z );
 
+		// Camera
+		entt.RegisterLuaType<Camera>("Camera",
+			"position", &Camera::m_position);
+
 		// GetComponent(e,componentName)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( entt.m_identifier_GetScriptComponent ,
@@ -200,7 +204,7 @@ namespace god
 		// FindCameraObject()
 		// ==============================================================================================
 		entt.RegisterLuaFunction("FindCameraObject",
-			[&engineResources]()->god::Camera
+			[&engineResources]()->god::Camera&
 			{
 				return engineResources.Get<Camera>().get();
 			}

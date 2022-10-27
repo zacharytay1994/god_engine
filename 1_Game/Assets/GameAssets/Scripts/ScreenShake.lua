@@ -16,13 +16,7 @@ function C_ScreenShake()
         duration = 0.0,
 
         -- the magnitude of the shake
-        amplitude = 10.0,
-
-        -- how much the magnitude decreases by
-        amplitudeChange = -1.0,
-
-        -- counts the duration of the shake
-        timer = 0.0,
+        amplitude = 180,
 
         -- bool to activate the shake
         doScreenShake = false
@@ -40,9 +34,10 @@ function S_ScreenShake(e)
         cameraShakeComponent = GetComponent(cameraShakeEntity, "C_ScreenShake")
     end
     
+    -- press Z to trigger a screenshake
     if (CheckKeyPress(90)) then
         print("Starting screen shake!")
-        cameraShakeComponent.duration = 5.0
+        cameraShakeComponent.duration = 1.0
         cameraShakeComponent.doScreenShake = true
     end
     
@@ -51,11 +46,19 @@ function S_ScreenShake(e)
         -- get camera object
         local cameraObject = FindCameraObject()
 
-        if (cameraShakeComponent.amplitude > 0) then
-            cameraShakeComponent.timer = cameraShakeComponent.timer + GetDeltaTime()
-            cameraShakeComponent.amplitude = cameraShakeComponent.amplitude + (cameraShakeComponent.amplitudeChange * GetDeltaTime())
-            -- camera.position.y = camera.position.y + sin(amplitude)
-            cameraObject.position = cameraObject.position + Sin(cameraShakeComponent.amplitude)
+        -- if (cameraShakeComponent.amplitude > 0) then
+        if (cameraShakeComponent.duration > 0) then
+            
+            -- decrease the timer
+            cameraShakeComponent.duration = cameraShakeComponent.duration - GetDeltaTime()
+
+            -- change the camera position
+            cameraObject.position.y = cameraObject.position.y + Sin(cameraShakeComponent.duration * cameraShakeComponent.amplitude)
+        else
+            
+            -- reset variables
+            cameraShakeComponent.doScreenShake = false
+            cameraShakeComponent.duration = 0.0
         end
     end
 end
