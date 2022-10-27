@@ -55,8 +55,6 @@ namespace god
 
 				glTexStorage2D(Target, static_cast<GLint>(DDS_Texture.levels()), Format.Internal, Extent.x, Extent.y);
 				
-				int errorCode = glGetError();
-				std::cout << errorCode << std::endl;
 				glCompressedTexSubImage2D(
 					Target, static_cast<GLint>(Level), 0, 0, Extent.x, Extent.y,
 					Format.Internal, static_cast<GLsizei>(DDS_Texture.size(Level)), DDS_Texture.data(0, 0, Level));
@@ -156,12 +154,7 @@ namespace god
 					{
 						
 						manager.Insert ( model.name.GetString () , { model.value[ 0 ][ "UID" ].GetUint (), OGLTexture ( assetFolderPath + model.value.GetArray ()[ 0 ][ "Raw" ].GetString () ) } );
-						int errorCode = glGetError();
-						std::cout << errorCode << std::endl;
-						if (errorCode == 1282)
-						{
-							std::cout << "lol\n";
-						}
+
 					}
 					else
 					{

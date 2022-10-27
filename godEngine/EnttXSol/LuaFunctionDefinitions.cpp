@@ -26,6 +26,10 @@ namespace god
 			"y" , &glm::ivec3::y ,
 			"z" , &glm::ivec3::z );
 
+		// Camera
+		entt.RegisterLuaType<Camera>("Camera",
+			"position", &Camera::m_position);
+
 		// GetComponent(e,componentName)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( entt.m_identifier_GetScriptComponent ,
@@ -103,13 +107,24 @@ namespace god
 			}
 		);
 
-		// EntitiesWithComponent(name)
+		// EntitiesWithEngineComponents(name)
 		// ==============================================================================================
-		entt.RegisterLuaFunction ( "EntitiesWithComponent" ,
+		entt.RegisterLuaFunction ( "EntitiesWithEngineComponent" ,
 			[&entt]( std::string const& name )->std::vector<entt::entity>
 			{
 				std::vector<entt::entity> entities;
-				entt.GetEntitiesWithComponent ( name , entities );
+				entt.GetEntitiesWithEngineComponent ( name , entities );
+				return entities;
+			}
+		);
+
+		// EntitiesWithScriptComponents(name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "EntitiesWithScriptComponent" ,
+			[&entt]( std::string const& name )->std::vector<entt::entity>
+			{
+				std::vector<entt::entity> entities;
+				entt.GetEntitiesWithScriptComponent ( name , entities );
 				return entities;
 			}
 		);
@@ -194,6 +209,24 @@ namespace god
 			[&entt , &engineResources]( entt::entity e )
 			{
 				entt.RemoveEntity ( engineResources.Get<EntityGrid> ().get () , entt.GetEngineComponent<EntityData> ( e )->m_id );
+			}
+		);
+
+		// FindCameraObject()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("FindCameraObject",
+			[&engineResources]()->god::Camera&
+			{
+				return engineResources.Get<Camera>().get();
+			}
+		);
+
+		// Sin(value)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("Sin",
+			[](float value)->float
+			{
+				return glm::sin(value);
 			}
 		);
 	}
