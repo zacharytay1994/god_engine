@@ -17,7 +17,7 @@ namespace god
 		SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
 
 		// access entities with specific component
-		for (auto&& [entity, as_entity_data, audio_source, as_transform] : entt.GetView<EntityData, AudioSource, Transform>().each())
+		for (auto&& [entity, active, audio_source, as_transform] : entt.GetView<AudioSource, Transform>().each())
 		{
 			if (audio_source.m_sound_id != -1)
 			{
