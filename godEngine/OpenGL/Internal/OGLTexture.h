@@ -15,6 +15,7 @@ namespace god
 		void Bind ( uint32_t location ) const;
 		void UnBind ( uint32_t location ) const;
 
+		bool isDDs{ false };
 	private:
 		uint32_t m_texture_id;
 	};

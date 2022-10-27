@@ -6,7 +6,7 @@
 #include "ES_Grid.h"
 
 #include "Physics/ES_Dynamic.h"
-#include "Physics/ES_Shape.h"
+
 #include "Physics/ES_Static.h"
 #include "Physics/ES_Debug.h"
 
@@ -26,7 +26,7 @@ namespace god
 		
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
 		//Physics
-		enttxsol.RunEngineSystem(engineResources, ShapeUpdate);
+
 		enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
 		enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);
 	}

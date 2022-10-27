@@ -143,7 +143,7 @@ namespace god
 			{{ 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f }},  // top right
 			{{ 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f }},  // bottom right
 			{{-1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f }},  // bottom left
-			{{-1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f }}  // top left 
+			{{-1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f }}	  // top left 
 		};
 		m_square_mesh.m_indices = {
 			0, 1, 3,   // first triangle
@@ -175,7 +175,7 @@ namespace god
 
 		m_causticmap_textures = OGLTexture( "Assets/EngineAssets/Textures/CausticMap.png" );
 
-		glCheckError ();
+		//glCheckError ();
 		std::cout << "OpenGL constructed." << std::endl;
 	}
 
@@ -502,6 +502,7 @@ namespace god
 
 	void OpenGL::FirstPassRenderToDepthmap ( Scene const& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures )
 	{
+		//glCheckError();
 		m_shadowmap.EnableDepthMap ();
 		for ( auto const& data : scene.m_instanced_render_data )
 		{
@@ -521,7 +522,7 @@ namespace god
 			}
 		}
 		m_shadowmap.DisableDepthMap ();
-		glCheckError ();
+		
 	}
 
 	OGLRenderPass<1>& OpenGL::BlurTexture ( unsigned int texture )

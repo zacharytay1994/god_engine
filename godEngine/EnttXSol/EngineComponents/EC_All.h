@@ -11,8 +11,7 @@
 #include "Render/EC_PointLight.h"
 #include "Render/EC_DirectionalLight.h"
 
-#include "Physics/EC_Material.h"
-#include "Physics/EC_Shape.h"
+
 #include "Physics/EC_Static.h"
 #include "Physics/EC_Dynamic.h"
 
@@ -31,8 +30,6 @@ namespace god
 			Transform ,
 			Renderable3D ,
 			GridCell ,
-			PhysicsMaterial ,
-			PhysicsShape ,
 			RigidStatic ,
 			RigidDynamic ,
 			AudioListener ,

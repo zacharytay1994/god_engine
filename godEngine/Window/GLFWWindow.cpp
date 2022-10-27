@@ -81,6 +81,27 @@ namespace god
 		}
 	}
 
+	void GLFWJoystick_callback(int jid, int event)
+	{
+		//UNREFERENCED_PARAMETER(jid);
+
+		if (event == GLFW_CONNECTED)
+		{
+			// The joystick was connected
+			//setGamepadConnect(true);
+			std::cout << "Joystick is connected!\n";
+
+		}
+		else if (event == GLFW_DISCONNECTED)
+		{
+			// The joystick was disconnected
+			//setGamepad(false);
+			//setGamepadConnect(false);
+			std::cout << "Joystick is disconnected!\n";
+		}
+
+	}
+
 	GLFWWindow::GLFWWindow ( uint32_t width , uint32_t height )
 		:
 		m_width ( width ) ,
@@ -91,7 +112,6 @@ namespace god
 		glfwWindowHint ( GLFW_CONTEXT_VERSION_MAJOR , 4 );
 		glfwWindowHint ( GLFW_CONTEXT_VERSION_MINOR , 5 );
 		glfwWindowHint ( GLFW_OPENGL_PROFILE , GLFW_OPENGL_CORE_PROFILE );
-
 
 		m_window = glfwCreateWindow ( m_width , m_height , "God Engine" , NULL , NULL );
 		if ( m_window == NULL )
@@ -108,6 +128,12 @@ namespace god
 		glfwSetKeyCallback ( m_window , GLFWKeyCallback );
 		glfwSetMouseButtonCallback ( m_window , GLFWMouseCallback );
 		glfwSetScrollCallback ( m_window , GLFWScrollCallback );
+
+		glfwSetJoystickCallback(GLFWJoystick_callback);
+		
+		present = glfwJoystickPresent(GLFW_JOYSTICK_1);
+		std::cout << "Joystick/Gamepad status: " << present << "\n";
+
 	}
 
 	GLFWWindow::~GLFWWindow ()
@@ -121,6 +147,18 @@ namespace god
 		return glfwWindowShouldClose ( m_window );
 	}
 
+	bool GLFWWindow::WindowsMinimized()
+	{
+		if (m_width == 0 || m_height == 0)
+		{
+			m_minimized = true;
+			return true;
+		}
+
+		m_minimized = false;
+		return false;
+	}
+
 	void GLFWWindow::PollEvents ()
 	{
 		// reset states
@@ -130,7 +168,88 @@ namespace god
 		m_scroll_up = false;
 		m_scroll_down = false;
 		m_resized = false;
+
+		m_gamepad_connected = false;
+		
+		if (present == 1)
+		{
+			int axesCount{ 0 };
+			const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
+			//std::cout << "Number of axes available: " << axesCount << "\n";
+
+			int buttonCount{ 0 };
+			const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
+
+			if (GLFW_PRESS == buttons[0])
+				std::cout << "Square Button pressed\n";
+
+			if (GLFW_PRESS == buttons[1])
+				std::cout << "X Button pressed\n";
+
+			if (GLFW_PRESS == buttons[2])
+				std::cout << "O Button pressed\n";
+
+			if (GLFW_PRESS == buttons[3])
+				std::cout << "Triangle Button pressed\n";
+
+			if (GLFW_PRESS == buttons[4])
+				std::cout << "L1 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[5])
+				std::cout << "R1 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[6])
+				std::cout << "L2 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[7])
+				std::cout << "R2 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[8])
+				std::cout << "8 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[9])
+				std::cout << "9 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[10])
+				std::cout << "10 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[11])
+				std::cout << "11 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[12])
+				std::cout << "12 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[13])
+				std::cout << "13 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[14])
+				std::cout << "14 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[15])
+				std::cout << "15 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[16])
+				std::cout << "16 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[17])
+				std::cout << "17 Button pressed\n";
+
+			if (GLFW_PRESS == buttons[18])
+				std::cout << "18 Button pressed\n";
+
+			/*else if (GLFW_RELEASE == buttons[1])
+				std::cout << "X Button released\n";*/
+
+			const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
+			//std::cout << "Joystick is called " << name << "\n";
+
+		}
+
 		glfwPollEvents ();
+
+		
+
+
 	}
 
 	void GLFWWindow::SwapWindowBuffers ()
@@ -256,6 +375,22 @@ namespace god
 	{
 		return m_scroll_down;
 	}
+
+	bool GLFWWindow::GamepadConnected()
+	{
+		return m_gamepad_connected;
+	}
+
+	bool GLFWWindow::GamepadPressed()
+	{
+		return m_gamepad_pressed;
+	}
+
+	bool GLFWWindow::GamepadReleased()
+	{
+		return m_gamepad_released;
+	}
+
 
 	void GLFWWindow::SetViewportMouseCoordinates ( double x , double y )
 	{
