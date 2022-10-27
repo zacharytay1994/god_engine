@@ -93,6 +93,7 @@ namespace god
 		// hdr
 		OGLMesh m_square_mesh;
 
+		OGLTexture m_causticmap_textures;
 
 		int m_max_point_lights { 5 };
 		int m_max_directional_lights { 5 };

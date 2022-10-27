@@ -4,6 +4,7 @@
 namespace god
 {
 	float DeltaTimer::m_dt { 0.0f };
+	float DeltaTimer::m_acc_dt{ 0.0f };
 	int DeltaTimer::m_fps { 0 } ;
 
 	void DeltaTimer::StartFrame ()
@@ -12,6 +13,7 @@ namespace god
 
 		// interval to record fps, e.g. 1.0f second
 		m_time += m_dt;
+		m_acc_dt += m_dt;
 		if ( m_time > 1.0f )
 		{
 			m_time = 0.0f;

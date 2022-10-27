@@ -2,8 +2,10 @@
 #include "OpenGL.h"
 #include "../godUtility/Scene.h"
 #include <godUtility/Math.h>
+#include "../Window/DeltaTimer.h"
 
 #include "Internal/OGLDebug.h"
+
 
 #pragma comment(lib, "opengl32.lib")
 
@@ -21,7 +23,8 @@ namespace god
 	OpenGL::Lines OpenGL::m_lines {};
 
 	OpenGL::OpenGL ( HWND windowHandle , int width , int height )
-		: m_screen_width { width } ,
+		: 
+		m_screen_width { width } ,
 		m_screen_height { height } ,
 		m_window_device_context { GetDC ( windowHandle ) }
 	{
@@ -140,7 +143,7 @@ namespace god
 			{{ 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f }},  // top right
 			{{ 1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f }},  // bottom right
 			{{-1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f }},  // bottom left
-			{{-1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f }}  // top left 
+			{{-1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f }}	  // top left 
 		};
 		m_square_mesh.m_indices = {
 			0, 1, 3,   // first triangle
@@ -170,7 +173,9 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/blend.fs"
 		);
 
-		glCheckError ();
+		m_causticmap_textures = OGLTexture( "Assets/EngineAssets/Textures/CausticMap.png" );
+
+		//glCheckError ();
 		std::cout << "OpenGL constructed." << std::endl;
 	}
 
@@ -255,13 +260,20 @@ namespace god
 			std::get<1> ( textures.Get ( data.first.m_specular_id ) ).Bind ( 1 );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.shininess" , data.first.m_shininess );
 
-			// Set reflection
+			// set reflection
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSkybox" , 2 );
 			m_cubemap.Bind ( 2 );
 
-			// Set shadowmap
+			// set shadowmap
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uShadowMap" , 3 );
 			m_shadowmap.Bind ( 3 );
+
+			// bind caustic map textures
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uCausticMap", 8 );
+			m_causticmap_textures.Bind( 8 );
+
+			// pass in delta time into shader 
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uDT", DeltaTimer::m_acc_dt );
 
 			// render point lights
 			std::sort ( scene.m_point_light_data.begin () , scene.m_point_light_data.end () ,
@@ -334,11 +346,11 @@ namespace god
 
 
 			// Set Fog
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.65f,0.85f,0.90f} );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.45f,0.65f,0.90f} );
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearStart",  10.0f);
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearEnd", 100.0f );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.05f );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 2 );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.03f );
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 0 );
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.isEnabled", true );
 
 
@@ -490,6 +502,7 @@ namespace god
 
 	void OpenGL::FirstPassRenderToDepthmap ( Scene const& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures )
 	{
+		//glCheckError();
 		m_shadowmap.EnableDepthMap ();
 		for ( auto const& data : scene.m_instanced_render_data )
 		{
@@ -509,7 +522,7 @@ namespace god
 			}
 		}
 		m_shadowmap.DisableDepthMap ();
-		glCheckError ();
+		
 	}
 
 	OGLRenderPass<1>& OpenGL::BlurTexture ( unsigned int texture )
