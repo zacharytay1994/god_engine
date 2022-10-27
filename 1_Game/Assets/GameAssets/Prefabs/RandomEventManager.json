@@ -1,1 +1,1 @@
-{"RandomEventManager":{"Type":"Default","Script Components":{"C_RandomEventManager":{"RandomEventManager":"RandomEventManager"}},"Engine Components":{},"Children":{}}}
+{"RandomEventManager":{"Type":"Default","Script Components":{"C_RandomEventEarthquake":{"RandomEventManager":"RandomEventManager","RandomEvent":"eventEarthquake"},"C_RandomEventManager":{"RandomEventManager":"RandomEventManager"}},"Engine Components":{},"Children":{}}}
