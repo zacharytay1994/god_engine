@@ -1,6 +1,9 @@
 --[IsComponent]
 function C_DiceScript()
     local var = {
+		--[SerializeString]
+		fodder_text = "DiceScript is attached!",
+	
 		position_x = 0.0,
 		position_y = 0.0,
 		position_z = 0.0,
@@ -25,6 +28,7 @@ function S_DiceScript(e)
 					if (c_dice.rotation_y == transform.rotation.y) then
 						if (c_dice.rotation_z == transform.rotation.z) then
 							print("DICE STOPPED!")
+							return
 						end
 					end
 				end
@@ -38,4 +42,6 @@ function S_DiceScript(e)
 	c_dice.rotation_x = transform.rotation.x
 	c_dice.rotation_y = transform.rotation.y
 	c_dice.rotation_z = transform.rotation.z
+	
+	print("DICE MOVING!")
 end
