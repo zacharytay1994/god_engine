@@ -88,7 +88,7 @@ function S_TurnOrderManager(e)
             
             -- adding all entities with C_Character script into the turnQueue and print result
             print("Entities added into turnQueue:")
-            turnOrderManagerComponent.turnQueue = EntitiesWithComponent("C_Character")
+            turnOrderManagerComponent.turnQueue = EntitiesWithScriptComponent("C_Character")
             for k = 1, #turnOrderManagerComponent.turnQueue do              
                 print(GetEntityData(turnOrderManagerComponent.turnQueue[k]).id)
             end
