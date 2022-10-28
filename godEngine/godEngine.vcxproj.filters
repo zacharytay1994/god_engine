@@ -124,6 +124,7 @@
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Raycast.h" />
     <ClInclude Include="Physics\SnippetUtils.h" />
+    <ClInclude Include="Physics\Callbacks.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

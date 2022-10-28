@@ -170,6 +170,7 @@
     <ClInclude Include="OpenGL\Internal\OGLShader.h" />
     <ClInclude Include="OpenGL\OpenGL.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Physics\Callbacks.h" />
     <ClInclude Include="Physics\godPhysics.h" />
     <ClInclude Include="Physics\PhysicUtils.h" />
     <ClInclude Include="Physics\SnippetUtils.h" />

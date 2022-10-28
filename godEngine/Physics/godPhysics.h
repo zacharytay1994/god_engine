@@ -4,7 +4,9 @@
 
 #include "PxPhysicsAPI.h"
 #include "PhysicUtils.h"
+#include "Callbacks.h"
 #include "../PhysX/physx/snippets/snippetutils/SnippetUtils.h"
+
 #include <godCamera/Camera.h>
 #include "../Window/GLFWWindow.h"
 
@@ -35,6 +37,10 @@ namespace god
 
 		bool debugdraw;
 	private:
+
+		ContactReportCallback gContactReportCallback;
+
+		CallbackFinishTask callbackFinishTask;
 
 		GLFWWindow* mWindow; 
 		Camera* mCamera;
