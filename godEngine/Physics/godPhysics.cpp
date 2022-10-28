@@ -34,7 +34,7 @@ namespace god
 					PxU32 internalFaceIndex0 = contacts[j].internalFaceIndex0;
 					PxU32 internalFaceIndex1 = contacts[j].internalFaceIndex1;
 					//...
-					std::cout << "ContactReportCallback -> Point: " << point << std::endl;
+					//std::cout << "ContactReportCallback -> Point: " << point << std::endl;
 				}
 			}
 		}
@@ -294,6 +294,11 @@ namespace god
 	physx::PxRigidActor* const PhysicsSystem::GetRayCastMouse() const
 	{
 		return mRayCastMouse;
+	}
+
+	bool PhysicsSystem::GetisRunning() const
+	{
+		return mRunning;
 	}
 
 	physx::PxPhysics* const PhysicsSystem::GetPhysics() const

@@ -61,12 +61,12 @@ namespace god
 		if ( !enttxsol.m_pause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameEnd );
-
+			enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
 		}
 		if (enttxsol.m_pause)
 		{
 			//physics
-			enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
+
 			enttxsol.RunEngineSystem(engineResources, DebugDynamic);
 			enttxsol.RunEngineSystem(engineResources, DebugStatic);
 		}

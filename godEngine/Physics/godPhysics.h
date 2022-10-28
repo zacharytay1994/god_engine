@@ -28,7 +28,7 @@ namespace god
 		
 		void Raycast();
 		physx::PxRigidActor* const GetRayCastMouse() const;
-
+		bool GetisRunning() const;
 		physx::PxPhysics* const GetPhysics() const;
 		physx::PxCooking* const GetCooking() const;
 		physx::PxScene* const GetPhysicsScene() const;

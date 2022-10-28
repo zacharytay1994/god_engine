@@ -142,10 +142,12 @@ namespace god
 
 	void RigidDynamicFrameEnd(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic& > component)
 	{
-		if (!entt.m_pause)
-		{
-			return;
-		}
+		//update only when physx simulating
+
+		PhysicsSystem& psys = engineResources.Get<PhysicsSystem>().get();
+		//wait for simulation
+		while (psys.GetisRunning())
+			;
 
 		Transform& transform = std::get<1>(component);
 		RigidDynamic& rigiddynamic = std::get<2>(component);
