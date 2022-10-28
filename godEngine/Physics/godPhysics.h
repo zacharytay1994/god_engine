@@ -1,40 +1,51 @@
 #pragma once
 
+
+
 #include "PxPhysicsAPI.h"
 #include "PhysicUtils.h"
+#include "../PhysX/physx/snippets/snippetutils/SnippetUtils.h"
+#include <godCamera/Camera.h>
+#include "../Window/GLFWWindow.h"
 
-#include <map>
 
 #define PVD_HOST "127.0.0.1"
 
 
 namespace god
 {
+	using namespace physx;
+
+
 	struct PhysicsSystem
 	{
 	public:
 
 		PhysicsSystem();
 		~PhysicsSystem();
-		 void Init();
-		 void Update(float dt, bool pause);
-
+		void Init(GLFWWindow* window, Camera* cam);
+		void Update(float dt, bool pause);
 		
+		void Raycast();
+		physx::PxRigidActor* const GetRayCastMouse() const;
+		bool GetisRunning() const;
+		physx::PxPhysics* const GetPhysics() const;
+		physx::PxCooking* const GetCooking() const;
+		physx::PxScene* const GetPhysicsScene() const;
 
-		 physx::PxPhysics* const GetPhysics() const;
-		 physx::PxCooking* const GetCooking() const;
-		 physx::PxScene* const GetPhysicsScene() const;
-		 std::map < std::string, physx::PxMaterial*>& GetMaterialContainer();
-
-
-		 bool debugdraw;
+		bool debugdraw;
 	private:
+
+		GLFWWindow* mWindow; 
+		Camera* mCamera;
+		
 
 		//PhysX Visual Debugger
 		void CreatePVD();
 		void SetupPVD();
 
-		std::map < std::string, physx::PxMaterial*> MaterialContainer;
+		physx::PxRigidActor* mRayCastMouse;
+		
 
 		physx::PxDefaultAllocator      mDefaultAllocatorCallback;
 		physx::PxDefaultErrorCallback  mDefaultErrorCallback;
@@ -51,13 +62,17 @@ namespace god
 
 		physx::PxPvd* mPvd;
 
-
+		bool mRunning;
 		float mAccumulator = 0.0f;
 		uint16_t numSteps = 1;
 		float mStepSize = 1.0f / 60.0f;
 		
 
 	};
+
+
+	
+
 
 }
 

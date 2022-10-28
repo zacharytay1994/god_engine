@@ -39,6 +39,7 @@
     <ClCompile Include="OpenGL\Advance\CubeMap.cpp" />
     <ClCompile Include="OpenGL\Advance\ShadowMap.cpp" />
     <ClCompile Include="OpenGL\Internal\OGLDebug.cpp" />
+    <ClCompile Include="Physics\SnippetUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioAPI.h" />
@@ -121,7 +122,8 @@
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_DynamicMesh.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Raycast.h" />
+    <ClInclude Include="Physics\SnippetUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

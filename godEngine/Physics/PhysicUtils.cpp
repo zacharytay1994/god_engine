@@ -68,4 +68,11 @@ namespace god
 	}
 
 
+
+	std::ostream& operator<<(std::ostream& os, const physx::PxVec3& v3)
+	{
+		os << v3.x << ',' << v3.y << ',' << v3.z;
+		return os;
+	}
+
 }
