@@ -18,13 +18,16 @@ namespace god
 	 */
 	void DebugDynamic(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic& > component)
 	{
+
 		PhysicsSystem& psystem = engineResources.Get<PhysicsSystem>().get();
 		RigidDynamic& rigiddynamic = std::get<2>(component);
+		EntityData& edata = std::get<0>(component);
 
 		if (!psystem.debugdraw)
 			return;
 		Transform& transform = std::get<1>(component);
 		//std::cout << "DebugDynamic\n";
+
 
 		switch (rigiddynamic.shapeid)
 		{
