@@ -101,7 +101,8 @@ namespace god
 			SerializeFunction<bool> SerializeBool ,
 			SerializeFunction<int> SerializeInt ,
 			SerializeFunction<float> SerializeFloat ,
-			SerializeFunction<std::string> SerializeString );
+			SerializeFunction<std::string> SerializeString ,
+			void( *RemoveCallback )( entt::registry& , entt::entity , int i , std::string const& name ) );
 
 		template<typename T>
 		void AttachComponent ( Entities::ID id );
@@ -177,7 +178,6 @@ namespace god
 
 	private:
 		sol::state m_lua;
-
 		sol::load_result m_copy_table;
 
 		entt::registry m_registry;
@@ -197,6 +197,8 @@ namespace god
 		std::unordered_map<std::string , Script> m_scripts;
 		std::unordered_map<std::string , sol::function> m_sol_functions;
 		std::unordered_map<std::string , Entities::ID> m_entity_pool;
+
+		bool m_on_load { true };
 
 		void( *m_engine_update )( EnttXSol& , EngineResources& engineResources , bool ) = nullptr;
 		void( *m_engine_init )( EnttXSol& , EngineResources& engineResources ) = nullptr;
@@ -326,6 +328,7 @@ namespace god
 		for ( auto i = 0; i < std::tuple_size_v<ENGINE_COMPONENTS::Components>; ++i )
 		{
 			T_Manip::RunOnType ( ENGINE_COMPONENTS::Components () , i , ComponentInspector () , m_entities[ entity ].m_id , std::ref ( m_registry ) , imguiUniqueID , editorResources );
+			++imguiUniqueID;
 		}
 	}
 

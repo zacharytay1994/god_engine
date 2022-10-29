@@ -166,7 +166,16 @@ namespace god
 				return glm::linearRand(minValue, maxValue);
 			}
 		);
-		
+
+		// srand()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("srand",
+			[]()->void
+			{
+				srand(time(0));
+			}
+		);
+
 		// InstancePrefab(name,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "InstancePrefab" ,

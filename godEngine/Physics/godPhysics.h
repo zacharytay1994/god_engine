@@ -5,8 +5,9 @@
 #include "PxPhysicsAPI.h"
 #include "PhysicUtils.h"
 #include "Callbacks.h"
-#include "../PhysX/physx/snippets/snippetutils/SnippetUtils.h"
 
+
+#include "../snippetutils/SnippetUtils.h"
 #include <godCamera/Camera.h>
 #include "../Window/GLFWWindow.h"
 

@@ -3,6 +3,8 @@
 #include "../../EngineComponents/EC_All.h"
 #include "../../EnttXSol.h"
 #include "../../../OpenGL/OpenGL.h"
+
+
 namespace god
 {
 
@@ -80,12 +82,20 @@ namespace god
 			OpenGL::DrawLine(min, pt[5]);
 			break;
 		case RigidDynamic::Sphere:
-	
+		{
 			//float radius = rigiddynamic.extents.x;
+			//glm::vec3 start = transform.m_local_transform * glm::vec4(transform.m_position,1.0);
+
+			////float pi = glm::pi<float>();
+
+			//for (int i = 0; i < 10; ++i)
+			//{
+			//	OpenGL::DrawLine(start + glm::vec3(std::sin(i * 2), 0, 0), start + glm::vec3(std::sin((i + 1) * 2 ), 0, 0));
+			//}
 
 			//std::cout << "lol";
 			break;
-	
+		}
 		case RigidDynamic::Capsule:
 
 
