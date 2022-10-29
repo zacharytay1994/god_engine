@@ -238,5 +238,14 @@ namespace god
 				return glm::sin(value);
 			}
 		);
+
+		// EntityName(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("EntityName",
+			[&entt](entt::entity e)->std::string&
+			{
+				return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_name;
+			}
+		);
 	}
 }

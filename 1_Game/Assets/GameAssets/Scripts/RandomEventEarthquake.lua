@@ -7,9 +7,7 @@
 -- Earthquake will only affect tiles on floor0, so players will have to get to higher ground within 3 turns to avoid damage.
 
 -- TODO:
--- 1) Damage characters standing on affected tiles
--- 2) Any characters on moving tiles should move along with the tiles
--- 3) Implement UI to warn player of earthquake every turn
+-- 1) Implement UI to warn player of earthquake every turn
 
 --[IsComponent]
 function C_RandomEventEarthquake()
@@ -45,7 +43,10 @@ function C_RandomEventEarthquake()
         earthquakeInitialized = false, 
 
         -- remind the player about earthquake every turn
-        playerWarned = false
+        playerWarned = false,
+
+        -- damage to characters standing on affected tiles during earthquake
+        earthquakeDamage = 3
     };
     return function()
         return var
@@ -176,19 +177,44 @@ function S_RandomEventEarthquake(e)
                     -- get another randomprob to determine move up or down
                     local directionProb = GenerateRandomProbability()
 
+                    -- get all entities with C_Character component
+                    local allCharacters = EntitiesWithScriptComponent("C_Character")
+
                     -- for each tile in affectedTileList, move either up or down, according to directionProb
+                    -- and also move any characters standing on them
                     for j = 1, #affectedTileList do 
                         
                         -- GridCell component for each tile
                         local tileGridCell = GetGridCell(affectedTileList[j])
 
+                        -- marks whether a character is standing on the affected tile
+                        local standingOnTile = false
+                        local affectedCharacterGridCell = nil
+                        
+                        -- looping through all characters to check if any of them are standing on this affected tile
+                        for l = 1, #allCharacters do
+                            if (GetGridCell(allCharacters[l]).y == tileGridCell.y + 1 and 
+                                GetGridCell(allCharacters[l]).x == tileGridCell.x and 
+                                GetGridCell(allCharacters[l]).z == tileGridCell.z) then 
+                                standingOnTile = true
+                                affectedCharacterGridCell = GetGridCell(allCharacters[l])
+                                GetComponent(allCharacters[l], "C_Character").currentHP = GetComponent(allCharacters[l], "C_Character").currentHP - randomEventEarthquakeComponent.earthquakeDamage
+                            end
+                        end
+                        
                         -- make the tile go up or down, according to directionProb
                         if (directionProb >= randomEventEarthquakeComponent.tileDirectionRate) then 
                             -- go up
                             tileGridCell.y = tileGridCell.y + 1
+                            if (standingOnTile) then 
+                                affectedCharacterGridCell.y = affectedCharacterGridCell.y + 1
+                            end
                         else
                             -- go down
                             tileGridCell.y = tileGridCell.y - 1
+                            if (standingOnTile) then 
+                                affectedCharacterGridCell.y = affectedCharacterGridCell.y - 1
+                            end
                         end
                     end
                     

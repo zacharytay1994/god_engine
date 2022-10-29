@@ -84,7 +84,7 @@ function S_CombatManager(e)
                 -- get attack type base damage
                 -- TODO
 
-                combatManagerComponent.damage = ((attackStrength + --[[base damage]]) * combatManagerComponent.critDamageMultiplier) - defenderDefence
+                combatManagerComponent.damage = ((attackStrength --[[+ base damage]]) * combatManagerComponent.critDamageMultiplier) - defenderDefence
 
                 combatManagerComponent.damageCalculated = true
             end
