@@ -4,7 +4,7 @@
 -- character's turn, before changing GlobalStatemachine.CurrentState to RandomEventState.
 
 -- TODO:
--- 1) Sort the turnQueue by remaining stamina (currently sorts by ID to test sorting)
+-- 1) 
 
 --[IsComponent]
 function C_TurnOrderManager()
@@ -94,21 +94,20 @@ function S_TurnOrderManager(e)
             end
             print() -- print line break
 
-            -- TODO: sort all characters in turnQueue by remaining stamina (Selection Sort)//////////////
+            -- sort all characters in turnQueue by remaining stamina (Selection Sort)//////////////
             if (#turnOrderManagerComponent.turnQueue > 1) then 
-                
+                                
                 local arrayLength = #turnOrderManagerComponent.turnQueue
         
-                for i = 1, #turnOrderManagerComponent.turnQueue do
+                for i = 1, #turnOrderManagerComponent.turnQueue - 1 do
                     
-                    if (i < arrayLength - 1) then 
-                    
+                    if (i <= arrayLength) then 
+                                            
                         indexLargest = i
 
                         for j = i + 1, #turnOrderManagerComponent.turnQueue do
-                            if (j < arrayLength) then
-                                 if (GetEntityData(turnOrderManagerComponent.turnQueue[j]).id > GetEntityData(turnOrderManagerComponent.turnQueue[indexLargest]).id) then
-                                --if (GetComponent(turnOrderManagerComponent.turnQueue[j]).currentStamina > GetComponent(turnOrderManagerComponent.turnQueue[indexLargest]).currentStamina) then
+                            if (j <= arrayLength) then
+                                if (GetComponent(turnOrderManagerComponent.turnQueue[j], "C_Character").currentStamina > GetComponent(turnOrderManagerComponent.turnQueue[indexLargest], "C_Character").currentStamina) then
                                     indexLargest = j
                                 end
                             end
@@ -117,17 +116,15 @@ function S_TurnOrderManager(e)
                         temp = turnOrderManagerComponent.turnQueue[indexLargest]
                         turnOrderManagerComponent.turnQueue[indexLargest] = turnOrderManagerComponent.turnQueue[i]
                         turnOrderManagerComponent.turnQueue[i] = temp
-
                     end
                 end
             end
 
             print("Sorted queue:")
             for l = 1, #turnOrderManagerComponent.turnQueue do              
-                print(GetEntityData(turnOrderManagerComponent.turnQueue[l]).id)
+                print(l, EntityName(turnOrderManagerComponent.turnQueue[l]), GetEntityData(turnOrderManagerComponent.turnQueue[l]).id)
             end
             -- END OF SELECTION SORT/////////////////////////////////////////////////////////////////////
-
 
             -- reset to false so it doesn't keep running this chunk
             turnOrderManagerComponent.buildTurnQueue = false
