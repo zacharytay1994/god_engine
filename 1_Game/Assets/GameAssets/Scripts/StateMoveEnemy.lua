@@ -5,6 +5,7 @@
 -- TODO:
 -- 1) Allow the enemy to move along y-axis
 -- 2) Decrease enemy stamina as they move
+-- 3) Define different movement types (don't move, move beside player, move to a distance away from player)
 
 --[IsComponent]
 function C_StateMoveEnemy()
