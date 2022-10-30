@@ -34,8 +34,8 @@ function S_ScreenShake(e)
         cameraShakeComponent = GetComponent(cameraShakeEntity, "C_ScreenShake")
     end
     
-    -- press Z to trigger a screenshake
-    if (CheckKeyPress(90)) then
+    -- press B to trigger a screenshake
+    if (CheckKeyPress(66)) then
         print("Starting screen shake!")
         cameraShakeComponent.duration = 1.0
         cameraShakeComponent.doScreenShake = true

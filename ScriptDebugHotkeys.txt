@@ -5,23 +5,23 @@ E - End current character's turn
 R - End current enemy's turn
 
 [Character Script debugging]
-I - Print current character's ID number
-L - print current character's grid location
-H - Print current character's stats
+C - Print current character's stats and details
+X - print current character's grid location
 
 [GlobalStatemachine debugging]
-J - Print current state of GlobalStatemachine
+Z - Print current state of GlobalStatemachine
 
 [TurnOrderManager debugging]
-B - Press to check the ID of the current active character
-K - Press to check whether TurnOrderManager.nextTurn is true or false
-M - Press to check whether TurnOrderManager script goes into main chunk
-N - Press to check whether TurnOrderManager.buildTurnQueue is true or false
-V - Press to check whether StateMovePlayer script goes into main chunk
-X - Press to check which turn number we are at
+M - Press to check the name and ID of the current active character
+N - Press to check which turn number we are at
 
-[RandomEventManager debugging]
-M - Press to check whether RandomEventManager script goes into main chunk, and test GenerateRandomProbability()
+[SeedRand debugging]
+V - Press to check RandomProbability()
 
 [ScreenShake debugging]
-Z - Press the trigger a screenshake
+B - Press the trigger a screenshake
+
+[Combat debugging]
+1 - Set player's selected attack as Front Jab (Blue)
+2 - Set player's selected attack as Big Swing (Blue)
+3 - Set player's selected attack as Energy Bolt (Blue)

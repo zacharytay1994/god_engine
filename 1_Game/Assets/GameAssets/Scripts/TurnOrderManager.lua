@@ -3,9 +3,6 @@
 -- While GlobalStatemachine.CurrentState is CharacterTurnState, this script will be responsible for switching to each 
 -- character's turn, before changing GlobalStatemachine.CurrentState to RandomEventState.
 
--- TODO:
--- 1) 
-
 --[IsComponent]
 function C_TurnOrderManager()
     local var = {
@@ -45,15 +42,6 @@ function S_TurnOrderManager(e)
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
     local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
     
-    -- for checking if nextTurn is true or false, by pressing K
-    if (CheckKeyPress(75)) then
-        if (turnOrderManagerComponent.nextTurn == true) then
-            print("nextTurn is true")  
-        else
-            print("nextTurn is false")  
-        end
-    end
-    
     -- getting GlobalStatemachine entity and component
     local globalStateMachineEntity = GetEntity("GlobalStatemachine")
     local globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
@@ -61,20 +49,12 @@ function S_TurnOrderManager(e)
     -- only run the rest of this script if globalStateMachine allows it
     if (globalStateMachineComponent.CurrentState == turnOrderManagerComponent.TurnOrderState) then
             
-        -- press M to check whether the script passes the globalStateMachineComponent.CurrentState check
+        -- press M to check ID of current active character
         if (CheckKeyPress(77)) then
-            print("TurnOrderManager script entered main chunk")
-        end
-        -- press N to check whether buildTurnQueue is true or false
-        if (CheckKeyPress(78)) then
-            print("buildTurnQueue is ", turnOrderManagerComponent.buildTurnQueue)
-        end
-        -- press B to check ID of current active character
-        if (CheckKeyPress(66)) then
-            print("current active character is ", turnOrderManagerComponent.currentTurn)
+            print("current active character:", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "    ID no.", turnOrderManagerComponent.currentTurn)
         end
         -- press X to check the number of turn cycles so far
-        if (CheckKeyPress(88)) then
+        if (CheckKeyPress(78)) then
             print("Currently at turn no.", turnOrderManagerComponent.turnCycleCounter)
         end
         
