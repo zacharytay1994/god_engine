@@ -247,5 +247,35 @@ namespace god
 				return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_name;
 			}
 		);
+
+		// SetTransformPosition(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("SetTransformPosition",
+			[&entt, &engineResources](entt::entity e, float x, float y, float z)->void
+			{
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				{
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setGlobalPose(ConvertToPhysXTransform({ x, y, z }, entt.GetEngineComponent<Transform>(e)->m_rotation));
+					}
+				}
+			}
+		);
+
+		// FreezeObject(e, bool)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("FreezeObject",
+			[&entt, &engineResources](entt::entity e, bool freeze)->void
+			{
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				{
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, freeze);
+					}
+				}
+			}
+		);
 	}
 }
