@@ -6,7 +6,6 @@
 
 #include "Internal/OGLDebug.h"
 
-
 #pragma comment(lib, "opengl32.lib")
 
 #include <iostream>
@@ -175,6 +174,21 @@ namespace god
 
 		m_causticmap_textures = OGLTexture( "Assets/EngineAssets/Textures/CausticMap.png" );
 
+
+		// Tested on file format : .dae / .md5mesh / .fbx
+		//std::string animated_path = "Assets/GameAssets/3DAssets/Animation/Vampire/dancing_vampire.dae";
+		//std::string animated_path = "Assets/GameAssets/3DAssets/Animation/Bob_lamp/bob_lamp_update_export.md5mesh";
+		std::string animated_path = "Assets/GameAssets/3DAssets/Animation/skeleton.fbx";
+
+		m_animation_model = Animation3D::Model( animated_path );
+		m_animation_dance = Animation3D::Animation( animated_path, &m_animation_model );
+		m_animator = Animation3D::Animator( &m_animation_dance );
+
+		m_animation_shader.InitializeFromFile(
+			"Assets/EngineAssets/OpenGLShaders/anim_model.vs",
+			"Assets/EngineAssets/OpenGLShaders/anim_model.fs"
+		);
+
 		//glCheckError ();
 		std::cout << "OpenGL constructed." << std::endl;
 	}
@@ -221,6 +235,8 @@ namespace god
 		OGLTextureManager& textures ,
 		glm::vec3 const& camera_front )
 	{
+
+		m_animator.UpdateAnimation( DeltaTimer::m_dt );
 		glViewport ( 0 , 0 , m_screen_width , m_screen_height );
 		ClearColour ();
 
@@ -353,6 +369,8 @@ namespace god
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 0 );
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.isEnabled", true );
 
+			// Set Tint
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "tint", glm::vec4(0.0f) );
 
 			// draw model
 			for ( auto& mesh : m_models[ data.first.m_model_id ] )
@@ -386,6 +404,26 @@ namespace god
 			// Enable the depth buffer
 			glEnable ( GL_DEPTH_TEST );
 		}
+
+		m_animation_shader.Use();
+		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "projection", projection );
+		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "view", view );
+		auto transforms = m_animator.GetFinalBoneMatrices();
+		for ( int i = 0; i < transforms.size(); ++i )
+		{
+			std::string temp = "bone_transforms[" + std::to_string( i ) + "]";
+			OGLShader::SetUniform( m_animation_shader.GetShaderID(), temp.c_str() , transforms[i] );
+		}
+
+		// render the loaded model
+		glm::mat4 model = glm::mat4( 1.0f );
+		model = glm::translate( model, glm::vec3( 0.0f, -0.4f, 0.0f ) ); // translate it down so it's at the center of the scene
+		model = glm::scale( model, glm::vec3( 0.5f, 0.5f, 0.5f ) );	// it's a bit too big for our scene, so scale it down
+		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "model", model );
+		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "light_position", camera_position );
+		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "view_position", camera_position );
+		m_animation_model.Draw( m_animation_shader );
+
 
 		// Draw skybox as last
 		m_cubemap.CubeMapEnableDepth ();
