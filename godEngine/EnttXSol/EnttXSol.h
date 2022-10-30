@@ -496,8 +496,16 @@ namespace god
 			// add to scene
 			if ( renderable.m_model_id != -1 )
 			{
-				scene.AddInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-					renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
+				if ( m_registry.storage<GUIObject> ().contains ( m_entities[ e ].m_id ) )
+				{
+					scene.Add2DInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
+				}
+				else
+				{
+					scene.AddInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
+				}
 			}
 
 			// populate scene with children

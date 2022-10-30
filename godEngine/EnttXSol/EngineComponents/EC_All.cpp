@@ -15,6 +15,7 @@ namespace god
 		"AudioSource" ,
 		"PointLight" ,
 		"DirectionalLight" ,
-		"GridManipulate"
+		"GridManipulate" ,
+		"GUIObject"
 	};
 }

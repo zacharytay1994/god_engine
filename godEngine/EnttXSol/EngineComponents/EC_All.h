@@ -17,6 +17,8 @@
 
 #include "Grid/EC_GridManipulate.h"
 
+#include "GUI/EC_GUIObject.h"
+
 #include <tuple>
 #include <string>
 #include <array>
@@ -36,7 +38,8 @@ namespace god
 			AudioSource ,
 			PointLight ,
 			DirectionalLight ,
-			GridManipulate
+			GridManipulate ,
+			GUIObject
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};

@@ -14,6 +14,8 @@
 
 #include "Grid/ES_GridManipulate.h"
 
+#include "GUI/ES_GUIObject.h"
+
 namespace god
 {
 	// runs in the middle of a frame
@@ -25,12 +27,15 @@ namespace god
 			enttxsol.RunEngineSystem ( engineResources , GridManipulateSystem );
 			enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
 		}
-		
-		enttxsol.RunEngineSystem ( engineResources , GridSystem );
-		//Physics
 
-		enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
-		enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);
+		enttxsol.RunEngineSystem ( engineResources , GridSystem );
+
+		//Physics
+		enttxsol.RunEngineSystem ( engineResources , RigidStaticUpdate );
+		enttxsol.RunEngineSystem ( engineResources , RigidDynamicUpdate );
+
+		// gui
+		enttxsol.RunEngineSystem ( engineResources , GUIObjectUpdate );
 	}
 
 	// runs at the start of a frame, i.e. runs before EngineSystems()
@@ -42,8 +47,8 @@ namespace god
 			enttxsol.RunEngineSystem ( engineResources , AudioSourceSystem );
 
 		}
-		enttxsol.RunEngineSystem(engineResources, RigidStaticFrameBegin);
-		enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameBegin);
+		enttxsol.RunEngineSystem ( engineResources , RigidStaticFrameBegin );
+		enttxsol.RunEngineSystem ( engineResources , RigidDynamicFrameBegin );
 	}
 
 	// runs at the end of a frame, i.e. runs after EngineSystems()
@@ -57,9 +62,9 @@ namespace god
 		}
 
 		//physics
-		enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
-		enttxsol.RunEngineSystem(engineResources, DebugDynamic);
-		enttxsol.RunEngineSystem(engineResources, DebugStatic);
+		enttxsol.RunEngineSystem ( engineResources , RigidDynamicFrameEnd );
+		enttxsol.RunEngineSystem ( engineResources , DebugDynamic );
+		enttxsol.RunEngineSystem ( engineResources , DebugStatic );
 
 	}
 

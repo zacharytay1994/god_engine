@@ -20,6 +20,11 @@ namespace god
 		return glm::perspective ( glm::radians ( m_field_of_view * m_free_camera_zoom ) , m_aspect_ratio , m_near_plane , m_far_plane );
 	}
 
+	glm::mat4 Camera::GetOrthographicProjectionMatrix ( float width , float height )
+	{
+		return glm::ortho ( 0.0f , width , 0.0f , height , 0.01f , 1000.0f );
+	}
+
 	glm::mat4 Camera::GetCameraViewMatrix ()
 	{
 		return glm::lookAt ( m_position , m_position + m_look_at , m_up );
