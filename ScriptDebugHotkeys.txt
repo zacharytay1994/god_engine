@@ -5,8 +5,9 @@ E - End current character's turn
 R - End current enemy's turn
 
 [Character Script debugging]
-I - Print current characters' ID numbers
-L - print current characters' grid location
+I - Print current character's ID number
+L - print current character's grid location
+H - Print current character's stats
 
 [GlobalStatemachine debugging]
 J - Print current state of GlobalStatemachine
