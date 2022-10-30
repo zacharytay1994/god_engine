@@ -18,5 +18,5 @@ namespace god
 	glm::vec4 ConvertToGlmVector(const physx::PxVec4& vector);
 	glm::quat ConvertToGlmQuat(const physx::PxQuat& quat);
 
-
+	std::ostream& operator<<(std::ostream& os, const physx::PxVec3& v3);
 }

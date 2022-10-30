@@ -107,13 +107,24 @@ namespace god
 			}
 		);
 
-		// EntitiesWithComponent(name)
+		// EntitiesWithEngineComponents(name)
 		// ==============================================================================================
-		entt.RegisterLuaFunction ( "EntitiesWithComponent" ,
+		entt.RegisterLuaFunction ( "EntitiesWithEngineComponent" ,
 			[&entt]( std::string const& name )->std::vector<entt::entity>
 			{
 				std::vector<entt::entity> entities;
-				entt.GetEntitiesWithComponent ( name , entities );
+				entt.GetEntitiesWithEngineComponent ( name , entities );
+				return entities;
+			}
+		);
+
+		// EntitiesWithScriptComponents(name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "EntitiesWithScriptComponent" ,
+			[&entt]( std::string const& name )->std::vector<entt::entity>
+			{
+				std::vector<entt::entity> entities;
+				entt.GetEntitiesWithScriptComponent ( name , entities );
 				return entities;
 			}
 		);
@@ -155,7 +166,16 @@ namespace god
 				return glm::linearRand(minValue, maxValue);
 			}
 		);
-		
+
+		// srand()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("srand",
+			[]()->void
+			{
+				srand(time(0));
+			}
+		);
+
 		// InstancePrefab(name,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "InstancePrefab" ,
@@ -216,6 +236,15 @@ namespace god
 			[](float value)->float
 			{
 				return glm::sin(value);
+			}
+		);
+
+		// EntityName(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("EntityName",
+			[&entt](entt::entity e)->std::string&
+			{
+				return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_name;
 			}
 		);
 	}
