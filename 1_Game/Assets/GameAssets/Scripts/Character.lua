@@ -16,9 +16,9 @@ function C_Character()
         --[SerializeInt]
         currentHP = 10,
         --[SerializeInt]
-        maxStamina = 10,
+        maxStamina = 7,
         --[SerializeInt]
-        currentStamina = 10,
+        currentStamina = 7,
         --[SerializeInt]
         strength = 10 ,
         --[SerializeInt]
@@ -42,6 +42,8 @@ function S_Character(e)
         local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")       
         -- getting this character's ID number
         local entityDataComponent = GetEntityData(e)
+        -- getting this character's C_Character component
+        local characterComponent = GetComponent(e, "C_Character")
 
         -- only run the rest of this script if it is currently this character's turn
         if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then
@@ -60,6 +62,17 @@ function S_Character(e)
                 --     print("entityData is nil")
                 -- end
                 print(entityDataComponent.id)
+            end
+
+            if (CheckKeyPress(72) == true) then           
+                print("[", EntityName(e), "STATS]")
+                print("maxHP:    ", characterComponent.maxHP)
+                print("currentHP:", characterComponent.currentHP)
+                print("maxStamina:", characterComponent.maxStamina)
+                print("currentStamina:", characterComponent.currentStamina)
+                print("strength:", characterComponent.strength)
+                print("defence:", characterComponent.defence)
+                print("\n\n")
             end
         end
     end

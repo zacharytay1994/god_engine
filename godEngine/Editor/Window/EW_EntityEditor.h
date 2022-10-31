@@ -200,6 +200,15 @@ namespace god
 					ImGui::PushID ( i );
 					ImGui::InputText ( name.c_str () , &val );
 					ImGui::PopID ();
+				} ,
+					[]( entt::registry& registry , entt::entity e , int i , std::string const& name )
+				{
+					ImGui::PushID ( i );
+					if ( ImGui::Button ( "Remove" ) )
+					{
+						registry.storage<sol::table> ( entt::hashed_string ( name.c_str () ) ).remove ( e );
+					}
+					ImGui::PopID ();
 				}
 				);
 

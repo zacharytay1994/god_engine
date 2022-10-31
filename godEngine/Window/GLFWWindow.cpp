@@ -27,6 +27,7 @@ namespace god
 		UNREFERENCED_PARAMETER ( scancode );
 
 		GLFWWindow* my_window = reinterpret_cast< GLFWWindow* >( glfwGetWindowUserPointer ( window ) );
+		if (key == -1) key = 0;
 		if ( action == GLFW_PRESS )
 		{
 			my_window->m_key_states[ key ] = true;

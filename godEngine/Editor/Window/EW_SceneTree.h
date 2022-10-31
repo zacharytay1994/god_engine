@@ -363,6 +363,11 @@ namespace god
 					//m_enttxsol.LoadPrefabV2 ( engineResources , "prefabv3" , entity );
 				}
 				this->ToolTipOnHover ( "Add a prefab as child of this object." );
+				if ( ImGui::Selectable ( "Rename" ) )
+				{
+					
+				}
+				this->ToolTipOnHover ( "Rename this entity. // not implemented yet!" );
 				if ( ImGui::Selectable ( "Save" ) )
 				{
 					m_enttxsol.SavePrefabV2 ( engineResources , entity , m_enttxsol.m_entities[ entity ].m_name );

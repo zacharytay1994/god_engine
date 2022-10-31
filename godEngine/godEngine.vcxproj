@@ -62,7 +62,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)\0_InternalDependencies\fmod\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include;$(SolutionDir)0_InternalDependencies\DDS;$(SolutionDir)0_ExternalDependencies\glm;$(SolutionDir)0_ExternalDependencies\assimp\build\x64\include;$(SolutionDir)0_ExternalDependencies\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)\0_InternalDependencies\fmod\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\physx\source\foundation\include;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include;$(SolutionDir)0_InternalDependencies\DDS;$(SolutionDir)0_ExternalDependencies\glm</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -84,7 +84,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)\0_InternalDependencies\fmod\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include;$(SolutionDir)0_InternalDependencies\DDS;$(SolutionDir)0_ExternalDependencies\glm;$(SolutionDir)0_ExternalDependencies\assimp\build\x64\include;$(SolutionDir)0_ExternalDependencies\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)\0_InternalDependencies\fmod\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\physx\source\foundation\include;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include;$(SolutionDir)0_InternalDependencies\DDS;$(SolutionDir)0_ExternalDependencies\glm</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -134,15 +134,16 @@
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_DirectionalLight.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_PointLight.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_All.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\ES_Audio.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_AudioListener.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\ES_AudioSource.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Dynamic.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Physics.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_ScenePopulate.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_DynamicMesh.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Raycast.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
     <ClInclude Include="EnttXSol\EnttXSol.h" />
     <ClInclude Include="EnttXSol\Internal\godEntity.h" />
@@ -178,6 +179,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Physics\godPhysics.h" />
     <ClInclude Include="Physics\PhysicUtils.h" />
+    <ClInclude Include="Physics\SnippetUtils.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
     <ClInclude Include="Window\DeltaTimer.h" />
     <ClInclude Include="Window\SystemTimer.h" />
@@ -312,6 +314,10 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Physics\PhysicUtils.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Physics\SnippetUtils.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
