@@ -5,6 +5,7 @@
 -- Energy bolt can only be used if player is in the same lane as the target &&
 -- there are no obstructions between player and target &&
 -- target is within 4 tiles away from player
+-- 4 tiles away meaning: |O| | | |X| 
 
 -- TODO:
 -- 1) Trigger sound effects / particles
@@ -32,11 +33,11 @@ function C_EnergyBolt()
         canAttack = false,
         
         -- error message (why the attack failed)
-        errorMessage = "[FrontJab.lua] Player not adjacent to enemy!!!",
-        --END OF REQUIRED SECTION -------------------------------------------------------------------------------------
+        errorMessage = "[AttackEnergyBolt.lua] Player not in the same lane as target!!!",
         
         -- used to turn player to face the target
         playerRotation = 0,
+        --END OF REQUIRED SECTION -------------------------------------------------------------------------------------
 
         -- how for the energy bolt can travel
         boltRange = 4
@@ -49,7 +50,7 @@ end
 --[IsSystem]
 function S_EnergyBolt(e)
     
-    attackComponent = GetComponent(e, "C_FrontJab")
+    attackComponent = GetComponent(e, "C_EnergyBolt")
     
     -- checking if player is able to use attack against the enemy --------------------------------------------------------
     if (attackComponent.startCheck == true) then
@@ -57,16 +58,16 @@ function S_EnergyBolt(e)
         -- run the check only once per attack
         attackComponent.startCheck = false
         
-        -- check if player is adjacent to enemy
-        if (CheckPlayerAdjacentToEnemy(attackComponent.attacker, attackComponent.defender, e) == true) then
+        -- check if player is in same lane as enemy
+        if (CheckEnemyWithinRange(attackComponent.attacker, attackComponent.defender, e) == true) then
             
             -- passed the check, allow the rest of the script to run
             attackComponent.canAttack = true
-            print("[FrontJab.lua] Adjacent check passed!")
+            print("[AttackEnergyBolt.lua] EnergyBolt check passed!")
         else
             
             -- failed the check, print fail message
-            print("[FrontJab.lua] Adjacent check failed!")
+            print("[AttackEnergyBolt.lua] EnergyBolt check failed!")
         end
         
         -- this will allow PlayerAttack.lua to proceed
@@ -82,13 +83,9 @@ function S_EnergyBolt(e)
         transformComponent = GetTransform(attackComponent.attacker)
         transformComponent.rotation.y = attackComponent.playerRotation
 
-        -- activate screenshake
-        screenShakeEntity = GetEntity("ScreenShake")
-        if (screenShakeEntity ~= -1) then
-            screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
-            screenShakeComponent.duration = 0.25
-            screenShakeComponent.doScreenShake = true
-        end
+        -- no screenshake here (will be triggered by the energy bolt entity's script)
+
+        -- instantiate the energy bolt (a prefab with a script that makes it float towards the target)
         
         -- trigger sound effect
         
@@ -106,7 +103,8 @@ function S_EnergyBolt(e)
 
 end
 
-function CheckPlayerAdjacentToEnemy(attacker, defender, e)
+-- checks whether the player and enemy are in the same lane, and if they are within range 
+function CheckEnemyWithinRange(attacker, defender, e)
     
     -- init result
     result = false
@@ -116,29 +114,54 @@ function CheckPlayerAdjacentToEnemy(attacker, defender, e)
     defenderGrid = GetGridCell(defender)
 
     -- get rotation variable
-    attackComponent = GetComponent(e, "C_FrontJab")
+    attackComponent = GetComponent(e, "C_EnergyBolt")
 
     if (attackerGrid.y == defenderGrid.y) then 
 
-        -- enemy behind player
-        if (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z - 1) then
-            result = true 
-            attackComponent.playerRotation = 90
+        -- enemy and player on the same x-axis
+        if (attackerGrid.x == defenderGrid.x) then
 
-        -- enemy in front of player
-        elseif (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z + 1) then
-            result = true 
-            attackComponent.playerRotation = 270
+            -- if enemy and player are within 4 tiles of each other
+            if (Abs(attackerGrid.z - defenderGrid.z) <= 4) then 
 
-        -- enemy to player's left
-        elseif (attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x - 1) then
-            result = true 
-            attackComponent.playerRotation = 180
+                -- enemy is behind player
+                if (attackerGrid.z > defenderGrid.z) then 
+                    result = true 
+                    attackComponent.playerRotation = 270
+                
+                -- enemy is in front of player
+                else
+                    result = true 
+                    attackComponent.playerRotation = 90
+                end
 
-        -- enemy to player's right
-        elseif(attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x + 1) then
-            result = true 
-            attackComponent.playerRotation = 0       
+            else
+                attackComponent.errorMessage = "[AttackEnergyBolt.lua] Enemy is too far away!!!"
+            end
+
+        -- enemy and player on the same z-axis
+        elseif (attackerGrid.z == defenderGrid.z) then
+
+            -- if enemy and player are within 4 tiles of each other
+            if (Abs(attackerGrid.x - defenderGrid.x) <= 4) then 
+            
+                -- enemy to the player's right
+                if (attackerGrid.x > defenderGrid.x) then
+                    result = true 
+                    attackComponent.playerRotation = 0    
+                
+                -- enemy to the player's left
+                else
+                    result = true 
+                    attackComponent.playerRotation = 180
+                end   
+
+            else
+                attackComponent.errorMessage = "[AttackEnergyBolt.lua] Enemy is too far away!!!"
+            end    
+            
+        else
+            attackComponent.errorMessage = "[AttackEnergyBolt.lua] Player not in the same lane as target!!!"
         end
     end
 

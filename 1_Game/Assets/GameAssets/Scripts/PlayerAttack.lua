@@ -74,17 +74,17 @@ function S_PlayerAttack(e)
                       "Special property:", playerAttackComponent.selectedAttack[3], "\n")
             end
 
-            -- press 2 to select Big Swing (Blue)
-            if (CheckKeyPress(50)) then
-                playerAttackComponent.selectedAttack = attackList[4]
-                print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
-                      "Base damage:", playerAttackComponent.selectedAttack[2], 
-                      "Special property:", playerAttackComponent.selectedAttack[3], "\n")
-            end
+            -- -- press 2 to select Big Swing (Blue)
+            -- if (CheckKeyPress(50)) then
+            --     playerAttackComponent.selectedAttack = attackList[4]
+            --     print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+            --           "Base damage:", playerAttackComponent.selectedAttack[2], 
+            --           "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+            -- end
 
             -- press 3 to select Energy Bolt (Blue)
             if (CheckKeyPress(51)) then
-                playerAttackComponent.selectedAttack = attackList[7]
+                playerAttackComponent.selectedAttack = attackList[10]
                 print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
                       "Base damage:", playerAttackComponent.selectedAttack[2], 
                       "Special property:", playerAttackComponent.selectedAttack[3], "\n")

@@ -30,11 +30,11 @@ function C_FrontJab()
         canAttack = false,
         
         -- error message (why the attack failed)
-        errorMessage = "[FrontJab.lua] Player not adjacent to enemy!!!",
-        --END OF REQUIRED SECTION -------------------------------------------------------------------------------------
+        errorMessage = "[AttackFrontJab.lua] Player not adjacent to enemy!!!",
         
         -- used to turn player to face the target
         playerRotation = 0
+        --END OF REQUIRED SECTION -------------------------------------------------------------------------------------
     }
     return function()
         return var
@@ -44,38 +44,38 @@ end
 --[IsSystem]
 function S_FrontJab(e)
     
-    frontJabComponent = GetComponent(e, "C_FrontJab")
+    attackComponent = GetComponent(e, "C_FrontJab")
     
     -- checking if player is able to use attack against the enemy --------------------------------------------------------
-    if (frontJabComponent.startCheck == true) then
+    if (attackComponent.startCheck == true) then
         
         -- run the check only once per attack
-        frontJabComponent.startCheck = false
+        attackComponent.startCheck = false
         
         -- check if player is adjacent to enemy
-        if (CheckPlayerAdjacentToEnemy(frontJabComponent.attacker, frontJabComponent.defender, e) == true) then
+        if (CheckPlayerAdjacentToEnemy(attackComponent.attacker, attackComponent.defender, e) == true) then
             
             -- passed the check, allow the rest of the script to run
-            frontJabComponent.canAttack = true
-            print("[FrontJab.lua] Adjacent check passed!")
+            attackComponent.canAttack = true
+            print("[AttackFrontJab.lua] Adjacent check passed!")
         else
             
             -- failed the check, print fail message
-            print("[FrontJab.lua] Adjacent check failed!")
+            print("[AttackFrontJab.lua] Adjacent check failed!")
         end
         
         -- this will allow PlayerAttack.lua to proceed
-        frontJabComponent.checkCompleted = true
+        attackComponent.checkCompleted = true
     end
     -- end of checking if player is able to use attack against the enemy -------------------------------------------------
     
 
     -- if can use attack, turn the player and activate effects -----------------------------------------------------------
-    if (frontJabComponent.canAttack == true) then 
+    if (attackComponent.canAttack == true) then 
         
         -- turn player to face enemy 
-        transformComponent = GetTransform(frontJabComponent.attacker)
-        transformComponent.rotation.y = frontJabComponent.playerRotation
+        transformComponent = GetTransform(attackComponent.attacker)
+        transformComponent.rotation.y = attackComponent.playerRotation
         
         -- activate screenshake
         screenShakeEntity = GetEntity("ScreenShake")
@@ -94,10 +94,10 @@ function S_FrontJab(e)
     -- end of attack effects ---------------------------------------------------------------------------------------------
     
     -- reset variables (do not reset checkCompleted and canAttack here. They will be reset by PlayerAttack.lua)
-    frontJabComponent.startCheck = false
-    frontJabComponent.attacker = -1
-    frontJabComponent.defender = -1
-    frontJabComponent.playerRotation = 0
+    attackComponent.startCheck = false
+    attackComponent.attacker = -1
+    attackComponent.defender = -1
+    attackComponent.playerRotation = 0
 end
 
 function CheckPlayerAdjacentToEnemy(attacker, defender, e)
@@ -110,29 +110,29 @@ function CheckPlayerAdjacentToEnemy(attacker, defender, e)
     defenderGrid = GetGridCell(defender)
 
     -- get rotation variable
-    frontJabComponent = GetComponent(e, "C_FrontJab")
+    attackComponent = GetComponent(e, "C_FrontJab")
 
     if (attackerGrid.y == defenderGrid.y) then 
 
         -- enemy behind player
         if (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z - 1) then
             result = true 
-            frontJabComponent.playerRotation = 90
+            attackComponent.playerRotation = 90
 
         -- enemy in front of player
         elseif (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z + 1) then
             result = true 
-            frontJabComponent.playerRotation = 270
+            attackComponent.playerRotation = 270
 
         -- enemy to player's left
         elseif (attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x - 1) then
             result = true 
-            frontJabComponent.playerRotation = 180
+            attackComponent.playerRotation = 180
 
         -- enemy to player's right
         elseif(attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x + 1) then
             result = true 
-            frontJabComponent.playerRotation = 0       
+            attackComponent.playerRotation = 0       
         end
     end
 
