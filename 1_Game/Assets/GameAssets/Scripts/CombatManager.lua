@@ -38,7 +38,7 @@ function C_CombatManager()
         critSuccess = false,
 
         -- CharacterAttack script will be responsible for telling CombatManager to reset variables 
-        resetVariables = false
+        resetVariables = false,
     }
     return function()
         return var

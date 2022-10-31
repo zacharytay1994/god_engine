@@ -10,17 +10,17 @@ function C_PlayerAttack()
         --[SerializeString]
         PlayerAttack = "PlayerAttack",
 
-        -- currently selected attack (refer to AttackList)
+        -- currently selected attack (refer to AttackList) is an array containing { attack name, base damage, special property, component name }
         selectedAttack = nil,
 
         -- target entity
         targetEntity = -1,
 
         -- reset variables
-        resetVariables = false
+        resetVariables = false,
 
-        -- -- will be set to false while combat resolution is taking place
-        -- canAttack = true
+        -- checks whether the attack script has performed its check
+        attackCheckTriggered = false
     }
     return function()
         return var
@@ -44,8 +44,10 @@ function S_PlayerAttack(e)
                   
             -- resetting variables
             if (playerAttackComponent.resetVariables) then 
+                print("[PlayerAttack.lua] Resetting variables!!!")
                 playerAttackComponent.selectedAttack = nil
                 playerAttackComponent.targetEntity = nil
+                playerAttackComponent.attackCheckTriggered = false
                 playerAttackComponent.resetVariables = false
             end
             
@@ -94,20 +96,47 @@ function S_PlayerAttack(e)
             -- print(EntityName(playerAttackComponent.targetEntity))
             -- end of selecting target ---------------------------------------------------------------------------------
 
-            -- if attack type and attack target are chosen and player is allowed to attack, then initiate combat
+            -- if attack type and attack target are chosen, then initiate combat
             if (playerAttackComponent.selectedAttack ~= nil and playerAttackComponent.targetEntity ~= -1) then
                         
-                -- pass this entity, attacktype, and target to CombatManager
-                combatManagerComponent = GetComponent(combatManagerEntity, "C_CombatManager")
-                combatManagerComponent.attacker = e
-                combatManagerComponent.attackType = playerAttackComponent.selectedAttack
-                combatManagerComponent.defender = playerAttackComponent.targetEntity
-                print("PlayerAttack.lua ---> CombatManager.lua")
+                -- check whether player is able to attack the enemy (within range / no obstructions / etc) --------------
+                if (playerAttackComponent.attackCheckTriggered == false) then
+                    selectedAttackComponent = GetComponent(combatManagerEntity, playerAttackComponent.selectedAttack[4])
+                    selectedAttackComponent.attacker = e
+                    selectedAttackComponent.defender = playerAttackComponent.targetEntity
+                    selectedAttackComponent.startCheck = true
+                    playerAttackComponent.attackCheckTriggered = true
+                    print("[PlayerAttack.lua] Triggering", playerAttackComponent.selectedAttack[4], "to perform check!")
+                end
+                ---end of range check -----------------------------------------------------------------------------------
+                
+                if (selectedAttackComponent.checkCompleted) then 
+                                        
+                    if (selectedAttackComponent.canAttack) then
+                                            
+                        -- pass this entity, attacktype, and target to CombatManager
+                        combatManagerComponent = GetComponent(combatManagerEntity, "C_CombatManager")
+                        combatManagerComponent.attacker = e
+                        combatManagerComponent.attackType = playerAttackComponent.selectedAttack
+                        combatManagerComponent.defender = playerAttackComponent.targetEntity
+                        print("PlayerAttack.lua ---> CombatManager.lua")
 
-                -- CombatManager will handle the rest of damage calculation and application
+                        -- resetting FrontJab variable
+                        selectedAttackComponent.canAttack = false
+                        
+                        -- CombatManager will handle the rest of damage calculation and application     
 
-                -- reset variables
-                playerAttackComponent.resetVariables = true
+                    else 
+                        -- print error message from attack script
+                        print(selectedAttackComponent.errorMessage)
+                    end
+
+                    -- reset variables
+                    playerAttackComponent.resetVariables = true
+
+                    -- reset FrontJab variable
+                    selectedAttackComponent.checkCompleted = false
+                end
             end
         end
     end
