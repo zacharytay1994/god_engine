@@ -14,6 +14,8 @@
 
 #include "Grid/ES_GridManipulate.h"
 
+#include "GUI/ES_GUIObject.h"
+
 namespace god
 {
 	// runs in the middle of a frame
@@ -25,6 +27,9 @@ namespace god
 			enttxsol.RunEngineSystem ( engineResources , GridManipulateSystem );
 			enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
 		}
+
+		// gui
+		enttxsol.RunEngineSystem ( engineResources , GUIObjectUpdate );
 		
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
 		//Physics
