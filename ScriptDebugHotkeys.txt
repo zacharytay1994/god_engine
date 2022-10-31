@@ -25,3 +25,6 @@ B - Press the trigger a screenshake
 1 - Set player's selected attack as Front Jab (Blue)
 2 - Set player's selected attack as Big Swing (Blue)
 3 - Set player's selected attack as Energy Bolt (Blue)
+
+[RemoveInstance debugging]
+L - Remove TestSubject
