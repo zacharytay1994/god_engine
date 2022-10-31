@@ -88,9 +88,9 @@ function S_EnergyBolt(e)
         -- no screenshake here (will be triggered by the energy bolt entity's script)
 
         -- instantiate the energy bolt (a prefab with a script that makes it float towards the target)
-        -- print("[AttackEnergyBolt.lua] Instantiating energy bolt!")
-        -- local playerPos = GetTransform(GetEntity("Player")).position
-        -- InstancePrefab("EnergyBolt", playerPos.x, playerPos.y, playerPos.z)
+        print("[AttackEnergyBolt.lua] Instantiating energy bolt!")
+        local playerPos = GetTransform(GetEntity("Player")).position
+        InstancePrefab("EnergyBolt", playerPos.x, playerPos.y, playerPos.z)
         
         -- trigger sound effect
         
@@ -102,10 +102,11 @@ function S_EnergyBolt(e)
     -- end of attack effects ---------------------------------------------------------------------------------------------
     
     -- reset variables (do not reset checkCompleted and canAttack here. They will be reset by PlayerAttack.lua)
+    -- should be fine if attacker and defender and rotation aren't reset (MoveEnergyBolt.lua needs them)
     attackComponent.startCheck = false
-    attackComponent.attacker = -1
-    attackComponent.defender = -1
-    attackComponent.playerRotation = 0
+    -- attackComponent.attacker = -1
+    -- attackComponent.defender = -1
+    -- attackComponent.playerRotation = 0
 
 end
 
