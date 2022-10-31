@@ -179,6 +179,7 @@ namespace god
 		//std::string animated_path = "Assets/GameAssets/3DAssets/Animation/Vampire/dancing_vampire.dae";
 		//std::string animated_path = "Assets/GameAssets/3DAssets/Animation/Bob_lamp/bob_lamp_update_export.md5mesh";
 		std::string animated_path = "Assets/GameAssets/3DAssets/Animation/skeleton.fbx";
+		//std::string animated_path = "Assets/GameAssets/3DAssets/Animation/JonathanKwekSample/Bipedal01_TestAnim_ImportReexportMax.fbx";
 
 		m_animation_model = Animation3D::Model( animated_path );
 		m_animation_dance = Animation3D::Animation( animated_path, &m_animation_model );
@@ -405,6 +406,8 @@ namespace god
 			glEnable ( GL_DEPTH_TEST );
 		}
 
+		//-------------------------------------------------------------
+		// skeleton animation
 		m_animation_shader.Use();
 		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "projection", projection );
 		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "view", view );
@@ -414,7 +417,6 @@ namespace god
 			std::string temp = "bone_transforms[" + std::to_string( i ) + "]";
 			OGLShader::SetUniform( m_animation_shader.GetShaderID(), temp.c_str() , transforms[i] );
 		}
-
 		// render the loaded model
 		glm::mat4 model = glm::mat4( 1.0f );
 		model = glm::translate( model, glm::vec3( 0.0f, -0.4f, 0.0f ) ); // translate it down so it's at the center of the scene
@@ -423,7 +425,7 @@ namespace god
 		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "light_position", camera_position );
 		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "view_position", camera_position );
 		m_animation_model.Draw( m_animation_shader );
-
+		//-------------------------------------------------------------
 
 		// Draw skybox as last
 		m_cubemap.CubeMapEnableDepth ();

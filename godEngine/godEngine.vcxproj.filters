@@ -43,6 +43,7 @@
     <ClCompile Include="OpenGL\Animation\AnimationModel3D.cpp" />
     <ClCompile Include="OpenGL\Animation\Animator.cpp" />
     <ClCompile Include="OpenGL\Animation\Animation.cpp" />
+    <ClCompile Include="OpenGL\Animation\Bone.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioAPI.h" />

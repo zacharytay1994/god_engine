@@ -1,20 +1,17 @@
-
 #include "Animator.h"
-
 
 namespace god
 {
 	namespace Animation3D
 	{
 		Animator::Animator( Animation* animation )
+			:
+			m_FinalBoneMatrices{ 100 },
+			m_CurrentAnimation{ animation },
+			m_CurrentTime{ 0.0f },
+			m_DeltaTime{ 0.0f }
 		{
-			m_CurrentTime = 0.0;
-			m_CurrentAnimation = animation;
-
-			m_FinalBoneMatrices.reserve( 100 );
-
-			for ( int i = 0; i < 100; i++ )
-				m_FinalBoneMatrices.push_back( glm::mat4( 1.0f ) );
+			fill( m_FinalBoneMatrices.begin(), m_FinalBoneMatrices.end(), glm::mat4(0.0f) );
 		}
 
 		void Animator::UpdateAnimation( float dt )
@@ -30,6 +27,7 @@ namespace god
 
 		void Animator::PlayAnimation( Animation* pAnimation )
 		{
+			assert( pAnimation != nullptr );
 			m_CurrentAnimation = pAnimation;
 			m_CurrentTime = 0.0f;
 		}
@@ -39,7 +37,7 @@ namespace god
 		{
 			std::string nodeName = node->name;
 			glm::mat4 nodeTransform = node->transformation;
-			
+
 
 			Bone* Bone = m_CurrentAnimation->FindBone( nodeName );
 
@@ -56,7 +54,7 @@ namespace god
 			{
 				int index = boneInfoMap[nodeName].id;
 				glm::mat4 offset = boneInfoMap[nodeName].offset;
-				m_FinalBoneMatrices[index] =  (globalTransformation * glm::mat4(10.0f)) * offset ; //sus
+				m_FinalBoneMatrices[index] = ( globalTransformation * glm::mat4( 10.0f ) ) * offset; //sus
 			}
 
 			for ( int i = 0; i < node->childrenCount; i++ )
