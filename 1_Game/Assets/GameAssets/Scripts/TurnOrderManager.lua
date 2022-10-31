@@ -88,7 +88,7 @@ function S_TurnOrderManager(e)
             
             -- adding all entities with C_Character script into the turnQueue and print result
             print("Entities added into turnQueue:")
-            turnOrderManagerComponent.turnQueue = EntitiesWithComponent("C_Character")
+            turnOrderManagerComponent.turnQueue = EntitiesWithScriptComponent("C_Character")
             for k = 1, #turnOrderManagerComponent.turnQueue do              
                 print(GetEntityData(turnOrderManagerComponent.turnQueue[k]).id)
             end
@@ -138,7 +138,7 @@ function S_TurnOrderManager(e)
         -- while there are still characters who have not taken their turn for this cycle
         if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
                      
-            -- TODO: allow current character do perform their turn
+            -- allow current character do perform their turn
             turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
 
             -- turnOrderManagerComponent.nextTurn will be toggled to true when the current active character ends their turn
@@ -147,6 +147,12 @@ function S_TurnOrderManager(e)
                 turnOrderManagerComponent.nextTurn = false    
                 -- increment queueIndex (next character in turnQueue will become active)
                 turnOrderManagerComponent.queueIndex = turnOrderManagerComponent.queueIndex + 1
+
+                if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
+                    print("[TurnOrderManager] It is now", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "turn!")
+                    turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
+                end
+
             end
         -- once all characters have taken their turn, reset variables and change global state to randomevents 
         else          

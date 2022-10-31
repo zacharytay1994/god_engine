@@ -7,21 +7,26 @@ namespace god
 {
 	void RigidStaticFrameBegin(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
-		if (entt.m_pause)
+		if (!entt.m_pause)
 		{
-			Transform& transform = std::get<1>(component);
-			RigidStatic& rigidstatic = std::get<2>(component);
-
-			if (rigidstatic.p_RigidStatic)
-			{
-				rigidstatic.p_RigidStatic->setGlobalPose(ConvertToPhysXTransform(transform.m_position, transform.m_rotation));
-			}
+			return;
 		}
+		Transform& transform = std::get<1>(component);
+		RigidStatic& rigidstatic = std::get<2>(component);
+
+		if (rigidstatic.p_RigidStatic)
+		{
+			rigidstatic.p_RigidStatic->setGlobalPose(ConvertToPhysXTransform(transform.m_position, transform.m_rotation));
+		}
+		
 	}
 
 	void RigidStaticUpdate(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
-
+		if (!entt.m_pause)
+		{
+			return;
+		}
 		Transform& transform = std::get<1>(component);
 		RigidStatic& rigidstatic = std::get<2>(component);
 

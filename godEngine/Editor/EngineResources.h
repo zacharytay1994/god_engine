@@ -11,8 +11,11 @@
 #include "../Audio/Internal/SoundManager.h"
 #include "../Physics/godPhysics.h"
 
+#define __PHYSICS
+
 namespace god
 {
+
 	/*!
 	 * @brief
 	 * : A collection of reference wrappers of type.

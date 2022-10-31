@@ -129,7 +129,8 @@ namespace god
 		editor_windows.AddWindow<god::EW_Performance> ( true );
 		editor_windows.AddWindow<god::EW_TilemapEditor> ( true , std::ref ( enttxsol ) );
 
-		godPhysicsSystem.Init ();
+		godPhysicsSystem.Init(&window, &camera);
+	
 
 
 		while ( !window.WindowShouldClose () )

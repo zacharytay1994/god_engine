@@ -167,6 +167,15 @@ namespace god
 			}
 		);
 
+		// srand()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("srand",
+			[]()->void
+			{
+				srand(time(0));
+			}
+		);
+
 		// InstancePrefab(name,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "InstancePrefab" ,
@@ -228,6 +237,15 @@ namespace god
 			[]( float value )->float
 			{
 				return glm::sin ( value );
+			}
+		);
+
+		// EntityName(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("EntityName",
+			[&entt](entt::entity e)->std::string&
+			{
+				return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_name;
 			}
 		);
 	}

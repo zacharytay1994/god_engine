@@ -36,7 +36,9 @@ function S_StateMovePlayer(e)
                 print("It is indeed the player's turn")
             end
 
+            -- allow movement after 1 second has passed
             if (stateMovePlayerComponent.Time < 1.0) then
+                -- accumulate time
                 stateMovePlayerComponent.Time = stateMovePlayerComponent.Time + GetDeltaTime()
             else
                 local pathfind = GetComponent(e, "C_Pathfind")
