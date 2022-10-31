@@ -23,7 +23,7 @@ end
 
 --[IsSystem]
 function S_StateMoveEnemy(e)
-    
+
     -- check if TurnOrderManager entity exists
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")  
     if (turnOrderManagerEntity ~= -1) then

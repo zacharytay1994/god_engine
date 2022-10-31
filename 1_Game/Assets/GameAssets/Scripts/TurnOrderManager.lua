@@ -38,6 +38,11 @@ end
 --[IsSystem]
 function S_TurnOrderManager(e)
     
+    -- press L to remove instance of TestSubject
+    if (CheckKeyPress(76) == true) then
+        RemoveInstance(GetEntity("TestSubject"))
+    end
+
     -- getting TurnOrderManager entity and component
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
     local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")

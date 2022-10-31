@@ -33,11 +33,6 @@ end
 --[IsSystem]
 function S_Character(e)
     
-    -- press L to remove instance of TestSubject
-    if (CheckKeyPress(76) == true) then
-        RemoveInstance(GetEntity("TestSubject"))
-    end
-    
     -- getting TurnOrderManager entity to check whether it's this character's turn
     local turnOrderManagerEntity = GetEntity("TurnOrderManager") 
 
@@ -54,6 +49,7 @@ function S_Character(e)
         -- -- breaks the game
         -- if (characterComponent.currentHP <= 0) then 
         --     RemoveInstance(e)
+        --     return
         -- end
 
         -- only run the rest of this script if it is currently this character's turn
