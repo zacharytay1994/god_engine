@@ -1,15 +1,19 @@
--- This script will allow the player to perform a front jab attack.
+-- This script will allow the player to perform a energy bolt attack.
 -- This script will be attached to CombatManager.
--- CombatManager will run this script whenever the player uses a Front Jab attack.
+-- CombatManager will run this script whenever the player uses a energy bolt attack.
+
+-- Energy bolt can only be used if player is in the same lane as the target &&
+-- there are no obstructions between player and target &&
+-- target is within 4 tiles away from player
 
 -- TODO:
 -- 1) Trigger sound effects / particles
 
 --[IsComponent]
-function C_FrontJab()
+function C_EnergyBolt()
     local var = {
         --[SerializeString]
-        AttackName = "FrontJab",
+        AttackName = "EnergyBolt",
 
         -- THE VARIABLES IN THIS SECTION IS REQUIRED BY ALL ATTACK SCRIPTS!!! -----------------------------------------
         -- the attacking entity, aka the player
@@ -32,7 +36,10 @@ function C_FrontJab()
         --END OF REQUIRED SECTION -------------------------------------------------------------------------------------
         
         -- used to turn player to face the target
-        playerRotation = 0
+        playerRotation = 0,
+
+        -- how for the energy bolt can travel
+        boltRange = 4
     }
     return function()
         return var
@@ -40,21 +47,21 @@ function C_FrontJab()
 end
 
 --[IsSystem]
-function S_FrontJab(e)
+function S_EnergyBolt(e)
     
-    frontJabComponent = GetComponent(e, "C_FrontJab")
+    attackComponent = GetComponent(e, "C_FrontJab")
     
-    -- checking if player is able to use FrontJab against the enemy
-    if (frontJabComponent.startCheck == true) then
+    -- checking if player is able to use attack against the enemy --------------------------------------------------------
+    if (attackComponent.startCheck == true) then
         
         -- run the check only once per attack
-        frontJabComponent.startCheck = false
+        attackComponent.startCheck = false
         
         -- check if player is adjacent to enemy
-        if (CheckPlayerAdjacentToEnemy(frontJabComponent.attacker, frontJabComponent.defender, e) == true) then
+        if (CheckPlayerAdjacentToEnemy(attackComponent.attacker, attackComponent.defender, e) == true) then
             
             -- passed the check, allow the rest of the script to run
-            frontJabComponent.canAttack = true
+            attackComponent.canAttack = true
             print("[FrontJab.lua] Adjacent check passed!")
         else
             
@@ -63,15 +70,17 @@ function S_FrontJab(e)
         end
         
         -- this will allow PlayerAttack.lua to proceed
-        frontJabComponent.checkCompleted = true
+        attackComponent.checkCompleted = true
     end
+    -- end of checking if player is able to use attack against the enemy -------------------------------------------------
     
-    -- if can use FrontJab, turn the player and activate effects
-    if (frontJabComponent.canAttack == true) then 
+
+    -- if can use attack, turn the player and activate effects -----------------------------------------------------------
+    if (attackComponent.canAttack == true) then 
         
         -- turn player to face enemy 
-        transformComponent = GetTransform(frontJabComponent.attacker)
-        transformComponent.rotation.y = frontJabComponent.playerRotation
+        transformComponent = GetTransform(attackComponent.attacker)
+        transformComponent.rotation.y = attackComponent.playerRotation
 
         -- activate screenshake
         screenShakeEntity = GetEntity("ScreenShake")
@@ -87,12 +96,13 @@ function S_FrontJab(e)
         
         -- play attack animation (if any)
     end
+    -- end of attack effects ---------------------------------------------------------------------------------------------
     
     -- reset variables (do not reset checkCompleted and canAttack here. They will be reset by PlayerAttack.lua)
-    frontJabComponent.startCheck = false
-    frontJabComponent.attacker = -1
-    frontJabComponent.defender = -1
-    frontJabComponent.playerRotation = 0
+    attackComponent.startCheck = false
+    attackComponent.attacker = -1
+    attackComponent.defender = -1
+    attackComponent.playerRotation = 0
 
 end
 
@@ -106,29 +116,29 @@ function CheckPlayerAdjacentToEnemy(attacker, defender, e)
     defenderGrid = GetGridCell(defender)
 
     -- get rotation variable
-    frontJabComponent = GetComponent(e, "C_FrontJab")
+    attackComponent = GetComponent(e, "C_FrontJab")
 
     if (attackerGrid.y == defenderGrid.y) then 
 
         -- enemy behind player
         if (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z - 1) then
             result = true 
-            frontJabComponent.playerRotation = 90
+            attackComponent.playerRotation = 90
 
         -- enemy in front of player
         elseif (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z + 1) then
             result = true 
-            frontJabComponent.playerRotation = 270
+            attackComponent.playerRotation = 270
 
         -- enemy to player's left
         elseif (attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x - 1) then
             result = true 
-            frontJabComponent.playerRotation = 180
+            attackComponent.playerRotation = 180
 
         -- enemy to player's right
         elseif(attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x + 1) then
             result = true 
-            frontJabComponent.playerRotation = 0       
+            attackComponent.playerRotation = 0       
         end
     end
 

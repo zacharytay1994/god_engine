@@ -44,7 +44,7 @@ function S_PlayerAttack(e)
                   
             -- resetting variables
             if (playerAttackComponent.resetVariables) then 
-                print("[PlayerAttack.lua] Resetting variables!!!")
+                print("[PlayerAttack.lua] Resetting variables!!!\n")
                 playerAttackComponent.selectedAttack = nil
                 playerAttackComponent.targetEntity = nil
                 playerAttackComponent.attackCheckTriggered = false
@@ -69,7 +69,7 @@ function S_PlayerAttack(e)
             -- press 1 to select Front Jab (Blue)
             if (CheckKeyPress(49)) then
                 playerAttackComponent.selectedAttack = attackList[1]
-                print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                print("\n[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
                       "Base damage:", playerAttackComponent.selectedAttack[2], 
                       "Special property:", playerAttackComponent.selectedAttack[3], "\n")
             end
