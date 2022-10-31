@@ -23,7 +23,7 @@ namespace god
 	OpenGL::Lines OpenGL::m_lines {};
 
 	OpenGL::OpenGL ( HWND windowHandle , int width , int height )
-		: 
+		:
 		m_screen_width { width } ,
 		m_screen_height { height } ,
 		m_window_device_context { GetDC ( windowHandle ) }
@@ -71,6 +71,11 @@ namespace god
 		m_depthmap_shader.InitializeFromFile (
 			"Assets/EngineAssets/OpenGLShaders/depthmap.vs" ,
 			"Assets/EngineAssets/OpenGLShaders/depthmap.fs" );
+
+		// Create 2D shader
+		m_2D_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/texturemaps2D.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/texturemaps2D.fs" );
 
 		// Calculation for shadow map
 		m_light_space_matrix =
@@ -173,7 +178,7 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/blend.fs"
 		);
 
-		m_causticmap_textures = OGLTexture( "Assets/EngineAssets/Textures/CausticMap.png" );
+		m_causticmap_textures = OGLTexture ( "Assets/EngineAssets/Textures/CausticMap.png" );
 
 		//glCheckError ();
 		std::cout << "OpenGL constructed." << std::endl;
@@ -269,11 +274,11 @@ namespace god
 			m_shadowmap.Bind ( 3 );
 
 			// bind caustic map textures
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uCausticMap", 8 );
-			m_causticmap_textures.Bind( 8 );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uCausticMap" , 8 );
+			m_causticmap_textures.Bind ( 8 );
 
 			// pass in delta time into shader 
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uDT", DeltaTimer::m_acc_dt );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uDT" , DeltaTimer::m_acc_dt );
 
 			// render point lights
 			std::sort ( scene.m_point_light_data.begin () , scene.m_point_light_data.end () ,
@@ -325,33 +330,13 @@ namespace god
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
 			}
 
-			//// Set point light
-			//OGLLight light;
-			//light.m_position = { 1.5f, 7.0f, 1.5f };
-			//light.m_ambient = { 0.5f, 0.5f, 0.5f };
-
-			//// Set spot light
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.direction" , camera_front );
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.position" , camera_position );
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.ambient" , light.m_ambient );
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.diffuse" , light.m_diffuse );
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.specular" , light.m_specular );
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.cutOff" , light.m_cutOff );
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.outerCutOff" , light.m_outerCutOff );
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.constant" , light.m_constant );
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.linear" , light.m_linear );
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.quadratic" , light.m_quadratic );
-			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpotLight.viewPos" , camera_position );
-
-
-
 			// Set Fog
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.color", {0.45f,0.65f,0.90f} );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearStart",  10.0f);
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.linearEnd", 100.0f );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.density", 0.03f );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.equation", 0 );
-			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uFogParams.isEnabled", true );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.linearStart" , 10.0f );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.density" , 0.03f );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.equation" , 0 );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.isEnabled" , true );
 
 
 			// draw model
@@ -400,6 +385,27 @@ namespace god
 
 		// Unuse the bound shader
 		OGLShader::UnUse ();
+	}
+
+	void OpenGL::RenderGUI ( Scene& scene , glm::mat4 const& projection , OGLTextureManager& textures )
+	{
+		m_2D_shader.Use ();
+
+		OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uProjection" , projection );
+
+		for ( auto const& data : scene.m_2D_instanced_render_data )
+		{
+			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			std::get<1> ( textures.Get ( data.first.m_diffuse_id ) ).Bind ( 0 );
+
+			for ( auto& mesh : m_models[ data.first.m_model_id ] )
+			{
+				mesh.SetTransformData ( data.second );
+				mesh.DrawInstanced ( GL_TRIANGLES );
+			}
+		}
+
+		m_2D_shader.UnUse ();
 	}
 
 	void OpenGL::ResizeViewport ( int width , int height )
@@ -522,7 +528,7 @@ namespace god
 			}
 		}
 		m_shadowmap.DisableDepthMap ();
-		
+
 	}
 
 	OGLRenderPass<1>& OpenGL::BlurTexture ( unsigned int texture )
