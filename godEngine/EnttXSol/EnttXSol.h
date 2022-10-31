@@ -90,6 +90,7 @@ namespace god
 
 		Entities::ID CreateEntity ( std::string const& name = "" , Entities::ID parent = Entities::Null );
 		Entities::ID GetEntity ( std::string const& name );
+		void QueueDelete ( Entities::ID entity );
 		void RemoveEntity ( EntityGrid& grid , Entities::ID entity );
 
 		template<typename ENGINE_COMPONENTS , typename EDITOR_RESOURCES>
@@ -217,6 +218,7 @@ namespace god
 		//void RecursiveRemoveEntityFromGrid ( EntityGrid& grid , Entities::ID entity );
 
 		std::queue<std::tuple<std::string , Entities::ID , float , float , float , bool>> m_instance_queue;
+		std::queue<Entities::ID> m_delete_queue;
 		void SetEntityActive ( EnttXSol::Entities::ID entity , bool active );
 		void PrefabSetMaster ( EngineResources& engineResources , std::string const& fileName );
 		EnttXSol::Entities::ID InstancePrefabFromMaster ( std::string const& fileName , Entities::ID parent = Entities::Null );

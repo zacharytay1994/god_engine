@@ -27,8 +27,8 @@ namespace god
 			"z" , &glm::ivec3::z );
 
 		// Camera
-		entt.RegisterLuaType<Camera>("Camera",
-			"position", &Camera::m_position);
+		entt.RegisterLuaType<Camera> ( "Camera" ,
+			"position" , &Camera::m_position );
 
 		// GetComponent(e,componentName)
 		// ==============================================================================================
@@ -151,22 +151,22 @@ namespace god
 
 		// GenerateRandomProbability()
 		// ==============================================================================================
-		entt.RegisterLuaFunction("GenerateRandomProbability",
+		entt.RegisterLuaFunction ( "GenerateRandomProbability" ,
 			[]()->float
 			{
-				return glm::linearRand(0.0f, 1.0f);
+				return glm::linearRand ( 0.0f , 1.0f );
 			}
 		);
 
 		// GenerateRandomNumberInRange(minValue, maxValue)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("GenerateRandomNumberInRange",
-			[]( int minValue, int maxValue)->int
+		entt.RegisterLuaFunction ( "GenerateRandomNumberInRange" ,
+			[]( int minValue , int maxValue )->int
 			{
-				return glm::linearRand(minValue, maxValue);
+				return glm::linearRand ( minValue , maxValue );
 			}
 		);
-		
+
 		// InstancePrefab(name,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "InstancePrefab" ,
@@ -206,27 +206,28 @@ namespace god
 		// RemoveInstance(e)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "RemoveInstance" ,
-			[&entt , &engineResources]( entt::entity e )
+			[&entt]( entt::entity e )
 			{
-				entt.RemoveEntity ( engineResources.Get<EntityGrid> ().get () , entt.GetEngineComponent<EntityData> ( e )->m_id );
+				entt.QueueDelete ( entt.GetEngineComponent<EntityData> ( e )->m_id );
+				//entt.RemoveEntity ( engineResources.Get<EntityGrid> ().get () , entt.GetEngineComponent<EntityData> ( e )->m_id );
 			}
 		);
 
 		// FindCameraObject()
 		// ==============================================================================================
-		entt.RegisterLuaFunction("FindCameraObject",
+		entt.RegisterLuaFunction ( "FindCameraObject" ,
 			[&engineResources]()->god::Camera&
 			{
-				return engineResources.Get<Camera>().get();
+				return engineResources.Get<Camera> ().get ();
 			}
 		);
 
 		// Sin(value)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("Sin",
-			[](float value)->float
+		entt.RegisterLuaFunction ( "Sin" ,
+			[]( float value )->float
 			{
-				return glm::sin(value);
+				return glm::sin ( value );
 			}
 		);
 	}

@@ -289,6 +289,11 @@ namespace god
 	template<typename EDITOR_RESOURCES>
 	inline EnttXSol::Entities::ID EW_SceneTree<EDITOR_RESOURCES>::GetSelectedEntity ()
 	{
+		if ( !m_enttxsol.m_entities.Valid ( m_selected_entity ) )
+		{
+			m_selected_entity = EnttXSol::Entities::Null;
+			return m_selected_entity;
+		}
 		return m_selected_entity;
 	}
 
