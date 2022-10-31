@@ -51,9 +51,11 @@ end
 function S_EnergyBolt(e)
     
     attackComponent = GetComponent(e, "C_EnergyBolt")
-    
+
     -- checking if player is able to use attack against the enemy --------------------------------------------------------
     if (attackComponent.startCheck == true) then
+        
+        print("[AttackEnergyBolt.lua] Starting check!")
         
         -- run the check only once per attack
         attackComponent.startCheck = false
@@ -86,12 +88,16 @@ function S_EnergyBolt(e)
         -- no screenshake here (will be triggered by the energy bolt entity's script)
 
         -- instantiate the energy bolt (a prefab with a script that makes it float towards the target)
+        -- print("[AttackEnergyBolt.lua] Instantiating energy bolt!")
+        -- local playerPos = GetTransform(GetEntity("Player")).position
+        -- InstancePrefab("EnergyBolt", playerPos.x, playerPos.y, playerPos.z)
         
         -- trigger sound effect
         
         -- trigger particles (if any)
         
         -- play attack animation (if any)
+
     end
     -- end of attack effects ---------------------------------------------------------------------------------------------
     

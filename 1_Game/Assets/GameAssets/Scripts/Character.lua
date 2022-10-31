@@ -47,9 +47,13 @@ function S_Character(e)
         local characterComponent = GetComponent(e, "C_Character")
 
         -- -- breaks the game
+        -- if (CheckKeyPress(75) and EntityName(e) == "Enemy") then
+        --     RemoveInstance(e)
+        -- end
+        
+        -- -- breaks the game
         -- if (characterComponent.currentHP <= 0) then 
         --     RemoveInstance(e)
-        --     return
         -- end
 
         -- only run the rest of this script if it is currently this character's turn
