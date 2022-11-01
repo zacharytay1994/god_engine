@@ -53,7 +53,7 @@ namespace god
 				// potential area for optimization looking for entity of name
 				for ( uint32_t i = 0; i < entt.m_entities.Size (); ++i )
 				{
-					if ( entt.m_entities[ i ].m_name == entityName )
+					if ( entt.m_entities.Valid ( i ) && entt.m_entities[ i ].m_name == entityName )
 					{
 						return static_cast< int >( entt.m_entities[ i ].m_id );
 					}
@@ -169,10 +169,10 @@ namespace god
 
 		// srand()
 		// ==============================================================================================
-		entt.RegisterLuaFunction("srand",
+		entt.RegisterLuaFunction ( "srand" ,
 			[]()->void
 			{
-				srand(time(0));
+				srand ( time ( 0 ) );
 			}
 		);
 
@@ -242,19 +242,19 @@ namespace god
 
 		// Abs(value)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("Abs",
-			[](float value)->float
+		entt.RegisterLuaFunction ( "Abs" ,
+			[]( float value )->float
 			{
-				return glm::abs(value);
+				return glm::abs ( value );
 			}
 		);
 
 		// EntityName(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("EntityName",
-			[&entt](entt::entity e)->std::string&
+		entt.RegisterLuaFunction ( "EntityName" ,
+			[&entt]( entt::entity e )->std::string&
 			{
-				return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_name;
+				return entt.m_entities[ entt.GetEngineComponent<EntityData> ( e )->m_id ].m_name;
 			}
 		);
 	}
