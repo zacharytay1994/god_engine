@@ -23,7 +23,7 @@ function C_PlayerAttack()
         attackCheckTriggered = false,
 
         -- used to cycle through enemy targets, won't be used anymore once UI to select enemy is done
-        enemyCycle = 0
+        enemyCycle = 1
     }
     return function()
         return var
@@ -109,22 +109,58 @@ function S_PlayerAttack(e)
             -- press 4 to cycle through enemy targets
             if (CheckKeyPress(52)) then 
                 
-                print("enemyCycle before increment is:", playerAttackComponent.enemyCycle)
-                playerAttackComponent.enemyCycle = playerAttackComponent.enemyCycle + 1
+                local enemyList = EntitiesWithScriptComponent("C_StateMoveEnemy")
+                local enemyRemaining = false
 
-                -- target the next enemy in the list
-                playerAttackComponent.targetEntity = EntitiesWithScriptComponent("C_StateMoveEnemy")[playerAttackComponent.enemyCycle]
-
-                print("playerAttackComponent.targetEntity", playerAttackComponent.targetEntity)
-
-                -- if exceeded array length then reset enemyCycle to 1
-                if (playerAttackComponent.targetEntity == nil or playerAttackComponent.targetEntity == -1) then
-                    
-                    print("TargetEntity does not exist, resetting enemyCycle to one")
-                    playerAttackComponent.enemyCycle = 1
-                    playerAttackComponent.targetEntity = EntitiesWithScriptComponent("C_StateMoveEnemy")[playerAttackComponent.enemyCycle]
-                
+                for i = 1, #enemyList do
+                    if (GetComponent(enemyList[i], "C_Character").isDead == false) then
+                        enemyRemaining = true
+                        break
+                    end
                 end
+
+                if (enemyRemaining == false) then
+                    print("all enemies are dead!")
+                else
+
+                    print("enemyCycle before increment is:", playerAttackComponent.enemyCycle)
+
+                    if (playerAttackComponent.enemyCycle > #enemyList) then
+                        playerAttackComponent.enemyCycle = 1
+                    end
+
+                    while (GetComponent(enemyList[playerAttackComponent.enemyCycle], "C_Character").isDead == true) do
+                        playerAttackComponent.enemyCycle = playerAttackComponent.enemyCycle + 1
+
+                        if (playerAttackComponent.enemyCycle > #enemyList) then
+                            playerAttackComponent.enemyCycle = 1
+                        end
+                    end
+
+                    -- target the next enemy in the list
+                    playerAttackComponent.targetEntity = enemyList[playerAttackComponent.enemyCycle]
+                    print("playerAttackComponent.targetEntity", playerAttackComponent.targetEntity)
+
+                    playerAttackComponent.enemyCycle = playerAttackComponent.enemyCycle + 1
+                end
+
+                
+                
+
+                
+                
+                
+
+                
+
+                -- -- if exceeded array length then reset enemyCycle to 1
+                -- if (playerAttackComponent.targetEntity == nil or playerAttackComponent.targetEntity == -1) then
+                    
+                --     print("TargetEntity does not exist, resetting enemyCycle to one")
+                --     playerAttackComponent.enemyCycle = 1
+                --     playerAttackComponent.targetEntity = EntitiesWithScriptComponent("C_StateMoveEnemy")[playerAttackComponent.enemyCycle]
+                
+                -- end
 
                 print("Currently target enemy is:", EntityName(playerAttackComponent.targetEntity), "ID no.", GetEntityData(playerAttackComponent.targetEntity).id)
             end
