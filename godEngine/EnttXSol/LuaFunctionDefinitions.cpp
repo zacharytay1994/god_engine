@@ -240,6 +240,15 @@ namespace god
 			}
 		);
 
+		// Abs(value)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("Abs",
+			[](float value)->float
+			{
+				return glm::abs(value);
+			}
+		);
+
 		// EntityName(e)
 		// ==============================================================================================
 		entt.RegisterLuaFunction("EntityName",

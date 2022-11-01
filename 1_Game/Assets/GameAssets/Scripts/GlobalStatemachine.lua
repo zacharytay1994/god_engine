@@ -20,23 +20,23 @@ function S_GlobalStatemachine(e)
     -- getting entity and component
     local globalStateMachineEntity = GetEntity("GlobalStatemachine")
     if (globalStateMachineEntity ~= -1) then 
-        local globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
+        globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
     end
     
-    -- press 1 to change state to StateCharacterTurn
-    if (CheckKeyPress(49) == true) then
-        globalStateMachineComponent.CurrentState = "StateCharacterTurn"
-        print("CurrentState = StateCharacterTurn")
-    end
+    -- -- press 1 to change state to StateCharacterTurn
+    -- if (CheckKeyPress(49) == true) then
+    --     globalStateMachineComponent.CurrentState = "StateCharacterTurn"
+    --     print("CurrentState = StateCharacterTurn")
+    -- end
 
-    -- press 2 to change state to StateRandomEvent
-    if (CheckKeyPress(50) == true) then
-        globalStateMachineComponent.CurrentState = "StateRandomEvent"
-        print("CurrentState = StateRandomEvent")
-    end
+    -- -- press 2 to change state to StateRandomEvent
+    -- if (CheckKeyPress(50) == true) then
+    --     globalStateMachineComponent.CurrentState = "StateRandomEvent"
+    --     print("CurrentState = StateRandomEvent")
+    -- end
 
-    -- press J to print the current State
-    if (CheckKeyPress(74)) then
+    -- press Z to print the current State
+    if (CheckKeyPress(90) == true) then
         print(globalStateMachineComponent.CurrentState)
     end
 end

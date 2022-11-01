@@ -19,7 +19,13 @@ function C_ScreenShake()
         amplitude = 180,
 
         -- bool to activate the shake
-        doScreenShake = false
+        doScreenShake = false,
+
+        -- camera position will reset to original position after shaking
+        originalYPos = 0.0,
+
+        -- makes the script save the camera position at the start of the screenshake
+        savePosition = true
     }
     return function()
         return var
@@ -34,8 +40,8 @@ function S_ScreenShake(e)
         cameraShakeComponent = GetComponent(cameraShakeEntity, "C_ScreenShake")
     end
     
-    -- press Z to trigger a screenshake
-    if (CheckKeyPress(90)) then
+    -- press B to trigger a screenshake
+    if (CheckKeyPress(66)) then
         print("Starting screen shake!")
         cameraShakeComponent.duration = 1.0
         cameraShakeComponent.doScreenShake = true
@@ -46,6 +52,15 @@ function S_ScreenShake(e)
         -- get camera object
         local cameraObject = FindCameraObject()
 
+        -- save it's position
+        if (cameraShakeComponent.savePosition) then
+            
+            -- print("cam position before shake:", cameraObject.position.x, cameraObject.position.y, cameraObject.position.z)
+            
+            cameraShakeComponent.originalYPos = cameraObject.position.y
+            cameraShakeComponent.savePosition = false
+        end
+
         -- if (cameraShakeComponent.amplitude > 0) then
         if (cameraShakeComponent.duration > 0) then
             
@@ -55,10 +70,17 @@ function S_ScreenShake(e)
             -- change the camera position
             cameraObject.position.y = cameraObject.position.y + Sin(cameraShakeComponent.duration * cameraShakeComponent.amplitude)
         else
-            
+                        
+            -- reset camera's position
+            cameraObject.position.y = cameraShakeComponent.originalYPos
+
+            -- print("cam position after restoring:", cameraObject.position.x, cameraObject.position.y, cameraObject.position.z)
+
             -- reset variables
             cameraShakeComponent.doScreenShake = false
             cameraShakeComponent.duration = 0.0
+            cameraShakeComponent.originalYPos = 0.0
+            cameraShakeComponent.savePosition = true
         end
     end
 end
