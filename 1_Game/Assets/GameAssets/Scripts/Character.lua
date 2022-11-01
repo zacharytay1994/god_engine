@@ -23,7 +23,10 @@ function C_Character()
         --[SerializeInt]
         strength = 10 ,
         --[SerializeInt]
-        defence = 10
+        defence = 10,
+
+        -- set to true when character's HP hits zero. Makes TurnOrderManager skip this character's turn
+        isDead = false
     };
     return function()
         return var
@@ -51,11 +54,28 @@ function S_Character(e)
         if (CheckKeyPress(75) and EntityName(e) == "Enemy") then
             RemoveInstance(e)
         end
+
+        -- press J to set enemy HP to zero
+        if (CheckKeyPress(74) and EntityName(e) == "Enemy") then
+            characterComponent.currentHP = 0
+        end
         
-        -- -- breaks the game
-        -- if (characterComponent.currentHP <= 0) then 
-        --     RemoveInstance(e)
-        -- end
+        if (characterComponent.currentHP <= 0) then 
+
+            -- hide the character below the map
+            GetTransform(e).position.y = -100
+            GetGridCell(e).y = -100
+            
+            -- set character to dead
+            characterComponent.isDead = true
+
+            -- RemoveInstance will be called by TurnOrderManager (near the end of the script)
+
+        end
+
+        if (characterComponent.isDead) then
+            return
+        end
 
         -- only run the rest of this script if it is currently this character's turn
         if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then

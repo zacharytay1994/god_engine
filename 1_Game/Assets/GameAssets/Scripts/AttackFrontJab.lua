@@ -51,21 +51,29 @@ function S_FrontJab(e)
         
         -- run the check only once per attack
         attackComponent.startCheck = false
-        
-        -- check if player is adjacent to enemy
-        if (CheckPlayerAdjacentToEnemy(attackComponent.attacker, attackComponent.defender, e) == true) then
-            
-            -- passed the check, allow the rest of the script to run
-            attackComponent.canAttack = true
-            print("[AttackFrontJab.lua] Adjacent check passed!")
+
+        if (attackComponent.attacker == -1 or attackComponent.defender == -1) then 
+
+            print("[AttackFrontJab.lua] Either attacker or defender is -1! Script stops here!")
+
         else
             
-            -- failed the check, print fail message
-            print("[AttackFrontJab.lua] Adjacent check failed!")
-        end
-        
-        -- this will allow PlayerAttack.lua to proceed
-        attackComponent.checkCompleted = true
+            -- check if player is adjacent to enemy
+            if (CheckPlayerAdjacentToEnemy(attackComponent.attacker, attackComponent.defender, e) == true) then
+                
+                -- passed the check, allow the rest of the script to run
+                attackComponent.canAttack = true
+                print("[AttackFrontJab.lua] Adjacent check passed!")
+            else
+                
+                -- failed the check, print fail message
+                print("[AttackFrontJab.lua] Adjacent check failed!")
+            end
+            
+            -- this will allow PlayerAttack.lua to proceed
+            attackComponent.checkCompleted = true
+
+        end   
     end
     -- end of checking if player is able to use attack against the enemy -------------------------------------------------
     

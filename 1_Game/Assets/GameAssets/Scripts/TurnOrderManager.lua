@@ -120,6 +120,11 @@ function S_TurnOrderManager(e)
         -- while there are still characters who have not taken their turn for this cycle
         if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
                      
+            -- skip dead character's turn
+            if (GetComponent(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex], "C_Character").isDead) then
+                turnOrderManagerComponent.nextTurn = true
+            end
+            
             -- allow current character do perform their turn
             turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
 
@@ -141,6 +146,16 @@ function S_TurnOrderManager(e)
             turnOrderManagerComponent.buildTurnQueue = true
             turnOrderManagerComponent.queueIndex = 1
             turnOrderManagerComponent.currentTurn = 0
+
+            -- remove all the fucking dead characters
+            print("Removing dead characters")
+            characterList = EntitiesWithScriptComponent("C_Character")
+            for m = 1, #characterList do
+                if (GetComponent(characterList[m], "C_Character").isDead) then
+                    print("character removed")
+                    RemoveInstance(characterList[m])
+                end
+            end
 
             globalStateMachineComponent.CurrentState = "StateRandomEvent"
             print("\n[TurnOrderManager - END]")
