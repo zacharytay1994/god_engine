@@ -147,6 +147,16 @@ function S_TurnOrderManager(e)
             turnOrderManagerComponent.queueIndex = 1
             turnOrderManagerComponent.currentTurn = 0
 
+            -- remove all the fucking dead characters
+            print("Removing dead characters")
+            characterList = EntitiesWithScriptComponent("C_Character")
+            for m = 1, #characterList do
+                if (GetComponent(characterList[m], "C_Character").isDead) then
+                    print("character removed")
+                    RemoveInstance(characterList[m])
+                end
+            end
+
             globalStateMachineComponent.CurrentState = "StateRandomEvent"
             print("\n[TurnOrderManager - END]")
             print("CurrentState = StateRandomEvent")
