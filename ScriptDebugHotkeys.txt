@@ -6,7 +6,7 @@ R - End current enemy's turn
 
 [Character Script debugging]
 C - Print current character's stats and details
-X - print current character's grid location
+X - print current character's grid location as well as global position
 
 [GlobalStatemachine debugging]
 Z - Print current state of GlobalStatemachine
@@ -27,4 +27,5 @@ B - Press the trigger a screenshake
 3 - Set player's selected attack as Energy Bolt (Blue)
 
 [RemoveInstance debugging]
+K - Remove Enemy entity (breaks the game)
 L - Remove TestSubject

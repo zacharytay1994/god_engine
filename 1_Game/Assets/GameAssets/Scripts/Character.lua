@@ -46,10 +46,11 @@ function S_Character(e)
         -- getting this character's C_Character component
         local characterComponent = GetComponent(e, "C_Character")
 
-        -- -- breaks the game
-        -- if (CheckKeyPress(75) and EntityName(e) == "Enemy") then
-        --     RemoveInstance(e)
-        -- end
+        -- breaks the game
+        -- press K to remove enemy entity
+        if (CheckKeyPress(75) and EntityName(e) == "Enemy") then
+            RemoveInstance(e)
+        end
         
         -- -- breaks the game
         -- if (characterComponent.currentHP <= 0) then 
@@ -62,7 +63,9 @@ function S_Character(e)
             -- press X to check character's coordinates on the grid
             if (CheckKeyPress(88) == true) then
                 local cell = GetGridCell(e)
-                print(EntityName(e), "location:", cell.x, cell.y, cell.z)
+                print(EntityName(e), "GridCell location:", cell.x, cell.y, cell.z)
+                local position = GetTransform(e).position
+                print(EntityName(e), "Transform position:", position.x, position.y, position.z)
             end
 
             -- press C to print character's ID number
