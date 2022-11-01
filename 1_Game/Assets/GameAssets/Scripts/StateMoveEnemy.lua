@@ -248,7 +248,7 @@ function SuitableTile()
             -- if code reaches here then it means there is nothing occupying diagonalCandidates[m]
             -- and the enemy can move here
             print("returning diagonalCandidates[m]", diagonalCandidatesGridCell.x, diagonalCandidatesGridCell.y, diagonalCandidatesGridCell.z)
-            return diagonalCandidates[m]
+            return diagonalCandidates[k]
         end
     end
     

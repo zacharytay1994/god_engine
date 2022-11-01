@@ -20,7 +20,10 @@ function C_PlayerAttack()
         resetVariables = false,
 
         -- checks whether the attack script has performed its check
-        attackCheckTriggered = false
+        attackCheckTriggered = false,
+
+        -- used to cycle through enemy targets, won't be used anymore once UI to select enemy is done
+        enemyCycle = 0
     }
     return function()
         return var
@@ -65,6 +68,17 @@ function S_PlayerAttack(e)
                 end    
             end 
 
+            -- press G to check currently selected enemy
+            if (CheckKeyPress(71)) then
+                print("G:", playerAttackComponent.targetEntity)
+                
+                -- if (playerAttackComponent.targetEntity ~= -1) then
+                --     print("Currently target enemy is", GetEntityData(playerAttackComponent.targetEntity).id)
+                -- else
+                --     print("G:", playerAttackComponent.targetEntity)
+                -- end
+            end
+
             -- select an attack ----------------------------------------------------------------------------------
             -- press 1 to select Front Jab (Blue)
             if (CheckKeyPress(49)) then
@@ -92,15 +106,36 @@ function S_PlayerAttack(e)
             -- end of selecting attack ---------------------------------------------------------------------------------
         
             -- select a target -----------------------------------------------------------------------------------------
-            playerAttackComponent.targetEntity = EntitiesWithScriptComponent("C_StateMoveEnemy")[1]
-            -- print(EntityName(playerAttackComponent.targetEntity))
+            -- press 4 to cycle through enemy targets
+            if (CheckKeyPress(52)) then 
+                
+                print("enemyCycle before increment is:", playerAttackComponent.enemyCycle)
+                playerAttackComponent.enemyCycle = playerAttackComponent.enemyCycle + 1
+
+                -- target the next enemy in the list
+                playerAttackComponent.targetEntity = EntitiesWithScriptComponent("C_StateMoveEnemy")[playerAttackComponent.enemyCycle]
+
+                print("playerAttackComponent.targetEntity", playerAttackComponent.targetEntity)
+
+                -- if exceeded array length then reset enemyCycle to 1
+                if (playerAttackComponent.targetEntity == nil or playerAttackComponent.targetEntity == -1) then
+                    
+                    print("TargetEntity does not exist, resetting enemyCycle to one")
+                    playerAttackComponent.enemyCycle = 1
+                    playerAttackComponent.targetEntity = EntitiesWithScriptComponent("C_StateMoveEnemy")[playerAttackComponent.enemyCycle]
+                
+                end
+
+                print("Currently target enemy is:", EntityName(playerAttackComponent.targetEntity), "ID no.", GetEntityData(playerAttackComponent.targetEntity).id)
+            end
             -- end of selecting target ---------------------------------------------------------------------------------
 
             -- if attack type and attack target are chosen, then initiate combat
-            if (playerAttackComponent.selectedAttack ~= nil and playerAttackComponent.targetEntity ~= -1) then
+            if (playerAttackComponent.selectedAttack ~= nil and playerAttackComponent.targetEntity ~= -1 and playerAttackComponent.targetEntity ~= nil) then
                         
                 -- check whether player is able to attack the enemy (within range / no obstructions / etc) --------------
                 if (playerAttackComponent.attackCheckTriggered == false) then
+                    print("playerAttackComponent.attackCheckTriggered == false")
                     selectedAttackComponent = GetComponent(combatManagerEntity, playerAttackComponent.selectedAttack[4])
                     selectedAttackComponent.attacker = e
                     selectedAttackComponent.defender = playerAttackComponent.targetEntity
