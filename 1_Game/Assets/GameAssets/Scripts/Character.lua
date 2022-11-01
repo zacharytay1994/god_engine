@@ -61,9 +61,6 @@ function S_Character(e)
         end
         
         if (characterComponent.currentHP <= 0) then 
-            
-            -- removing instance breaks the game!
-            -- RemoveInstance(e)
 
             -- hide the character below the map
             GetTransform(e).position.y = -100
@@ -72,15 +69,11 @@ function S_Character(e)
             -- set character to dead
             characterComponent.isDead = true
 
+            -- RemoveInstance will be called by TurnOrderManager (near the end of the script)
+
         end
 
         if (characterComponent.isDead) then
-            
-            -- print message to check if character is marked as dead
-            -- if (e ~= -1 and e ~= nil) then
-            --     print("[Character.lua]", EntityName(e), "is dead!")
-            -- end
-            
             return
         end
 

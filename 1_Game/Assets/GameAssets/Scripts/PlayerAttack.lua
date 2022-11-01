@@ -123,8 +123,6 @@ function S_PlayerAttack(e)
                     print("all enemies are dead!")
                 else
 
-                    print("enemyCycle before increment is:", playerAttackComponent.enemyCycle)
-
                     if (playerAttackComponent.enemyCycle > #enemyList) then
                         playerAttackComponent.enemyCycle = 1
                     end
@@ -139,28 +137,9 @@ function S_PlayerAttack(e)
 
                     -- target the next enemy in the list
                     playerAttackComponent.targetEntity = enemyList[playerAttackComponent.enemyCycle]
-                    print("playerAttackComponent.targetEntity", playerAttackComponent.targetEntity)
 
                     playerAttackComponent.enemyCycle = playerAttackComponent.enemyCycle + 1
                 end
-
-                
-                
-
-                
-                
-                
-
-                
-
-                -- -- if exceeded array length then reset enemyCycle to 1
-                -- if (playerAttackComponent.targetEntity == nil or playerAttackComponent.targetEntity == -1) then
-                    
-                --     print("TargetEntity does not exist, resetting enemyCycle to one")
-                --     playerAttackComponent.enemyCycle = 1
-                --     playerAttackComponent.targetEntity = EntitiesWithScriptComponent("C_StateMoveEnemy")[playerAttackComponent.enemyCycle]
-                
-                -- end
 
                 print("Currently target enemy is:", EntityName(playerAttackComponent.targetEntity), "ID no.", GetEntityData(playerAttackComponent.targetEntity).id)
             end
