@@ -261,7 +261,7 @@ namespace god
 		// SetTransformPosition(e,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction("SetTransformPosition",
-			[&entt, &engineResources](entt::entity e, float x, float y, float z)->void
+			[&entt, &engineResources](entt::entity e, float x, float y, float z)
 			{
 				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
 				{
@@ -273,10 +273,10 @@ namespace god
 			}
 		);
 
-		// FreezeObject(e, bool)
+		// FreezeObject(e)
 		// ==============================================================================================
 		entt.RegisterLuaFunction("FreezeObject",
-			[&entt, &engineResources](entt::entity e, bool freeze)->void
+			[&entt, &engineResources](entt::entity e, bool freeze)
 			{
 				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
 				{

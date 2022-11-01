@@ -23,31 +23,26 @@ function C_DiceScript()
     end
 end
 
-local function DiceScript_RollDice(c_dice)
-	c_dice.is_rolling = true
-	print("ROLLING...")
-	FreezeObject(e, false)
-	rotation_x = math.random(0,360)
-	rotation_y = math.random(0,360)
-	rotation_z = math.random(0,360)
-	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
-end
-
-local function DiceScript_DisableDice(c_dice)
-	c_dice.is_rolling = false
-end
-
 --[IsSystem]
 function S_DiceScript(e)
 	local c_dice = GetComponent(e, "C_DiceScript")
 	if (c_dice.is_init == false) then
-		c_dice.fodder_text = "DiceScript is running!"
-		DiceScript_RollDice(c_dice)
+		c_dice.fodder_text = "---DiceScript is running!"
 		local transform = GetTransform(e)
-		start_position_x = transform.position.x
-		start_position_y = transform.position.y
-		start_position_z = transform.position.z
+		c_dice.start_position_x = transform.position.x
+		c_dice.start_position_y = transform.position.y
+		c_dice.start_position_z = transform.position.z
+		FreezeObject(e, true)
 		c_dice.is_init = true
+	end
+	
+	if(CheckKeyPress(79) == true) then
+		DiceScript_RollDice(e, c_dice)
+		return
+	elseif(CheckKeyPress(80) == true) then
+		SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
+		DiceScript_DisableDice(e, c_dice)
+		return
 	end
 	
 	local transform = GetTransform(e)
@@ -58,9 +53,7 @@ function S_DiceScript(e)
 				if (c_dice.rotation_x == transform.rotation.x) then
 					if (c_dice.rotation_y == transform.rotation.y) then
 						if (c_dice.rotation_z == transform.rotation.z) then
-							print("DICE STOPPED!")
-							c_dice.is_rolling = false
-							DiceScript_RollDice(c_dice)
+							DiceScript_DisableDice(e, c_dice)
 							return
 						end
 					end
@@ -77,3 +70,16 @@ function S_DiceScript(e)
 	c_dice.rotation_z = transform.rotation.z
 end
 
+function DiceScript_RollDice(e, c_dice)
+	c_dice.is_rolling = true
+	FreezeObject(e, false)
+	c_dice.rotation_x = GenerateRandomNumberInRange(0,360)
+	c_dice.rotation_y = GenerateRandomNumberInRange(0,360)
+	c_dice.rotation_z = GenerateRandomNumberInRange(0,360)
+	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
+end
+
+function DiceScript_DisableDice(e, c_dice)
+	c_dice.is_rolling = false
+	FreezeObject(e, true)
+end
