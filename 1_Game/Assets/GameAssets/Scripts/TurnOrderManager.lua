@@ -120,6 +120,11 @@ function S_TurnOrderManager(e)
         -- while there are still characters who have not taken their turn for this cycle
         if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
                      
+            -- skip dead character's turn
+            if (GetComponent(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex], "C_Character").isDead) then
+                turnOrderManagerComponent.nextTurn = true
+            end
+            
             -- allow current character do perform their turn
             turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
 

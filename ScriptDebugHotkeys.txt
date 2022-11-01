@@ -27,5 +27,6 @@ B - Press the trigger a screenshake
 3 - Set player's selected attack as Energy Bolt (Blue)
 
 [RemoveInstance debugging]
-K - Remove Enemy entity (breaks the game)
+J - Set Enemy HP to zero (the entity named "Enemy")
+K - Remove Enemy entity (the entity named "Enemy") (breaks the game)
 L - Remove TestSubject
