@@ -1,5 +1,11 @@
 -- How this script works:
--- 1) First, it checks against 
+-- 1) On the enemy's turn, it will set one of the player's adjacent tiles as the destination
+-- 2) The enemy will start moving towards the destination using pathfinding.
+
+-- TODO:
+-- 1) Allow the enemy to move along y-axis
+-- 2) Decrease enemy stamina as they move
+-- 3) Define different movement types (don't move, move beside player, move to a distance away from player)
 
 --[IsComponent]
 function C_StateMoveEnemy()
@@ -17,7 +23,7 @@ end
 
 --[IsSystem]
 function S_StateMoveEnemy(e)
-    
+
     -- check if TurnOrderManager entity exists
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")  
     if (turnOrderManagerEntity ~= -1) then
@@ -29,12 +35,7 @@ function S_StateMoveEnemy(e)
         local enemyGridCell = GetGridCell(e)
              
         -- if it's this character's turn, let it perform it actions
-        if (turnOrderManagerComponent.currentTurn == entityDataComponent.id) then
-            
-            -- press V to check if script passes currentTurn check
-            if (CheckKeyPress(86)) then
-                print("It is indeed the enemy's turn")
-            end          
+        if (turnOrderManagerComponent.currentTurn == entityDataComponent.id) then  
                      
             -- allow movement after 1 second has passed
             if (stateMoveEnemyComponent.Time < 1.0) then
@@ -74,9 +75,9 @@ function S_StateMoveEnemy(e)
                             currentGridCell.z == playerGridCell.z and currentGridCell.y == playerGridCell.y -1 and currentGridCell.x == playerGridCell.x - 1 or -- to the right
                             currentGridCell.z == playerGridCell.z and currentGridCell.y == playerGridCell.y -1 and currentGridCell.x == playerGridCell.x + 1 ) then -- to the left
                                 
-                                -- store the location of the adjacent tile and break the loop
-                                targetGridCell = currentGridCell
-                                break
+                            -- store the location of the adjacent tile and break the loop
+                            targetGridCell = currentGridCell
+                            break
                         end
                     end
 

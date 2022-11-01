@@ -135,6 +135,8 @@
     <ClInclude Include="OpenGL\Animation\Animator.h" />
     <ClInclude Include="OpenGL\Animation\Bone.h" />
     <ClInclude Include="OpenGL\Animation\Animation.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIObject.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\GUI\ES_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Raycast.h" />
     <ClInclude Include="Physics\SnippetUtils.h" />
   </ItemGroup>

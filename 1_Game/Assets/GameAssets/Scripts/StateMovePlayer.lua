@@ -2,6 +2,7 @@
 
 -- TODO:
 -- 1) Decrease Player's stamina as the Player moves.
+-- 2) Allow player to move along y-axis
 
 --[IsComponent]
 function C_StateMovePlayer()
@@ -30,11 +31,6 @@ function S_StateMovePlayer(e)
         
         if (turnOrderManagerComponent.currentTurn == entityDataComponent.id) then
             -- action ...
-
-            -- press V to check if script passes currentTurn check
-            if (CheckKeyPress(86)) then
-                print("It is indeed the player's turn")
-            end
 
             -- allow movement after 1 second has passed
             if (stateMovePlayerComponent.Time < 1.0) then

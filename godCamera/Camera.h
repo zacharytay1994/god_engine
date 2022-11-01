@@ -25,6 +25,7 @@ namespace god
 		void GODCAMERA_API UpdateAspectRatio ( int width , int height );
 
 		glm::mat4 GODCAMERA_API GetPerpectiveProjectionMatrix ();
+		glm::mat4 GODCAMERA_API GetOrthographicProjectionMatrix ( float width , float height );
 		glm::mat4 GODCAMERA_API GetCameraViewMatrix ();
 
 		// camera modes

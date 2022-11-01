@@ -3,9 +3,6 @@
 -- While GlobalStatemachine.CurrentState is CharacterTurnState, this script will be responsible for switching to each 
 -- character's turn, before changing GlobalStatemachine.CurrentState to RandomEventState.
 
--- TODO:
--- 1) Sort the turnQueue by remaining stamina (currently sorts by ID to test sorting)
-
 --[IsComponent]
 function C_TurnOrderManager()
     local var = {
@@ -41,18 +38,14 @@ end
 --[IsSystem]
 function S_TurnOrderManager(e)
     
+    -- press L to remove instance of TestSubject
+    if (CheckKeyPress(76) == true) then
+        RemoveInstance(GetEntity("TestSubject"))
+    end
+
     -- getting TurnOrderManager entity and component
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
     local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
-    
-    -- for checking if nextTurn is true or false, by pressing K
-    if (CheckKeyPress(75)) then
-        if (turnOrderManagerComponent.nextTurn == true) then
-            print("nextTurn is true")  
-        else
-            print("nextTurn is false")  
-        end
-    end
     
     -- getting GlobalStatemachine entity and component
     local globalStateMachineEntity = GetEntity("GlobalStatemachine")
@@ -61,20 +54,12 @@ function S_TurnOrderManager(e)
     -- only run the rest of this script if globalStateMachine allows it
     if (globalStateMachineComponent.CurrentState == turnOrderManagerComponent.TurnOrderState) then
             
-        -- press M to check whether the script passes the globalStateMachineComponent.CurrentState check
+        -- press M to check ID of current active character
         if (CheckKeyPress(77)) then
-            print("TurnOrderManager script entered main chunk")
-        end
-        -- press N to check whether buildTurnQueue is true or false
-        if (CheckKeyPress(78)) then
-            print("buildTurnQueue is ", turnOrderManagerComponent.buildTurnQueue)
-        end
-        -- press B to check ID of current active character
-        if (CheckKeyPress(66)) then
-            print("current active character is ", turnOrderManagerComponent.currentTurn)
+            print("current active character:", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "    ID no.", turnOrderManagerComponent.currentTurn)
         end
         -- press X to check the number of turn cycles so far
-        if (CheckKeyPress(88)) then
+        if (CheckKeyPress(78)) then
             print("Currently at turn no.", turnOrderManagerComponent.turnCycleCounter)
         end
         
@@ -94,21 +79,20 @@ function S_TurnOrderManager(e)
             end
             print() -- print line break
 
-            -- TODO: sort all characters in turnQueue by remaining stamina (Selection Sort)//////////////
+            -- sort all characters in turnQueue by remaining stamina (Selection Sort)//////////////
             if (#turnOrderManagerComponent.turnQueue > 1) then 
-                
+                                
                 local arrayLength = #turnOrderManagerComponent.turnQueue
         
-                for i = 1, #turnOrderManagerComponent.turnQueue do
+                for i = 1, #turnOrderManagerComponent.turnQueue - 1 do
                     
-                    if (i < arrayLength - 1) then 
-                    
+                    if (i <= arrayLength) then 
+                                            
                         indexLargest = i
 
                         for j = i + 1, #turnOrderManagerComponent.turnQueue do
-                            if (j < arrayLength) then
-                                 if (GetEntityData(turnOrderManagerComponent.turnQueue[j]).id > GetEntityData(turnOrderManagerComponent.turnQueue[indexLargest]).id) then
-                                --if (GetComponent(turnOrderManagerComponent.turnQueue[j]).currentStamina > GetComponent(turnOrderManagerComponent.turnQueue[indexLargest]).currentStamina) then
+                            if (j <= arrayLength) then
+                                if (GetComponent(turnOrderManagerComponent.turnQueue[j], "C_Character").currentStamina > GetComponent(turnOrderManagerComponent.turnQueue[indexLargest], "C_Character").currentStamina) then
                                     indexLargest = j
                                 end
                             end
@@ -117,17 +101,15 @@ function S_TurnOrderManager(e)
                         temp = turnOrderManagerComponent.turnQueue[indexLargest]
                         turnOrderManagerComponent.turnQueue[indexLargest] = turnOrderManagerComponent.turnQueue[i]
                         turnOrderManagerComponent.turnQueue[i] = temp
-
                     end
                 end
             end
 
             print("Sorted queue:")
             for l = 1, #turnOrderManagerComponent.turnQueue do              
-                print(GetEntityData(turnOrderManagerComponent.turnQueue[l]).id)
+                print(l, EntityName(turnOrderManagerComponent.turnQueue[l]), GetEntityData(turnOrderManagerComponent.turnQueue[l]).id)
             end
             -- END OF SELECTION SORT/////////////////////////////////////////////////////////////////////
-
 
             -- reset to false so it doesn't keep running this chunk
             turnOrderManagerComponent.buildTurnQueue = false

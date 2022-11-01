@@ -47,6 +47,9 @@ namespace god
 			glm::vec3 const& camera_position ,
 			OGLTextureManager& textures ,
 			glm::vec3 const& camera_front );
+		void RenderGUI ( Scene& scene ,
+			glm::mat4 const& projection ,
+			OGLTextureManager& textures );
 
 		void  ResizeViewport ( int width , int height );
 
@@ -70,7 +73,7 @@ namespace god
 		OGLRenderPass<1>& BlurTexture ( unsigned int texture );
 		void RenderBlendTextures ( unsigned int texture1 , unsigned int texture2 );
 
-		std::vector<std::vector<OGLMesh>> getMesh() { return m_models; }
+		std::vector<std::vector<OGLMesh>> getMesh () { return m_models; }
 
 		// blur 
 		OGLRenderPass<1> m_blur_pingpong_1;
@@ -92,6 +95,7 @@ namespace god
 		OGLShader m_hdr_shader;
 		OGLShader m_blur_shader;
 		OGLShader m_blend_shader;
+		OGLShader m_2D_shader;
 
 		// hdr
 		OGLMesh m_square_mesh;

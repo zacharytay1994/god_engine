@@ -39,15 +39,6 @@ function S_RandomEventManager(e)
     -- getting TurnOrderManager entity and component
     local randomEventManagerEntity = GetEntity("RandomEventManager")
     local randomEventManagerComponent = GetComponent(randomEventManagerEntity, "C_RandomEventManager")
-
-    -- -- press C to check whether RandomEventManager is working
-    -- if (CheckKeyPress(67)) then
-    --     if (randomEventManagerComponent ~= nil) then
-    --         print("RandomEventManager is alive and well")  
-    --     else
-    --         print("ERROR: RandomEventManager is not working!!!")  
-    --     end
-    -- end
  
     -- getting GlobalStatemachine entity and component
     local globalStateMachineEntity = GetEntity("GlobalStatemachine")
@@ -57,14 +48,7 @@ function S_RandomEventManager(e)
 
     -- only run the rest of this script if globalStateMachine allows it
     if (globalStateMachineComponent.CurrentState == randomEventManagerComponent.RandomEventState) then
-            
-        -- press M to check whether the script passes the globalStateMachineComponent.CurrentState check
-        if (CheckKeyPress(77)) then
-            print("RandomEventManager script entered main chunk")
-            print("RandomProbability:", GenerateRandomProbability())
-            print("GenerateRandomNumberInRange(1, #randomEventList)", GenerateRandomNumberInRange(1, #randomEventManagerComponent.randomEventList))
-        end
-        
+             
         -- only allow random event if no other random event is occuring
         if (randomEventManagerComponent.currentEvent == nil) then
             print("\n[RandomEventManager - START]")
