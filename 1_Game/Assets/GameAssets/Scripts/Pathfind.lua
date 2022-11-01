@@ -36,10 +36,12 @@ function S_Pathfind(e)
                 else
                     pathfind.Path = false
                     pathfind.Timer = 0.0 
+                    -- print("#path <= 1, path not found")
                 end
             else
                 pathfind.Path = true
                 pathfind.Timer = 0.0
+                -- print("path not found")
             end
         end
     end
