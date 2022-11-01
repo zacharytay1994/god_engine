@@ -122,6 +122,9 @@
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_DynamicMesh.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIObject.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\GUI\ES_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Raycast.h" />
     <ClInclude Include="Physics\SnippetUtils.h" />
   </ItemGroup>

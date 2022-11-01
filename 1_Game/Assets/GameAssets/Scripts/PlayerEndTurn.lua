@@ -2,6 +2,9 @@
 -- Upon ending turn, this script will inform TurnOrderManager to switch to 
 -- the next character's turn. 
 
+-- TODO:
+-- 1) Implement player end turn button
+
 --[IsComponent]
 function C_PlayerEndTurn()
     local var = {

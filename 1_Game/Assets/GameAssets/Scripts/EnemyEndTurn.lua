@@ -4,7 +4,7 @@
 
 -- TODO:
 -- 1) Get enemy to its turn automatically after it has performed its turn.
---    Currently, the enemy's ends automatically after moving 1 tile.
+--    Currently, the enemy's ends automatically after it reaches a tile adjacent to the player.
 --    Will be implemented in a separate script.
 
 --[IsComponent]

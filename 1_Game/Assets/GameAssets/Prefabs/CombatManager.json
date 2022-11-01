@@ -1,0 +1,1 @@
+{"CombatManager":{"Type":"Default","Script Components":{"C_EnergyBolt":{"AttackName":"EnergyBolt"},"C_FrontJab":{"AttackName":"FrontJab"},"C_AttackList":{"AttackList":"AttackList"},"C_CombatManager":{"CombatManager":"CombatManager","attackListAttached":false}},"Engine Components":{},"Children":{}}}
