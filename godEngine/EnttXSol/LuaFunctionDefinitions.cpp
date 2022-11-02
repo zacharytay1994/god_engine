@@ -263,6 +263,9 @@ namespace god
 		entt.RegisterLuaFunction("SetTransformPosition",
 			[&entt, &engineResources](entt::entity e, float x, float y, float z)
 			{
+				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+					;
+
 				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
 				{
 					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)

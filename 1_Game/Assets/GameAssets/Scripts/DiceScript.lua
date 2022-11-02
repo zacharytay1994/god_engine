@@ -74,7 +74,7 @@ function DiceScript_RollDice(e, c_dice)
 	c_dice.rotation_x = GenerateRandomNumberInRange(0,360)
 	c_dice.rotation_y = GenerateRandomNumberInRange(0,360)
 	c_dice.rotation_z = GenerateRandomNumberInRange(0,360)
-	--AddForce(e, 1.0, 1.0, 1.0)
+	--AddForce(e, 100.0, 100.0, 100.0)
 	print(EntityName(Child(e, 1)))
 	--SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
 end
