@@ -11,7 +11,10 @@ function C_Player()
         Player = "Player",
 
         -- certain systems will run / not run based on currently selected action
-        selectedAction = nil
+        selectedAction = nil,
+
+        -- used by ButtonOnHoverPopup.lua to set button texture to empty after player uses the attack
+        playerAttacked = false
     };
     return function()
         return var

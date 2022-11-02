@@ -232,6 +232,9 @@ function S_PlayerAttack(e)
 
                         -- resetting FrontJab variable
                         selectedAttackComponent.canAttack = false
+
+                        -- setting cue to reset action button texture
+                        GetComponent(e, "C_Player").playerAttacked = true
                         
                         -- CombatManager will handle the rest of damage calculation and application     
 

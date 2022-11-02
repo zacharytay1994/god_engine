@@ -6,6 +6,8 @@ function C_UIManager()
         --[SerializeString]
         UIManager = "UIManager",
 
+        diceRolled = false,
+        
         diceHasZero = false,
 
         buttonActionsList = {}
@@ -23,42 +25,102 @@ function S_UIManager(e)
 
     local UIManagerComponent = GetComponent(e, "C_UIManager")
     
-    local diceList = EntitiesWithScriptComponent("C_DiceScript")
-    local bool = true
-    for i = 1, #diceList do
-        if (GetComponent(diceList[i], "C_DiceScript").is_rolling == true and GetComponent(diceList[i], "C_DiceScript").is_init) then
-            bool = false
-        end
+    -- Updating action buttons -----------------------------------------------------------------------------------------------------------
+    -- only update action buttons on the player's turn
+
+    local turnOrderManagerEntity = GetEntity("TurnOrderManager")
+    local turnOrderManagerComponent
+    if (turnOrderManagerEntity ~= -1) then
+        turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
     end
 
-    if (bool) then
-        
-        print("UIManagerComponent.diceHasZero == false")
-        
-        -- change the button textures
-        for j = 1, #diceList do
+    if (GetEntityData(GetEntity("Player")).id == turnOrderManagerComponent.currentTurn) then
+
+        -- if have not gotten proper values from dice
+        if (UIManagerComponent.diceRolled == false) then
             
-            currentDiceComponent = GetComponent(diceList[j], "C_DiceScript")
-
-            if (currentDiceComponent.value == 1 or currentDiceComponent.value == 2) then
-
-                UIManagerComponent.buttonActionsList[#UIManagerComponent.buttonActionsList + 1] = "FrontJab"
-
-            else
             
-                UIManagerComponent.buttonActionsList[#UIManagerComponent.buttonActionsList + 1] = "EnergyBolt"
+            local diceList = EntitiesWithScriptComponent("C_DiceScript")
+            local diceSettled = true
+            
+            -- print("UIManagerComponent.diceRolled == false")
 
+            -- if any die has a value of 0 then they have not properly settled down
+            for i = 1, #diceList do
+                if (GetComponent(diceList[i], "C_DiceScript").value == 0) then
+                    diceSettled = false
+                end
+            end
+            
+            -- press T
+            if (diceSettled) then
+                
+                UIManagerComponent.diceRolled = true
+                            
+                -- change the button textures
+                for j = 1, #diceList do
+                    
+                    currentDiceComponent = GetComponent(diceList[j], "C_DiceScript")
+
+                    -- print("[UIManager.lua] Dice value:", currentDiceComponent.value)
+                    
+                    if (currentDiceComponent.value == 1 or currentDiceComponent.value == 2 or currentDiceComponent.value == 3) then
+                        
+                        UIManagerComponent.buttonActionsList[#UIManagerComponent.buttonActionsList + 1] = "FrontJab"
+                        
+                    else
+                        
+                        UIManagerComponent.buttonActionsList[#UIManagerComponent.buttonActionsList + 1] = "EnergyBolt"
+                        
+                    end
+                end
+                
+                ChangeTexture(GetEntity("Button1"), UIManagerComponent.buttonActionsList[1])
+                ChangeTexture(GetEntity("Button2"), UIManagerComponent.buttonActionsList[2])
+                ChangeTexture(GetEntity("Button3"), UIManagerComponent.buttonActionsList[3])
+                --ChangeTexture(GetEntity("Button3"), UIManagerComponent.buttonActionsList[3])
+                
+                -- print(TextureName(GetEntity("Button1")))
+                
+                -- reset dice value to zero
+                for k = 1, #diceList do
+                    GetComponent(diceList[k], "C_DiceScript").value = 0
+                end
+                
             end
         end
 
-        ChangeTexture(GetEntity("Button1"), "Dice_Pink")
-        ChangeTexture(GetEntity("Button2"), "Dice_Pink")
-        ChangeTexture(GetEntity("Button3"), "Dice_Pink")
-        --ChangeTexture(GetEntity("Button3"), UIManagerComponent.buttonActionsList[3])
+    else
 
-        -- reset dice value to zero
+        -- if not the player's turn, then reset diceRolled
+        UIManagerComponent.diceRolled = false
+
+        -- reset the buttons
+        ChangeTexture(GetEntity("Button1"), "empty_btn")
+        ChangeTexture(GetEntity("Button2"), "empty_btn")
+        ChangeTexture(GetEntity("Button3"), "empty_btn")
 
     end
+    -- End of updating buttons -----------------------------------------------------------------------------------------------------------
+
+    -- Updating turn order icons ---------------------------------------------------------------------------------------------------------
+
+
+
+
+    -- End of updating turn order icons --------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 end
 
