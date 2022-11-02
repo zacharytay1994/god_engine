@@ -149,6 +149,26 @@ namespace god
 			}
 		);
 
+		// CheckLeftMousePress()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("CheckLeftMousePress",
+			[&engineResources]()->bool
+			{
+				auto& window = engineResources.Get<GLFWWindow>().get();
+				return window.MouseLPressed();
+			}
+		);
+
+		// CheckRightMousePress()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("CheckRightMousePress",
+			[&engineResources]()->bool
+			{
+				auto& window = engineResources.Get<GLFWWindow>().get();
+				return window.MouseRPressed();
+			}
+		);
+
 		// GenerateRandomProbability()
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "GenerateRandomProbability" ,

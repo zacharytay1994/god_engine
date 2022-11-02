@@ -16,7 +16,8 @@ namespace god
 	FMOD::ChannelGroup* AudioAPI::m_master_channel_group;
 	FMOD::SoundGroup* AudioAPI::m_master_sound_group;
 
-	std::vector<FMOD::Channel*> AudioAPI::m_channels;
+	//std::vector<FMOD::Channel*> AudioAPI::m_channels;
+	std::list<FMOD::Channel*> AudioAPI::m_channels;
 	std::unordered_map<int, FMOD::ChannelGroup*> AudioAPI::m_channel_groups;
 
 	std::unordered_map<int, const char*> AudioAPI::m_channel_group_names =
@@ -59,6 +60,21 @@ namespace god
 	void AudioAPI::Update()
 	{
 		m_FMOD_system->update();
+		
+		bool isPlaying = true;
+		FMOD::Channel* channel_ptr = nullptr;
+
+		for (auto& channel : m_channels)
+		{
+			channel->isPlaying(&isPlaying);
+			if (!isPlaying)
+			{
+				channel_ptr = channel;
+				break;
+			}
+		}
+
+		m_channels.remove(channel_ptr);
 	}
 
 	FMOD::ChannelGroup* AudioAPI::CreateChannelGroup(const char* name)
@@ -162,6 +178,13 @@ namespace god
 	void AudioAPI::StopSound(FMOD::Channel* channel)
 	{
 		channel->stop();
+	}
+
+	FMOD_RESULT AudioAPI::CheckSoundPlayback(FMOD::Channel* channel, bool* isPlaying)
+	{
+		channel->isPlaying(isPlaying);
+
+		return FMOD_OK;
 	}
 
 	void AudioAPI::StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)

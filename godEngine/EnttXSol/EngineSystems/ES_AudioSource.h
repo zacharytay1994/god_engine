@@ -16,6 +16,9 @@ namespace god
 		{
 			if (audio_source.m_channel != nullptr)
 			{
+				// check for playback state
+				AudioAPI::CheckSoundPlayback(audio_source.m_channel, &audio_source.m_finish_playing);
+
 				AudioAPI::SetMute(audio_source.m_channel, audio_source.m_mute);
 				AudioAPI::SetVolume(audio_source.m_channel, audio_source.m_volume);
 				AudioAPI::SetPitch(audio_source.m_channel, audio_source.m_pitch);
@@ -28,6 +31,7 @@ namespace god
 				AudioAPI::GLMVectorToFMODVector(glm::vec3(0.f), audio_source.m_velocity);
 
 				AudioAPI::SetSourceAttributes(audio_source.m_channel, &audio_source.m_position, &audio_source.m_velocity);
+
 			}
 		}
 	}

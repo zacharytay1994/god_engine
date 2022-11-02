@@ -26,10 +26,20 @@ namespace god
 
 				AudioAPI::SetLoop(sound, audio_source.m_loop);
 
-				if (audio_source.m_play_on_awake && !audio_source.m_played) // modify a bit to check for m_play_on_awake
+				if (audio_source.m_play_on_awake)
 				{
-					AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
+					if (!audio_source.m_awake_played)
+						AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_awake_played);
 				}
+				else
+				{
+					if (!audio_source.m_played)
+						AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
+				}
+				//if (audio_source.m_play_on_awake && !audio_source.m_played) // modify a bit to check for m_play_on_awake
+				//{
+				//	AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
+				//}
 			}
 		}
 
