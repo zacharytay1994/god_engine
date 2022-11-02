@@ -27,8 +27,8 @@ namespace god
 			"z" , &glm::ivec3::z );
 
 		// Camera
-		entt.RegisterLuaType<Camera>("Camera",
-			"position", &Camera::m_position);
+		entt.RegisterLuaType<Camera> ( "Camera" ,
+			"position" , &Camera::m_position );
 
 		// GetComponent(e,componentName)
 		// ==============================================================================================
@@ -53,7 +53,7 @@ namespace god
 				// potential area for optimization looking for entity of name
 				for ( uint32_t i = 0; i < entt.m_entities.Size (); ++i )
 				{
-					if ( entt.m_entities[ i ].m_name == entityName )
+					if ( entt.m_entities.Valid ( i ) && entt.m_entities[ i ].m_name == entityName )
 					{
 						return static_cast< int >( entt.m_entities[ i ].m_id );
 					}
@@ -151,28 +151,28 @@ namespace god
 
 		// GenerateRandomProbability()
 		// ==============================================================================================
-		entt.RegisterLuaFunction("GenerateRandomProbability",
+		entt.RegisterLuaFunction ( "GenerateRandomProbability" ,
 			[]()->float
 			{
-				return glm::linearRand(0.0f, 1.0f);
+				return glm::linearRand ( 0.0f , 1.0f );
 			}
 		);
 
 		// GenerateRandomNumberInRange(minValue, maxValue)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("GenerateRandomNumberInRange",
-			[]( int minValue, int maxValue)->int
+		entt.RegisterLuaFunction ( "GenerateRandomNumberInRange" ,
+			[]( int minValue , int maxValue )->int
 			{
-				return glm::linearRand(minValue, maxValue);
+				return glm::linearRand ( minValue , maxValue );
 			}
 		);
 
 		// srand()
 		// ==============================================================================================
-		entt.RegisterLuaFunction("srand",
+		entt.RegisterLuaFunction ( "srand" ,
 			[]()->void
 			{
-				srand(time(0));
+				srand ( time ( 0 ) );
 			}
 		);
 
@@ -215,36 +215,76 @@ namespace god
 		// RemoveInstance(e)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "RemoveInstance" ,
-			[&entt , &engineResources]( entt::entity e )
+			[&entt]( entt::entity e )
 			{
-				entt.RemoveEntity ( engineResources.Get<EntityGrid> ().get () , entt.GetEngineComponent<EntityData> ( e )->m_id );
+				entt.QueueDelete ( entt.GetEngineComponent<EntityData> ( e )->m_id );
+				//entt.RemoveEntity ( engineResources.Get<EntityGrid> ().get () , entt.GetEngineComponent<EntityData> ( e )->m_id );
 			}
 		);
 
 		// FindCameraObject()
 		// ==============================================================================================
-		entt.RegisterLuaFunction("FindCameraObject",
+		entt.RegisterLuaFunction ( "FindCameraObject" ,
 			[&engineResources]()->god::Camera&
 			{
-				return engineResources.Get<Camera>().get();
+				return engineResources.Get<Camera> ().get ();
 			}
 		);
 
 		// Sin(value)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("Sin",
-			[](float value)->float
+		entt.RegisterLuaFunction ( "Sin" ,
+			[]( float value )->float
 			{
-				return glm::sin(value);
+				return glm::sin ( value );
+			}
+		);
+
+		// Abs(value)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "Abs" ,
+			[]( float value )->float
+			{
+				return glm::abs ( value );
 			}
 		);
 
 		// EntityName(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("EntityName",
-			[&entt](entt::entity e)->std::string&
+		entt.RegisterLuaFunction ( "EntityName" ,
+			[&entt]( entt::entity e )->std::string&
 			{
-				return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_name;
+				return entt.m_entities[ entt.GetEngineComponent<EntityData> ( e )->m_id ].m_name;
+			}
+		);
+
+		// SetTransformPosition(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("SetTransformPosition",
+			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+			{
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				{
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setGlobalPose(ConvertToPhysXTransform({ x, y, z }, entt.GetEngineComponent<Transform>(e)->m_rotation));
+					}
+				}
+			}
+		);
+
+		// FreezeObject(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("FreezeObject",
+			[&entt, &engineResources](entt::entity e, bool freeze)
+			{
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				{
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, freeze);
+					}
+				}
 			}
 		);
 	}

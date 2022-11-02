@@ -15,9 +15,18 @@ namespace god
 		m_instanced_render_data[ data ].push_back ( transform );
 	}
 
+	void Scene::Add2DInstancedObject ( InstancedRenderData const& data , glm::mat4 const& transform )
+	{
+		m_2D_instanced_render_data[ data ].push_back ( transform );
+	}
+
 	void Scene::ClearInstancedScene ()
 	{
 		for ( auto& instance : m_instanced_render_data )
+		{
+			instance.second.clear ();
+		}
+		for ( auto& instance : m_2D_instanced_render_data )
 		{
 			instance.second.clear ();
 		}

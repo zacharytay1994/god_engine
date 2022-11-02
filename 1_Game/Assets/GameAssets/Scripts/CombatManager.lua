@@ -1,21 +1,23 @@
 -- How Combat will work:
 -- 1) Only one character will be able to attack at a time (i.e. during their turn).
--- 2) When a character wants to attack a target, its CharacterAttack script will have to pass 3 variables to CombatManager, which are the attacker entity, the target entity, and the attack type.
+-- 2) When a character wants to attack a target, its attack script will have to pass 3 variables to CombatManager, which are the attacker entity, the target entity, and the attack type.
 -- 3) CombatManager will then check if both the attacker and targer entities have the C_Character components before continuing.
--- 4) CombatManager will then calculate damage by referencing the AttackList (which will be stored in another script) and applying it into the damage equation.
+-- 4) CombatManager will then calculate damage.
 -- 5) The calculated damage will be temporarily stored in CombatManager.damage before it is deducted from the target's C_Character component.
 
--- Note: if something doesn't work, try changing attacker and target nil value to nil instead of -1
+-- Note: Player will have a PlayerAttack script, while each type of enemy will have a its own attack script (because they have different sets of attacks)
 
 -- TODO:
--- 1) Implement CharacterAttack script
--- 2) Implement AttackList script
+-- 1) Implement enemy attack scripts
 
 --[IsComponent]
 function C_CombatManager()
     local var = {
         --[SerializeString]
         CombatManager = "CombatManager",
+
+        --[SerializeBool]
+        attackListAttached = false,
 
         -- damage for current attack
         damage = 0,
@@ -26,19 +28,17 @@ function C_CombatManager()
         -- defending entity
         defender = -1,
 
-        -- attack type is a number corresponding to an attack in the AttackList script
-        -- 0 is nothing. the index starts from 1.
-        attackType = 0,
+        -- attack type is an array containing attack name, base damage, special property
+        attackType = nil,
 
         -- scales the damage of a critical hit
         critDamageMultiplier = 1.5,
 
-        -- calculate damage once per attack.
-        -- CharacterAttack script will use this variable as a sign to retrieve the calculated damage
-        damageCalculated = false,
+        -- set to true if player manages to pass the crit hit mini game
+        critSuccess = false,
 
         -- CharacterAttack script will be responsible for telling CombatManager to reset variables 
-        resetVariables = false
+        resetVariables = false,
     }
     return function()
         return var
@@ -54,54 +54,58 @@ function S_CombatManager(e)
         combatManagerComponent = GetComponent(combatManagerEntity, "C_CombatManager")
     end
 
+    if (GetComponent(combatManagerEntity, "C_AttackList") ~= nil) then
+        combatManagerComponent.attackListAttached = true
+    end
+
+    -- reset variables
     if (combatManagerComponent.resetVariables) then 
         combatManagerComponent.damage = 0
         combatManagerComponent.attacker = -1
         combatManagerComponent.defender = -1
-        combatManagerComponent.attackType = 0
-        combatManagerComponent.damageCalculated = false
+        combatManagerComponent.attackType = nil
         combatManagerComponent.resetVariables = false
     end
-    
-    -- calculate damage once per attack
-    if (combatManagerComponent.damageCalculated == false) then 
-    
-        -- only calculate damage if all the required components are available
-        if (combatManagerComponent.attacker ~= -1 and combatManagerComponent.defender ~= -1 and combatManagerComponent.attackType ~= 0) then
-            
-            local attackerCharacterComponent = GetComponent(attackerCharacterComponent, "C_Character")
-            local defenderCharacterComponent = GetComponent(defenderCharacterComponent, "C_Character")
 
-            -- checking if both the attacker and defender have the C_Character component
-            if (attackerCharacterComponent ~= nil and defenderCharacterComponent ~= nil) then 
-                
-                -- get attacker strength
-                local attackStrength = attackerCharacterComponent.strength
+    -- only calculate damage if all the required components are available
+    if (combatManagerComponent.attacker ~= -1 and combatManagerComponent.defender ~= -1 and combatManagerComponent.attackType ~= nil) then
+                    
+        print("[CombatManager.lua] CombatManager received all info, proceeding to calculate damage.")
+        
+        -- getting the attacker and defenders' C_Character components
+        local attackerCharacterComponent = GetComponent(combatManagerComponent.attacker, "C_Character")
+        local defenderCharacterComponent = GetComponent(combatManagerComponent.defender, "C_Character")
 
-                -- get defender defence
-                local defenderDefence = defenderCharacterComponent.defence
+        -- checking if both the attacker and defender have the C_Character component
+        if (attackerCharacterComponent ~= nil and defenderCharacterComponent ~= nil) then 
+                            
+            -- get attacker strength
+            local attackStrength = attackerCharacterComponent.strength
 
-                -- get attack type base damage
-                -- TODO
+            -- get defender defence
+            local defenderDefence = defenderCharacterComponent.defence
 
-                combatManagerComponent.damage = ((attackStrength --[[+ base damage]]) * combatManagerComponent.critDamageMultiplier) - defenderDefence
+            -- get attack type base damage
+            local baseDamage = combatManagerComponent.attackType[2]
 
-                combatManagerComponent.damageCalculated = true
+            -- calculate damage and print results
+            if (combatManagerComponent.critSuccess) then 
+                combatManagerComponent.damage = ((attackStrength + baseDamage) * combatManagerComponent.critDamageMultiplier) - defenderDefence
+                print("CombatManager.lua] [(", attackStrength, "+", baseDamage, ") *", combatManagerComponent.critDamageMultiplier, "] -", defenderDefence, "=", combatManagerComponent.damage)
+            else
+                combatManagerComponent.damage = (attackStrength + baseDamage) - defenderDefence
+                print("CombatManager.lua] (", attackStrength, "+", baseDamage, ") -", defenderDefence, "=", combatManagerComponent.damage)
             end
+
+            -- deduct defender's current HP
+            defenderCharacterComponent.currentHP = defenderCharacterComponent.currentHP - combatManagerComponent.damage
+            print("CombatManager.lua]", EntityName(combatManagerComponent.attacker), "dealt", combatManagerComponent.damage, "damage to", EntityName(combatManagerComponent.defender), ".\n")
+
+            -- resetting variables
+            combatManagerComponent.resetVariables = true
+
+        else
+            print("[CombatManager.lua] ERROR: Either the attacking entity or defending entity does not have C_Character component!!!")
         end
-    end 
+    end
 end
-
--- local bob_spin = GetComponent(e, "C_BobSpin")
-    -- local transform = GetTransform(e)
-    -- local dt = GetDeltaTime()
-    -- transform.rotation.y = transform.rotation.y + bob_spin.SpinRate * dt
-    -- bob_spin.BobCounter = bob_spin.BobCounter + bob_spin.BobRate * dt
-    -- transform.position.y = math.sin(bob_spin.BobCounter) / 2.0
-
-    -- if CheckKeyPress(65) then
-    --     InstancePrefabParented("DownArrow", e)
-    -- end
-    -- if CheckKeyPress(66) then
-    --     RemoveInstance(e)
-    -- end

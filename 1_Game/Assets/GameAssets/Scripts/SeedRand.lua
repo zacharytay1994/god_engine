@@ -1,4 +1,4 @@
--- This script will run seed rand() only once.
+-- This script will run seed rand() only once, at the start of the program.
 
 --[IsComponent]
 function C_SeedRand()
@@ -22,9 +22,14 @@ function S_SeedRand(e)
         seedRandComponent = GetComponent(seedRandEntity, "C_SeedRand")
     end
 
+    -- press V to check RandomProbability()
+    if (CheckKeyPress(86)) then
+        print("RandomProbability:", GenerateRandomProbability())
+    end
+
     if (seedRandComponent.seeded == false) then
         srand()
         seedRandComponent.seeded = true
-        print("seeded rand()")
+        print("[SeedRand.lua] Seeded rand().\n")
     end
 end

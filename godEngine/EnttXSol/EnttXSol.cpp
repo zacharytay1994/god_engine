@@ -109,6 +109,13 @@ namespace god
 			}
 			m_instance_queue.pop ();
 		}
+
+		auto& grid = engineResources.Get<EntityGrid> ().get ();
+		while ( !m_delete_queue.empty () )
+		{
+			RemoveEntity ( grid , m_delete_queue.front () );
+			m_delete_queue.pop ();
+		}
 	}
 
 	void EnttXSol::ClearEntt ( EngineResources& engineResources )
@@ -413,6 +420,11 @@ namespace god
 			}
 		}
 		return Entities::Null;
+	}
+
+	void EnttXSol::QueueDelete ( Entities::ID entity )
+	{
+		m_delete_queue.push ( entity );
 	}
 
 	void EnttXSol::RemoveEntity ( EntityGrid& grid , Entities::ID entity )
