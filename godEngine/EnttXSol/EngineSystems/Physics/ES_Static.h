@@ -17,6 +17,7 @@ namespace god
 		if (rigidstatic.p_RigidStatic)
 		{
 			rigidstatic.p_RigidStatic->setGlobalPose(ConvertToPhysXTransform(transform.m_position, transform.m_rotation));
+			
 		}
 		
 	}

@@ -5,13 +5,6 @@
 #include <assert.h>
 namespace god
 {
-
-
-
-
-
-
-	
 	PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
 		PxFilterObjectAttributes attributes1, PxFilterData filterData1,
 		PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
@@ -31,8 +24,6 @@ namespace god
 		return PxFilterFlag::eDEFAULT;
 	}
 
-
-
 	PhysicsSystem::PhysicsSystem() 
 	{
 		mRunning = false;
@@ -50,6 +41,7 @@ namespace god
 
 		std::cout << "Physics Constructed" << std::endl;
 	}
+
 	PhysicsSystem::~PhysicsSystem()
 	{
 		while (mRunning)
@@ -74,6 +66,7 @@ namespace god
 		mFoundation->release();
 		
 	}
+
 	void PhysicsSystem::Init(GLFWWindow* window, Camera* cam)
 	{
 		// Fouundation (required)
@@ -153,10 +146,7 @@ namespace god
 			const physx::PxContactPairHeader* pairHeader;
 			physx::PxU32 nbContactPairs;
 
-
 			mScene->fetchResultsStart(pairHeader, nbContactPairs, true);
-
-			
 
 			//Set up continuation task to be run after callbacks have been processed in parallel
 			callbackFinishTask.setContinuation(*mScene->getTaskManager(), NULL);
@@ -173,16 +163,12 @@ namespace god
 			Raycast();
 			mRunning = false;
 		#endif
-
-
-
-
-
 			
 		}
 
 
 	}
+
 	void PhysicsSystem::CreatePVD()
 	{
 		//PVD
@@ -258,4 +244,4 @@ namespace god
 
 
 
-}
+}//god

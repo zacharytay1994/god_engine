@@ -41,6 +41,8 @@ namespace god
 		{
 			rigiddynamic.p_RigidDynamic = nullptr;
 
+			
+
 			if (rigiddynamic.p_material == nullptr)
 			{
 				rigiddynamic.p_material = mPhysics->createMaterial(rigiddynamic.StaticFriction, rigiddynamic.DynamicFriction, rigiddynamic.Restitution);

@@ -3,13 +3,26 @@
 #include "PxPhysicsAPI.h"
 #include "PhysicUtils.h"
 #include "../PhysX/physx/snippets/snippetutils/SnippetUtils.h"
-
+#include <vector>
 namespace god
 {
 	using namespace physx;
 
 	class ContactReportCallback : public PxSimulationEventCallback
 	{
+	public:
+		ContactReportCallback()
+		{
+			mContacts.resize(64);
+		}
+		~ContactReportCallback() {}
+
+
+	private:
+
+
+		std::vector< PxContactPairPoint> mContacts;
+
 		void onConstraintBreak(PxConstraintInfo* constraints, PxU32 count) { PX_UNUSED(constraints); PX_UNUSED(count); }
 		void onWake(PxActor** actors, PxU32 count) { PX_UNUSED(actors); PX_UNUSED(count); }
 		void onSleep(PxActor** actors, PxU32 count) { PX_UNUSED(actors); PX_UNUSED(count); }
@@ -17,21 +30,26 @@ namespace god
 		void onAdvance(const PxRigidBody* const*, const PxTransform*, const PxU32) {}
 		void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 		{
-			PX_UNUSED((pairHeader));
+	/*		if ((pairHeader.actors[0] == mSubmarineActor) ||
+				(pairHeader.actors[1] == mSubmarineActor))
+			{
+
+			}*/
+
 			//Maximum of 64 vertices can be produced by contact gen
 			const PxU32 bufferSize = 64;
-			PxContactPairPoint contacts[bufferSize];
+			
 			for (PxU32 i = 0; i < nbPairs; i++)
 			{
 				const PxContactPair& cp = pairs[i];
 
-				PxU32 nbContacts = pairs[i].extractContacts(contacts, bufferSize);
+				PxU32 nbContacts = pairs[i].extractContacts( &mContacts.front(), bufferSize);
 				for (PxU32 j = 0; j < nbContacts; j++)
 				{
-					PxVec3 point = contacts[j].position;
-					PxVec3 impulse = contacts[j].impulse;
-					PxU32 internalFaceIndex0 = contacts[j].internalFaceIndex0;
-					PxU32 internalFaceIndex1 = contacts[j].internalFaceIndex1;
+					PxVec3 point = mContacts[j].position;
+					PxVec3 impulse = mContacts[j].impulse;
+					PxU32 internalFaceIndex0 = mContacts[j].internalFaceIndex0;
+					PxU32 internalFaceIndex1 = mContacts[j].internalFaceIndex1;
 					//...
 					//std::cout << "ContactReportCallback -> Point: " << point << std::endl;
 				}

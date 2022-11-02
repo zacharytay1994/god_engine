@@ -7,7 +7,7 @@ namespace god
 
 	/**
 	 * 
-	 * \param translation	Translatoon
+	 * \param translation	Translation
 	 * \param rotation		Rotation euler angle
 	 * \return 
 	 */
@@ -63,15 +63,26 @@ namespace god
 	}
 	glm::quat ConvertToGlmQuat(const physx::PxQuat& quat)
 	{
-
 		return glm::quat{quat.w, quat.x, quat.y, quat.z};
 	}
 
 
 
+	std::ostream& operator<<(std::ostream& os, const physx::PxVec2& v2)
+	{
+		os << v2.x << ',' << v2.y;
+		return os;
+	}
+
 	std::ostream& operator<<(std::ostream& os, const physx::PxVec3& v3)
 	{
 		os << v3.x << ',' << v3.y << ',' << v3.z;
+		return os;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const physx::PxVec4& v3)
+	{
+		os << v3.x << ',' << v3.y << ',' << v3.z << ','<<v3.w;
 		return os;
 	}
 
