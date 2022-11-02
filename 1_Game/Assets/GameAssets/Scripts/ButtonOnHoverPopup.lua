@@ -22,6 +22,10 @@ function S_ButtonOnHoverPopup(e)
         gui_object.size.y = gui_object.size.y * on_hover_popup.PopUpAmount
     end
 
+    if gui_object.pressed then
+        ChangeTexture(e, "White")
+    end
+
     if gui_object.exit then
         gui_object.size.x = on_hover_popup.InitialScaleX
         gui_object.size.y = on_hover_popup.InitialScaleY
