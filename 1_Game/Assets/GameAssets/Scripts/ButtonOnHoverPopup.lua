@@ -61,6 +61,14 @@ function S_ButtonOnHoverPopup(e)
 
         end
 
+        if (EntityName(e) == "EndTurnButton") then
+            -- only end the turn if it is actually the player's turn
+            if (GetComponent(GetEntity("TurnOrderManager"), "C_TurnOrderManager").currentTurn == GetEntityData(GetEntity("Player")).id) then
+                
+                -- signal turnOrderManager to move on to the next character's turn
+                GetComponent(GetEntity("TurnOrderManager"), "C_TurnOrderManager").nextTurn = true
+            end
+        end
     end
 
     if (on_hover_popup.buttonSelected == false) then 
