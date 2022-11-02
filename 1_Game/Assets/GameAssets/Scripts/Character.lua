@@ -51,6 +51,19 @@ function S_Character(e)
         -- getting this character's C_Character component
         local characterComponent = GetComponent(e, "C_Character")
 
+        -- press T to reset player stamina
+        if (CheckKeyPress(84) and EntityName(e) == "Player") then
+            characterComponent.currentStamina = characterComponent.maxStamina
+            print("Player's stamina refreshed! Back to", characterComponent.currentStamina)
+        end
+
+        -- press T to reset player stamina
+        if (CheckKeyPress(89)) then
+            GetComponent(GetEntity("MoveButton"), "C_ButtonOnHoverPopup").resetSize = true
+            GetComponent(e, "C_Player").selectedAction = nil
+            print("Releasing MoveButton. Player's selectedAction is:", GetComponent(e, "C_Player").selectedAction)
+        end
+
         -- breaks the game
         -- press K to remove enemy entity
         if (CheckKeyPress(75) and EntityName(e) == "Enemy") then

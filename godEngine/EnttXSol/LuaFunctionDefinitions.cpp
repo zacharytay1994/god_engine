@@ -360,6 +360,19 @@ namespace god
 			}
 		);
 
+		// TextureName(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("TextureName",
+			[&entt, &engineResources](entt::entity e)->std::string
+			{
+				Renderable3D* r = entt.GetEngineComponent<Renderable3D>(e);
+				if (r)
+				{
+					return engineResources.Get<OGLTextureManager>().get().GetName(r->m_diffuse_id);
+				}
+			}
+		);
+
 		// WorldPosition(e)
 		// ==============================================================================================
 		entt.RegisterLuaFunction("WorldPosition",

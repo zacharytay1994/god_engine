@@ -72,7 +72,7 @@ function S_SmallFastFish(e)
                 print("[SmallFastFish.lua] Player's HP before getting hit is", playerCharacterComponent.currentHP)
                 print("[SmallFastFish.lua] SmallFastFish attacks player!")
 
-                playerCharacterComponent.currentHP = playerCharacterComponent.currentHP - 2
+                playerCharacterComponent.currentHP = playerCharacterComponent.currentHP - 1
 
                 -- activate screenshake
                 print("triggering screenshake!")

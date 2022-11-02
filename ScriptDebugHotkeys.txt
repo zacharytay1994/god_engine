@@ -8,9 +8,6 @@ R - End current enemy's turn
 C - Print current character's stats and details
 X - print current character's grid location as well as global position
 
-[GlobalStatemachine debugging]
-Z - Print current state of GlobalStatemachine
-
 [TurnOrderManager debugging]
 M - Press to check the name and ID of the current active character
 N - Press to check which turn number we are at
@@ -33,4 +30,8 @@ J - Set Enemy HP to zero (the entity named "Enemy")
 K - Remove Enemy entity (the entity named "Enemy") (breaks the game)
 L - Remove TestSubject
 
-[Player Component debugging]
+
+[Cheats for presentation]
+T - Reset player stamina
+Y - Press to release the Move button
+Z - Immediately trigger earthquake

@@ -65,6 +65,12 @@ function S_RandomEventEarthquake(e)
     -- getting C_RandomEventEarthquake component
     local randomEventEarthquakeComponent = GetComponent(randomEventManagerEntity, "C_RandomEventEarthquake")
 
+    -- cheat for immediate earthquake
+    if (CheckKeyPress(90)) then
+        randomEventManagerComponent.currentEvent = randomEventEarthquakeComponent.RandomEvent
+        turnOrderManagerComponent.turnCycleCounter = randomEventEarthquakeComponent.earthquakeExecuteTurn
+    end
+
     -- only go on if RandomEventManager says the current event is an earthquake
     if (randomEventManagerComponent.currentEvent == randomEventEarthquakeComponent.RandomEvent) then 
             
@@ -78,7 +84,8 @@ function S_RandomEventEarthquake(e)
         if (randomEventEarthquakeComponent.earthquakeInitialized == false) then
             
             -- earthquakeExecuteTurn will be current turn number + eventCountdown
-            randomEventEarthquakeComponent.earthquakeExecuteTurn = turnOrderManagerComponent.turnCycleCounter + randomEventEarthquakeComponent.eventCountdown
+            -- randomEventEarthquakeComponent.earthquakeExecuteTurn = turnOrderManagerComponent.turnCycleCounter + randomEventEarthquakeComponent.eventCountdown
+            randomEventEarthquakeComponent.earthquakeExecuteTurn = turnOrderManagerComponent.turnCycleCounter
 
             -- storing the turn number of the turn where the earthquake was confirmed
             randomEventEarthquakeComponent.startOfCountdown = turnOrderManagerComponent.turnCycleCounter
