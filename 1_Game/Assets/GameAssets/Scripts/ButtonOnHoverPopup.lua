@@ -77,6 +77,9 @@ function S_ButtonOnHoverPopup(e)
         GetComponent(GetEntity("Player"), "C_Player").playerAttacked = false
         on_hover_popup.buttonSelected = false
 
+        gui_object.size.x = on_hover_popup.InitialScaleX
+        gui_object.size.y = on_hover_popup.InitialScaleY
+
     end
 
     if (on_hover_popup.resetSize) then
