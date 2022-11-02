@@ -25,7 +25,10 @@ function C_Character()
         defence = 10,
 
         -- set to true when character's HP hits zero. Makes TurnOrderManager skip this character's turn
-        isDead = false
+        isDead = false,
+
+        -- StateMoveEnemy will set this to true once it is finished. then the enemy-specific script will reset this.
+        moved = false
     };
     return function()
         return var

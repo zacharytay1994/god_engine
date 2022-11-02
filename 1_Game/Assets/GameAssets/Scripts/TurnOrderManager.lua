@@ -62,6 +62,14 @@ function S_TurnOrderManager(e)
         if (CheckKeyPress(78)) then
             print("Currently at turn no.", turnOrderManagerComponent.turnCycleCounter)
         end
+
+        -- if player is dead, don't do anything because the game is over
+        if (GetEntity("Player") == -1) then
+            
+            -- trigger any game over events here
+
+            return
+        end
         
         -- if starting a new turn cycle, build the turn queue 
         if (turnOrderManagerComponent.buildTurnQueue == true) then        
