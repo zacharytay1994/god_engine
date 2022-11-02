@@ -28,7 +28,9 @@ function C_TurnOrderManager()
         turnQueue = {},
 
         -- counts the number of turn cycles 
-        turnCycleCounter = 0
+        turnCycleCounter = 0,
+
+        refreshTurnOrderUI = false
     };
     return function()
         return var
@@ -152,6 +154,9 @@ function S_TurnOrderManager(e)
 
             -- reset to false so it doesn't keep running this chunk
             turnOrderManagerComponent.buildTurnQueue = false
+
+            -- cue UIManager to refresh the turn order icons 
+            turnOrderManagerComponent.refreshTurnOrderUI = true
 
             print("[TurnOrderManager.lua] End of building turnQueue.\n")
         end

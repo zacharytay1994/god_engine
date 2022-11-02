@@ -10,7 +10,11 @@ function C_UIManager()
         
         diceHasZero = false,
 
-        buttonActionsList = {}
+        buttonActionsList = {},
+
+        characterIconsInit = false,
+
+        iconList = {} 
     };
     return function()
         return var
@@ -104,8 +108,63 @@ function S_UIManager(e)
     -- End of updating buttons -----------------------------------------------------------------------------------------------------------
 
     -- Updating turn order icons ---------------------------------------------------------------------------------------------------------
+    -- if (UIManagerComponent.characterIconsInit == false) then
+    if (UIManagerComponent.characterIconsInit == false) then
+    
+        print("[UIManager.lua] Initialized character icons")
+        UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnOne")
+        UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnTwo")
+        UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnThree")
+        UIManagerComponent.characterIconsInit = true
+    end
 
+    local turnOrderManagerComponent = GetComponent(GetEntity("TurnOrderManager"), "C_TurnOrderManager")
 
+    if (turnOrderManagerComponent.refreshTurnOrderUI == true) then
+    
+        print("Refreshing turn order UI")
+        
+        for i = 1, #turnOrderManagerComponent.turnQueue do 
+        
+            if (EntityName(turnOrderManagerComponent.turnQueue[i]) == "Player") then
+                ChangeTexture(UIManagerComponent.iconList[i], "TritonTurn")
+
+            else
+                ChangeTexture(UIManagerComponent.iconList[i], "SquinkyTurn")
+            end
+        end
+
+        turnOrderManagerComponent.refreshTurnOrderUI = false
+    end
+
+    -- press I
+    if (CheckKeyPress(73)) then
+        ChangeTexture(GetEntity("TurnOne"), "TritonDark")
+
+    end
+
+    -- darken icon for idle characters
+    for k = 1, #UIManagerComponent.iconList do
+                   
+        -- print("turnOrderManagerComponent.queueIndex", turnOrderManagerComponent.queueIndex
+        -- print(k)
+        if (turnOrderManagerComponent.queueIndex == k) then
+        
+            if (TextureName(UIManagerComponent.iconList[k]) == "TritonDark") then
+                ChangeTexture(UIManagerComponent.iconList[k], "TritonTurn")
+            elseif (TextureName(UIManagerComponent.iconList[k]) == "SquinkyDark") then
+                ChangeTexture(UIManagerComponent.iconList[k], "SquinkyTurn")
+            end
+
+        else -- if not this char's turn, set to dark
+
+            if (TextureName(UIManagerComponent.iconList[k]) == "TritonTurn") then
+                ChangeTexture(UIManagerComponent.iconList[k], "TritonDark")
+            elseif (TextureName(UIManagerComponent.iconList[k]) == "SquinkyTurn") then
+                ChangeTexture(UIManagerComponent.iconList[k], "SquinkyDark")
+            end
+        end
+    end
 
 
     -- End of updating turn order icons --------------------------------------------------------------------------------------------------
