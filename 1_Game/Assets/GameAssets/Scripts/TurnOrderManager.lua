@@ -70,6 +70,10 @@ function S_TurnOrderManager(e)
 
             -- incrementing the turn counter
             turnOrderManagerComponent.turnCycleCounter = turnOrderManagerComponent.turnCycleCounter + 1
+
+            -- reset nextTurn
+            print("Resetting nextTurn!!!")
+            turnOrderManagerComponent.nextTurn = false
             
             -- adding all entities with C_Character script into the turnQueue and print result
             print("Entities added into turnQueue:")
@@ -105,9 +109,35 @@ function S_TurnOrderManager(e)
                 end
             end
 
+            -- push player to the front as much as possible (e.g. if a bunch of characters have 0 stamina, the player will go first among the 0-stamina-ers) ------------------------------------------            
+            local playerIndex = 0
+            for n = 1, #turnOrderManagerComponent.turnQueue do
+                if (turnOrderManagerComponent.turnQueue[n] == GetEntityData(GetEntity("Player")).id) then
+                    playerIndex = name
+                    break;
+                end
+            end
+
+            while ((playerIndex - 1) > 1) do
+                
+                if (GetComponent(turnOrderManagerComponent.turnQueue[playerIndex], "C_Character").currentStamina == GetComponent(turnOrderManagerComponent.turnQueue[playerIndex - 1], "C_Character").currentStamina) then
+                
+                    temp = turnOrderManagerComponent.turnQueue[playerIndex]
+                    turnOrderManagerComponent.turnQueue[playerIndex] = turnOrderManagerComponent.turnQueue[playerIndex - 1]
+                    turnOrderManagerComponent.turnQueue[playerIndex - 1] = temp
+
+                    playerIndex = playerIndex - 1
+                else
+                    break
+                end
+            end
+            -- end of pushing player to the front -----------------------------------------------------------------------------------------------------------------------------------------------------
+
+            -- print sort queue, and also refresh characters' stamina
             print("Sorted queue:")
             for l = 1, #turnOrderManagerComponent.turnQueue do              
                 print(l, EntityName(turnOrderManagerComponent.turnQueue[l]), GetEntityData(turnOrderManagerComponent.turnQueue[l]).id)
+                GetComponent(turnOrderManagerComponent.turnQueue[l], "C_Character").currentStamina = GetComponent(turnOrderManagerComponent.turnQueue[l], "C_Character").maxStamina
             end
             -- END OF SELECTION SORT/////////////////////////////////////////////////////////////////////
 
@@ -130,6 +160,9 @@ function S_TurnOrderManager(e)
 
             -- turnOrderManagerComponent.nextTurn will be toggled to true when the current active character ends their turn
             if (turnOrderManagerComponent.nextTurn == true) then
+                
+                print(EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "has set nextTurn to true")
+                
                 -- reset to false
                 turnOrderManagerComponent.nextTurn = false    
                 -- increment queueIndex (next character in turnQueue will become active)

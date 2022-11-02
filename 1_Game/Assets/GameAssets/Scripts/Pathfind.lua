@@ -1,3 +1,6 @@
+-- This script contains path finding algorithm for characters.
+-- Character stamina is also reduced as they walk.
+
 --[IsComponent]
 function C_Pathfind()
     local var = {
@@ -33,6 +36,17 @@ function S_Pathfind(e)
                     current_cell.z = path[2].z
                     -- print("found")
                     print(current_cell.x, current_cell.y, current_cell.z)
+
+                    -- reduce stamina by one for each step
+                    charComp = GetComponent(e, "C_Character")
+                    charComp.currentStamina = charComp.currentStamina - 1
+                    print("stamina after moving:", charComp.currentStamina)
+
+                    if (charComp.currentStamina <= 0) then
+                        pathfind.Path = false
+                        pathfind.Timer = 0.0
+                    end
+
                 else
                     pathfind.Path = false
                     pathfind.Timer = 0.0 

@@ -6,9 +6,8 @@
 
 -- TODO:
 -- 1) Allow the enemy to move along y-axis
--- 2) Decrease enemy stamina as they move
--- 3) Define different movement types (don't move, move beside player, move to a distance away from player)
--- 4) Before selecting the adjacent tile, need to check if it is empty first!!!
+-- 2) Define different movement types (don't move, move beside player, move to a distance away from player)
+-- 3)
 
 --[IsComponent]
 function C_StateMoveEnemy()
@@ -82,6 +81,7 @@ function S_StateMoveEnemy(e)
                         -- reset variables
                         stateMoveEnemyComponent.Time = 0.0
                         -- switch to next character's turn
+                        print("[nextTurn = true --- StateMoveEnemy line 85")
                         turnOrderManagerComponent.nextTurn = true
                         print("[StateEnemyMove] No suitable tiles to move to, staying still and ending turn")
                         print("[StateEnemyMove - END]\n\n")
@@ -102,9 +102,26 @@ function S_StateMoveEnemy(e)
                 pathfind.z = 0
 
                 -- switch to next character's turn
+                print("[nextTurn = true --- StateMoveEnemy line 106")
                 turnOrderManagerComponent.nextTurn = true
-
+                print("Destination reached!")
                 print("[StateEnemyMove - END]\n\n")
+            
+            elseif (GetComponent(e, "C_Character").currentStamina <= 0) then
+                
+                -- reset variables
+                stateMoveEnemyComponent.Time = 0.0
+                stateMoveEnemyComponent.startedPathfind = false
+                pathfind.x = 0
+                pathfind.y = 0
+                pathfind.z = 0
+
+                -- switch to next character's turn
+                print("[nextTurn = true --- StateMoveEnemy line 121")
+                turnOrderManagerComponent.nextTurn = true
+                print("Stamina depleted!")
+                print("[StateEnemyMove - END]\n\n")
+            
             end
         end
     end
@@ -255,6 +272,39 @@ function SuitableTile()
     -- if the code reaches here then it means all 8 tiles surrounding the player are occupied.
     -- the enemy will just stay still
     return nil
+end
+
+-- currently unused
+function CheckEnemyAdjacentToPlayer(enemy, player)
+    
+    -- init result
+    result = false
+
+    -- get attacker and defenders' locations
+    enemyGrid = GetGridCell(enemy)
+    playerGrid = GetGridCell(player)
+
+    if (enemyGrid.y == playerGrid.y) then 
+
+        -- enemy behind player
+        if     (enemyGrid.x == playerGrid.x and enemyGrid.z == playerGrid.z - 1) then
+            result = true 
+
+        -- enemy in front of player
+        elseif (enemyGrid.x == playerGrid.x and enemyGrid.z == playerGrid.z + 1) then
+            result = true 
+
+        -- enemy to player's left
+        elseif (enemyGrid.z == playerGrid.z and enemyGrid.x == playerGrid.x - 1) then
+            result = true 
+
+        -- enemy to player's right
+        elseif (enemyGrid.z == playerGrid.z and enemyGrid.x == playerGrid.x + 1) then
+            result = true  
+        end
+    end
+
+    return result
 end
 
 -- function S_StateMoveEnemy(e)
