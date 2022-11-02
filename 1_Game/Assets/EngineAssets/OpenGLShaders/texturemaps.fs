@@ -96,7 +96,8 @@ struct sFogParameters
 uniform sFogParameters uFogParams;
 
 // tint
-uniform vec4 tint;
+uniform vec4 uTint;
+uniform bool uIsTint = false;
 
 float light_max_distance = 5.0f;
 float gamma = 2.2;
@@ -314,10 +315,13 @@ void main()
 
     output_color += vec4(caustic_color,1.0);
     
-    output_color = vec4(output_color.x+((1-output_color.x)*tint.x),
-                        output_color.y+((1-output_color.y)*tint.y), 
-                        output_color.z+((1-output_color.z)*tint.z),
-                        output_color.w+((1-output_color.w)*tint.w));
+    if(uIsTint)
+    {
+    output_color = vec4(output_color.x+((1-output_color.x)*uTint.x),
+                        output_color.y+((1-output_color.y)*uTint.y), 
+                        output_color.z+((1-output_color.z)*uTint.z),
+                        output_color.w+((1-output_color.w)*uTint.w));
+    }
 
     fFragColor = output_color   ;
 }

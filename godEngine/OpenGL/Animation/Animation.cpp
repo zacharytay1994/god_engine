@@ -7,15 +7,15 @@ namespace god
 		Animation::Animation( const std::string& animationPath, Model* model )
 		{
 			Assimp::Importer importer;
-			const aiScene* scene = importer.ReadFile( animationPath, aiProcess_Triangulate );
-			//const aiScene* scene = importer.ReadFile( animationPath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs );
+			//const aiScene* scene = importer.ReadFile( animationPath, aiProcess_Triangulate );
+			const aiScene* scene = importer.ReadFile( animationPath, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs );
 			assert( scene );
 			assert( scene->mRootNode );
 			assert( scene->HasAnimations() );
 
 			if ( scene )
 			{
-				std::cout << "This" << animationPath << "has anim" << scene->HasAnimations() << std::endl;
+				std::cout << "This " << animationPath << " has animation : " << scene->HasAnimations() << std::endl;
 				auto animation = scene->mAnimations[0];
 				m_Duration = animation->mDuration;
 				m_TicksPerSecond = animation->mTicksPerSecond;

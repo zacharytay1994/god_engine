@@ -125,6 +125,11 @@ namespace god
 		Animation3D::Animation m_animation_dance;
 		Animation3D::Animator m_animator;
 
+		//Temperory hard coded 
+		/* May god forgive my sin !*/
+		// To change the speed go to constructor OpenGL() , line 200
+		float shark_temp_x{  };
+		bool shark_start{ false };
 	};
 
 	template<size_t N>

@@ -40,9 +40,9 @@ namespace god
 			// read file via ASSIMP
 			Assimp::Importer importer;
 			//const aiScene* scene = importer.ReadFile( path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace );
-			
-			const aiScene* scene = importer.ReadFile( path, aiProcess_Triangulate | aiProcess_GenSmoothNormals |aiProcess_FlipUVs ); //--
-			
+
+			const aiScene* scene = importer.ReadFile( path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs ); //--
+
 			// check for errors
 			if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode ) // if is Not Zero
 			{
@@ -110,12 +110,30 @@ namespace god
 
 				vertices.push_back( vertex );
 			}
+
 			for ( unsigned int i = 0; i < mesh->mNumFaces; i++ )
 			{
 				aiFace face = mesh->mFaces[i];
 				for ( unsigned int j = 0; j < face.mNumIndices; j++ )
 					indices.push_back( face.mIndices[j] );
 			}
+
+			// if no normals, generate some
+			for ( int i = 0; i < indices.size(); i += 3 )
+			{
+				auto& v1 = vertices[indices[i]];
+				auto& v2 = vertices[indices[i + 1]];
+				auto& v3 = vertices[indices[i + 2]];
+
+				auto edge1 = v1.Position - v2.Position;
+				auto edge2 = v3.Position - v2.Position;
+
+				auto normal = glm::normalize( glm::cross( edge2, edge1 ) );
+				v1.Normal = normal;
+				v2.Normal = normal;
+				v3.Normal = normal;
+			}
+
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 			vector<Texture> diffuseMaps = loadMaterialTextures( material, aiTextureType_DIFFUSE, "texture_diffuse" );
