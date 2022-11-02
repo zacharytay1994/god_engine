@@ -40,7 +40,7 @@ function S_Pathfind(e)
                     -- reduce stamina by one for each step
                     charComp = GetComponent(e, "C_Character")
                     charComp.currentStamina = charComp.currentStamina - 1
-                    print("stamina after moving:", charComp.currentStamina)
+                    print("[Pathfind.lua] Stamina after moving:", charComp.currentStamina)
 
                     if (charComp.currentStamina <= 0) then
                         pathfind.Path = false

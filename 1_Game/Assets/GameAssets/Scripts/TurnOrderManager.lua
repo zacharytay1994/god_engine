@@ -66,17 +66,17 @@ function S_TurnOrderManager(e)
         -- if starting a new turn cycle, build the turn queue 
         if (turnOrderManagerComponent.buildTurnQueue == true) then        
 
-            print("\n[TurnOrderManager: buildTurnQueue - START]")
+            print("[TurnOrderManager.lua] Start of building turnQueue")
 
             -- incrementing the turn counter
             turnOrderManagerComponent.turnCycleCounter = turnOrderManagerComponent.turnCycleCounter + 1
 
             -- reset nextTurn
-            print("Resetting nextTurn!!!")
+            -- print("Resetting nextTurn!!!")
             turnOrderManagerComponent.nextTurn = false
             
             -- adding all entities with C_Character script into the turnQueue and print result
-            print("Entities added into turnQueue:")
+            print("[TurnOrderManager.lua] Entities added into turnQueue:")
             turnOrderManagerComponent.turnQueue = EntitiesWithScriptComponent("C_Character")
             for k = 1, #turnOrderManagerComponent.turnQueue do              
                 print(GetEntityData(turnOrderManagerComponent.turnQueue[k]).id)
@@ -110,10 +110,11 @@ function S_TurnOrderManager(e)
             end
 
             -- push player to the front as much as possible (e.g. if a bunch of characters have 0 stamina, the player will go first among the 0-stamina-ers) ------------------------------------------            
+            print("[TurnOrderManager.lua] Pushing player to the front.")
             local playerIndex = 0
             for n = 1, #turnOrderManagerComponent.turnQueue do
                 if (turnOrderManagerComponent.turnQueue[n] == GetEntityData(GetEntity("Player")).id) then
-                    playerIndex = name
+                    playerIndex = n
                     break;
                 end
             end
@@ -134,7 +135,7 @@ function S_TurnOrderManager(e)
             -- end of pushing player to the front -----------------------------------------------------------------------------------------------------------------------------------------------------
 
             -- print sort queue, and also refresh characters' stamina
-            print("Sorted queue:")
+            print("[TurnOrderManager.lua] Sorted queue:")
             for l = 1, #turnOrderManagerComponent.turnQueue do              
                 print(l, EntityName(turnOrderManagerComponent.turnQueue[l]), GetEntityData(turnOrderManagerComponent.turnQueue[l]).id)
                 GetComponent(turnOrderManagerComponent.turnQueue[l], "C_Character").currentStamina = GetComponent(turnOrderManagerComponent.turnQueue[l], "C_Character").maxStamina
@@ -144,7 +145,7 @@ function S_TurnOrderManager(e)
             -- reset to false so it doesn't keep running this chunk
             turnOrderManagerComponent.buildTurnQueue = false
 
-            print("[TurnOrderManager: buildTurnQueue - END]\n\n")
+            print("[TurnOrderManager.lua] End of building turnQueue.\n")
         end
      
         -- while there are still characters who have not taken their turn for this cycle
@@ -161,7 +162,7 @@ function S_TurnOrderManager(e)
             -- turnOrderManagerComponent.nextTurn will be toggled to true when the current active character ends their turn
             if (turnOrderManagerComponent.nextTurn == true) then
                 
-                print(EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "has set nextTurn to true")
+                print("[TurnOrderManager.lua]", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "has set nextTurn to true.")
                 
                 -- reset to false
                 turnOrderManagerComponent.nextTurn = false    
@@ -169,7 +170,7 @@ function S_TurnOrderManager(e)
                 turnOrderManagerComponent.queueIndex = turnOrderManagerComponent.queueIndex + 1
 
                 if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
-                    print("[TurnOrderManager] It is now", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "turn!")
+                    print("[TurnOrderManager.lua] It is now", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "turn.")
                     turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
                 end
 
@@ -180,20 +181,18 @@ function S_TurnOrderManager(e)
             turnOrderManagerComponent.queueIndex = 1
             turnOrderManagerComponent.currentTurn = 0
 
-            -- remove all the fucking dead characters
-            print("Removing dead characters")
+            -- remove all the dead characters
+            print("[TurnOrderManager.lua] Removing dead characters.")
             characterList = EntitiesWithScriptComponent("C_Character")
             for m = 1, #characterList do
                 if (GetComponent(characterList[m], "C_Character").isDead) then
-                    print("character removed")
+                    print("[TurnOrderManager.lua]", EntityName(characterList[m]), GetEntityData(characterList[m]).id , "removed.")
                     RemoveInstance(characterList[m])
                 end
             end
 
             globalStateMachineComponent.CurrentState = "StateRandomEvent"
-            print("\n[TurnOrderManager - END]")
-            print("CurrentState = StateRandomEvent")
-            print("[TurnOrderManager - END]\n\n")
+            print("[TurnOrderManager.lua] Setting globalStatemachine to StateRandomEvent.")
         end
     end
 end
