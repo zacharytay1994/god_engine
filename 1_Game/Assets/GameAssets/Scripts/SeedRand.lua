@@ -30,6 +30,6 @@ function S_SeedRand(e)
     if (seedRandComponent.seeded == false) then
         srand()
         seedRandComponent.seeded = true
-        print("seeded rand()")
+        print("[SeedRand.lua] Seeded rand().\n")
     end
 end

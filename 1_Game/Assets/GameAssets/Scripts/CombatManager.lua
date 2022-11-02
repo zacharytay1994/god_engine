@@ -70,7 +70,7 @@ function S_CombatManager(e)
     -- only calculate damage if all the required components are available
     if (combatManagerComponent.attacker ~= -1 and combatManagerComponent.defender ~= -1 and combatManagerComponent.attackType ~= nil) then
                     
-        print("CombatManager received all info, proceeding to calculate damage")
+        print("[CombatManager.lua] CombatManager received all info, proceeding to calculate damage.")
         
         -- getting the attacker and defenders' C_Character components
         local attackerCharacterComponent = GetComponent(combatManagerComponent.attacker, "C_Character")
@@ -91,21 +91,21 @@ function S_CombatManager(e)
             -- calculate damage and print results
             if (combatManagerComponent.critSuccess) then 
                 combatManagerComponent.damage = ((attackStrength + baseDamage) * combatManagerComponent.critDamageMultiplier) - defenderDefence
-                print("[(", attackStrength, "+", baseDamage, ") *", combatManagerComponent.critDamageMultiplier, "] -", defenderDefence, "=", combatManagerComponent.damage)
+                print("CombatManager.lua] [(", attackStrength, "+", baseDamage, ") *", combatManagerComponent.critDamageMultiplier, "] -", defenderDefence, "=", combatManagerComponent.damage)
             else
                 combatManagerComponent.damage = (attackStrength + baseDamage) - defenderDefence
-                print("(", attackStrength, "+", baseDamage, ") -", defenderDefence, "=", combatManagerComponent.damage)
+                print("CombatManager.lua] (", attackStrength, "+", baseDamage, ") -", defenderDefence, "=", combatManagerComponent.damage)
             end
 
             -- deduct defender's current HP
             defenderCharacterComponent.currentHP = defenderCharacterComponent.currentHP - combatManagerComponent.damage
-            print(EntityName(combatManagerComponent.attacker), "dealt", combatManagerComponent.damage, "damage to", EntityName(combatManagerComponent.defender), "\n\n")
+            print("CombatManager.lua]", EntityName(combatManagerComponent.attacker), "dealt", combatManagerComponent.damage, "damage to", EntityName(combatManagerComponent.defender), ".\n")
 
             -- resetting variables
             combatManagerComponent.resetVariables = true
 
         else
-            print("[CombatManager.lua] ERROR: Either the attacking entity or defending entity does have C_Character component!!!")
+            print("[CombatManager.lua] ERROR: Either the attacking entity or defending entity does not have C_Character component!!!")
         end
     end
 end

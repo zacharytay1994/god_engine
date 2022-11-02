@@ -47,7 +47,7 @@ function S_PlayerAttack(e)
                   
             -- resetting variables
             if (playerAttackComponent.resetVariables) then 
-                print("[PlayerAttack.lua] Resetting variables!!!\n")
+                print("[PlayerAttack.lua] Resetting variables!\n")
                 playerAttackComponent.selectedAttack = nil
                 playerAttackComponent.targetEntity = nil
                 playerAttackComponent.attackCheckTriggered = false
@@ -64,7 +64,7 @@ function S_PlayerAttack(e)
                 if (attackListComponent ~= nil) then
                     attackList = attackListComponent.attackList
                 else
-                    print("[PlayerAttack.lua] ERROR: attackListComponent is nil!!!")
+                    print("[PlayerAttack.lua] ERROR: attackListComponent is nil.")
                 end    
             end 
 
@@ -83,7 +83,7 @@ function S_PlayerAttack(e)
             -- press 1 to select Front Jab (Blue)
             if (CheckKeyPress(49)) then
                 playerAttackComponent.selectedAttack = attackList[1]
-                print("\n[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
                       "Base damage:", playerAttackComponent.selectedAttack[2], 
                       "Special property:", playerAttackComponent.selectedAttack[3], "\n")
             end
@@ -120,7 +120,7 @@ function S_PlayerAttack(e)
                 end
 
                 if (enemyRemaining == false) then
-                    print("all enemies are dead!")
+                    print("[PlayerAttack.lua] No enemies to target, all enemies are dead!")
                 else
 
                     if (playerAttackComponent.enemyCycle > #enemyList) then
@@ -141,7 +141,7 @@ function S_PlayerAttack(e)
                     playerAttackComponent.enemyCycle = playerAttackComponent.enemyCycle + 1
                 end
 
-                print("Currently target enemy is:", EntityName(playerAttackComponent.targetEntity), "ID no.", GetEntityData(playerAttackComponent.targetEntity).id)
+                print("[PlayerAttack.lua] Currently target enemy is:", EntityName(playerAttackComponent.targetEntity), "ID no.", GetEntityData(playerAttackComponent.targetEntity).id)
             end
             -- end of selecting target ---------------------------------------------------------------------------------
 
@@ -150,7 +150,7 @@ function S_PlayerAttack(e)
                         
                 -- check whether player is able to attack the enemy (within range / no obstructions / etc) --------------
                 if (playerAttackComponent.attackCheckTriggered == false) then
-                    print("playerAttackComponent.attackCheckTriggered == false")
+                    -- print("[PlayerAttack.lua] playerAttackComponent.attackCheckTriggered == false")
                     selectedAttackComponent = GetComponent(combatManagerEntity, playerAttackComponent.selectedAttack[4])
                     selectedAttackComponent.attacker = e
                     selectedAttackComponent.defender = playerAttackComponent.targetEntity
@@ -169,7 +169,7 @@ function S_PlayerAttack(e)
                         combatManagerComponent.attacker = e
                         combatManagerComponent.attackType = playerAttackComponent.selectedAttack
                         combatManagerComponent.defender = playerAttackComponent.targetEntity
-                        print("PlayerAttack.lua ---> CombatManager.lua")
+                        print("[PlayerAttack.lua] PlayerAttack.lua ---> CombatManager.lua")
 
                         -- resetting FrontJab variable
                         selectedAttackComponent.canAttack = false
