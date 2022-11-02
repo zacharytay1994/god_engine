@@ -80,69 +80,128 @@ function S_PlayerAttack(e)
             end
 
             -- select an attack ----------------------------------------------------------------------------------
-            -- press 1 to select Front Jab (Blue)
-            if (CheckKeyPress(49)) then
-                playerAttackComponent.selectedAttack = attackList[1]
-                print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
-                      "Base damage:", playerAttackComponent.selectedAttack[2], 
-                      "Special property:", playerAttackComponent.selectedAttack[3], "\n")
-            end
+            local playerComponent = GetComponent(e, "C_Player")
 
-            -- -- press 2 to select Big Swing (Blue)
-            -- if (CheckKeyPress(50)) then
-            --     playerAttackComponent.selectedAttack = attackList[4]
-            --     print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
-            --           "Base damage:", playerAttackComponent.selectedAttack[2], 
-            --           "Special property:", playerAttackComponent.selectedAttack[3], "\n")
-            -- end
+            if (CheckKeyPress(49) or CheckKeyPress(50) or CheckKeyPress(51)) then
+                -- -- press 1 to select Front Jab (Blue)
+                -- if (CheckKeyPress(49)) then
+                --     playerAttackComponent.selectedAttack = attackList[1]
+                --     print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                --           "Base damage:", playerAttackComponent.selectedAttack[2], 
+                --           "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+                -- end
+                if (playerComponent.selectedAction == "FrontJab") then
+                    playerAttackComponent.selectedAttack = attackList[1]
+                    print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                        "Base damage:", playerAttackComponent.selectedAttack[2], 
+                        "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+                end
 
-            -- press 3 to select Energy Bolt (Blue)
-            if (CheckKeyPress(51)) then
-                playerAttackComponent.selectedAttack = attackList[10]
-                print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
-                      "Base damage:", playerAttackComponent.selectedAttack[2], 
-                      "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+                -- -- press 2 to select Big Swing (Blue)
+                -- if (CheckKeyPress(50)) then
+                --     playerAttackComponent.selectedAttack = attackList[4]
+                --     print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                --           "Base damage:", playerAttackComponent.selectedAttack[2], 
+                --           "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+                -- end
+                -- if (playerComponent.selectedAction == "BigSwing") then
+                --     playerAttackComponent.selectedAttack = attackList[4]
+                --     print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                --           "Base damage:", playerAttackComponent.selectedAttack[2], 
+                --           "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+                -- end
+
+                -- press 3 to select Energy Bolt (Blue)
+                -- if (CheckKeyPress(51)) then
+                --     playerAttackComponent.selectedAttack = attackList[10]
+                --     print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                --           "Base damage:", playerAttackComponent.selectedAttack[2], 
+                --           "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+                -- end
+                if (playerComponent.selectedAction == "EnergyBolt") then
+                    playerAttackComponent.selectedAttack = attackList[10]
+                    print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                        "Base damage:", playerAttackComponent.selectedAttack[2], 
+                        "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+                end
             end
             -- end of selecting attack ---------------------------------------------------------------------------------
         
             -- select a target -----------------------------------------------------------------------------------------
-            -- press 4 to cycle through enemy targets
-            if (CheckKeyPress(52)) then 
+            if (playerComponent.selectedAction ~= "Move") then
                 
-                local enemyList = EntitiesWithScriptComponent("C_StateMoveEnemy")
-                local enemyRemaining = false
+                local gridManipulateEntity = GetEntity("GridManipulate")
+                    
+                if (gridManipulateEntity ~= -1) then
+                    
+                    local gridManipulateComponent = GetGridManipulate(gridManipulateEntity)
+                    
+                    if (gridManipulateComponent.clicked) then
+                        
+                        -- note: last_clicked_cell.y will +1 automatically, so need to minus one first
+                        local enemyGridx = gridManipulateComponent.last_clicked_cell.x
+                        local enemyGridy = gridManipulateComponent.last_clicked_cell.y - 1
+                        local enemyGridz = gridManipulateComponent.last_clicked_cell.z
 
-                for i = 1, #enemyList do
-                    if (GetComponent(enemyList[i], "C_Character").isDead == false) then
-                        enemyRemaining = true
-                        break
-                    end
-                end
+                        local characterList = EntitiesWithScriptComponent("C_Character")
 
-                if (enemyRemaining == false) then
-                    print("[PlayerAttack.lua] No enemies to target, all enemies are dead!")
-                else
+                        for i = 1, #characterList do
+                        
+                            -- skip the player
+                            if (EntityName(characterList[i]) ~= "Player") then
+                            
+                                local currentEntityGridCell = GetGridCell(characterList[i])
 
-                    if (playerAttackComponent.enemyCycle > #enemyList) then
-                        playerAttackComponent.enemyCycle = 1
-                    end
-
-                    while (GetComponent(enemyList[playerAttackComponent.enemyCycle], "C_Character").isDead == true) do
-                        playerAttackComponent.enemyCycle = playerAttackComponent.enemyCycle + 1
-
-                        if (playerAttackComponent.enemyCycle > #enemyList) then
-                            playerAttackComponent.enemyCycle = 1
+                                if (currentEntityGridCell.x == enemyGridx and currentEntityGridCell.y == enemyGridy and currentEntityGridCell.z == enemyGridz) then
+                                    print("Selected target:", EntityName(characterList[i]), GetEntityData(characterList[i]).id)
+                                    playerAttackComponent.targetEntity = characterList[i]
+                                    break
+                                end
+                            end
                         end
                     end
-
-                    -- target the next enemy in the list
-                    playerAttackComponent.targetEntity = enemyList[playerAttackComponent.enemyCycle]
-
-                    playerAttackComponent.enemyCycle = playerAttackComponent.enemyCycle + 1
+                else
+                    print("[PlayerAttack.lua] ERROR: GridManipulate entity does not exist!")
                 end
-
-                print("[PlayerAttack.lua] Currently target enemy is:", EntityName(playerAttackComponent.targetEntity), "ID no.", GetEntityData(playerAttackComponent.targetEntity).id)
             end
+            
+            -- press 4 to cycle through enemy targets
+            -- if (CheckKeyPress(52)) then 
+                
+            --     local enemyList = EntitiesWithScriptComponent("C_StateMoveEnemy")
+            --     local enemyRemaining = false
+
+            --     for i = 1, #enemyList do
+            --         if (GetComponent(enemyList[i], "C_Character").isDead == false) then
+            --             enemyRemaining = true
+            --             break
+            --         end
+            --     end
+
+            --     if (enemyRemaining == false) then
+            --         print("[PlayerAttack.lua] No enemies to target, all enemies are dead!")
+            --     else
+
+            --         if (playerAttackComponent.enemyCycle > #enemyList) then
+            --             playerAttackComponent.enemyCycle = 1
+            --         end
+
+            --         while (GetComponent(enemyList[playerAttackComponent.enemyCycle], "C_Character").isDead == true) do
+            --             playerAttackComponent.enemyCycle = playerAttackComponent.enemyCycle + 1
+
+            --             if (playerAttackComponent.enemyCycle > #enemyList) then
+            --                 playerAttackComponent.enemyCycle = 1
+            --             end
+            --         end
+
+            --         -- target the next enemy in the list
+            --         playerAttackComponent.targetEntity = enemyList[playerAttackComponent.enemyCycle]
+
+            --         playerAttackComponent.enemyCycle = playerAttackComponent.enemyCycle + 1
+            --     end
+
+            --     print("[PlayerAttack.lua] Currently target enemy is:", EntityName(playerAttackComponent.targetEntity), "ID no.", GetEntityData(playerAttackComponent.targetEntity).id)
+            -- end
             -- end of selecting target ---------------------------------------------------------------------------------
 
             -- if attack type and attack target are chosen, then initiate combat
