@@ -12,11 +12,13 @@ namespace god
 		int m_channel_group_id{ 0 }; // to seperate sounds into different categories
 
 		int m_sound_id{ -1 };
-		bool m_played{ false };
+		bool m_played{ true };
 
 		bool m_mute{ false };
 		bool m_loop{ false };
 		bool m_play_on_awake{ true };
+
+		bool m_awake_played{ false };
 
 		float m_volume{ 1.f };
 		float m_pitch{ 1.f };
