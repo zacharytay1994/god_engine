@@ -45,6 +45,9 @@ function S_DiceScript(e)
 	if(CheckKeyPress(79) == true) then
 		DiceScript_RollDice(e, c_dice)
 		return
+	elseif(CheckKeyPress(80) == true) then
+		DiceScript_DisableDice(e, c_dice)
+		return
 	end
 	
 	local transform = GetTransform(e)
@@ -105,6 +108,7 @@ end
 
 function DiceScript_RollDice(e, c_dice)
 	c_dice.is_rolling = true
+	FreezeObject(e, false)
 	local transform = GetTransform(e)
 	transform.rotation.x = GenerateRandomNumberInRange(0,360)
 	transform.rotation.y = GenerateRandomNumberInRange(0,360)
@@ -116,5 +120,6 @@ end
 
 function DiceScript_DisableDice(e, c_dice)
 	c_dice.is_rolling = false
-	--FreezeObject(e, true)
+	FreezeObject(e, true)
+	SetTransformPosition(e, 999, 999, 999)
 end
