@@ -30,7 +30,7 @@ function C_FrontJab()
         canAttack = false,
         
         -- error message (why the attack failed)
-        errorMessage = "[AttackFrontJab.lua] Player not adjacent to enemy!!!",
+        errorMessage = "[AttackFrontJab.lua] Player not adjacent to enemy.",
         
         -- used to turn player to face the target
         playerRotation = 0
@@ -54,7 +54,7 @@ function S_FrontJab(e)
 
         if (attackComponent.attacker == -1 or attackComponent.defender == -1) then 
 
-            print("[AttackFrontJab.lua] Either attacker or defender is -1! Script stops here!")
+            print("[AttackFrontJab.lua] ERROR: Either attacker or defender is -1.")
 
         else
             
@@ -67,7 +67,7 @@ function S_FrontJab(e)
             else
                 
                 -- failed the check, print fail message
-                print("[AttackFrontJab.lua] Adjacent check failed!")
+                print("[AttackFrontJab.lua] Adjacent check failed.")
             end
             
             -- this will allow PlayerAttack.lua to proceed

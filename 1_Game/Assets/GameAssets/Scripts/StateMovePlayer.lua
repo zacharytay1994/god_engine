@@ -1,8 +1,8 @@
 -- This script allows the player to move, but only during the Player's turn.
 
 -- TODO:
--- 1) Decrease Player's stamina as the Player moves.
--- 2) Allow player to move along y-axis
+-- 1) Allow player to move along y-axis
+-- 2) 
 
 --[IsComponent]
 function C_StateMovePlayer()
@@ -31,6 +31,11 @@ function S_StateMovePlayer(e)
         
         if (turnOrderManagerComponent.currentTurn == entityDataComponent.id) then
             -- action ...
+
+            -- do not allow movement if no more stamina
+            if (GetComponent(e, "C_Character").currentStamina <= 0) then
+                return
+            end
 
             -- allow movement after 1 second has passed
             if (stateMovePlayerComponent.Time < 1.0) then

@@ -6,9 +6,8 @@
 
 -- TODO:
 -- 1) Allow the enemy to move along y-axis
--- 2) Decrease enemy stamina as they move
--- 3) Define different movement types (don't move, move beside player, move to a distance away from player)
--- 4) Before selecting the adjacent tile, need to check if it is empty first!!!
+-- 2) Define different movement types (don't move, move beside player, move to a distance away from player)
+-- 3)
 
 --[IsComponent]
 function C_StateMoveEnemy()
@@ -47,8 +46,8 @@ function S_StateMoveEnemy(e)
                 stateMoveEnemyComponent.Time = stateMoveEnemyComponent.Time + GetDeltaTime()
 
             -- after 1 second has passed and pathfinding has not been initialized
-            elseif (stateMoveEnemyComponent.Time >= 1.0 and stateMoveEnemyComponent.startedPathfind == false) then
-                print("\n[StateEnemyMove - START]", EntityName(e), entityDataComponent.id)
+            elseif (stateMoveEnemyComponent.Time >= 1.0 and stateMoveEnemyComponent.startedPathfind == false and GetComponent(e, "C_Character").moved == false) then
+                print("[StateMoveEnemy.lua] Start of movement for", EntityName(e), entityDataComponent.id)
 
                 -- get the enemy's C_Pathfind component
                 pathfind = GetComponent(e, "C_Pathfind")
@@ -82,10 +81,11 @@ function S_StateMoveEnemy(e)
                         -- reset variables
                         stateMoveEnemyComponent.Time = 0.0
                         -- switch to next character's turn
-                        turnOrderManagerComponent.nextTurn = true
-                        print("[StateEnemyMove] No suitable tiles to move to, staying still and ending turn")
-                        print("[StateEnemyMove - END]\n\n")
-                        
+                        print("[StateMoveEnemy.lua] moved = true (line 84).")
+                        -- turnOrderManagerComponent.nextTurn = true
+                        GetComponent(e, "C_Character").moved = true
+                        print("[StateMoveEnemy.lua] No suitable tiles to move to, staying still and ending turn.")
+                        print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")                 
                         return
                     end
                 end
@@ -102,9 +102,28 @@ function S_StateMoveEnemy(e)
                 pathfind.z = 0
 
                 -- switch to next character's turn
-                turnOrderManagerComponent.nextTurn = true
+                print("[StateMoveEnemy.lua] moved = true (line 104).")
+                -- turnOrderManagerComponent.nextTurn = true
+                GetComponent(e, "C_Character").moved = true
+                print("[StateMoveEnemy.lua] Destination reached!")
+                print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")  
+            
+            elseif (GetComponent(e, "C_Character").currentStamina <= 0) then
+                
+                -- reset variables
+                stateMoveEnemyComponent.Time = 0.0
+                stateMoveEnemyComponent.startedPathfind = false
+                pathfind.x = 0
+                pathfind.y = 0
+                pathfind.z = 0
 
-                print("[StateEnemyMove - END]\n\n")
+                -- switch to next character's turn
+                print("[StateMoveEnemy.lua] moved = true (line 119).")
+                -- turnOrderManagerComponent.nextTurn = true
+                GetComponent(e, "C_Character").moved = true
+                print("[StateMoveEnemy.lua] Stamina fully depleted!")
+                print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")  
+            
             end
         end
     end
@@ -113,16 +132,15 @@ end
 -- helper function for selecting a suitable tile to set as pathfind destination
 function SuitableTile()
     
-    print("[SuitableTile() - START]")
+    print("[StateMoveEnemy.lua] Start of SuitableTile().")
 
     -- getting player's location
-    -- print("inside SuitableTile(), checking player Entity's name:", EntityName(playerEntity))
     local playerGridCell = GetGridCell(playerEntity)
-    print("player grid location:", playerGridCell.x, playerGridCell.y, playerGridCell.z)
+    -- print("[StateMoveEnemy.lua] Player grid location:", playerGridCell.x, playerGridCell.y, playerGridCell.z)
 
     -- get all tiles
     local allTiles = EntitiesWithScriptComponent("C_FloorTile")
-    -- print("inside SuitableTile(), checking #allTiles:", #allTiles)
+    -- print("[StateMoveEnemy.lua] Inside SuitableTile(), checking #allTiles:", #allTiles)
 
     -- a list of possible adjacent tiles to set as destination. this list is prioritized over diagonalCandidates
     local adjacentCandidates = { }
@@ -143,8 +161,7 @@ function SuitableTile()
            currentGridCell.z == playerGridCell.z and currentGridCell.y == playerGridCell.y -1 and currentGridCell.x == playerGridCell.x + 1 ) then -- to the left
                
             -- add current tile to adjacentCandidates
-            print("adding current tile to adjacentCandidates")
-            -- currentGridCell.y = currentGridCell.y + 1 -- to see which tiles are added
+            -- print("[StateMoveEnemy.lua] Adding current tile to adjacentCandidates.")
             adjacentCandidates[#adjacentCandidates + 1] = allTiles[i]
            
         -- else if current tile is diagonal to the player
@@ -154,22 +171,21 @@ function SuitableTile()
                 currentGridCell.x == playerGridCell.x - 1 and currentGridCell.y == playerGridCell.y -1 and currentGridCell.z == playerGridCell.z - 1 ) then -- backward left
 
             -- add current tile to diagonalCandidates
-            print("adding current tile to diagonalCandidates")
-            -- currentGridCell.y = currentGridCell.y + 1 -- to see which tiles are added
+            -- print("[StateMoveEnemy.lua] Adding current tile to diagonalCandidates.")
             diagonalCandidates[#diagonalCandidates + 1] = allTiles[i]
        end
    end
 
    -- get all entities with gridcell component
    entitiesWithGridCell = EntitiesWithEngineComponent("GridCell") 
-   print("checking length of entitiesWithGridCell:", #entitiesWithGridCell)
+   -- print("[StateMoveEnemy.lua] Checking length of entitiesWithGridCell:", #entitiesWithGridCell)
    
    -- go through adjacentCandidates first, if a tile in this list is empty, immediately return it
     for j = 1, #adjacentCandidates do
 
         currentTileSuitable = true
         
-        print("adjacentCandidate coordinates:", GetGridCell(adjacentCandidates[j]).x, GetGridCell(adjacentCandidates[j]).y, GetGridCell(adjacentCandidates[j]).z)
+        -- print("[StateMoveEnemy.lua] adjacentCandidate coordinates:", GetGridCell(adjacentCandidates[j]).x, GetGridCell(adjacentCandidates[j]).y, GetGridCell(adjacentCandidates[j]).z)
         
         -- if GetGridCell(adjacentCandidates[j]).y + 1 == the gridcell of anther object then break,
         -- because it means there is something occupying the current adjacentCandidates[j]
@@ -178,34 +194,11 @@ function SuitableTile()
             adjacentCandidatesGridCell = GetGridCell(adjacentCandidates[j])
             local otherEntityGridCell = GetGridCell(entitiesWithGridCell[l])
 
-            -- if (adjacentCandidatesGridCell == nil) then
-            --     print("ERRO: adjacentCandidatesGridCell is nil") 
-            -- else
-            --     print("adjacentCandidatesGridCell IS NOT NIL")
-            --     print(adjacentCandidatesGridCell.x, adjacentCandidatesGridCell.y, adjacentCandidatesGridCell.z)
-            -- end
-
-            -- if (otherEntityGridCell == nil) then
-            --     print("ERRO: otherEntityGridCell is nil") 
-            -- else
-            --     print("otherEntityGridCell IS NOT NIL")
-            --     print("name of other entity:", EntityName(entitiesWithGridCell[l]))
-            --     print(otherEntityGridCell.x, otherEntityGridCell.y, otherEntityGridCell.z)
-            --     print(GetGridCell(entitiesWithGridCell[l]).x, GetGridCell(entitiesWithGridCell[l]).y, GetGridCell(entitiesWithGridCell[l]).z)
-            -- end
-
-            -- if (GetEntityData(entitiesWithGridCell[l]).id == 82) then
-            --     print("checking enemy 82's location:", otherEntityGridCell.x, otherEntityGridCell.y, otherEntityGridCell.z)
-            -- end
-
-            -- print("\n", adjacentCandidatesGridCell.y + 1, adjacentCandidatesGridCell.x, adjacentCandidatesGridCell.z, "vs" )
-            -- print(otherEntityGridCell.y, otherEntityGridCell.x, otherEntityGridCell.z)
-
             if (adjacentCandidatesGridCell.y + 1 == otherEntityGridCell.y and
                 adjacentCandidatesGridCell.x     == otherEntityGridCell.x and
                 adjacentCandidatesGridCell.z     == otherEntityGridCell.z) then 
                 
-                print("current tile is unsuitable")  
+                -- print("[StateMoveEnemy.lua] Current tile is unsuitable.")  
                 currentTileSuitable = false
             end
         end
@@ -213,19 +206,19 @@ function SuitableTile()
         if (currentTileSuitable) then
             -- if code reaches here then it means there is nothing occupying adjacentCandidates[j]
             -- and the enemy can move here
-            print("returning adjacentCandidates[j]", adjacentCandidatesGridCell.x, adjacentCandidatesGridCell.y, adjacentCandidatesGridCell.z)
+            print("[StateMoveEnemy.lua] Returning adjacentCandidates[j]", adjacentCandidatesGridCell.x, adjacentCandidatesGridCell.y, adjacentCandidatesGridCell.z)
             return adjacentCandidates[j]
         end
 
     end
-    print("end of checking adjacentCandidates")
+    -- print("[StateMoveEnemy.lua] End of checking adjacentCandidates.")
 
     -- if no tiles in adjacentCandidates are suitable, then go through diagonalCandidates
     for k = 1, #diagonalCandidates do
 
         currentTileSuitable = true
 
-        print("diagonalCandidates coordinates:", GetGridCell(diagonalCandidates[k]).x, GetGridCell(diagonalCandidates[k]).y, GetGridCell(diagonalCandidates[k]).z)
+        -- print("[StateMoveEnemy.lua] diagonalCandidates coordinates:", GetGridCell(diagonalCandidates[k]).x, GetGridCell(diagonalCandidates[k]).y, GetGridCell(diagonalCandidates[k]).z)
         
         -- if GetGridCell(diagonalCandidates[k]).y + 1 == the gridcell of anther object then break,
         -- because it means there is something occupying the current diagonalCandidates[k]
@@ -238,7 +231,7 @@ function SuitableTile()
                 diagonalCandidatesGridCell.x     == otherEntityGridCell.x and
                 diagonalCandidatesGridCell.z     == otherEntityGridCell.z) then 
                 
-                print("current tile is unsuitable")  
+                -- print("[StateMoveEnemy.lua] Current tile is unsuitable.")
                 currentTileSuitable = false
             end
         end
@@ -247,14 +240,48 @@ function SuitableTile()
             
             -- if code reaches here then it means there is nothing occupying diagonalCandidates[m]
             -- and the enemy can move here
-            print("returning diagonalCandidates[m]", diagonalCandidatesGridCell.x, diagonalCandidatesGridCell.y, diagonalCandidatesGridCell.z)
+            print("[StateMoveEnemy.lua] Returning diagonalCandidates[m]", diagonalCandidatesGridCell.x, diagonalCandidatesGridCell.y, diagonalCandidatesGridCell.z)
             return diagonalCandidates[k]
         end
     end
     
     -- if the code reaches here then it means all 8 tiles surrounding the player are occupied.
     -- the enemy will just stay still
+    print("[StateMoveEnemy.lua] End of SuitableTile().")
     return nil
+end
+
+-- currently unused
+function CheckEnemyAdjacentToPlayer(enemy, player)
+    
+    -- init result
+    result = false
+
+    -- get attacker and defenders' locations
+    enemyGrid = GetGridCell(enemy)
+    playerGrid = GetGridCell(player)
+
+    if (enemyGrid.y == playerGrid.y) then 
+
+        -- enemy behind player
+        if     (enemyGrid.x == playerGrid.x and enemyGrid.z == playerGrid.z - 1) then
+            result = true 
+
+        -- enemy in front of player
+        elseif (enemyGrid.x == playerGrid.x and enemyGrid.z == playerGrid.z + 1) then
+            result = true 
+
+        -- enemy to player's left
+        elseif (enemyGrid.z == playerGrid.z and enemyGrid.x == playerGrid.x - 1) then
+            result = true 
+
+        -- enemy to player's right
+        elseif (enemyGrid.z == playerGrid.z and enemyGrid.x == playerGrid.x + 1) then
+            result = true  
+        end
+    end
+
+    return result
 end
 
 -- function S_StateMoveEnemy(e)
