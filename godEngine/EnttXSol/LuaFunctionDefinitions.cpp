@@ -339,5 +339,14 @@ namespace god
 				}
 			}
 		);
+
+		// WorldPosition(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("WorldPosition",
+			[&entt](entt::entity e)->glm::vec3
+			{
+				return glm::vec3{ entt.GetEngineComponent<Transform>(e)->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform>(e)->m_position, 1.0f } };
+			}
+		);
 	}
 }
