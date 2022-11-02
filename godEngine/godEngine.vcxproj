@@ -62,14 +62,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)\0_InternalDependencies\fmod\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\physx\source\foundation\include;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include;$(SolutionDir)0_InternalDependencies\DDS;$(SolutionDir)0_ExternalDependencies\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)\0_InternalDependencies\fmod\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\physx\source\foundation\include;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include;$(SolutionDir)0_InternalDependencies\DDS;$(SolutionDir)0_ExternalDependencies\glm;$(SolutionDir)0_ExternalDependencies\assimp\build\x64\include;$(SolutionDir)0_ExternalDependencies\assimp\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;fmod_vc.lib;PhysXTask_static_64.lib;SceneQuery_static_64.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;PhysXFoundation_64.lib;LowLevelDynamics_static_64.lib;SimulationController_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysX_64.lib;PhysXExtensions_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;fmod_vc.lib;PhysXTask_static_64.lib;SceneQuery_static_64.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;PhysXFoundation_64.lib;LowLevelDynamics_static_64.lib;SimulationController_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysX_64.lib;PhysXExtensions_static_64.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\0_InternalDependencies\lua;$(SolutionDir)\0_InternalDependencies\fmod;$(SolutionDir)0_InternalDependencies\PhysX\lib\physxdebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -84,7 +84,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)\0_InternalDependencies\fmod\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\physx\source\foundation\include;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include;$(SolutionDir)0_InternalDependencies\DDS;$(SolutionDir)0_ExternalDependencies\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\0_InternalDependencies\glad\include;$(SolutionDir)\0_InternalDependencies\lua\include;$(SolutionDir)\0_InternalDependencies\fmod\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\include;$(SolutionDir)0_InternalDependencies\PhysX\physx\bin;$(SolutionDir)0_InternalDependencies\PhysX\physx\source\foundation\include;$(SolutionDir)0_InternalDependencies\PhysX\pxshared\include;$(SolutionDir)0_InternalDependencies\DDS;$(SolutionDir)0_ExternalDependencies\glm;$(SolutionDir)0_ExternalDependencies\assimp\build\x64\include;$(SolutionDir)0_ExternalDependencies\assimp\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -93,7 +93,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;fmod_vc.lib;PhysXTask_static_64.lib;SceneQuery_static_64.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;PhysXFoundation_64.lib;LowLevelDynamics_static_64.lib;SimulationController_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysX_64.lib;PhysXExtensions_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;fmod_vc.lib;PhysXTask_static_64.lib;SceneQuery_static_64.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;PhysXFoundation_64.lib;LowLevelDynamics_static_64.lib;SimulationController_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysX_64.lib;PhysXExtensions_static_64.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\0_InternalDependencies\lua;$(SolutionDir)\0_InternalDependencies\fmod;$(SolutionDir)0_InternalDependencies\PhysX\lib\physxrelease;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -165,6 +165,13 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="OpenGL\Advance\CubeMap.h" />
     <ClInclude Include="OpenGL\Advance\ShadowMap.h" />
+    <ClInclude Include="OpenGL\Animation\Animation.h" />
+    <ClInclude Include="OpenGL\Animation\AnimationBoneInfo.h" />
+    <ClInclude Include="OpenGL\Animation\AnimationMesh.h" />
+    <ClInclude Include="OpenGL\Animation\AnimationModel3D.h" />
+    <ClInclude Include="OpenGL\Animation\Animator.h" />
+    <ClInclude Include="OpenGL\Animation\AssimpGLMHelpers.h" />
+    <ClInclude Include="OpenGL\Animation\Bone.h" />
     <ClInclude Include="OpenGL\Internal\OGLDebug.h" />
     <ClInclude Include="OpenGL\Internal\OGLTexture.h" />
     <ClInclude Include="OpenGL\Internal\OGLPrimitives.h" />
@@ -255,6 +262,26 @@
     <ClCompile Include="OpenGL\Advance\ShadowMap.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Animation\Animation.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Animation\AnimationMesh.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Animation\AnimationModel3D.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Animation\Animator.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Animation\Bone.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="OpenGL\Internal\OGLDebug.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>

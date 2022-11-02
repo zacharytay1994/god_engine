@@ -1,1 +1,202 @@
-{"BackpackDiffuse":[{"Raw":"diffuse.jpg","Source":"C:\\Users\\zacha\\Downloads\\backpack\\diffuse.jpg","Last Edited":"25-07-2022 22-12-42","UID":3916083164}],"BackpackSpecular":[{"Raw":"specular.jpg","Source":"C:\\Users\\zacha\\Downloads\\backpack\\specular.jpg","Last Edited":"25-07-2022 22-13-04","UID":652207713}],"FlamethrowerDiffuse":[{"Raw":"salam_Base_Color.png","Source":"C:\\Users\\zacha\\Downloads\\cso-salamander-flamethrower\\source\\pawipiw\\salam_Base_Color.png","Last Edited":"25-07-2022 22-14-15","UID":670286950}],"FlamethrowerSpecular":[{"Raw":"salam_Metallic.png","Source":"C:\\Users\\zacha\\Downloads\\cso-salamander-flamethrower\\source\\pawipiw\\salam_Metallic.png","Last Edited":"25-07-2022 22-14-36","UID":2380861504}],"White":[{"Raw":"White.jpg","Source":"C:\\Users\\ASUS\\Desktop\\White.jpg","Last Edited":"13-09-2022 18-27-53","UID":2130157803}],"Door_Texture":[{"Raw":"Door_Texture.jpg","Source":"C:\\Users\\darri\\Desktop\\Door_Texture.jpg","Last Edited":"22-09-2022 11-18-12","UID":3398492983}],"Textures_RockSmooth":[{"Raw":"Textures_RockSmooth.jpg","Source":"C:\\Users\\darri\\Desktop\\Textures_RockSmooth.jpg","Last Edited":"22-09-2022 10-30-49","UID":83083436}],"TileTexture":[{"Raw":"outUV.jpg","Source":"C:\\Users\\darri\\Desktop\\outUV.jpg","Last Edited":"22-09-2022 11-10-48","UID":2013979416}],"Textures_Door_Purple":[{"Raw":"Textures_Door_Purple.jpg","Source":"C:\\Users\\darri\\Desktop\\Textures_Door_Purple.jpg","Last Edited":"22-09-2022 10-23-31","UID":4015350131}],"Textures_Rock":[{"Raw":"Textures_Rock.jpg","Source":"C:\\Users\\darri\\Desktop\\Textures_Rock.jpg","Last Edited":"22-09-2022 09-40-47","UID":1887241107}],"Blue":[{"Raw":"Blue.jpg","Source":"C:\\Users\\darri\\Desktop\\Blue.jpg","Last Edited":"26-09-2022 18-06-55","UID":3243071222}],"Green":[{"Raw":"Green.jpg","Source":"C:\\Users\\darri\\Desktop\\Green.jpg","Last Edited":"26-09-2022 18-17-55","UID":911467760}],"DarkGreen":[{"Raw":"DarkGreen.jpg","Source":"C:\\Users\\darri\\Desktop\\DarkGreen.jpg","Last Edited":"26-09-2022 18-19-23","UID":658120761}],"test":[{"Raw":"test.dds","Source":"C:\\Users\\darri\\Desktop\\NEW GITHUB\\god_engine\\1_Game\\Assets\\EngineAssets\\Textures\\test.dds","Last Edited":"27-09-2022 18-16-50","UID":1568167910}],"Dice":[{"Raw":"Dice.dds","Source":"C:\\Users\\darri\\Desktop\\Dice.dds","Last Edited":"28-09-2022 20-57-28","UID":2324547998}],"Dice_Gold":[{"Raw":"Dice_Gold.jpg","Source":"D:\\Downloads\\GAM\\GAM300\\Engine\\god_engine\\1_Game\\Assets\\GameAssets\\2DAssets\\Raw\\Textures\\Dice_Gold.jpg","Last Edited":"02-11-2022 17-36-55","UID":2015529011}],"Dice_Blue":[{"Raw":"Dice_Blue.jpg","Source":"D:\\Downloads\\GAM\\GAM300\\Engine\\god_engine\\1_Game\\Assets\\GameAssets\\2DAssets\\Raw\\Textures\\Dice_Blue.jpg","Last Edited":"02-11-2022 17-38-45","UID":1374885342}],"Dice_Pink":[{"Raw":"Dice_Pink.jpg","Source":"D:\\Downloads\\GAM\\GAM300\\Engine\\god_engine\\1_Game\\Assets\\GameAssets\\2DAssets\\Raw\\Textures\\Dice_Pink.jpg","Last Edited":"02-11-2022 17-38-45","UID":470513894}]}
+{
+    "BackpackDiffuse": [
+        {
+            "Raw": "diffuse.jpg",
+            "Source": "C:\\Users\\zacha\\Downloads\\backpack\\diffuse.jpg",
+            "Last Edited": "25-07-2022 22-12-42",
+            "UID": 3916083164
+        }
+    ],
+    "BackpackSpecular": [
+        {
+            "Raw": "specular.jpg",
+            "Source": "C:\\Users\\zacha\\Downloads\\backpack\\specular.jpg",
+            "Last Edited": "25-07-2022 22-13-04",
+            "UID": 652207713
+        }
+    ],
+    "FlamethrowerDiffuse": [
+        {
+            "Raw": "salam_Base_Color.png",
+            "Source": "C:\\Users\\zacha\\Downloads\\cso-salamander-flamethrower\\source\\pawipiw\\salam_Base_Color.png",
+            "Last Edited": "25-07-2022 22-14-15",
+            "UID": 670286950
+        }
+    ],
+    "FlamethrowerSpecular": [
+        {
+            "Raw": "salam_Metallic.png",
+            "Source": "C:\\Users\\zacha\\Downloads\\cso-salamander-flamethrower\\source\\pawipiw\\salam_Metallic.png",
+            "Last Edited": "25-07-2022 22-14-36",
+            "UID": 2380861504
+        }
+    ],
+    "White": [
+        {
+            "Raw": "White.jpg",
+            "Source": "C:\\Users\\ASUS\\Desktop\\White.jpg",
+            "Last Edited": "13-09-2022 18-27-53",
+            "UID": 2130157803
+        }
+    ],
+    "Door_Texture": [
+        {
+            "Raw": "Door_Texture.jpg",
+            "Source": "C:\\Users\\darri\\Desktop\\Door_Texture.jpg",
+            "Last Edited": "22-09-2022 11-18-12",
+            "UID": 3398492983
+        }
+    ],
+    "Textures_RockSmooth": [
+        {
+            "Raw": "Textures_RockSmooth.jpg",
+            "Source": "C:\\Users\\darri\\Desktop\\Textures_RockSmooth.jpg",
+            "Last Edited": "22-09-2022 10-30-49",
+            "UID": 83083436
+        }
+    ],
+    "TileTexture": [
+        {
+            "Raw": "outUV.jpg",
+            "Source": "C:\\Users\\darri\\Desktop\\outUV.jpg",
+            "Last Edited": "22-09-2022 11-10-48",
+            "UID": 2013979416
+        }
+    ],
+    "Textures_Door_Purple": [
+        {
+            "Raw": "Textures_Door_Purple.jpg",
+            "Source": "C:\\Users\\darri\\Desktop\\Textures_Door_Purple.jpg",
+            "Last Edited": "22-09-2022 10-23-31",
+            "UID": 4015350131
+        }
+    ],
+    "Textures_Rock": [
+        {
+            "Raw": "Textures_Rock.jpg",
+            "Source": "C:\\Users\\darri\\Desktop\\Textures_Rock.jpg",
+            "Last Edited": "22-09-2022 09-40-47",
+            "UID": 1887241107
+        }
+    ],
+    "Blue": [
+        {
+            "Raw": "Blue.jpg",
+            "Source": "C:\\Users\\darri\\Desktop\\Blue.jpg",
+            "Last Edited": "26-09-2022 18-06-55",
+            "UID": 3243071222
+        }
+    ],
+    "Green": [
+        {
+            "Raw": "Green.jpg",
+            "Source": "C:\\Users\\darri\\Desktop\\Green.jpg",
+            "Last Edited": "26-09-2022 18-17-55",
+            "UID": 911467760
+        }
+    ],
+    "DarkGreen": [
+        {
+            "Raw": "DarkGreen.jpg",
+            "Source": "C:\\Users\\darri\\Desktop\\DarkGreen.jpg",
+            "Last Edited": "26-09-2022 18-19-23",
+            "UID": 658120761
+        }
+    ],
+    "test": [
+        {
+            "Raw": "test.dds",
+            "Source": "C:\\Users\\darri\\Desktop\\NEW GITHUB\\god_engine\\1_Game\\Assets\\EngineAssets\\Textures\\test.dds",
+            "Last Edited": "27-09-2022 18-16-50",
+            "UID": 1568167910
+        }
+    ],
+    "Dice": [
+        {
+            "Raw": "Dice.dds",
+            "Source": "C:\\Users\\darri\\Desktop\\Dice.dds",
+            "Last Edited": "28-09-2022 20-57-28",
+            "UID": 2324547998
+        }
+    ],
+    "Dice_Gold": [
+        {
+            "Raw": "Dice_Gold.jpg",
+            "Source": "D:\\Downloads\\GAM\\GAM300\\Engine\\god_engine\\1_Game\\Assets\\GameAssets\\2DAssets\\Raw\\Textures\\Dice_Gold.jpg",
+            "Last Edited": "02-11-2022 17-36-55",
+            "UID": 2015529011
+        }
+    ],
+    "Dice_Blue": [
+        {
+            "Raw": "Dice_Blue.jpg",
+            "Source": "D:\\Downloads\\GAM\\GAM300\\Engine\\god_engine\\1_Game\\Assets\\GameAssets\\2DAssets\\Raw\\Textures\\Dice_Blue.jpg",
+            "Last Edited": "02-11-2022 17-38-45",
+            "UID": 1374885342
+        }
+    ],
+    "Dice_Pink": [
+        {
+            "Raw": "Dice_Pink.jpg",
+            "Source": "D:\\Downloads\\GAM\\GAM300\\Engine\\god_engine\\1_Game\\Assets\\GameAssets\\2DAssets\\Raw\\Textures\\Dice_Pink.jpg",
+            "Last Edited": "02-11-2022 17-38-45",
+            "UID": 470513894
+        }
+    ],
+    "MoveButton": [
+        {
+            "Raw": "move_btns_1.png",
+            "Source": "C:\\Users\\zacha\\Downloads\\updated ui\\move_btns_1.png",
+            "Last Edited": "02-11-2022 14-25-30",
+            "UID": 4234999052
+        }
+    ],
+    "MeleeButton": [
+        {
+            "Raw": "melee_btns_1.png",
+            "Source": "C:\\Users\\zacha\\Downloads\\updated ui\\melee_btns_1.png",
+            "Last Edited": "02-11-2022 14-26-15",
+            "UID": 103338026
+        }
+    ],
+    "BoltsButton": [
+        {
+            "Raw": "bolts_btns_1.png",
+            "Source": "C:\\Users\\zacha\\Downloads\\updated ui\\bolts_btns_1.png",
+            "Last Edited": "02-11-2022 14-27-53",
+            "UID": 1612323444
+        }
+    ],
+    "StaminaIcon": [
+        {
+            "Raw": "stamina.png",
+            "Source": "C:\\Users\\zacha\\Downloads\\updated ui\\stamina.png",
+            "Last Edited": "02-11-2022 14-28-52",
+            "UID": 3721069971
+        }
+    ],
+    "HealthIcon": [
+        {
+            "Raw": "health_bar_1.png",
+            "Source": "C:\\Users\\zacha\\Downloads\\updated ui\\health_bar_1.png",
+            "Last Edited": "02-11-2022 14-35-41",
+            "UID": 1069467640
+        }
+    ],
+    "EndTurnButton": [
+        {
+            "Raw": "end_turn_btn.png",
+            "Source": "C:\\Users\\zacha\\Downloads\\updated ui\\end_turn_btn.png",
+            "Last Edited": "02-11-2022 14-37-37",
+            "UID": 4192124204
+        }
+    ],
+    "SettingsButton": [
+        {
+            "Raw": "settings_1.png",
+            "Source": "C:\\Users\\zacha\\Downloads\\updated ui\\settings_1.png",
+            "Last Edited": "02-11-2022 14-39-20",
+            "UID": 2131660293
+        }
+    ]
+}
