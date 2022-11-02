@@ -70,13 +70,20 @@ function S_Character(e)
             RemoveInstance(e)
         end
 
-        -- press J to set enemy HP to zero
-        if (CheckKeyPress(74) and EntityName(e) == "Enemy") then
-            characterComponent.currentHP = 0
+        -- press J to set all enemy HP to zero
+        if (CheckKeyPress(74)) then
+            
+            enemyList = EntitiesWithScriptComponent("C_EnemyEndTurn")
+            
+            for i = 1, #enemyList do
+                GetComponent(enemyList[i], "C_Character").currentHP = 0
+            end
         end
         
         if (characterComponent.currentHP <= 0) then 
 
+            print("enemy hP is zero")
+            
             -- hide the character below the map
             GetTransform(e).position.y = -100
             GetGridCell(e).y = -100
