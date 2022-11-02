@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <assert.h>
+#include <algorithm>
 
 #pragma warning(disable : 4201)
 #include <glm/glm/glm.hpp>
@@ -389,9 +390,27 @@ namespace god
 
 	void OpenGL::RenderGUI ( Scene& scene , glm::mat4 const& projection , OGLTextureManager& textures )
 	{
+		// enable blending
+		glEnable ( GL_BLEND );
+		glBlendFunc ( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
+
 		m_2D_shader.Use ();
 
 		OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uProjection" , projection );
+
+		/*std::vector<std::tuple< Scene::InstancedRenderData , glm::mat4>> m_sort_container;
+		for ( auto const& data : scene.m_2D_instanced_render_data )
+		{
+			m_sort_container.emplace_back ( data.first , data.second.begin () );
+		}
+		std::sort ( m_sort_container.begin () , m_sort_container.end () ,
+			[]( auto const& lhs , auto const& rhs )
+			{
+				auto& [lhs_first , lhs_second] = lhs;
+				auto& [rhs_first , rhs_second] = rhs;
+				return lhs_second[ 3 ].z < rhs_second[ 3 ].z;
+			}
+		);*/
 
 		for ( auto const& data : scene.m_2D_instanced_render_data )
 		{
@@ -404,8 +423,23 @@ namespace god
 				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
 		}
+		/*for ( auto const& key_pair : m_sort_container )
+		{
+			auto& [key , t] = key_pair;
+			auto& value = scene.m_2D_instanced_render_data[ key ];
+
+			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			std::get<1> ( textures.Get ( key.m_diffuse_id ) ).Bind ( 0 );
+
+			for ( auto& mesh : m_models[ key.m_model_id ] )
+			{
+				mesh.SetTransformData ( value );
+				mesh.DrawInstanced ( GL_TRIANGLES );
+			}
+		}*/
 
 		m_2D_shader.UnUse ();
+		glDisable ( GL_BLEND );
 	}
 
 	void OpenGL::ResizeViewport ( int width , int height )
