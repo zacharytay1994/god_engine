@@ -285,7 +285,7 @@ namespace god
 				{
 					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
 					{
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
 						std::cout << "---ADDING FORCE1...." << std::endl;
 						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->addForce(ConvertToPhysXVector({ x, y, z }));
 						std::cout << "---ADDING FORCE2...." << std::endl;
@@ -311,11 +311,14 @@ namespace god
 
 		// Child(e, index)
 		// ==============================================================================================
-		//entt.RegisterLuaFunction("Child",
-		//	[&entt](entt::entity e, unsigned index)->entt::entity
-		//	{
-		//		return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children[index];
-		//	}
-		//);
+		entt.RegisterLuaFunction("Child",
+			[&entt](entt::entity e, unsigned index)->entt::entity
+			{
+				if (index >= entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children.size())
+					std::cout << "Child at index " << index << " does not exist!" << std::endl;
+				else
+					return entt.m_entities[entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children[index]].m_id;
+			}
+		);
 	}
 }
