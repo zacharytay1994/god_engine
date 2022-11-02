@@ -5,6 +5,7 @@ function C_DiceScript()
 		fodder_text = "DiceScript is attached!",
 		is_init = false,
 		is_rolling = false,
+		value = 0,
 		
 		start_position_x = 0.0,
 		start_position_y = 0.0,
@@ -38,10 +39,10 @@ function S_DiceScript(e)
 	if(CheckKeyPress(79) == true) then
 		DiceScript_RollDice(e, c_dice)
 		return
-	elseif(CheckKeyPress(80) == true) then
-		SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
-		DiceScript_DisableDice(e, c_dice)
-		return
+	--elseif(CheckKeyPress(80) == true) then
+	--	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
+	--	--DiceScript_DisableDice(e, c_dice)
+	--	return
 	end
 	
 	local transform = GetTransform(e)
@@ -52,8 +53,20 @@ function S_DiceScript(e)
 				if (c_dice.rotation_x == transform.rotation.x) then
 					if (c_dice.rotation_y == transform.rotation.y) then
 						if (c_dice.rotation_z == transform.rotation.z) then
-							DiceScript_DisableDice(e, c_dice)
-							return
+							if (c_dice.is_rolling == true) then
+								c_dice.is_rolling = false
+								print("Dice Stopped!")
+								local top_index_position_y = -999
+								for i = 0,5 do
+									if (top_index_position_y < GetTransform(Child(e, i)).position.y) then
+										top_index_position_y = GetTransform(Child(e, i)).position.y
+										c_dice.value = i + 1
+									end
+								end
+								print(c_dice.value)
+								ChangeTexture(e, "Blue")
+								return
+							end
 						end
 					end
 				end
@@ -71,12 +84,12 @@ end
 
 function DiceScript_RollDice(e, c_dice)
 	c_dice.is_rolling = true
-	c_dice.rotation_x = GenerateRandomNumberInRange(0,360)
-	c_dice.rotation_y = GenerateRandomNumberInRange(0,360)
-	c_dice.rotation_z = GenerateRandomNumberInRange(0,360)
+	local transform = GetTransform(e)
+	transform.rotation.x = GenerateRandomNumberInRange(0,360)
+	transform.rotation.y = GenerateRandomNumberInRange(0,360)
+	transform.rotation.z = GenerateRandomNumberInRange(0,360)
 	--AddForce(e, 100.0, 100.0, 100.0)
-	print(EntityName(Child(e, 1)))
-	--SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
+	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
 end
 
 function DiceScript_DisableDice(e, c_dice)

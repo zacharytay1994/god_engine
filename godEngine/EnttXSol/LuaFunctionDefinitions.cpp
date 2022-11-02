@@ -326,5 +326,18 @@ namespace god
 					return entt.m_entities[entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children[index]].m_id;
 			}
 		);
+
+		// ChangeTexture(e, texture name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("ChangeTexture",
+			[&entt, &engineResources](entt::entity e, std::string texture_name)
+			{
+				Renderable3D* r = entt.GetEngineComponent<Renderable3D>(e);
+				if (r)
+				{
+					r->m_diffuse_id = engineResources.Get<OGLTextureManager>().get().GetID(texture_name);
+				}
+			}
+		);
 	}
 }
