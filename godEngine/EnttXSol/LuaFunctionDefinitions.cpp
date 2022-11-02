@@ -317,11 +317,14 @@ namespace god
 
 		// Child(e, index)
 		// ==============================================================================================
-		//entt.RegisterLuaFunction("Child",
-		//	[&entt](entt::entity e, unsigned index)->entt::entity
-		//	{
-		//		return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children[index];
-		//	}
-		//);
+		entt.RegisterLuaFunction("Child",
+			[&entt](entt::entity e, unsigned index)->entt::entity
+			{
+				if (index >= entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children.size())
+					std::cout << "Child at index " << index << " does not exist!" << std::endl;
+				else
+					return entt.m_entities[entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children[index]].m_id;
+			}
+		);
 	}
 }
