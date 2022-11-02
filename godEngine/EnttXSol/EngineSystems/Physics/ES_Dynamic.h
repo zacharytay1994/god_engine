@@ -104,6 +104,8 @@ namespace god
 
 			rigiddynamic.p_RigidDynamic->attachShape(*rigiddynamic.p_shape);
 			rigiddynamic.p_RigidDynamic->setAngularVelocity(physx::PxVec3(rigiddynamic.AngularVelocity.x, rigiddynamic.AngularVelocity.y, rigiddynamic.AngularVelocity.z), true);
+			physx::PxReal mass = 10.f;
+			physx::PxRigidBodyExt::setMassAndUpdateInertia(*rigiddynamic.p_RigidDynamic, mass);
 			physx::PxRigidBodyExt::updateMassAndInertia(*rigiddynamic.p_RigidDynamic, rigiddynamic.Density);
 
 			mScene->addActor(*rigiddynamic.p_RigidDynamic);
