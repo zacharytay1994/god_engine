@@ -33,7 +33,7 @@ function C_EnergyBolt()
         canAttack = false,
         
         -- error message (why the attack failed)
-        errorMessage = "[AttackEnergyBolt.lua] Player not in the same lane as target!!!",
+        errorMessage = "[AttackEnergyBolt.lua] Player not in the same lane as target.",
         
         -- used to turn player to face the target
         playerRotation = 0,
@@ -69,7 +69,7 @@ function S_EnergyBolt(e)
         else
             
             -- failed the check, print fail message
-            print("[AttackEnergyBolt.lua] EnergyBolt check failed!")
+            print("[AttackEnergyBolt.lua] EnergyBolt check failed.")
         end
         
         -- this will allow PlayerAttack.lua to proceed
@@ -143,7 +143,7 @@ function CheckEnemyWithinRange(attacker, defender, e)
                 end
 
             else
-                attackComponent.errorMessage = "[AttackEnergyBolt.lua] Enemy is too far away!!!"
+                attackComponent.errorMessage = "[AttackEnergyBolt.lua] Cannot use Energy Bolt because enemy is too far away."
             end
 
         -- enemy and player on the same z-axis
@@ -164,11 +164,11 @@ function CheckEnemyWithinRange(attacker, defender, e)
                 end   
 
             else
-                attackComponent.errorMessage = "[AttackEnergyBolt.lua] Enemy is too far away!!!"
+                attackComponent.errorMessage = "[AttackEnergyBolt.lua] Cannot use Energy Bolt because enemy is too far away."
             end    
             
         else
-            attackComponent.errorMessage = "[AttackEnergyBolt.lua] Player not in the same lane as target!!!"
+            attackComponent.errorMessage = "[AttackEnergyBolt.lua] Cannot use Energy Bolt because Player not in the same lane as target."
         end
     end
 
