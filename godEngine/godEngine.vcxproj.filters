@@ -39,6 +39,11 @@
     <ClCompile Include="OpenGL\Advance\CubeMap.cpp" />
     <ClCompile Include="OpenGL\Advance\ShadowMap.cpp" />
     <ClCompile Include="OpenGL\Internal\OGLDebug.cpp" />
+    <ClCompile Include="OpenGL\Animation\AnimationMesh.cpp" />
+    <ClCompile Include="OpenGL\Animation\AnimationModel3D.cpp" />
+    <ClCompile Include="OpenGL\Animation\Animator.cpp" />
+    <ClCompile Include="OpenGL\Animation\Animation.cpp" />
+    <ClCompile Include="OpenGL\Animation\Bone.cpp" />
     <ClCompile Include="Physics\SnippetUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +128,13 @@
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_DynamicMesh.h" />
+    <ClInclude Include="OpenGL\Animation\AnimationModel3D.h" />
+    <ClInclude Include="OpenGL\Animation\AnimationMesh.h" />
+    <ClInclude Include="OpenGL\Animation\AssimpGLMHelpers.h" />
+    <ClInclude Include="OpenGL\Animation\AnimationBoneInfo.h" />
+    <ClInclude Include="OpenGL\Animation\Animator.h" />
+    <ClInclude Include="OpenGL\Animation\Bone.h" />
+    <ClInclude Include="OpenGL\Animation\Animation.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineSystems\GUI\ES_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Raycast.h" />

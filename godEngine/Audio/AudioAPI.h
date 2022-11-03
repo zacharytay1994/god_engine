@@ -52,6 +52,8 @@ namespace god
 		static void PauseSound(Sound& sound, bool paused);
 		static void StopSound(FMOD::Channel* channel);
 
+		static FMOD_RESULT CheckSoundPlayback(FMOD::Channel* channel, bool* isPlaying);
+
 		static void PauseAll();
 		static void ResumeAll();
 		static void StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets);
@@ -69,7 +71,8 @@ namespace god
 		static FMOD::ChannelGroup* m_master_channel_group;
 		static FMOD::SoundGroup* m_master_sound_group;
 
-		static std::vector<FMOD::Channel*> m_channels;
+		//static std::vector<FMOD::Channel*> m_channels;
+		static std::list<FMOD::Channel*> m_channels;
 		static std::unordered_map<int, FMOD::ChannelGroup*> m_channel_groups;
 		static std::unordered_map<int, const char*> m_channel_group_names;
 	};

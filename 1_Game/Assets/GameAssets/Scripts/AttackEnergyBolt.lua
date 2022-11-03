@@ -93,6 +93,7 @@ function S_EnergyBolt(e)
         InstancePrefab("EnergyBolt", playerPos.x, playerPos.y, playerPos.z)
         
         -- trigger sound effect
+        InstancePrefab("SFX_Jab",0,0,0)
         
         -- trigger particles (if any)
         

@@ -94,6 +94,7 @@ function S_FrontJab(e)
         end
         
         -- trigger sound effect
+        InstancePrefab("SFX_Jab",0,0,0)
         
         -- trigger particles (if any)
         

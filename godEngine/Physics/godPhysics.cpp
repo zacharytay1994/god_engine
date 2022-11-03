@@ -160,8 +160,10 @@ namespace god
 			callbackFinishTask.wait();
 
 			mScene->fetchResultsFinish();
-			Raycast();
 			mRunning = false;
+
+			Raycast();
+
 		#endif
 			
 		}

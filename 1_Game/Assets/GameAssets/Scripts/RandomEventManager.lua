@@ -19,7 +19,8 @@ function C_RandomEventManager()
         RandomEventState = "StateRandomEvent",
 
         -- probability of a randomevent occuring 
-        randomEventRate = 0.25,
+        -- randomEventRate = 0.25,
+        randomEventRate = 0.0,
 
         -- false if there is no random event occuring at the moment
         currentEvent = nil,

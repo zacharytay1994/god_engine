@@ -1,0 +1,29 @@
+Subdivision 0 = 3171 Polygons & 2238 verts
+Subdivision 1 = 6797 polygons & 6919 verts
+Render sub = 25301 Polygons & 25533 verts
+
+Model have just square polygons/faces - No triss
+and got good typology, so its easy to add just triss to all polygons if needed.
+
+
+All parts of model is Uv -mapped with 2 textures =
+Sharktexture002.png = 6100*6100 (Bodytexture)
+Sharkmouthtexture002.png = 2600*2600
+.These textures is of course included in the file that you download.
+
+Animation frames.
+Swim 10-50
+Attack 50-102
+Idle 105-170
+You can also use Idle-frames for swim in very low speed.
+The idle animation is not shown as Turntable, but im sure you will not be disappointed.
+Frame 10-50 is a very aggresive fast swimming action.
+
+The model is, as you already know = RIGGED - So why dont you make your own cool animation?! ;)
+The shark is perfectly rigged for any movement.
+
+This shark is 100% my own design using my own sketch/blueprint.
+
+Enyoy
+
+

@@ -17,6 +17,13 @@ namespace god
 		glm::vec3 m_size { 0.1f,0.1f,1.0f };
 		bool m_fixed_aspect_ratio { false };
 		float m_aspect_ratio { 1.0f };
+
+		bool m_hovered { false };
+		bool m_pressed { false };
+		bool m_down { false };
+		bool m_released { false };
+		bool m_enter { false };
+		bool m_exit { false };
 	};
 	template <>
 	inline void NewLuaType<GUIObject> ( sol::state& luaState , std::string const& name )
@@ -26,7 +33,13 @@ namespace god
 			"layer" , &GUIObject::m_layer ,
 			"size" , &GUIObject::m_size ,
 			"fixed_ar" , &GUIObject::m_fixed_aspect_ratio ,
-			"ar" , &GUIObject::m_aspect_ratio );
+			"ar" , &GUIObject::m_aspect_ratio ,
+			"hovered" , &GUIObject::m_hovered ,
+			"pressed" , &GUIObject::m_pressed ,
+			"down" , &GUIObject::m_down ,
+			"up" , &GUIObject::m_released ,
+			"enter" , &GUIObject::m_enter ,
+			"exit" , &GUIObject::m_exit );
 	}
 	template<>
 	inline void ComponentInspector::operator() < GUIObject > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )

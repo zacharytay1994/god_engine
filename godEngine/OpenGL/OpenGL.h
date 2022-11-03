@@ -10,6 +10,9 @@
 
 #include "../godUtility/Utility.h"
 
+#include "Animation/AnimationModel3D.h"
+#include "Animation/Animator.h"
+
 #include <vector>
 #include <queue>
 #include <unordered_map>
@@ -115,6 +118,18 @@ namespace god
 		// shadow stuff
 		glm::mat4 m_light_space_matrix;
 		OGLShadowMap m_shadowmap;
+
+
+		OGLShader m_animation_shader;
+		Animation3D::Model m_animation_model;
+		Animation3D::Animation m_animation_dance;
+		Animation3D::Animator m_animator;
+
+		//Temperory hard coded 
+		/* May god forgive my sin !*/
+		// To change the speed go to constructor OpenGL() , line 200
+		float shark_temp_x{  };
+		bool shark_start{ false };
 	};
 
 	template<size_t N>

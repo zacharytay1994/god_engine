@@ -20,6 +20,11 @@ end
 --[IsSystem]
 function S_StateMovePlayer(e)
 
+    -- if selected action is not Move then don't move
+    if (GetComponent(e, "C_Player").selectedAction ~= "Move") then
+        return
+    end
+    
     -- check if TurnOrderManager entity exists
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
     if (turnOrderManagerEntity ~= -1) then
