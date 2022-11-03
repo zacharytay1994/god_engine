@@ -5,7 +5,7 @@
 #include "PxPhysicsAPI.h"
 #include "PhysicUtils.h"
 #include "Callbacks.h"
-
+#include "PhysicsInterface.h"
 
 #include "../snippetutils/SnippetUtils.h"
 #include <godCamera/Camera.h>
@@ -18,6 +18,7 @@
 namespace god
 {
 	using namespace physx;
+
 
 
 	struct PhysicsSystem
@@ -38,7 +39,8 @@ namespace god
 
 		bool debugdraw;
 	private:
-
+		PhysicsAPI pAPI;
+		
 		ContactReportCallback gContactReportCallback;
 
 		CallbackFinishTask callbackFinishTask;

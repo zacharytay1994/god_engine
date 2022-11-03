@@ -2,6 +2,8 @@
 #include "godPhysics.h"
 #include "../editor/engineresources.h"
 
+
+
 #include <assert.h>
 namespace god
 {
@@ -26,6 +28,7 @@ namespace god
 
 	PhysicsSystem::PhysicsSystem() 
 	{
+	
 		mRunning = false;
 		mCamera = nullptr;
 		mWindow = nullptr;
@@ -69,6 +72,7 @@ namespace god
 
 	void PhysicsSystem::Init(GLFWWindow* window, Camera* cam)
 	{
+		
 		// Fouundation (required)
 		mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
 		if (!mFoundation) throw("PxCreateFoundation failed!");
@@ -106,7 +110,7 @@ namespace god
 			mScene->setSimulationEventCallback(&gContactReportCallback);
 		
 			SetupPVD();
-
+			
 			std::cout << "Bound Physics" << std::endl;
 			
 		}
