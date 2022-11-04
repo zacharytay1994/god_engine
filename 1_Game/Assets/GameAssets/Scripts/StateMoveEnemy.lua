@@ -53,7 +53,7 @@ function S_StateMoveEnemy(e)
                 pathfind = GetComponent(e, "C_Pathfind")
                                 
                 -- get player entity
-                playerEntity = (EntitiesWithScriptComponent("C_PlayerEndTurn"))[1]
+                playerEntity = GetEntity("Player")
 
                 -- checking that player entity exists
                 if (playerEntity ~= -1) then 
