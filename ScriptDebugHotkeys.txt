@@ -2,7 +2,6 @@ Useful keys:
 
 [In-game actions]
 E - End current character's turn
-R - End current enemy's turn
 
 [Character Script debugging]
 C - Print current character's stats and details
