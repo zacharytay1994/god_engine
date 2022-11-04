@@ -5,7 +5,7 @@
 -- Front jab can only be used when player is directly adjacent to the target.
 
 -- TODO:
--- 1) Trigger sound effects / particles
+-- 1) 
 
 --[IsComponent]
 function C_FrontJab()
