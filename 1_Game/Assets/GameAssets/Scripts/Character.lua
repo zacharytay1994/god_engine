@@ -10,7 +10,11 @@
 
 --[IsComponent]
 function C_Character()
-    local var = {
+    local var = {     
+        -- for identifying the type of character 
+        -- e.g. Player, Squinky, etc
+        --[SerializeString]
+        characterType = "",
         --[SerializeInt]
         maxHP = 10,
         --[SerializeInt]
@@ -77,6 +81,7 @@ function S_Character(e)
         if (CheckKeyPress(74)) then
             
             enemyList = EntitiesWithScriptComponent("C_EnemyEndTurn")
+            print(#enemyList, "enemies set to 0 HP!")
             
             for i = 1, #enemyList do
                 GetComponent(enemyList[i], "C_Character").currentHP = 0

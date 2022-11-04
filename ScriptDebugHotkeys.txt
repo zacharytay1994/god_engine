@@ -8,8 +8,8 @@ R - End current enemy's turn
 C - Print current character's stats and details
 X - print current character's grid location as well as global position
 
-[TurnOrderManager debugging]
-M - Press to check the name and ID of the current active character
+[TurnOrderManager.lua debugging]
+M - Press to check the name and ID of the current active character, as well as current round number
 N - Press to check which turn number we are at
 
 [SeedRand debugging]
