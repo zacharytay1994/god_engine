@@ -56,8 +56,16 @@ function S_ActionButton(e)
         -- hardcoded
         if (playerComponent.selectedAction == "FrontJab") then
             playerAttackComponent.selectedAttack = attackList[1]
+            print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                        "Base damage:", playerAttackComponent.selectedAttack[2], 
+                        "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+        
         elseif (playerComponent.selectedAction == "EnergyBolt") then
             playerAttackComponent.selectedAttack = attackList[10]
+            print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                        "Base damage:", playerAttackComponent.selectedAttack[2], 
+                        "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+            
         end
         -- end of setting selected action --------------------------------------------------
 
@@ -77,6 +85,7 @@ function S_ActionButton(e)
         -- reset the button texture and scale
         ChangeTexture(e, "empty_btn")
         playerComponent.playerAttacked = false
+        playerComponent.selectedAction = nil
         actionButtonComponent.buttonSelected = false
     end
 end
