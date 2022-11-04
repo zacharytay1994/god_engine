@@ -222,6 +222,7 @@ namespace god
 			ogl_editor.BeginFrame ();
 			// pass scene view the renderpass texture
 			//editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( imgui_renderpass.GetTexture () );
+			//editor_windows.GetWindow<EW_SceneView>()->SetRenderpassTexture( hdr_renderpass.GetTexture(1) );
 			editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( extra_renderpass.GetTexture () );
 			//editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( opengl.m_blur_pingpong_1.GetTexture() );
 			editor_windows.Update ( 0.02f , engine_resources );

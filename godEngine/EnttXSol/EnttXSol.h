@@ -506,7 +506,7 @@ namespace god
 				else
 				{
 					scene.AddInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
+						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive } , model_xform_cat );
 				}
 			}
 

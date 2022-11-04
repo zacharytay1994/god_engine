@@ -14,6 +14,7 @@ namespace god
 		uint32_t m_specular_id { 0 };
 		float m_shininess { 32.0f };
 		bool m_gui { false };
+		float m_emissive { 1.0f };
 	};
 	template <>
 	inline void NewLuaType<Renderable3D> ( sol::state& luaState , std::string const& name )
@@ -106,6 +107,9 @@ namespace god
 
 				ImGui::Text ( "- Shininess :" );
 				ImGui::InputFloat ( "##Shininess" , &component.m_shininess );
+
+				ImGui::Text( "- Emissive :" );
+				ImGui::DragFloat( "##Emissive", &component.m_emissive );
 
 				ImGui::Text ( "- Is GUI :" );
 				ImGui::Checkbox ( "##gui" , &component.m_gui );

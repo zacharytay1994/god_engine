@@ -49,6 +49,7 @@ namespace god
 		HashCombine ( seed , data.m_diffuse_id );
 		HashCombine ( seed , data.m_specular_id );
 		HashCombine ( seed , data.m_shininess );
+		HashCombine	( seed , data.m_emissive );
 		return seed;
 	}
 
@@ -57,7 +58,8 @@ namespace god
 		return m_model_id == rhs.m_model_id &&
 			m_diffuse_id == rhs.m_diffuse_id &&
 			m_specular_id == rhs.m_specular_id &&
-			m_shininess == rhs.m_shininess;
+			m_shininess == rhs.m_shininess &&
+			m_emissive == rhs.m_emissive;
 	}
 
 	Scene::PointLightData& Scene::PointLightData::operator=( PointLightData const& rhs )
