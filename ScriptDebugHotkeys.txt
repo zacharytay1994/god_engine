@@ -14,9 +14,6 @@ N - Press to check which turn number we are at
 [SeedRand debugging]
 V - Press to check RandomProbability()
 
-[ScreenShake debugging]
-B - Press the trigger a screenshake
-
 [Combat debugging]
 1 - Set player's selected attack as Front Jab (Blue)
 2 - Set player's selected attack as Big Swing (Blue) (not implemented yet)
@@ -31,4 +28,4 @@ K - Remove Enemy entity (the entity named "Enemy") (breaks the game)
 [Cheats for presentation]
 T - Reset player stamina
 Y - Press to release the Move button
-Z - Immediately trigger earthquake
+Z - Set earthquake to occur in 3 turns
