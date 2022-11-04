@@ -28,7 +28,6 @@ G - Press to print currently selected attack target
 [RemoveInstance debugging]
 J - Set Enemy HP to zero (the entity named "Enemy")
 K - Remove Enemy entity (the entity named "Enemy") (breaks the game)
-L - Remove TestSubject
 
 
 [Cheats for presentation]
