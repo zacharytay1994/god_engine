@@ -1,6 +1,9 @@
 -- This script stores data such as currently selected action.
 -- Probably will not have a system.
 
+-- This component is used by:
+-- 1) ActionButton.lua
+
 -- TODO:
 -- 1) 
 

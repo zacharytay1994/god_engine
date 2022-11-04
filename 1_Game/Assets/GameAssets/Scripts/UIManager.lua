@@ -1,4 +1,5 @@
--- This script manages Action Buttons and the Turn Order UI.
+-- This script manages Action Buttons textures and the Turn Order UI.
+-- Action Button functionality is defined in ActionButton.lua.
 -- May separate this script into smaller scripts during M3.
 
 --[IsComponent]
@@ -45,6 +46,7 @@ function S_UIManager(e)
     
     -- updating action buttons -----------------------------------------------------------------------------------------------------------
     -- only update action buttons on the player's turn
+    -- note that only the action buttons' textures are defined here. functionality is defined in ActionButton.lua
     if (GetEntityData(playerEntity).id == turnOrderManagerComponent.currentTurn) then
 
         -- wait until dice have finished rolling

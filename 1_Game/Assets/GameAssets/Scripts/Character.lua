@@ -66,7 +66,6 @@ function S_Character(e)
 
         -- press T to reset player stamina
         if (CheckKeyPress(89)) then
-            GetComponent(GetEntity("MoveButton"), "C_ButtonOnHoverPopup").resetSize = true
             GetComponent(e, "C_Player").selectedAction = nil
             print("Releasing MoveButton. Player's selectedAction is:", GetComponent(e, "C_Player").selectedAction)
         end
