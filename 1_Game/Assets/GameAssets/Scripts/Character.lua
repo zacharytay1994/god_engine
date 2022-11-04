@@ -51,45 +51,35 @@ function S_Character(e)
     -- checking whether turnOrderManager is nil
     if (turnOrderManagerEntity ~= -1) then
     
-        -- getting TurnOrderManager component
+        -- getting required components
         local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")       
-        -- getting this character's ID number
         local entityDataComponent = GetEntityData(e)
-        -- getting this character's C_Character component
         local characterComponent = GetComponent(e, "C_Character")
 
         -- press T to reset player stamina
         if (CheckKeyPress(84) and EntityName(e) == "Player") then
             characterComponent.currentStamina = characterComponent.maxStamina
-            print("Player's stamina refreshed! Back to", characterComponent.currentStamina)
+            print("[Character.lua] Player's stamina refreshed! Back to", characterComponent.currentStamina)
         end
 
-        -- press T to reset player stamina
+        -- press Y to unselect the Move button
         if (CheckKeyPress(89)) then
             GetComponent(e, "C_Player").selectedAction = nil
             print("Releasing MoveButton. Player's selectedAction is:", GetComponent(e, "C_Player").selectedAction)
         end
 
-        -- breaks the game
-        -- press K to remove enemy entity
-        if (CheckKeyPress(75) and EntityName(e) == "Enemy") then
-            RemoveInstance(e)
-        end
-
         -- press J to set all enemy HP to zero
         if (CheckKeyPress(74)) then
             
-            enemyList = EntitiesWithScriptComponent("C_EnemyEndTurn")
-            print(#enemyList, "enemies set to 0 HP!")
+            enemyList = EntitiesWithScriptComponent("C_StateMoveEnemy")
             
             for i = 1, #enemyList do
                 GetComponent(enemyList[i], "C_Character").currentHP = 0
             end
+            print(#enemyList, "enemies set to 0 HP!")
         end
         
         if (characterComponent.currentHP <= 0) then 
-
-            print("enemy hP is zero")
             
             -- hide the character below the map
             GetTransform(e).position.y = -100
@@ -99,7 +89,6 @@ function S_Character(e)
             characterComponent.isDead = true
 
             -- RemoveInstance will be called by TurnOrderManager (near the end of the script)
-
         end
 
         if (characterComponent.isDead) then

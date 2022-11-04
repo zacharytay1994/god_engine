@@ -21,9 +21,7 @@ V - Press to check RandomProbability()
 4 - Set player's selected action to Move
 
 [RemoveInstance debugging]
-J - Set Enemy HP to zero (the entity named "Enemy")
-K - Remove Enemy entity (the entity named "Enemy") (breaks the game)
-
+J - Set all enemies' HP to zero
 
 [Cheats for presentation]
 T - Reset player stamina

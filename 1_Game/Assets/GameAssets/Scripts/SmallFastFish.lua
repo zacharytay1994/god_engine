@@ -76,7 +76,6 @@ function S_SmallFastFish(e)
                 playerCharacterComponent.currentHP = playerCharacterComponent.currentHP - 2
 
                 -- activate screenshake
-                print("triggering screenshake!")
                 local screenShakeEntity = GetEntity("ScreenShake")
                 if (screenShakeEntity ~= -1) then
                     local screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
