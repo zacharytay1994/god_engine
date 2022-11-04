@@ -29,6 +29,9 @@ function C_Character()
 
         -- StateMoveEnemy will set this to true once it is finished. then the enemy-specific script will reset this.
         moved = false
+
+        -- name of icon texture (for turn order UI)
+        -- iconName = ""
     };
     return function()
         return var

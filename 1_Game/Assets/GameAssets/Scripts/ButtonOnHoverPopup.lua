@@ -17,6 +17,7 @@ function S_ButtonOnHoverPopup(e)
     local on_hover_popup = GetComponent(e, "C_ButtonOnHoverPopup")
     local gui_object = GetGUIObject(e)
 
+    -- only allow button to pop up when it's not already selected
     if (on_hover_popup.buttonSelected == false) then
         if gui_object.enter then
             on_hover_popup.InitialScaleX = gui_object.size.x
@@ -29,8 +30,16 @@ function S_ButtonOnHoverPopup(e)
 
     if gui_object.pressed then
         
-        local playerComponent = GetComponent(GetEntity("Player"), "C_Player")
-        local playerAttackComponent = GetComponent(GetEntity("Player"), "C_PlayerAttack")
+        -- making sure playing entity exists
+        local playerComponent
+        local playerAttackComponent
+        if (GetEntity("Player") ~= -1) then
+            playerComponent = GetComponent(GetEntity("Player"), "C_Player")
+            playerAttackComponent = GetComponent(GetEntity("Player"), "C_PlayerAttack")
+        else
+            print("[ButtonOnHoverPopup.lua] Player Entity not found! Returning.")
+            return
+        end
         
         if (on_hover_popup.buttonSelected) then
             
@@ -46,7 +55,11 @@ function S_ButtonOnHoverPopup(e)
             -- lock the button
             on_hover_popup.buttonSelected = true
             
-            local attackList = GetComponent(GetEntity("CombatManager"), "C_AttackList").attackList
+            local attackList
+            local combatManagerEntity = GetEntity("CombatManager")
+            if (combatManagerEntity ~= -1 then)
+                GetComponent(combatManagerEntity, "C_AttackList").attackList
+            end
             
             -- set player's selected attack to whatever this button represents
             playerComponent.selectedAction = TextureName(e)

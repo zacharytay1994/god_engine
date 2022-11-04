@@ -126,22 +126,22 @@ function CheckPlayerAdjacentToEnemy(attacker, defender, e)
         -- enemy behind player
         if (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z - 1) then
             result = true 
-            attackComponent.playerRotation = 90
+            attackComponent.playerRotation = 0
 
         -- enemy in front of player
         elseif (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z + 1) then
             result = true 
-            attackComponent.playerRotation = 270
+            attackComponent.playerRotation = 180
 
         -- enemy to player's left
         elseif (attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x - 1) then
             result = true 
-            attackComponent.playerRotation = 180
+            attackComponent.playerRotation = 90
 
         -- enemy to player's right
         elseif(attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x + 1) then
             result = true 
-            attackComponent.playerRotation = 0       
+            attackComponent.playerRotation = 270
         end
     end
 
