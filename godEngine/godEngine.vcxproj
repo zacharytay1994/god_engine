@@ -172,6 +172,8 @@
     <ClInclude Include="OpenGL\Animation\Animator.h" />
     <ClInclude Include="OpenGL\Animation\AssimpGLMHelpers.h" />
     <ClInclude Include="OpenGL\Animation\Bone.h" />
+    <ClInclude Include="OpenGL\Font\Font.h" />
+    <ClInclude Include="OpenGL\Font\FontRenderer.h" />
     <ClInclude Include="OpenGL\Internal\OGLDebug.h" />
     <ClInclude Include="OpenGL\Internal\OGLTexture.h" />
     <ClInclude Include="OpenGL\Internal\OGLPrimitives.h" />
@@ -282,6 +284,14 @@
     <ClCompile Include="OpenGL\Animation\Bone.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Font\Font.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Font\FontRenderer.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="OpenGL\Internal\OGLDebug.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>

@@ -4,6 +4,7 @@
 #include "OpenGL/OpenGL.h"
 #include "OpenGL/Internal/OGLRenderPass.h"
 #include "OpenGL/Internal/OGLTexture.h"
+#include "OpenGL/Font/Font.h"
 
 #include "Window/GLFWWindow.h"
 #include "Window/DeltaTimer.h"
@@ -55,6 +56,8 @@ namespace god
 		GLFWWindow window ( 1920 , 1080 );
 		DeltaTimer delta_timer;
 		OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
+		Fonts fonts;
+		fonts.InsertNewFont ( "Arial" , "Assets/GameAssets/Fonts/arial.ttf" );
 		OGLRenderPass imgui_renderpass ( window.GetWindowWidth () , window.GetWindowHeight () );
 		OGLRenderPass<2> hdr_renderpass ( window.GetWindowWidth () , window.GetWindowHeight () , GL_RGBA16F , GL_RGBA , GL_FLOAT );
 		OGLRenderPass extra_renderpass ( window.GetWindowWidth () , window.GetWindowHeight () );
@@ -129,8 +132,8 @@ namespace god
 		editor_windows.AddWindow<god::EW_Performance> ( true );
 		editor_windows.AddWindow<god::EW_TilemapEditor> ( true , std::ref ( enttxsol ) );
 
-		godPhysicsSystem.Init(&window, &camera);
-	
+		godPhysicsSystem.Init ( &window , &camera );
+
 
 
 		while ( !window.WindowShouldClose () )
@@ -163,7 +166,7 @@ namespace god
 			enttxsol.Update ( engine_resources );
 			SystemTimer::EndTimeSegment ( "EnTT Update" );
 			SystemTimer::StartTimeSegment ( "Populating Scene" );
-			enttxsol.PopulateScene<Scene , Transform , Renderable3D> ( scene );
+			enttxsol.PopulateScene<Scene , Transform , Renderable3D , Fonts> ( scene , fonts );
 			SystemTimer::EndTimeSegment ( "Populating Scene" );
 
 			//Physics Simulate update

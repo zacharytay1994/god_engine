@@ -45,6 +45,8 @@
     <ClCompile Include="OpenGL\Animation\Animation.cpp" />
     <ClCompile Include="OpenGL\Animation\Bone.cpp" />
     <ClCompile Include="Physics\SnippetUtils.cpp" />
+    <ClCompile Include="OpenGL\Font\Font.cpp" />
+    <ClCompile Include="OpenGL\Font\FontRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioAPI.h" />
@@ -127,7 +129,6 @@
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_DynamicMesh.h" />
     <ClInclude Include="OpenGL\Animation\AnimationModel3D.h" />
     <ClInclude Include="OpenGL\Animation\AnimationMesh.h" />
     <ClInclude Include="OpenGL\Animation\AssimpGLMHelpers.h" />
@@ -139,6 +140,8 @@
     <ClInclude Include="EnttXSol\EngineSystems\GUI\ES_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Raycast.h" />
     <ClInclude Include="Physics\SnippetUtils.h" />
+    <ClInclude Include="OpenGL\Font\Font.h" />
+    <ClInclude Include="OpenGL\Font\FontRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

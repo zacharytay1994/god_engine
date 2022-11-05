@@ -8,6 +8,8 @@
 #include "Advance/CubeMap.h"
 #include "Advance/ShadowMap.h"
 
+#include "Font/FontRenderer.h"
+
 #include "../godUtility/Utility.h"
 
 #include "Animation/AnimationModel3D.h"
@@ -96,6 +98,7 @@ namespace god
 		OGLShader m_blur_shader;
 		OGLShader m_blend_shader;
 		OGLShader m_2D_shader;
+		OGLShader m_font_shader;
 
 		// hdr
 		OGLMesh m_square_mesh;
@@ -130,6 +133,9 @@ namespace god
 		// To change the speed go to constructor OpenGL() , line 200
 		float shark_temp_x{  };
 		bool shark_start{ false };
+
+		// font
+		FontRenderer m_font_renderer;
 	};
 
 	template<size_t N>
