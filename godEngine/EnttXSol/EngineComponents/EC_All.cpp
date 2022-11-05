@@ -16,6 +16,7 @@ namespace god
 		"PointLight" ,
 		"DirectionalLight" ,
 		"GridManipulate" ,
-		"GUIObject"
+		"GUIObject" ,
+		"GUIText"
 	};
 }

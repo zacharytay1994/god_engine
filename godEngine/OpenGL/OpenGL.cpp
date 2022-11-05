@@ -576,6 +576,8 @@ namespace god
 
 		m_font_shader.Use ();
 
+		OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uProjection" , projection );
+
 		for ( auto const& data : scene.m_characters )
 		{
 			OGLShader::SetUniform ( m_font_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );

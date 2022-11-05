@@ -130,6 +130,7 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Grid\EC_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIObject.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIText.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Dynamic.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_DirectionalLight.h" />

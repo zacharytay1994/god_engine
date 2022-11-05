@@ -142,6 +142,7 @@
     <ClInclude Include="Physics\SnippetUtils.h" />
     <ClInclude Include="OpenGL\Font\Font.h" />
     <ClInclude Include="OpenGL\Font\FontRenderer.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIText.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

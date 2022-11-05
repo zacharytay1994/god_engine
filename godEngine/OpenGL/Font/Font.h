@@ -13,7 +13,7 @@ namespace god
 		uint32_t	m_texture_ID;	// ID handle of the glyph texture
 		glm::ivec2  m_size;			// Size of glyph
 		glm::ivec2  m_bearing;		// Offset from baseline to left/top of glyph
-		uint32_t	m_advance;		// Offset to advance to next glyph
+		uint32_t	m_advance;		// Offset to advance to next glyph, in pixel >> 6
 	};
 
 	struct Font

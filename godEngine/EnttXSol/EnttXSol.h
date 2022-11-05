@@ -500,12 +500,86 @@ namespace god
 			{
 				if ( m_registry.storage<GUIObject> ().contains ( m_entities[ e ].m_id ) )
 				{
-					/*scene.Add2DInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );*/
+					scene.Add2DInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
 
-					auto const& characters = fonts.GetFont ( "Arial" ).GetCharacters ( F::DEFAULT_FONT_SIZE );
-					scene.AddCharacter ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-						characters[ static_cast< uint32_t >( 'c' ) ].m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
+					if ( m_registry.storage<GUIText> ().contains ( m_entities[ e ].m_id ) )
+					{
+						GUIText& gui_text = m_registry.get<GUIText> ( m_entities[ e ].m_id );
+
+						auto const& characters = fonts.GetFont ( "Arial" ).GetCharacters ( F::DEFAULT_FONT_SIZE );
+
+						std::stringstream ss;
+						ss << gui_text.m_text;
+						std::string test_text { gui_text.m_text };
+						std::string::const_iterator c;
+						float x { -1.0f } , y { 0 } , z { 0 };
+						float scale { 1.0f / 100.0f * 0.1 };
+
+						std::string word;
+						while ( ss >> word )
+						{
+							// check if word length will exceed boundary
+							uint32_t word_length { 0 };
+							for ( auto const& c : word )
+							{
+								auto& ch = characters[ static_cast< uint32_t >( c ) ];
+								word_length += ch.m_advance;
+							}
+							if ( word_length * scale + x > 1.0f )
+							{
+								y -= 100.0f * scale;
+								x = -1.0f;
+							}
+							word.push_back ( ' ' );
+							for ( auto const& c : word )
+							{
+								auto& ch = characters[ static_cast< uint32_t >( c ) ];
+								if ( x + ch.m_advance * scale > 1.0f )
+								{
+									y -= 100.0f * scale;
+									x = -1.0f;
+								}
+
+								float xpos = x + ( ch.m_bearing.x + ch.m_size.x / 2.0f ) * scale;
+								float ypos = y + ( ch.m_bearing.y - ch.m_size.y / 2.0f ) * scale;
+								//float ypos = 0.0f;
+								//x += ch.m_size.x / 2.0f * scale;
+
+								float w = ch.m_size.x * scale / 2.0f;
+								float h = ch.m_size.y * scale / 2.0f;
+
+								glm::mat4 character_transform = BuildModelMatrixRotDegrees ( { xpos,ypos,1 } , { 0,0,0 } , { w,-h,1 } );
+
+								scene.AddCharacter ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+									ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat * character_transform );
+
+								x += ch.m_advance * scale;
+								//x += ch.m_size.x / 2.0f * scale;
+							}
+						}
+
+						//for ( c = test_text.begin (); c != test_text.end (); ++c )
+						//{
+						//	auto& ch = characters[ static_cast< uint32_t >( *c ) ];
+
+						//	float xpos = x + ( ch.m_bearing.x + ch.m_size.x / 2.0f ) * scale;
+						//	float ypos = y + ( ch.m_bearing.y - ch.m_size.y / 2.0f ) * scale;
+						//	//float ypos = 0.0f;
+						//	//x += ch.m_size.x / 2.0f * scale;
+
+						//	float w = ch.m_size.x * scale / 2.0f;
+						//	float h = ch.m_size.y * scale / 2.0f;
+
+						//	glm::mat4 character_transform = BuildModelMatrixRotDegrees ( { xpos,ypos,1 } , { 0,0,0 } , { w,-h,1 } );
+
+						//	scene.AddCharacter ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+						//		ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat * character_transform );
+
+						//	x += ( ch.m_advance >> 6 ) * scale;
+						//	//x += ch.m_size.x / 2.0f * scale;
+						//}
+					}
 				}
 				else
 				{

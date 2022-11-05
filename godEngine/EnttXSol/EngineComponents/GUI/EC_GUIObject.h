@@ -17,6 +17,7 @@ namespace god
 		glm::vec3 m_size { 0.1f,0.1f,1.0f };
 		bool m_fixed_aspect_ratio { false };
 		float m_aspect_ratio { 1.0f };
+		std::string m_text { "" };
 
 		bool m_hovered { false };
 		bool m_pressed { false };
@@ -34,6 +35,7 @@ namespace god
 			"size" , &GUIObject::m_size ,
 			"fixed_ar" , &GUIObject::m_fixed_aspect_ratio ,
 			"ar" , &GUIObject::m_aspect_ratio ,
+			"text" , &GUIObject::m_text ,
 			"hovered" , &GUIObject::m_hovered ,
 			"pressed" , &GUIObject::m_pressed ,
 			"down" , &GUIObject::m_down ,
@@ -61,6 +63,9 @@ namespace god
 				{
 					ImGui::DragFloat ( "Aspect-Ratio" , &component.m_aspect_ratio , 0.05f , 0.0f );
 				}
+
+				ImGui::Separator ();
+				ImGui::InputText ( "Text" , &component.m_text );
 			} );
 	}
 
