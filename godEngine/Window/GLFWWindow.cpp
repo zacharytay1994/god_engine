@@ -170,6 +170,25 @@ namespace god
 		m_scroll_down = false;
 		m_resized = false;
 
+		// mouse left press
+		if ( m_left_mouse_recent_pressed_priority != m_left_mouse_logged_pressed_priority )
+		{
+			m_left_mouse_logged_pressed_priority = 0;
+		}
+		m_left_mouse_recent_pressed_priority = 0;
+		// mouse left down
+		if ( m_left_mouse_recent_down_priority != m_left_mouse_logged_down_priority )
+		{
+			m_left_mouse_logged_down_priority = 0;
+		}
+		m_left_mouse_recent_down_priority = 0;
+		// mouse left up
+		if ( m_left_mouse_recent_up_priority != m_left_mouse_logged_up_priority )
+		{
+			m_left_mouse_logged_up_priority = 0;
+		}
+		m_left_mouse_recent_up_priority = 0;
+
 		m_gamepad_connected = false;
 		
 		if (present == 1)
@@ -337,18 +356,36 @@ namespace god
 #endif
 	}
 
-	bool GLFWWindow::MouseLDown ()
+	bool GLFWWindow::MouseLDown ( uint32_t priority )
 	{
+		m_left_mouse_recent_down_priority = priority > m_left_mouse_recent_down_priority ? priority : m_left_mouse_recent_down_priority;
+		if ( priority < m_left_mouse_logged_down_priority )
+		{
+			return false;
+		}
+		m_left_mouse_logged_down_priority = priority;
 		return m_left_mouse;
 	}
 
-	bool GLFWWindow::MouseLPressed ()
+	bool GLFWWindow::MouseLPressed ( uint32_t priority )
 	{
+		m_left_mouse_recent_pressed_priority = priority > m_left_mouse_recent_pressed_priority ? priority : m_left_mouse_recent_pressed_priority;
+		if ( priority < m_left_mouse_logged_pressed_priority )
+		{
+			return false;
+		}
+		m_left_mouse_logged_pressed_priority = priority;
 		return m_left_mouse && !m_previous_left_mouse;
 	}
 
-	bool GLFWWindow::MouseLUp ()
+	bool GLFWWindow::MouseLUp ( uint32_t priority )
 	{
+		m_left_mouse_recent_up_priority = priority > m_left_mouse_recent_up_priority ? priority : m_left_mouse_recent_up_priority;
+		if ( priority < m_left_mouse_logged_up_priority )
+		{
+			return false;
+		}
+		m_left_mouse_logged_up_priority = priority;
 		return !m_left_mouse && m_previous_left_mouse;
 	}
 

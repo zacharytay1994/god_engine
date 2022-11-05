@@ -45,9 +45,9 @@ namespace god
 					gui.m_enter = true;
 				}
 				gui.m_hovered = true;
-				gui.m_pressed = window.MouseLPressed ();
-				gui.m_down = window.MouseLDown ();
-				gui.m_released = window.MouseLUp ();
+				gui.m_pressed = window.MouseLPressed ( 1 );
+				gui.m_down = window.MouseLDown ( 1 );
+				gui.m_released = window.MouseLUp ( 1 );
 			}
 			else
 			{
@@ -55,6 +55,8 @@ namespace god
 				{
 					gui.m_exit = true;
 					gui.m_hovered = false;
+					gui.m_down = false;
+					gui.m_released = false;
 				}
 			}
 		}
