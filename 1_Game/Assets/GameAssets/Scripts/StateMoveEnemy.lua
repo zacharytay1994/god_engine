@@ -41,6 +41,11 @@ function S_StateMoveEnemy(e)
             print("[StateMoveEnemy.lua] ERROR: Player does not exist! Returning.")
             return
         end
+
+        if (GetComponent(e, "C_Character").moved == true) then
+            print("[StateMoveEnemy.lua] Enemy moved already, skipping this script!")
+            return
+        end
              
         -- if it's this character's turn, let it perform it actions
         if (turnOrderManagerComponent.currentTurn == entityDataComponent.id) then  
@@ -82,6 +87,13 @@ function S_StateMoveEnemy(e)
                 else
                     -- reset variables
                     stateMoveEnemyComponent.Time = 0.0
+                    stateMoveEnemyComponent.startedPathfind = false
+                    pathfind.x = 0
+                    pathfind.y = 0
+                    pathfind.z = 0
+
+
+
                     -- switch to next character's turn
                     print("[StateMoveEnemy.lua] moved = true (line 84).")
                     -- turnOrderManagerComponent.nextTurn = true
@@ -92,40 +104,42 @@ function S_StateMoveEnemy(e)
                 end
             end   
 
-            -- once the enemy has reached its destination, or if it's adjacent to the player, stop moving
-            if ((enemyGridCell.x == pathfind.x and enemyGridCell.y == pathfind.y and enemyGridCell.z == pathfind.z) or 
-                CheckEnemyAdjacentToPlayer(e, playerEntity) == true)  then
+            if (GetComponent(e, "C_Character").moved == false) then
+                -- once the enemy has reached its destination, or if it's adjacent to the player, stop moving
+                if ((enemyGridCell.x == pathfind.x and enemyGridCell.y == pathfind.y and enemyGridCell.z == pathfind.z) or 
+                    CheckEnemyAdjacentToPlayer(e, playerEntity) == true)  then
 
-                -- reset variables
-                stateMoveEnemyComponent.Time = 0.0
-                stateMoveEnemyComponent.startedPathfind = false
-                pathfind.x = 0
-                pathfind.y = 0
-                pathfind.z = 0
+                    -- reset variables
+                    stateMoveEnemyComponent.Time = 0.0
+                    stateMoveEnemyComponent.startedPathfind = false
+                    pathfind.x = 0
+                    pathfind.y = 0
+                    pathfind.z = 0
 
-                -- switch to next character's turn
-                print("[StateMoveEnemy.lua] moved = true (line 104).")
-                -- turnOrderManagerComponent.nextTurn = true
-                GetComponent(e, "C_Character").moved = true
-                print("[StateMoveEnemy.lua] Destination reached!")
-                print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")  
-            
-            elseif (GetComponent(e, "C_Character").currentStamina <= 0) then
+                    -- switch to next character's turn
+                    print("[StateMoveEnemy.lua] moved = true (line 104).")
+                    -- turnOrderManagerComponent.nextTurn = true
+                    GetComponent(e, "C_Character").moved = true
+                    print("[StateMoveEnemy.lua] Destination reached!")
+                    print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")  
                 
-                -- reset variables
-                stateMoveEnemyComponent.Time = 0.0
-                stateMoveEnemyComponent.startedPathfind = false
-                pathfind.x = 0
-                pathfind.y = 0
-                pathfind.z = 0
+                elseif (GetComponent(e, "C_Character").currentStamina <= 0) then
+                    
+                    -- reset variables
+                    stateMoveEnemyComponent.Time = 0.0
+                    stateMoveEnemyComponent.startedPathfind = false
+                    pathfind.x = 0
+                    pathfind.y = 0
+                    pathfind.z = 0
 
-                -- switch to next character's turn
-                print("[StateMoveEnemy.lua] moved = true (line 119).")
-                -- turnOrderManagerComponent.nextTurn = true
-                GetComponent(e, "C_Character").moved = true
-                print("[StateMoveEnemy.lua] Stamina fully depleted!")
-                print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")  
-            
+                    -- switch to next character's turn
+                    print("[StateMoveEnemy.lua] moved = true (line 119).")
+                    -- turnOrderManagerComponent.nextTurn = true
+                    GetComponent(e, "C_Character").moved = true
+                    print("[StateMoveEnemy.lua] Stamina fully depleted!")
+                    print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")  
+                
+                end
             end
         end
     end

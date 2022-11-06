@@ -31,6 +31,27 @@ function S_Pathfind(e)
             if (current_cell.x ~= pathfind.x or current_cell.y ~= pathfind.y or current_cell.z ~= pathfind.z) then
                 local path = GetPath(e, pathfind.x, pathfind.y, pathfind.z);
                 if (#path > 1) then
+                           
+                    -- -- adjust player's rotation here -----------------------------------------------------------
+                    if (EntityName(e) == "Player") then
+                        local playerTransform = GetTransform(e)
+                        
+                        if (path[2].x > current_cell.x) then
+                            -- face left
+                            playerTransform.rotation.y = 90
+                        elseif (path[2].x < current_cell.x) then
+                            -- face right
+                            playerTransform.rotation.y = 270
+                        elseif (path[2].z > current_cell.z) then
+                            -- face front
+                            playerTransform.rotation.y = 0
+                        else
+                            -- face back
+                            playerTransform.rotation.y = 180         
+                        end
+                    end
+                    -- -- end of adjusting rotation ------------------------------------------------------------------
+                    
                     current_cell.x = path[2].x
                     current_cell.y = path[2].y
                     current_cell.z = path[2].z

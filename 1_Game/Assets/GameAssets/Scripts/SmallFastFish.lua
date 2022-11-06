@@ -106,9 +106,15 @@ function S_SmallFastFish(e)
             enemyComponent.hasMoved = false
             enemyComponent.hasAttacked = false
             enemyComponent.hasPerformedSpecialBehaviour = false
+            print("[SmallFastFish.lua] Resetting hasMoved, hasAttacked, hasPerformedSpecialBehaviour.")
+
+            -- may need to move this to StateMoveEnemy.lua 
+            GetComponent(e, "C_Character").moved = false
             
             -- set next turn to true
             turnOrderManagerComponent.nextTurn = true
+
+            print("[SmallFastFish.lua] Ending enemy turn!")
         end
     end
 
