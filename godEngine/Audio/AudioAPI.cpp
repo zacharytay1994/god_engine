@@ -22,7 +22,7 @@ namespace god
 
 	std::unordered_map<int, const char*> AudioAPI::m_channel_group_names =
 	{
-		{ 0, "Master" }, { 1, "Music" }, { 2, "SFX" }
+		{ 0, "Default" }, { 1, "Music" }, { 2, "SFX" }
 	};
 
 	AudioAPI::AudioAPI()
