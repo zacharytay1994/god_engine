@@ -2,30 +2,28 @@ Useful keys:
 
 [In-game actions]
 E - End current character's turn
-R - End current enemy's turn
 
 [Character Script debugging]
 C - Print current character's stats and details
 X - print current character's grid location as well as global position
 
-[GlobalStatemachine debugging]
-Z - Print current state of GlobalStatemachine
-
-[TurnOrderManager debugging]
-M - Press to check the name and ID of the current active character
+[TurnOrderManager.lua debugging]
+M - Press to check the name and ID of the current active character, as well as current round number
 N - Press to check which turn number we are at
 
 [SeedRand debugging]
 V - Press to check RandomProbability()
 
-[ScreenShake debugging]
-B - Press the trigger a screenshake
-
 [Combat debugging]
 1 - Set player's selected attack as Front Jab (Blue)
-2 - Set player's selected attack as Big Swing (Blue)
+2 - Set player's selected attack as Big Swing (Blue) (not implemented yet)
 3 - Set player's selected attack as Energy Bolt (Blue)
+4 - Set player's selected action to Move
 
 [RemoveInstance debugging]
-K - Remove Enemy entity (breaks the game)
-L - Remove TestSubject
+J - Set all enemies' HP to zero
+
+[Cheats for presentation]
+T - Reset player stamina
+Y - Press to release the Move button
+Z - Set earthquake to occur in 3 turns

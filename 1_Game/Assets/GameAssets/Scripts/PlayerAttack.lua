@@ -1,8 +1,7 @@
--- This script will allow the player to perform an attack
+-- This script will allow the player to select an enemy as an attack target.
 
 -- TODO:
--- 1) Attacks should be selected by pressing the Attack Button UI. For now just press hotkeys.
--- 2) Click to select target entity. For now, the enemy is selected by default.
+-- 1) 
 
 --[IsComponent]
 function C_PlayerAttack()
@@ -20,7 +19,10 @@ function C_PlayerAttack()
         resetVariables = false,
 
         -- checks whether the attack script has performed its check
-        attackCheckTriggered = false
+        attackCheckTriggered = false,
+
+        -- used to cycle through enemy targets, won't be used anymore once UI to select enemy is done
+        enemyCycle = 1
     }
     return function()
         return var
@@ -36,72 +38,85 @@ function S_PlayerAttack(e)
 
         -- getting the required entities and components
         local entityDataComponent = GetEntityData(e)
-        turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
+        local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
         local playerAttackComponent = GetComponent(e, "C_PlayerAttack")
         
         -- only run this script if its the character's turn
         if (turnOrderManagerComponent.currentTurn == entityDataComponent.id) then
-                  
+            
             -- resetting variables
             if (playerAttackComponent.resetVariables) then 
-                print("[PlayerAttack.lua] Resetting variables!!!\n")
+                print("[PlayerAttack.lua] Resetting variables!\n")
                 playerAttackComponent.selectedAttack = nil
                 playerAttackComponent.targetEntity = nil
                 playerAttackComponent.attackCheckTriggered = false
                 playerAttackComponent.resetVariables = false
             end
             
-            --  check if CombatManager entity exists
+            --  getting the attack list
             combatManagerEntity = GetEntity("CombatManager")
             if (combatManagerEntity ~= -1) then
                 
-                -- get C_AttackList
                 attackListComponent = GetComponent(combatManagerEntity, "C_AttackList")
 
                 if (attackListComponent ~= nil) then
                     attackList = attackListComponent.attackList
                 else
-                    print("[PlayerAttack.lua] ERROR: attackListComponent is nil!!!")
+                    print("[PlayerAttack.lua] ERROR: attackListComponent is nil.")
                 end    
             end 
 
-            -- select an attack ----------------------------------------------------------------------------------
-            -- press 1 to select Front Jab (Blue)
-            if (CheckKeyPress(49)) then
-                playerAttackComponent.selectedAttack = attackList[1]
-                print("\n[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
-                      "Base damage:", playerAttackComponent.selectedAttack[2], 
-                      "Special property:", playerAttackComponent.selectedAttack[3], "\n")
-            end
-
-            -- -- press 2 to select Big Swing (Blue)
-            -- if (CheckKeyPress(50)) then
-            --     playerAttackComponent.selectedAttack = attackList[4]
-            --     print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
-            --           "Base damage:", playerAttackComponent.selectedAttack[2], 
-            --           "Special property:", playerAttackComponent.selectedAttack[3], "\n")
-            -- end
-
-            -- press 3 to select Energy Bolt (Blue)
-            if (CheckKeyPress(51)) then
-                playerAttackComponent.selectedAttack = attackList[10]
-                print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
-                      "Base damage:", playerAttackComponent.selectedAttack[2], 
-                      "Special property:", playerAttackComponent.selectedAttack[3], "\n")
-            end
-            -- end of selecting attack ---------------------------------------------------------------------------------
+            
         
-            -- select a target -----------------------------------------------------------------------------------------
-            playerAttackComponent.targetEntity = EntitiesWithScriptComponent("C_StateMoveEnemy")[1]
-            -- print(EntityName(playerAttackComponent.targetEntity))
+            -- select a target -----------------------------------------------------------------------------------------           
+            if (playerComponent.selectedAction ~= "Move") then
+                
+                local gridManipulateEntity = GetEntity("GridManipulate")
+                    
+                if (gridManipulateEntity ~= -1) then
+                    
+                    local gridManipulateComponent = GetGridManipulate(gridManipulateEntity)
+                    
+                    if (gridManipulateComponent.clicked) then
+                        
+                        -- note: last_clicked_cell.y will +1 automatically, so need to minus one first
+                        local enemyGridx = gridManipulateComponent.last_clicked_cell.x
+                        local enemyGridy = gridManipulateComponent.last_clicked_cell.y - 1
+                        local enemyGridz = gridManipulateComponent.last_clicked_cell.z
+
+                        local characterList = EntitiesWithScriptComponent("C_Character")
+
+                        for i = 1, #characterList do
+                        
+                            -- skip the player
+                            if (characterList[i] ~= e) then
+                            
+                                local currentEntityGridCell = GetGridCell(characterList[i])
+
+                                if (currentEntityGridCell.x == enemyGridx and currentEntityGridCell.y == enemyGridy and currentEntityGridCell.z == enemyGridz) then
+                                    print("Selected target:", EntityName(characterList[i]), GetEntityData(characterList[i]).id)
+                                    playerAttackComponent.targetEntity = characterList[i]
+                                    break
+                                end
+                            end
+                        end
+                    end
+                else
+                    print("[PlayerAttack.lua] ERROR: GridManipulate entity does not exist!")
+                end
+            end
             -- end of selecting target ---------------------------------------------------------------------------------
 
             -- if attack type and attack target are chosen, then initiate combat
-            if (playerAttackComponent.selectedAttack ~= nil and playerAttackComponent.targetEntity ~= -1) then
+            if (playerAttackComponent.selectedAttack ~= nil and playerAttackComponent.targetEntity ~= -1 and playerAttackComponent.targetEntity ~= nil) then
                         
+                local selectedAttackComponent = GetComponent(combatManagerEntity, playerAttackComponent.selectedAttack[4])
+                
                 -- check whether player is able to attack the enemy (within range / no obstructions / etc) --------------
                 if (playerAttackComponent.attackCheckTriggered == false) then
-                    selectedAttackComponent = GetComponent(combatManagerEntity, playerAttackComponent.selectedAttack[4])
+                    
+                    -- note: selectedAttack[4] is the attack's component name (refer to AttackList.lua)
+                    -- selectedAttackComponent = GetComponent(combatManagerEntity, playerAttackComponent.selectedAttack[4])
                     selectedAttackComponent.attacker = e
                     selectedAttackComponent.defender = playerAttackComponent.targetEntity
                     selectedAttackComponent.startCheck = true
@@ -119,10 +134,13 @@ function S_PlayerAttack(e)
                         combatManagerComponent.attacker = e
                         combatManagerComponent.attackType = playerAttackComponent.selectedAttack
                         combatManagerComponent.defender = playerAttackComponent.targetEntity
-                        print("PlayerAttack.lua ---> CombatManager.lua")
+                        print("[PlayerAttack.lua] PlayerAttack.lua ---> CombatManager.lua")
 
                         -- resetting FrontJab variable
                         selectedAttackComponent.canAttack = false
+
+                        -- setting cue to reset action button texture
+                        GetComponent(e, "C_Player").playerAttacked = true
                         
                         -- CombatManager will handle the rest of damage calculation and application     
 
@@ -133,8 +151,6 @@ function S_PlayerAttack(e)
 
                     -- reset variables
                     playerAttackComponent.resetVariables = true
-
-                    -- reset FrontJab variable
                     selectedAttackComponent.checkCompleted = false
                 end
             end

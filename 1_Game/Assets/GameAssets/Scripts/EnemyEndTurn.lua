@@ -1,3 +1,5 @@
+-- DEPRECATED SCRIPT --
+
 -- This script allows the enemy to end their turn.
 -- Upon ending turn, this script will change GlobalStatemachine's current state to 
 -- the next character's turn. 

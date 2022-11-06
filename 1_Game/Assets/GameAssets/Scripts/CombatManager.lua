@@ -8,7 +8,7 @@
 -- Note: Player will have a PlayerAttack script, while each type of enemy will have a its own attack script (because they have different sets of attacks)
 
 -- TODO:
--- 1) Implement enemy attack scripts
+-- 1) 
 
 --[IsComponent]
 function C_CombatManager()
@@ -35,10 +35,7 @@ function C_CombatManager()
         critDamageMultiplier = 1.5,
 
         -- set to true if player manages to pass the crit hit mini game
-        critSuccess = false,
-
-        -- CharacterAttack script will be responsible for telling CombatManager to reset variables 
-        resetVariables = false,
+        critSuccess = false
     }
     return function()
         return var
@@ -58,19 +55,10 @@ function S_CombatManager(e)
         combatManagerComponent.attackListAttached = true
     end
 
-    -- reset variables
-    if (combatManagerComponent.resetVariables) then 
-        combatManagerComponent.damage = 0
-        combatManagerComponent.attacker = -1
-        combatManagerComponent.defender = -1
-        combatManagerComponent.attackType = nil
-        combatManagerComponent.resetVariables = false
-    end
-
     -- only calculate damage if all the required components are available
     if (combatManagerComponent.attacker ~= -1 and combatManagerComponent.defender ~= -1 and combatManagerComponent.attackType ~= nil) then
                     
-        print("CombatManager received all info, proceeding to calculate damage")
+        print("[CombatManager.lua] CombatManager received all info, proceeding to calculate damage.")
         
         -- getting the attacker and defenders' C_Character components
         local attackerCharacterComponent = GetComponent(combatManagerComponent.attacker, "C_Character")
@@ -91,21 +79,24 @@ function S_CombatManager(e)
             -- calculate damage and print results
             if (combatManagerComponent.critSuccess) then 
                 combatManagerComponent.damage = ((attackStrength + baseDamage) * combatManagerComponent.critDamageMultiplier) - defenderDefence
-                print("[(", attackStrength, "+", baseDamage, ") *", combatManagerComponent.critDamageMultiplier, "] -", defenderDefence, "=", combatManagerComponent.damage)
+                print("[CombatManager.lua] [(", attackStrength, "+", baseDamage, ") *", combatManagerComponent.critDamageMultiplier, "] -", defenderDefence, "=", combatManagerComponent.damage)
             else
                 combatManagerComponent.damage = (attackStrength + baseDamage) - defenderDefence
-                print("(", attackStrength, "+", baseDamage, ") -", defenderDefence, "=", combatManagerComponent.damage)
+                print("[CombatManager.lua] (", attackStrength, "+", baseDamage, ") -", defenderDefence, "=", combatManagerComponent.damage)
             end
 
             -- deduct defender's current HP
             defenderCharacterComponent.currentHP = defenderCharacterComponent.currentHP - combatManagerComponent.damage
-            print(EntityName(combatManagerComponent.attacker), "dealt", combatManagerComponent.damage, "damage to", EntityName(combatManagerComponent.defender), "\n\n")
+            print("[CombatManager.lua]", EntityName(combatManagerComponent.attacker), "dealt", combatManagerComponent.damage, "damage to", EntityName(combatManagerComponent.defender), ".\n")
 
-            -- resetting variables
-            combatManagerComponent.resetVariables = true
+            -- reset variables
+            combatManagerComponent.damage = 0
+            combatManagerComponent.attacker = -1
+            combatManagerComponent.defender = -1
+            combatManagerComponent.attackType = nil
 
         else
-            print("[CombatManager.lua] ERROR: Either the attacking entity or defending entity does have C_Character component!!!")
+            print("[CombatManager.lua] ERROR: Either the attacking entity or defending entity does not have C_Character component!!!")
         end
     end
 end

@@ -58,6 +58,7 @@ function S_RandomEventEarthquake(e)
     
     -- getting RandomEventManager
     local randomEventManagerEntity = GetEntity("RandomEventManager")
+    local randomEventManagerComponent
     if (randomEventManagerEntity ~= -1) then
         randomEventManagerComponent = GetComponent(randomEventManagerEntity, "C_RandomEventManager")
     end
@@ -65,11 +66,17 @@ function S_RandomEventEarthquake(e)
     -- getting C_RandomEventEarthquake component
     local randomEventEarthquakeComponent = GetComponent(randomEventManagerEntity, "C_RandomEventEarthquake")
 
+    -- cheat to activate earthquake in 3 turns
+    if (CheckKeyPress(90)) then
+        randomEventManagerComponent.currentEvent = randomEventEarthquakeComponent.RandomEvent
+    end
+
     -- only go on if RandomEventManager says the current event is an earthquake
     if (randomEventManagerComponent.currentEvent == randomEventEarthquakeComponent.RandomEvent) then 
             
         -- getting TurnOrderManager to check the turn counter
         local turnOrderManagerEntity = GetEntity("TurnOrderManager")
+        local turnOrderManagerComponent
         if (turnOrderManagerEntity ~= -1) then
             turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
         end
@@ -86,10 +93,8 @@ function S_RandomEventEarthquake(e)
             -- set earthquakeInitialized to true so script will not overwrite earthquakeExecuteTurn
             randomEventEarthquakeComponent.earthquakeInitialized = true
             
-            print("\n[Earthquake announcement - START]")
-            print("Current turn is turn no.", turnOrderManagerComponent.turnCycleCounter)
-            print("Earthquake will execute on turn no.", randomEventEarthquakeComponent.earthquakeExecuteTurn)
-            print("[Earthquake announcement - END]\n\n")
+            print("[RandomEventEarthquake.lua] Current turn is turn no.", turnOrderManagerComponent.turnCycleCounter)
+            print("[RandomEventEarthquake.lua] Earthquake will execute on turn no.", randomEventEarthquakeComponent.earthquakeExecuteTurn, "\n")
         end
 
         --countdown, warn the player, let them know how many more turns until earthquake
@@ -98,9 +103,7 @@ function S_RandomEventEarthquake(e)
             -- insert UI to warn player here
             
             -- for now, just print a message
-            print("\n[Earthquake warning - START]")
-            print("EARTHQUAKE HAPPENING IN", randomEventEarthquakeComponent.eventCountdown, "TURNS")
-            print("[Earthquake warning - END]\n\n")
+            print("[RandomEventEarthquake.lua] WARNING: EARTHQUAKE HAPPENING IN", randomEventEarthquakeComponent.eventCountdown, "TURNS\n")
 
             -- reset playerWarned, and decrement eventCountdown
             randomEventEarthquakeComponent.playerWarned = true
@@ -116,11 +119,11 @@ function S_RandomEventEarthquake(e)
         -- when it's time to execute the earthquake
         if (turnOrderManagerComponent.turnCycleCounter == randomEventEarthquakeComponent.earthquakeExecuteTurn) then 
             
-            print("\n[RandomEventEarthquake - START]")
+            print("[RandomEventEarthquake.lua] START OF EARTHQUAKE]")
 
             -- get a list of all tiles
             local tileList = EntitiesWithScriptComponent("C_FloorTile")
-            print("number of tiles", #tileList)
+            print("[RandomEventEarthquake.lua] number of tiles", #tileList)
 
             -- iterate through each tile in tileList
             for i = 1, #tileList do
@@ -138,7 +141,7 @@ function S_RandomEventEarthquake(e)
                     
                     -- getting the x,y,z grid coordinates for the center tile
                     local mainTileCoordinates = GetGridCell(tileList[i])
-                    print("mainTileCoordinates:", mainTileCoordinates.x, mainTileCoordinates.y, mainTileCoordinates.z)
+                    print("[RandomEventEarthquake.lua] mainTileCoordinates:", mainTileCoordinates.x, mainTileCoordinates.y, mainTileCoordinates.z)
 
                     -- manually add surrounding tiles into affectedTileList, by iterating through tileList again to look for tiles with correct coords
                     for k = 1, #tileList do
@@ -158,13 +161,13 @@ function S_RandomEventEarthquake(e)
                                 --(adjacentTileCoordinates.x == mainTileCoordinates.x - 1 and adjacentTileCoordinates.z == mainTileCoordinates.z + 1) or -- front + right
                                 --(adjacentTileCoordinates.x == mainTileCoordinates.x + 1 and adjacentTileCoordinates.z == mainTileCoordinates.z - 1) or -- behind + left
                                 --(adjacentTileCoordinates.x == mainTileCoordinates.x - 1 and adjacentTileCoordinates.z == mainTileCoordinates.z - 1)) then -- behind + right
-                                print("inserting a tile in affectedTileList", adjacentTileCoordinates.x, adjacentTileCoordinates.y, adjacentTileCoordinates.z)
+                                print("[RandomEventEarthquake.lua] Inserting a tile in affectedTileList", adjacentTileCoordinates.x, adjacentTileCoordinates.y, adjacentTileCoordinates.z)
                                 affectedTileList[#affectedTileList+1] = tileList[k]
                             end 
                         end
                     end
 
-                    print("2. number of tiles in affectedTileList:", #affectedTileList, "\n")
+                    print("[RandomEventEarthquake.lua] 2. number of tiles in affectedTileList:", #affectedTileList, "\n")
 
                     -- activate screenshake here
                     local screenShakeEntity = GetEntity("ScreenShake")
@@ -224,7 +227,7 @@ function S_RandomEventEarthquake(e)
 
                 -- break the loop after hitting the cap for affected tiles
                 if (randomEventEarthquakeComponent.affectedTilesCounter == randomEventEarthquakeComponent.maxAffectedTiles) then
-                    print("Maximum affected tiles hit! Breaking loop") 
+                    print("[RandomEventEarthquake.lua] Maximum affected tiles hit! Breaking loop") 
                     break
                 end
             end
@@ -240,34 +243,7 @@ function S_RandomEventEarthquake(e)
             -- reset randomeventmanager.currentEvent
             randomEventManagerComponent.currentEvent = nil
 
-            print("RandomEventEarthquake - END]\n\n")
+            print("[RandomEventEarthquake.lua] END OF EARTHQUAKE]\n")
         end
     end
 end
-
-
---[[ PSEUDOCODE
-
-if (RandomEventManager.currentEvent = eventEarthquake)
-{
-    tileList = a list of all tiles
-    
-    for each tile in tileList
-    {
-        if (randomprob <= 0.1)
-        {
-            1. tile will be affected! 
-            2. push this tile and its surrounding 8 tiles into another list
-            3. get another randomprob to determine move up or down
-            4. for each tile in this new list, move either up or down, according to no. 3
-            5. ++affecttiles
-        }        
-
-        if affectedtiles >= 3, stop
-    }
-
-    reset variables
-    reset randomeventmanager.currentEvent
-}
-
---]]

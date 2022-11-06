@@ -38,56 +38,34 @@ function S_RandomEventManager(e)
     
     -- getting TurnOrderManager entity and component
     local randomEventManagerEntity = GetEntity("RandomEventManager")
-    local randomEventManagerComponent = GetComponent(randomEventManagerEntity, "C_RandomEventManager")
+    local randomEventManagerComponent
+    if (randomEventManagerEntity ~= -1) then
+        randomEventManagerComponent = GetComponent(randomEventManagerEntity, "C_RandomEventManager")
+    end
  
     -- getting GlobalStatemachine entity and component
     local globalStateMachineEntity = GetEntity("GlobalStatemachine")
-    local globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
-
-    -- print(globalStateMachineComponent.CurrentState, "vs", randomEventManagerComponent.RandomEventState)
+    local globalStateMachineComponent
+    if (globalStateMachineEntity ~= -1) then
+        globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
+    end
 
     -- only run the rest of this script if globalStateMachine allows it
     if (globalStateMachineComponent.CurrentState == randomEventManagerComponent.RandomEventState) then
              
         -- only allow random event if no other random event is occuring
         if (randomEventManagerComponent.currentEvent == nil) then
-            print("\n[RandomEventManager - START]")
             if (GenerateRandomProbability() < randomEventManagerComponent.randomEventRate) then
-                print("RandomEvent activated! 25% chance.")
+                print("[RandomEventManager.lua] RandomEvent activated! 25% chance.")
                 
                 local randomNumber = GenerateRandomNumberInRange(1, #randomEventManagerComponent.randomEventList)
-                print("Activated random event:", randomEventManagerComponent.randomEventList[randomNumber])
+                print("[RandomEventManager.lua] Activated random event:", randomEventManagerComponent.randomEventList[randomNumber], "\n")
                 randomEventManagerComponent.currentEvent = randomEventManagerComponent.randomEventList[randomNumber]
-                print("Double-checking: randomEventManagerComponent.currentEvent =", randomEventManagerComponent.currentEvent)
-                -- TODO: randomly pick an event and run that script
-                print("[RandomEventManager - END]\n\n")
             else
-                print("RandomEvent not activated! 75% chance.")
-                print("[RandomEventManager - END]\n\n")            
+                print("[RandomEventManager.lua] RandomEvent not activated! 75% chance.\n")
             end
         end
         
         globalStateMachineComponent.CurrentState = "StateCharacterTurn"        
     end
 end
-
-
-
-
---[[ PSEUDOCODE
-
-if starting a new turn cycle
-    init the turnQueue array
-    buildTurnQueue = false
-
-if (GlobalStatemachine.CurrentState = CharacterTurn)
-    while not every character has performed their turn
-        perform turn
-        if (nextTurn)
-            nextTurn = false
-            go to next character
-
-buildTurnQueue = true
-GlobalStatemachine.CurrentState = RandomEventState
-
---]]

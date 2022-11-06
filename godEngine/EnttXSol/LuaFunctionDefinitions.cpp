@@ -53,7 +53,7 @@ namespace god
 				// potential area for optimization looking for entity of name
 				for ( uint32_t i = 0; i < entt.m_entities.Size (); ++i )
 				{
-					if ( entt.m_entities[ i ].m_name == entityName )
+					if ( entt.m_entities.Valid ( i ) && entt.m_entities[ i ].m_name == entityName )
 					{
 						return static_cast< int >( entt.m_entities[ i ].m_id );
 					}
@@ -149,6 +149,26 @@ namespace god
 			}
 		);
 
+		// CheckLeftMousePress()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("CheckLeftMousePress",
+			[&engineResources]()->bool
+			{
+				auto& window = engineResources.Get<GLFWWindow>().get();
+				return window.MouseLPressed();
+			}
+		);
+
+		// CheckRightMousePress()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("CheckRightMousePress",
+			[&engineResources]()->bool
+			{
+				auto& window = engineResources.Get<GLFWWindow>().get();
+				return window.MouseRPressed();
+			}
+		);
+
 		// GenerateRandomProbability()
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "GenerateRandomProbability" ,
@@ -169,10 +189,10 @@ namespace god
 
 		// srand()
 		// ==============================================================================================
-		entt.RegisterLuaFunction("srand",
+		entt.RegisterLuaFunction ( "srand" ,
 			[]()->void
 			{
-				srand(time(0));
+				srand ( time ( 0 ) );
 			}
 		);
 
@@ -242,19 +262,123 @@ namespace god
 
 		// Abs(value)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("Abs",
-			[](float value)->float
+		entt.RegisterLuaFunction ( "Abs" ,
+			[]( float value )->float
 			{
-				return glm::abs(value);
+				return glm::abs ( value );
 			}
 		);
 
 		// EntityName(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("EntityName",
-			[&entt](entt::entity e)->std::string&
+		entt.RegisterLuaFunction ( "EntityName" ,
+			[&entt]( entt::entity e )->std::string&
 			{
-				return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_name;
+				return entt.m_entities[ entt.GetEngineComponent<EntityData> ( e )->m_id ].m_name;
+			}
+		);
+
+		// SetTransformPosition(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("SetTransformPosition",
+			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+			{
+				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+					;
+
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				{
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setGlobalPose(ConvertToPhysXTransform({ x, y, z }, entt.GetEngineComponent<Transform>(e)->m_rotation));
+					}
+				}
+			}
+		);
+
+		// AddForce(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("AddForce",
+			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+			{
+				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+					;
+
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				{
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
+						std::cout << "---ADDING FORCE1...." << std::endl;
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->addForce(ConvertToPhysXVector({ x, y, z }));
+						std::cout << "---ADDING FORCE2...." << std::endl;
+					}
+				}
+			}
+		);
+
+		// FreezeObject(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("FreezeObject",
+			[&entt, &engineResources](entt::entity e, bool freeze)
+			{
+				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+					;
+
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				{
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, freeze);
+					}
+				}
+			}
+		);
+
+		// Child(e, index)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("Child",
+			[&entt](entt::entity e, unsigned index)->entt::entity
+			{
+				if (index >= entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children.size())
+					std::cout << "Child at index " << index << " does not exist!" << std::endl;
+				else
+					return entt.m_entities[entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children[index]].m_id;
+			}
+		);
+
+		// ChangeTexture(e, texture name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("ChangeTexture",
+			[&entt, &engineResources](entt::entity e, std::string texture_name)
+			{
+				Renderable3D* r = entt.GetEngineComponent<Renderable3D>(e);
+				if (r)
+				{
+					r->m_diffuse_id = engineResources.Get<OGLTextureManager>().get().GetID(texture_name);
+				}
+			}
+		);
+
+		// TextureName(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("TextureName",
+			[&entt, &engineResources](entt::entity e)->std::string
+			{
+				Renderable3D* r = entt.GetEngineComponent<Renderable3D>(e);
+				if (r)
+				{
+					return engineResources.Get<OGLTextureManager>().get().GetName(r->m_diffuse_id);
+				}
+			}
+		);
+
+		// WorldPosition(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("WorldPosition",
+			[&entt](entt::entity e)->glm::vec3
+			{
+				return glm::vec3{ entt.GetEngineComponent<Transform>(e)->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform>(e)->m_position, 1.0f } };
 			}
 		);
 	}

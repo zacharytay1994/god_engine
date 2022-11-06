@@ -5,7 +5,7 @@
 -- Front jab can only be used when player is directly adjacent to the target.
 
 -- TODO:
--- 1) Trigger sound effects / particles
+-- 1) 
 
 --[IsComponent]
 function C_FrontJab()
@@ -30,7 +30,7 @@ function C_FrontJab()
         canAttack = false,
         
         -- error message (why the attack failed)
-        errorMessage = "[AttackFrontJab.lua] Player not adjacent to enemy!!!",
+        errorMessage = "[AttackFrontJab.lua] Player not adjacent to enemy.",
         
         -- used to turn player to face the target
         playerRotation = 0
@@ -51,21 +51,29 @@ function S_FrontJab(e)
         
         -- run the check only once per attack
         attackComponent.startCheck = false
-        
-        -- check if player is adjacent to enemy
-        if (CheckPlayerAdjacentToEnemy(attackComponent.attacker, attackComponent.defender, e) == true) then
-            
-            -- passed the check, allow the rest of the script to run
-            attackComponent.canAttack = true
-            print("[AttackFrontJab.lua] Adjacent check passed!")
+
+        if (attackComponent.attacker == -1 or attackComponent.defender == -1) then 
+
+            print("[AttackFrontJab.lua] ERROR: Either attacker or defender is -1.")
+
         else
             
-            -- failed the check, print fail message
-            print("[AttackFrontJab.lua] Adjacent check failed!")
-        end
-        
-        -- this will allow PlayerAttack.lua to proceed
-        attackComponent.checkCompleted = true
+            -- check if player is adjacent to enemy
+            if (CheckPlayerAdjacentToEnemy(attackComponent.attacker, attackComponent.defender, e) == true) then
+                
+                -- passed the check, allow the rest of the script to run
+                attackComponent.canAttack = true
+                print("[AttackFrontJab.lua] Adjacent check passed!")
+            else
+                
+                -- failed the check, print fail message
+                print("[AttackFrontJab.lua] Adjacent check failed.")
+            end
+            
+            -- this will allow PlayerAttack.lua to proceed
+            attackComponent.checkCompleted = true
+
+        end   
     end
     -- end of checking if player is able to use attack against the enemy -------------------------------------------------
     
@@ -86,6 +94,7 @@ function S_FrontJab(e)
         end
         
         -- trigger sound effect
+        InstancePrefab("SFX_Jab",0,0,0)
         
         -- trigger particles (if any)
         
@@ -117,22 +126,22 @@ function CheckPlayerAdjacentToEnemy(attacker, defender, e)
         -- enemy behind player
         if (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z - 1) then
             result = true 
-            attackComponent.playerRotation = 90
+            attackComponent.playerRotation = 0
 
         -- enemy in front of player
         elseif (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z + 1) then
             result = true 
-            attackComponent.playerRotation = 270
+            attackComponent.playerRotation = 180
 
         -- enemy to player's left
         elseif (attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x - 1) then
             result = true 
-            attackComponent.playerRotation = 180
+            attackComponent.playerRotation = 90
 
         -- enemy to player's right
         elseif(attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x + 1) then
             result = true 
-            attackComponent.playerRotation = 0       
+            attackComponent.playerRotation = 270
         end
     end
 
