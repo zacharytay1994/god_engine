@@ -24,15 +24,15 @@ namespace god
 			PxContactPairPoint contacts[bufferSize];
 			for (PxU32 i = 0; i < nbPairs; i++)
 			{
-				const PxContactPair& cp = pairs[i];
+				//const PxContactPair& cp = pairs[i];
 
 				PxU32 nbContacts = pairs[i].extractContacts(contacts, bufferSize);
 				for (PxU32 j = 0; j < nbContacts; j++)
 				{
 					PxVec3 point = contacts[j].position;
 					PxVec3 impulse = contacts[j].impulse;
-					PxU32 internalFaceIndex0 = contacts[j].internalFaceIndex0;
-					PxU32 internalFaceIndex1 = contacts[j].internalFaceIndex1;
+					//PxU32 internalFaceIndex0 = contacts[j].internalFaceIndex0;
+					//PxU32 internalFaceIndex1 = contacts[j].internalFaceIndex1;
 					//...
 					//std::cout << "ContactReportCallback -> Point: " << point << std::endl;
 				}
@@ -147,7 +147,7 @@ namespace god
 		CreatePVD();
 	
 		mToleranceScale.length = 1;        // typical length of an object
-		mToleranceScale.speed = 98.1;         // typical speed of an object, gravity*1s is a reasonable choice
+		mToleranceScale.speed = static_cast<physx::PxReal>(98.1);         // typical speed of an object, gravity*1s is a reasonable choice
 		mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, mToleranceScale, true, mPvd);
 
 
@@ -277,12 +277,12 @@ namespace god
 		
 		physx::PxVec3 origin = mCamera->m_position;                 // [in] Ray origin
 		physx::PxVec3 unitDir = ray_dir;                // [in] Normalized ray direction
-		physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
+		//physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
 		physx::PxRaycastBuffer hit;                 // [out] Raycast results
 		
 		// Raycast against all static & dynamic objects (no filtering)
 		// The main result from this call is the closest hit, stored in the 'hit.block' structure
-		bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
+		//bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
 		if (hit.hasBlock)
 		{
 			mRayCastMouse = hit.block.actor;

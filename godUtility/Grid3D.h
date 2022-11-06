@@ -280,7 +280,7 @@ namespace god
 		// start plane
 		auto difference = start - origin;
 		glm::vec3 stride = scale * 2.0f * granularity;
-		int num_layers = difference.y / stride.y;
+		int num_layers = static_cast< int >( difference.y / stride.y );
 		float start_layer = origin.y + num_layers * stride.y;
 		glm::vec3 intersect;
 		int cell_x , cell_y , cell_z;
@@ -290,9 +290,9 @@ namespace god
 			if ( IntersectLineSegmentPlane ( start , end , { 0,1,0 } , start_layer + ( stride.y / 2.0f ) , intersect ) )
 			{
 				intersect -= origin;
-				cell_x = std::floor ( intersect.x / stride.x );
+				cell_x = static_cast< int >( std::floor ( intersect.x / stride.x ) );
 				cell_y = num_layers - i;
-				cell_z = std::floor ( intersect.z / stride.z );
+				cell_z = static_cast< int >( std::floor ( intersect.z / stride.z ) );
 
 				if ( Has ( granularity , { cell_x, cell_y, cell_z } ) )
 				{

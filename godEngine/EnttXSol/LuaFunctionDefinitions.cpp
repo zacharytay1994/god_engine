@@ -151,21 +151,21 @@ namespace god
 
 		// CheckLeftMousePress()
 		// ==============================================================================================
-		entt.RegisterLuaFunction("CheckLeftMousePress",
+		entt.RegisterLuaFunction ( "CheckLeftMousePress" ,
 			[&engineResources]()->bool
 			{
-				auto& window = engineResources.Get<GLFWWindow>().get();
-				return window.MouseLPressed();
+				auto& window = engineResources.Get<GLFWWindow> ().get ();
+				return window.MouseLPressed ();
 			}
 		);
 
 		// CheckRightMousePress()
 		// ==============================================================================================
-		entt.RegisterLuaFunction("CheckRightMousePress",
+		entt.RegisterLuaFunction ( "CheckRightMousePress" ,
 			[&engineResources]()->bool
 			{
-				auto& window = engineResources.Get<GLFWWindow>().get();
-				return window.MouseRPressed();
+				auto& window = engineResources.Get<GLFWWindow> ().get ();
+				return window.MouseRPressed ();
 			}
 		);
 
@@ -192,7 +192,7 @@ namespace god
 		entt.RegisterLuaFunction ( "srand" ,
 			[]()->void
 			{
-				srand ( time ( 0 ) );
+				srand ( static_cast< unsigned int >( time ( 0 ) ) );
 			}
 		);
 
@@ -219,7 +219,7 @@ namespace god
 		entt.RegisterLuaFunction ( "InstancePrefabOnGrid" ,
 			[&entt]( std::string const& name , int x , int y , int z )
 			{
-				entt.QueueInstancePrefab ( name , x , y , z , EnttXSol::Entities::Null , true );
+				entt.QueueInstancePrefab ( name , static_cast< float >( x ) , static_cast< float >( y ) , static_cast< float >( z ) , EnttXSol::Entities::Null , true );
 			}
 		);
 
@@ -228,7 +228,7 @@ namespace god
 		entt.RegisterLuaFunction ( "InstancePrefabParentedOnGrid" ,
 			[&entt]( entt::entity e , std::string const& name , int x , int y , int z )
 			{
-				entt.QueueInstancePrefab ( name , x , y , z , entt.GetEngineComponent<EntityData> ( e )->m_id , true );
+				entt.QueueInstancePrefab ( name , static_cast< float >( x ) , static_cast< float >( y ) , static_cast< float >( z ) , entt.GetEngineComponent<EntityData> ( e )->m_id , true );
 			}
 		);
 
@@ -280,17 +280,17 @@ namespace god
 
 		// SetTransformPosition(e,x,y,z)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("SetTransformPosition",
-			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+		entt.RegisterLuaFunction ( "SetTransformPosition" ,
+			[&entt , &engineResources]( entt::entity e , float x , float y , float z )
 			{
-				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+				while ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () )
 					;
 
-				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				if ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () == false )
 				{
-					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setGlobalPose(ConvertToPhysXTransform({ x, y, z }, entt.GetEngineComponent<Transform>(e)->m_rotation));
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setGlobalPose ( ConvertToPhysXTransform ( { x, y, z } , entt.GetEngineComponent<Transform> ( e )->m_rotation ) );
 					}
 				}
 			}
@@ -298,19 +298,19 @@ namespace god
 
 		// AddForce(e,x,y,z)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("AddForce",
-			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+		entt.RegisterLuaFunction ( "AddForce" ,
+			[&entt , &engineResources]( entt::entity e , float x , float y , float z )
 			{
-				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+				while ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () )
 					;
 
-				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				if ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () == false )
 				{
-					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_SIMULATION , false );
 						std::cout << "---ADDING FORCE1...." << std::endl;
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->addForce(ConvertToPhysXVector({ x, y, z }));
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->addForce ( ConvertToPhysXVector ( { x, y, z } ) );
 						std::cout << "---ADDING FORCE2...." << std::endl;
 					}
 				}
@@ -319,17 +319,17 @@ namespace god
 
 		// FreezeObject(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("FreezeObject",
-			[&entt, &engineResources](entt::entity e, bool freeze)
+		entt.RegisterLuaFunction ( "FreezeObject" ,
+			[&entt , &engineResources]( entt::entity e , bool freeze )
 			{
-				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+				while ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () )
 					;
 
-				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				if ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () == false )
 				{
-					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, freeze);
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_SIMULATION , freeze );
 					}
 				}
 			}
@@ -337,48 +337,50 @@ namespace god
 
 		// Child(e, index)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("Child",
-			[&entt](entt::entity e, unsigned index)->entt::entity
+		entt.RegisterLuaFunction ( "Child" ,
+			[&entt]( entt::entity e , unsigned index )->entt::entity
 			{
-				if (index >= entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children.size())
+				if ( index >= entt.m_entities[ entt.GetEngineComponent<EntityData> ( e )->m_id ].m_children.size () )
 					std::cout << "Child at index " << index << " does not exist!" << std::endl;
 				else
-					return entt.m_entities[entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children[index]].m_id;
+					return entt.m_entities[ entt.m_entities[ entt.GetEngineComponent<EntityData> ( e )->m_id ].m_children[ index ] ].m_id;
+				return entt::null;
 			}
 		);
 
 		// ChangeTexture(e, texture name)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("ChangeTexture",
-			[&entt, &engineResources](entt::entity e, std::string texture_name)
+		entt.RegisterLuaFunction ( "ChangeTexture" ,
+			[&entt , &engineResources]( entt::entity e , std::string texture_name )
 			{
-				Renderable3D* r = entt.GetEngineComponent<Renderable3D>(e);
-				if (r)
+				Renderable3D* r = entt.GetEngineComponent<Renderable3D> ( e );
+				if ( r )
 				{
-					r->m_diffuse_id = engineResources.Get<OGLTextureManager>().get().GetID(texture_name);
+					r->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( texture_name );
 				}
 			}
 		);
 
 		// TextureName(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("TextureName",
-			[&entt, &engineResources](entt::entity e)->std::string
+		entt.RegisterLuaFunction ( "TextureName" ,
+			[&entt , &engineResources]( entt::entity e )->std::string
 			{
-				Renderable3D* r = entt.GetEngineComponent<Renderable3D>(e);
-				if (r)
+				Renderable3D* r = entt.GetEngineComponent<Renderable3D> ( e );
+				if ( r )
 				{
-					return engineResources.Get<OGLTextureManager>().get().GetName(r->m_diffuse_id);
+					return engineResources.Get<OGLTextureManager> ().get ().GetName ( r->m_diffuse_id );
 				}
+				return std::string ();
 			}
 		);
 
 		// WorldPosition(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("WorldPosition",
-			[&entt](entt::entity e)->glm::vec3
+		entt.RegisterLuaFunction ( "WorldPosition" ,
+			[&entt]( entt::entity e )->glm::vec3
 			{
-				return glm::vec3{ entt.GetEngineComponent<Transform>(e)->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform>(e)->m_position, 1.0f } };
+				return glm::vec3 { entt.GetEngineComponent<Transform> ( e )->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform> ( e )->m_position, 1.0f } };
 			}
 		);
 	}
