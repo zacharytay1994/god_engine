@@ -1,6 +1,9 @@
 -- This script stores data such as currently selected action.
 -- Probably will not have a system.
 
+-- This component is used by:
+-- 1) ActionButton.lua
+
 -- TODO:
 -- 1) 
 
@@ -13,7 +16,7 @@ function C_Player()
         -- certain systems will run / not run based on currently selected action
         selectedAction = nil,
 
-        -- used by ButtonOnHoverPopup.lua to set button texture to empty after player uses the attack
+        -- used by ActionButton.lua to set button texture to empty after player uses the attack
         playerAttacked = false
     };
     return function()
@@ -24,7 +27,8 @@ end
 --[IsSystem]
 function S_Player(e)  
 
-    -- clicking on UI buttons will replace these placeholder functions!!!
+    -- Pressing 1, 2, 3, 4 does the same thing as clicking the Action Buttons.
+    -- Leaving these here for quick access.
     
     playerComponent = GetComponent(e, "C_Player")
 

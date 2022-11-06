@@ -40,8 +40,11 @@ function S_SmallFastFish(e)
     local enemyComponent = GetComponent(e, "C_SmallFastFish")
     local entityDataComponent = GetEntityData(e)
 
-    -- print(entityDataComponent.id)
-    -- print(turnOrderManagerComponent.currentTurn)
+    local playerEntity = GetEntity("Player")
+    if (playerEntity == -1) then
+        print("[SmallFastFish.lua] ERROR: Player does not exist! Returning.")
+        return
+    end
 
     -- check if its this enemy's turn
     if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then
@@ -54,8 +57,6 @@ function S_SmallFastFish(e)
             -- wait for StateMoveEnemy.lua to finish.
             -- StateMoveEnemy.lua will set C_Character.moved to true
 
-            --print("[SmallFastFish.lua] characterComponent.moved", characterComponent.moved)
-
             if (characterComponent.moved) then
                 print("[EnemySmallFastFish.lua] Done moving.")
                 enemyComponent.hasMoved = true
@@ -64,21 +65,20 @@ function S_SmallFastFish(e)
 
         elseif (enemyComponent.hasAttacked == false) then
         
-            if (CheckEnemyAdjacentToPlayer(e, GetEntity("Player"))) then
+            if (CheckEnemyAdjacentToPlayer(e, playerEntity)) then
                 
-                local playerCharacterComponent = GetComponent(GetEntity("Player"), "C_Character")
+                local playerCharacterComponent = GetComponent(playerEntity, "C_Character")
                 
                 --attack player
                 print("[SmallFastFish.lua] Player's HP before getting hit is", playerCharacterComponent.currentHP)
                 print("[SmallFastFish.lua] SmallFastFish attacks player!")
 
-                playerCharacterComponent.currentHP = playerCharacterComponent.currentHP - 1
+                playerCharacterComponent.currentHP = playerCharacterComponent.currentHP - 2
 
                 -- activate screenshake
-                print("triggering screenshake!")
-                screenShakeEntity = GetEntity("ScreenShake")
+                local screenShakeEntity = GetEntity("ScreenShake")
                 if (screenShakeEntity ~= -1) then
-                    screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
+                    local screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
                     screenShakeComponent.duration = 0.25
                     screenShakeComponent.doScreenShake = true
                 end
@@ -93,7 +93,7 @@ function S_SmallFastFish(e)
         elseif (enemyComponent.hasPerformedSpecialBehaviour == false) then
 
             -- special action code here
-            print("[SmallFastFishSmallFastFish.lua] Pretend to perform special action.")
+            print("[SmallFastFish.lua] Pretend to perform special action.")
 
             -- set to true
             enemyComponent.hasPerformedSpecialBehaviour = true
@@ -145,12 +145,3 @@ function CheckEnemyAdjacentToPlayer(enemy, player)
 
     return result
 end
-
--- helper function template
--- function HelperFunction(attacker, defender, e)
-    
---     -- init result
---     result = false
-
---     return result
--- end
