@@ -610,14 +610,19 @@ namespace god
 
 				if (ImGui::BeginPopup("SoundConfirmDelete"))
 				{
-					ImGui::Text("Delete %s?", m_selected_sound.c_str());
-					if (ImGui::Button("Yes", { 200.0f, 0.0f }))
+
+					if (!m_selected_sound.empty())
 					{
-						m_document_sounds.RemoveMember(m_document_sounds.FindMember(m_selected_sound.c_str()));
-						god::WriteJSON(m_document_sounds, AssetPath::File_SoundsConfig);
-						ReloadConfig();
-						m_selected_sound = { "" };
+						ImGui::Text("Delete %s?", m_selected_sound.c_str());
+						if (ImGui::Button("Yes", { 200.0f, 0.0f }))
+						{
+							m_document_sounds.RemoveMember(m_document_sounds.FindMember(m_selected_sound.c_str()));
+							god::WriteJSON(m_document_sounds, AssetPath::File_SoundsConfig);
+							ReloadConfig();
+							m_selected_sound = { "" };
+						}
 					}
+				
 					ImGui::EndPopup();
 				}
 
