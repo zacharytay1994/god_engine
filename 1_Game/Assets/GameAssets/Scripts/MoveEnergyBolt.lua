@@ -66,25 +66,25 @@ function S_MoveEnergyBolt(e)
 
             -- determining the direction of energy sphere based on player's direction
             -- note to self: xDirection = 1, the sphere goes to the left
-            if (attackComponent.playerRotation == 270) then
+            if (attackComponent.playerRotation == 180) then
                 
                 --print("sphere goes behind")
                 energyBoltComponent.zDirection = -1
                 energyBoltComponent.distanceToTravel = Abs(defenderGrid.z - attackerGrid.z)
 
-            elseif (attackComponent.playerRotation == 90) then
+            elseif (attackComponent.playerRotation == 0) then
                 
                 -- print("sphere goes front")
                 energyBoltComponent.zDirection = 1
                 energyBoltComponent.distanceToTravel = Abs(defenderGrid.z - attackerGrid.z)
 
-            elseif (attackComponent.playerRotation == 0) then
+            elseif (attackComponent.playerRotation == 270) then
                 
                 -- print("sphere goes right")
                 energyBoltComponent.xDirection = -1
                 energyBoltComponent.distanceToTravel = Abs(defenderGrid.x - attackerGrid.x)
 
-            elseif (attackComponent.playerRotation == 180) then
+            elseif (attackComponent.playerRotation == 90) then
                 
                 -- print("sphere goes left")
                 energyBoltComponent.xDirection = 1

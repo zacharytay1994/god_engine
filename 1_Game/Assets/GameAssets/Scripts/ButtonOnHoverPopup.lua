@@ -1,11 +1,13 @@
+-- This script makes buttons pop up when hovered over.
+-- Button size becomes locked when the player clicks on it. Need to click it again to revert.
+-- Also plays a cute sound effect when hovered over or clicked on.
+
 --[IsComponent]
 function C_ButtonOnHoverPopup()
     local var = {
         PopUpAmount = 1.2,
         InitialScaleX = 0.0,
         InitialScaleY = 0.0,
-        buttonSelected = false,
-        resetSize = false -- used by release Move button cheat in Character.lua
     }
     return function()
         return var
@@ -17,84 +19,17 @@ function S_ButtonOnHoverPopup(e)
     local on_hover_popup = GetComponent(e, "C_ButtonOnHoverPopup")
     local gui_object = GetGUIObject(e)
 
-    if (on_hover_popup.buttonSelected == false) then
-        if gui_object.enter then
-            on_hover_popup.InitialScaleX = gui_object.size.x
-            on_hover_popup.InitialScaleY = gui_object.size.y
-            gui_object.size.x = gui_object.size.x * on_hover_popup.PopUpAmount
-            gui_object.size.y = gui_object.size.y * on_hover_popup.PopUpAmount
-            InstancePrefab("SFX_Bloop",0,0,0)
-        end
+    if gui_object.enter then
+        on_hover_popup.InitialScaleX = gui_object.size.x
+        on_hover_popup.InitialScaleY = gui_object.size.y
+        gui_object.size.x = gui_object.size.x * on_hover_popup.PopUpAmount
+        gui_object.size.y = gui_object.size.y * on_hover_popup.PopUpAmount
+        InstancePrefab("SFX_Bloop",0,0,0)
     end
 
-    if gui_object.pressed then
-        
-        local playerComponent = GetComponent(GetEntity("Player"), "C_Player")
-        local playerAttackComponent = GetComponent(GetEntity("Player"), "C_PlayerAttack")
-        
-        if (on_hover_popup.buttonSelected) then
-            
-            -- release the button
-            on_hover_popup.buttonSelected = false
-
-            -- set player's selected action to nil
-            playerComponent.selectedAction = nil
-            playerAttackComponent.selectedAttack = nil
-
-        else
-            
-            -- lock the button
-            on_hover_popup.buttonSelected = true
-            
-            local attackList = GetComponent(GetEntity("CombatManager"), "C_AttackList").attackList
-            
-            -- set player's selected attack to whatever this button represents
-            playerComponent.selectedAction = TextureName(e)
-            print("playerComponent.selectedAction:", playerComponent.selectedAction)
-
-            -- hardcode
-            if (playerComponent.selectedAction == "FrontJab") then
-                playerAttackComponent.selectedAttack = attackList[1]
-            elseif (playerComponent.selectedAction == "EnergyBolt") then
-                playerAttackComponent.selectedAttack = attackList[10]
-            end
-
-        end
-
-        if (EntityName(e) == "EndTurnButton") then
-            -- only end the turn if it is actually the player's turn
-            if (GetComponent(GetEntity("TurnOrderManager"), "C_TurnOrderManager").currentTurn == GetEntityData(GetEntity("Player")).id) then
-                
-                -- signal turnOrderManager to move on to the next character's turn
-                GetComponent(GetEntity("TurnOrderManager"), "C_TurnOrderManager").nextTurn = true
-            end
-        end
-    end
-
-    if (on_hover_popup.buttonSelected == false) then 
-        if gui_object.exit then
-            gui_object.size.x = on_hover_popup.InitialScaleX
-            gui_object.size.y = on_hover_popup.InitialScaleY
-        end
-    end
-
-    if (on_hover_popup.buttonSelected == true and GetComponent(GetEntity("Player"), "C_Player").playerAttacked == true) then
-        
-        -- reset the button texture and scale
-        ChangeTexture(e, "empty_btn")
-        GetComponent(GetEntity("Player"), "C_Player").playerAttacked = false
-        on_hover_popup.buttonSelected = false
-
+    if gui_object.exit then
         gui_object.size.x = on_hover_popup.InitialScaleX
         gui_object.size.y = on_hover_popup.InitialScaleY
-
-    end
-
-    if (on_hover_popup.resetSize) then
-        gui_object.size.x = on_hover_popup.InitialScaleX
-        gui_object.size.y = on_hover_popup.InitialScaleY
-        on_hover_popup.resetSize = false
-        on_hover_popup.buttonSelected = false
     end
 
     if gui_object.pressed then
