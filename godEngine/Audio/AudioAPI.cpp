@@ -61,6 +61,7 @@ namespace god
 	{
 		m_FMOD_system->update();
 		
+		// check for inactive channels and remove them
 		bool isPlaying = true;
 		FMOD::Channel* channel_ptr = nullptr;
 
@@ -73,7 +74,6 @@ namespace god
 				break;
 			}
 		}
-
 		m_channels.remove(channel_ptr);
 	}
 
