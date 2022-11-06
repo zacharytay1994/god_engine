@@ -22,7 +22,7 @@ namespace god
 
 	std::unordered_map<int, const char*> AudioAPI::m_channel_group_names =
 	{
-		{ 0, "Default" }, { 1, "Music" }, { 2, "SFX" }
+		{ 0, "Master" }, { 1, "Music" }, { 2, "SFX" }
 	};
 
 	AudioAPI::AudioAPI()
@@ -61,6 +61,7 @@ namespace god
 	{
 		m_FMOD_system->update();
 		
+		// check for inactive channels and remove them
 		bool isPlaying = true;
 		FMOD::Channel* channel_ptr = nullptr;
 
@@ -73,7 +74,6 @@ namespace god
 				break;
 			}
 		}
-
 		m_channels.remove(channel_ptr);
 	}
 
