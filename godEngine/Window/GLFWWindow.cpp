@@ -84,6 +84,7 @@ namespace god
 
 	void GLFWJoystick_callback(int jid, int event)
 	{
+		( jid );
 		//UNREFERENCED_PARAMETER(jid);
 
 		if (event == GLFW_CONNECTED)
@@ -193,8 +194,8 @@ namespace god
 		
 		if (present == 1)
 		{
-			int axesCount{ 0 };
-			const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
+			//int axesCount{ 0 };
+			//const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
 			//std::cout << "Number of axes available: " << axesCount << "\n";
 
 			int buttonCount{ 0 };
@@ -260,7 +261,7 @@ namespace god
 			/*else if (GLFW_RELEASE == buttons[1])
 				std::cout << "X Button released\n";*/
 
-			const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
+			//const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
 			//std::cout << "Joystick is called " << name << "\n";
 
 		}

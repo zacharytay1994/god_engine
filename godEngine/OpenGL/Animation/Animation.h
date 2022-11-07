@@ -45,8 +45,8 @@ namespace god
 
 		private:
 
-			float m_Duration;
-			int m_TicksPerSecond;
+			double m_Duration;
+			double m_TicksPerSecond;
 			std::vector<Bone> m_Bones;
 			AssimpNodeData m_RootNode;
 			std::map<std::string, BoneInfo> m_BoneInfoMap;
