@@ -373,12 +373,14 @@ namespace detail
 		return is_normalized(Format) && is_signed(Format);
 	}
 
+#pragma warning(disable: 4244)
 	inline bool is_packed(format Format)
 	{
 		gli::uint16 flags = detail::get_format_info(Format).Flags;
 
 		return (flags & detail::CAP_PACKED8_BIT) != 0 || (flags & detail::CAP_PACKED16_BIT) != 0 || (flags & detail::CAP_PACKED32_BIT) != 0;
 	}
+#pragma warning(default: 4244)
 
 	inline bool is_depth(format Format)
 	{

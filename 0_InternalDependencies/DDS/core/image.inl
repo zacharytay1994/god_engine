@@ -1,6 +1,7 @@
 namespace gli{
 namespace detail
 {
+#pragma warning(disable: 4100)
 	inline size_t texel_linear_addressing
 	(
 		extent1d const& Extent,
@@ -76,6 +77,7 @@ namespace detail
 
 		return static_cast<size_t>(glm::bitfieldInterleave(Input.x, Input.y, Input.z));
 	}
+#pragma warning(default: 4100)
 }//namespace detail
 
 	inline image::image()
@@ -213,12 +215,14 @@ namespace detail
 			*(this->data<genType>() + TexelIndex) = Texel;
 	}
 
+#pragma warning(disable: 4458)
 	inline image::data_type* image::compute_data(size_type BaseLayer, size_type BaseFace, size_type BaseLevel)
 	{
 		size_type const BaseOffset = this->Storage->base_offset(BaseLayer, BaseFace, BaseLevel);
 
 		return this->Storage->data() + BaseOffset;
 	}
+#pragma warning(default: 4458)
 
 	inline image::size_type image::compute_size(size_type Level) const
 	{

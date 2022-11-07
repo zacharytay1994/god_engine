@@ -1,6 +1,6 @@
 #include "../pch.h"
 #include "godPhysics.h"
-#include "../editor/engineresources.h"
+#include "../Editor/EngineResources.h"
 
 #include <assert.h>
 namespace god

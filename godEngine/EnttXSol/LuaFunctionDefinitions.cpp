@@ -6,8 +6,12 @@
 #include "../Window/DeltaTimer.h"
 
 #include <sol/sol.hpp>
+
+#pragma warning(disable: 4201)
 #include <glm/glm/glm.hpp>
 #include <glm/gtc/random.hpp>
+#pragma warning(default: 4201)
+
 #include <functional>
 
 namespace god

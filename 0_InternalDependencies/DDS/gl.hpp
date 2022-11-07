@@ -358,6 +358,7 @@ namespace gli
 			unsigned int Properties;
 		};
 
+#pragma warning(disable: 4458)
 		bool has_swizzle(profile Profile) const
 		{
 			return Profile == PROFILE_ES30 || Profile == PROFILE_GL33;
@@ -367,6 +368,7 @@ namespace gli
 
 		std::array<format_desc, FORMAT_COUNT> FormatDesc;
 		profile Profile;
+#pragma warning(default: 4458)
 	};
 }//namespace gli
 

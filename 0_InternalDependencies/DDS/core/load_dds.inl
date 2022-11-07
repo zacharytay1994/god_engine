@@ -160,6 +160,7 @@ namespace detail
 	}
 }//namespace detail
 
+#pragma warning(disable: 4100)
 	inline texture load_dds(char const * Data, std::size_t Size)
 	{
 		GLI_ASSERT(Data && (Size >= sizeof(detail::FOURCC_DDS)));
@@ -299,6 +300,7 @@ namespace detail
 
 		return Texture;
 	}
+#pragma warning(default: 4100)
 
 	inline texture load_dds(char const * Filename)
 	{

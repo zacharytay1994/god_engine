@@ -42,6 +42,7 @@ namespace detail
 	}
 }//namespace detail
 
+#pragma warning(disable: 5054)
 	inline bool save_dds(texture const& Texture, std::vector<char>& Memory)
 	{
 		if(Texture.empty())
@@ -125,6 +126,7 @@ namespace detail
 
 		return true;
 	}
+#pragma warning(default: 5054)
 
 	inline bool save_dds(texture const& Texture, char const* Filename)
 	{

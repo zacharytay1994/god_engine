@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include "PxPhysicsAPI.h"
 #include "PhysicUtils.h"
 #include "../snippetutils/SnippetUtils.h"
