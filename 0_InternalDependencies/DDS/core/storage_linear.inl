@@ -107,6 +107,8 @@ namespace gli
 		return BaseOffset;
 	}
 
+#pragma warning(disable: 4458)
+#pragma warning(disable: 4100)
 	inline storage_linear::size_type storage_linear::image_offset(extent1d const& Coord, extent1d const& Extent) const
 	{
 		GLI_ASSERT(glm::all(glm::lessThan(Coord, Extent)));
@@ -147,6 +149,8 @@ namespace gli
 			memcpy(DataDst, DataSrc, this->block_size() * BlockCount.x);
 		}
 	}
+#pragma warning(default: 4458)
+#pragma warning(default: 4100)
 
 	inline storage_linear::size_type storage_linear::level_size(size_type Level) const
 	{

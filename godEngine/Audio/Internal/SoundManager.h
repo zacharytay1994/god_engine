@@ -3,6 +3,8 @@
 #include <godUtility/Internal/ResourceManager.h>
 #include "../AudioAPI.h"
 
+#include <tuple>
+
 namespace god
 {
 	using SoundManager = ResourceManager<std::tuple<uint32_t, Sound>>;

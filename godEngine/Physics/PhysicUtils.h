@@ -1,15 +1,17 @@
 #pragma once
 
 #include "PxPhysicsAPI.h"
+#pragma warning(disable: 4201)
 #include <glm/glm/gtx/quaternion.hpp>
+#pragma warning(default: 4201)
 
 namespace god
 {
 
 	physx::PxTransform ConvertToPhysXTransform(const glm::vec3& translation, const glm::vec3& rotation);
 	physx::PxMat44 ConvertToPhysXMatrix(const glm::mat4& matrix);
-	const physx::PxVec3& ConvertToPhysXVector(const glm::vec3& vector);
-	const physx::PxVec4& ConvertToPhysXVector(const glm::vec4& vector);
+	physx::PxVec3 ConvertToPhysXVector(const glm::vec3& vector);
+	physx::PxVec4 ConvertToPhysXVector(const glm::vec4& vector);
 	physx::PxQuat ConvertToPhysXQuat(const glm::quat& quat);
 
 	glm::mat4 ConvertToGlmTransform(const physx::PxTransform& transform);

@@ -16,6 +16,7 @@
 #include "Physics/godPhysics.h"
 
 #include "Audio/AudioAPI.h"
+#include "Audio/Internal/SoundManager.h"
 
 #include "Editor/Editor.h"
 #include "Editor/EngineResources.h"

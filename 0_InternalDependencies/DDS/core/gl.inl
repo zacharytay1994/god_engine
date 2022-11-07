@@ -323,6 +323,7 @@ namespace detail
 		return Table[Target];
 	}
 
+#pragma warning(disable: 4458)
 	inline gl::format gl::translate(gli::format Format, gli::swizzles const& Swizzles) const
 	{
 		GLI_ASSERT(Format >= FORMAT_FIRST && Format <= FORMAT_LAST);
@@ -363,4 +364,5 @@ namespace detail
 
 		return detail::translate(IsExternalBGRA ? gli::swizzles(Swizzles.b, Swizzles.g, Swizzles.r, Swizzles.a) : Swizzles);
 	}
+#pragma warning(default: 4458)
 }//namespace gli
