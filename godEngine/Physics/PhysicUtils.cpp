@@ -17,11 +17,11 @@ namespace god
 	}
 
 
-	const physx::PxVec3& ConvertToPhysXVector(const glm::vec3& vector)
+	physx::PxVec3 ConvertToPhysXVector(const glm::vec3& vector)
 	{
 		return physx::PxVec3(vector.x, vector.y, vector.z);
 	}
-	const physx::PxVec4& ConvertToPhysXVector(const glm::vec4& vector)
+	physx::PxVec4 ConvertToPhysXVector(const glm::vec4& vector)
 	{
 		return physx::PxVec4( vector.x,vector.y, vector.z, vector.w);
 	}

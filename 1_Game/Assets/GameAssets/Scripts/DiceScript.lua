@@ -39,6 +39,7 @@ function S_DiceScript(e)
 		c_dice.start_position_z = transform.position.z
 		ChangeTexture(e, "Dice_Blue")
 		c_dice.current_timer = GenerateRandomNumberInRange(0, c_dice.blue_chance)
+		DiceScript_DisableDice(e, c_dice)
 		c_dice.is_init = true
 	end
 	

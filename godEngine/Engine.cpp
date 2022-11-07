@@ -17,6 +17,7 @@
 #include "Physics/godPhysics.h"
 
 #include "Audio/AudioAPI.h"
+#include "Audio/Internal/SoundManager.h"
 
 #include "Editor/Editor.h"
 #include "Editor/EngineResources.h"
@@ -73,7 +74,7 @@ namespace god
 		camera.m_yaw = 155.0f;
 		//camera.m_look_at = { 0,0,0 };
 		camera.m_position = { -2,7,-10 };
-		float scene_camera_zoom_distance { 20.0f };
+		//float scene_camera_zoom_distance { 20.0f };
 		glm::vec3 scene_camera_position_offset { 0.0f };
 
 		// setup FMOD system
@@ -133,8 +134,6 @@ namespace god
 		editor_windows.AddWindow<god::EW_TilemapEditor> ( true , std::ref ( enttxsol ) );
 
 		godPhysicsSystem.Init ( &window , &camera );
-
-
 
 		while ( !window.WindowShouldClose () )
 		{
@@ -215,7 +214,7 @@ namespace god
 
 			extra_renderpass.Bind ();
 			opengl.RenderBlendTextures ( imgui_renderpass.GetTexture () , blur.GetTexture () );
-			opengl.RenderGUI ( scene , camera.GetOrthographicProjectionMatrix ( window.GetWindowWidth () , window.GetWindowHeight () ) , ogl_textures );
+			opengl.RenderGUI ( scene , camera.GetOrthographicProjectionMatrix ( static_cast< float >( window.GetWindowWidth () ) , static_cast< float >( window.GetWindowHeight () ) ) , ogl_textures );
 			extra_renderpass.UnBind ();
 
 			SystemTimer::EndTimeSegment ( "Rendering" );

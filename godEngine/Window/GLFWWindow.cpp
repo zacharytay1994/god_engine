@@ -84,6 +84,7 @@ namespace god
 
 	void GLFWJoystick_callback(int jid, int event)
 	{
+		( jid );
 		//UNREFERENCED_PARAMETER(jid);
 
 		if (event == GLFW_CONNECTED)
@@ -170,12 +171,31 @@ namespace god
 		m_scroll_down = false;
 		m_resized = false;
 
+		// mouse left press
+		if ( m_left_mouse_recent_pressed_priority != m_left_mouse_logged_pressed_priority )
+		{
+			m_left_mouse_logged_pressed_priority = 0;
+		}
+		m_left_mouse_recent_pressed_priority = 0;
+		// mouse left down
+		if ( m_left_mouse_recent_down_priority != m_left_mouse_logged_down_priority )
+		{
+			m_left_mouse_logged_down_priority = 0;
+		}
+		m_left_mouse_recent_down_priority = 0;
+		// mouse left up
+		if ( m_left_mouse_recent_up_priority != m_left_mouse_logged_up_priority )
+		{
+			m_left_mouse_logged_up_priority = 0;
+		}
+		m_left_mouse_recent_up_priority = 0;
+
 		m_gamepad_connected = false;
 		
 		if (present == 1)
 		{
-			int axesCount{ 0 };
-			const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
+			//int axesCount{ 0 };
+			//const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
 			//std::cout << "Number of axes available: " << axesCount << "\n";
 
 			int buttonCount{ 0 };
@@ -241,7 +261,7 @@ namespace god
 			/*else if (GLFW_RELEASE == buttons[1])
 				std::cout << "X Button released\n";*/
 
-			const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
+			//const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
 			//std::cout << "Joystick is called " << name << "\n";
 
 		}
@@ -337,18 +357,36 @@ namespace god
 #endif
 	}
 
-	bool GLFWWindow::MouseLDown ()
+	bool GLFWWindow::MouseLDown ( uint32_t priority )
 	{
+		m_left_mouse_recent_down_priority = priority > m_left_mouse_recent_down_priority ? priority : m_left_mouse_recent_down_priority;
+		if ( priority < m_left_mouse_logged_down_priority )
+		{
+			return false;
+		}
+		m_left_mouse_logged_down_priority = priority;
 		return m_left_mouse;
 	}
 
-	bool GLFWWindow::MouseLPressed ()
+	bool GLFWWindow::MouseLPressed ( uint32_t priority )
 	{
+		m_left_mouse_recent_pressed_priority = priority > m_left_mouse_recent_pressed_priority ? priority : m_left_mouse_recent_pressed_priority;
+		if ( priority < m_left_mouse_logged_pressed_priority )
+		{
+			return false;
+		}
+		m_left_mouse_logged_pressed_priority = priority;
 		return m_left_mouse && !m_previous_left_mouse;
 	}
 
-	bool GLFWWindow::MouseLUp ()
+	bool GLFWWindow::MouseLUp ( uint32_t priority )
 	{
+		m_left_mouse_recent_up_priority = priority > m_left_mouse_recent_up_priority ? priority : m_left_mouse_recent_up_priority;
+		if ( priority < m_left_mouse_logged_up_priority )
+		{
+			return false;
+		}
+		m_left_mouse_logged_up_priority = priority;
 		return !m_left_mouse && m_previous_left_mouse;
 	}
 

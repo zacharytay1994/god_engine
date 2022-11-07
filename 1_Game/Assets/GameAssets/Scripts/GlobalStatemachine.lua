@@ -35,8 +35,8 @@ function S_GlobalStatemachine(e)
     --     print("CurrentState = StateRandomEvent")
     -- end
 
-    -- press Z to print the current State
-    if (CheckKeyPress(90) == true) then
-        print(globalStateMachineComponent.CurrentState)
-    end
+    -- -- press Z to print the current State
+    -- if (CheckKeyPress(90) == true) then
+    --     print(globalStateMachineComponent.CurrentState)
+    -- end
 end

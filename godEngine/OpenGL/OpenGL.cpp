@@ -256,6 +256,7 @@ namespace god
 							  OGLTextureManager& textures,
 							  glm::vec3 const& camera_front )
 	{
+		( camera_front );
 		// Update animation transformation 
 		m_animator.UpdateAnimation( DeltaTimer::m_dt ); //--
 
@@ -320,7 +321,7 @@ namespace god
 						   return LengthSq( pld1.m_position - camera_position ) < LengthSq( pld2.m_position - camera_position );
 					   }
 			);
-			int num_point_light = scene.m_point_light_data.size() > m_max_point_lights ? m_max_point_lights : scene.m_point_light_data.size();
+			int num_point_light = static_cast<int>(scene.m_point_light_data.size() > m_max_point_lights ? m_max_point_lights : scene.m_point_light_data.size());
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uNumPointLight", num_point_light );
 			for ( auto i = 0; i < num_point_light; ++i )
 			{
@@ -341,7 +342,7 @@ namespace god
 						   return LengthSq( dld1.m_position - camera_position ) < LengthSq( dld2.m_position - camera_position );
 					   }
 			);
-			int num_directional_light = scene.m_directional_light_data.size() > m_max_directional_lights ? m_max_directional_lights : scene.m_directional_light_data.size();
+			int num_directional_light = static_cast<int>(scene.m_directional_light_data.size() > m_max_directional_lights ? m_max_directional_lights : scene.m_directional_light_data.size());
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uNumDirectionalLight", num_directional_light );
 			for ( auto i = 0; i < num_directional_light; ++i )
 			{
@@ -468,7 +469,7 @@ namespace god
 					   return LengthSq( pld1.m_position - camera_position ) < LengthSq( pld2.m_position - camera_position );
 				   }
 		);
-		int num_point_light = scene.m_point_light_data.size() > m_max_point_lights ? m_max_point_lights : scene.m_point_light_data.size();
+		int num_point_light = static_cast<int>(scene.m_point_light_data.size() > m_max_point_lights ? m_max_point_lights : scene.m_point_light_data.size());
 		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "uNumPointLight", num_point_light );
 		for ( auto i = 0; i < num_point_light; ++i )
 		{
@@ -489,7 +490,7 @@ namespace god
 					   return LengthSq( dld1.m_position - camera_position ) < LengthSq( dld2.m_position - camera_position );
 				   }
 		);
-		int num_directional_light = scene.m_directional_light_data.size() > m_max_directional_lights ? m_max_directional_lights : scene.m_directional_light_data.size();
+		int num_directional_light = static_cast<int>(scene.m_directional_light_data.size() > m_max_directional_lights ? m_max_directional_lights : scene.m_directional_light_data.size());
 		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "uNumDirectionalLight", num_directional_light );
 		for ( auto i = 0; i < num_directional_light; ++i )
 		{
@@ -695,6 +696,11 @@ namespace god
 
 	void OpenGL::FirstPassRenderToDepthmap( Scene const& scene, glm::mat4 const& projection, glm::mat4 const& view, glm::vec3 const& camera_position, OGLTextureManager& textures )
 	{
+		( textures );
+		( camera_position );
+		( view );
+		( projection );
+
 		//glCheckError();
 		m_shadowmap.EnableDepthMap();
 		for ( auto const& data : scene.m_instanced_render_data )
@@ -721,7 +727,7 @@ namespace god
 	OGLRenderPass<1>& OpenGL::BlurTexture( unsigned int texture )
 	{
 		bool horizontal = true, first_iteration = true;
-		int amount = 5;
+		unsigned int amount = 5;
 		m_blur_shader.Use();
 		for ( unsigned int i = 0; i < amount; i++ )
 		{

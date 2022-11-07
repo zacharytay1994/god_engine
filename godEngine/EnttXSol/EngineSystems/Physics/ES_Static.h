@@ -7,6 +7,7 @@ namespace god
 {
 	void RigidStaticFrameBegin(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
+		( engineResources );
 		if (!entt.m_pause)
 		{
 			return;

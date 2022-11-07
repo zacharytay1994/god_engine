@@ -1,9 +1,11 @@
+-- DEPRECATED SCRIPT --
+
 -- This script allows the player to end their turn.
 -- Upon ending turn, this script will inform TurnOrderManager to switch to 
 -- the next character's turn. 
 
 -- TODO:
--- 1) Implement player end turn button
+-- 1) 
 
 --[IsComponent]
 function C_PlayerEndTurn()

@@ -136,6 +136,7 @@ namespace god
 		(engineResources);
 		// serialize
 		RapidJSON::JSONifyToValue(value, document, "sound_id", component.m_sound_id);
+		RapidJSON::JSONifyToValue(value, document, "channel_group_id", component.m_channel_group_id);
 		RapidJSON::JSONifyToValue(value, document, "mute", component.m_mute);
 		RapidJSON::JSONifyToValue(value, document, "loop", component.m_loop);
 		RapidJSON::JSONifyToValue(value, document, "play_on_awake", component.m_play_on_awake);
@@ -151,6 +152,7 @@ namespace god
 		(engineResources);
 		// deserialize
 		AssignIfExist(jsonObj, component.m_sound_id, "sound_id");
+		AssignIfExist(jsonObj, component.m_channel_group_id, "channel_group_id");
 		AssignIfExist(jsonObj, component.m_mute, "mute");
 		AssignIfExist(jsonObj, component.m_loop, "loop");
 		AssignIfExist(jsonObj, component.m_play_on_awake, "play_on_awake");
