@@ -1,12 +1,80 @@
 #include "../pch.h"
 #include "godPhysics.h"
-#include "../editor/engineresources.h"
+#include "../Editor/EngineResources.h"
 
 
 
 #include <assert.h>
 namespace god
 {
+
+	PxI32 gSharedIndex = 0;
+
+
+	class ContactReportCallback : public PxSimulationEventCallback
+	{
+		void onConstraintBreak(PxConstraintInfo* constraints, PxU32 count) { PX_UNUSED(constraints); PX_UNUSED(count); }
+		void onWake(PxActor** actors, PxU32 count) { PX_UNUSED(actors); PX_UNUSED(count); }
+		void onSleep(PxActor** actors, PxU32 count) { PX_UNUSED(actors); PX_UNUSED(count); }
+		void onTrigger(PxTriggerPair* pairs, PxU32 count) { PX_UNUSED(pairs); PX_UNUSED(count); }
+		void onAdvance(const PxRigidBody* const*, const PxTransform*, const PxU32) {}
+		void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
+		{
+			PX_UNUSED((pairHeader));
+			//Maximum of 64 vertices can be produced by contact gen
+			const PxU32 bufferSize = 64;
+			PxContactPairPoint contacts[bufferSize];
+			for (PxU32 i = 0; i < nbPairs; i++)
+			{
+				//const PxContactPair& cp = pairs[i];
+
+				PxU32 nbContacts = pairs[i].extractContacts(contacts, bufferSize);
+				for (PxU32 j = 0; j < nbContacts; j++)
+				{
+					PxVec3 point = contacts[j].position;
+					PxVec3 impulse = contacts[j].impulse;
+					//PxU32 internalFaceIndex0 = contacts[j].internalFaceIndex0;
+					//PxU32 internalFaceIndex1 = contacts[j].internalFaceIndex1;
+					//...
+					//std::cout << "ContactReportCallback -> Point: " << point << std::endl;
+				}
+			}
+		}
+	};
+
+	ContactReportCallback gContactReportCallback;
+
+
+	class CallbackFinishTask : public PxLightCpuTask
+	{
+		SnippetUtils::Sync* mSync;
+	public:
+		CallbackFinishTask() { mSync = SnippetUtils::syncCreate(); }
+		~CallbackFinishTask() {
+			
+		}
+
+		void free()
+		{
+			SnippetUtils::syncRelease(mSync);
+		}
+		virtual void release()
+		{
+			PxLightCpuTask::release();
+			SnippetUtils::syncSet(mSync);
+		}
+
+		void reset() { SnippetUtils::syncReset(mSync); }
+
+		void wait() { SnippetUtils::syncWait(mSync); }
+
+		virtual void run() { /*Do nothing - release the sync in the release method for thread-safety*/ }
+
+		virtual const char* getName() const { return "CallbackFinishTask"; }
+	}
+	callbackFinishTask;
+
+	
 	PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
 		PxFilterObjectAttributes attributes1, PxFilterData filterData1,
 		PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
@@ -83,7 +151,7 @@ namespace god
 		CreatePVD();
 	
 		mToleranceScale.length = 1;        // typical length of an object
-		mToleranceScale.speed = 98.1;         // typical speed of an object, gravity*1s is a reasonable choice
+		mToleranceScale.speed = static_cast<physx::PxReal>(98.1);         // typical speed of an object, gravity*1s is a reasonable choice
 		mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, mToleranceScale, true, mPvd);
 
 
@@ -206,12 +274,12 @@ namespace god
 		
 		physx::PxVec3 origin = mCamera->m_position;                 // [in] Ray origin
 		physx::PxVec3 unitDir = ray_dir;                // [in] Normalized ray direction
-		physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
+		//physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
 		physx::PxRaycastBuffer hit;                 // [out] Raycast results
 		
 		// Raycast against all static & dynamic objects (no filtering)
 		// The main result from this call is the closest hit, stored in the 'hit.block' structure
-		bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
+		//bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
 		if (hit.hasBlock)
 		{
 			mRayCastMouse = hit.block.actor;

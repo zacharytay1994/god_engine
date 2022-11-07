@@ -18,10 +18,10 @@ namespace god
 	 */
 	void DebugDynamic(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic& > component)
 	{
-
+		( entt );
 		PhysicsSystem& psystem = engineResources.Get<PhysicsSystem>().get();
 		RigidDynamic& rigiddynamic = std::get<2>(component);
-		EntityData& edata = std::get<0>(component);
+		//EntityData& edata = std::get<0>(component);
 
 		if (!psystem.debugdraw)
 			return;
@@ -109,6 +109,7 @@ namespace god
 
 	void DebugStatic(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
+		( entt );
 		PhysicsSystem& psystem = engineResources.Get<PhysicsSystem>().get();
 		if (!psystem.debugdraw)
 			return;

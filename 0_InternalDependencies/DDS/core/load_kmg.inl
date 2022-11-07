@@ -27,6 +27,7 @@ namespace detail
 		std::uint32_t MaxLevel;
 	};
 
+#pragma warning(disable: 4100)
 	inline texture load_kmg100(char const * Data, std::size_t Size)
 	{
 		detail::kmgHeader10 const & Header(*reinterpret_cast<detail::kmgHeader10 const *>(Data));
@@ -62,6 +63,7 @@ namespace detail
 			Header.BaseLevel, Header.MaxLevel, 
 			Texture.swizzles());
 	}
+#pragma warning(default: 4100)
 }//namespace detail
 
 	inline texture load_kmg(char const * Data, std::size_t Size)

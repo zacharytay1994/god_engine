@@ -14,7 +14,7 @@ namespace god
 		( engineResources );
 		// some code here ...
 
-		auto& entity_data = std::get<0> ( components );
+		//auto& entity_data = std::get<0> ( components );
 		auto& grid_manipulate = std::get<1> ( components );
 		auto grid_root_entity = entt.GetEntity ( grid_manipulate.m_grid_root );
 
@@ -31,7 +31,7 @@ namespace god
 			camera.GetPerpectiveProjectionMatrix () ,
 			camera.GetCameraViewMatrix () );
 		glm::vec3 a = camera.m_position , b = camera.m_position + ray_dir * 1000.0f;
-		glm::vec3 intersect;
+		//glm::vec3 intersect;
 
 		if ( grid_root_entity != EnttXSol::Entities::Null )
 		{

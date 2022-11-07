@@ -252,14 +252,18 @@ namespace god
 
 				if ( ImGui::BeginPopup ( "ModelConfirmDelete" ) )
 				{
-					ImGui::Text ( "Delete %s?" , m_selected_model.c_str () );
-					if ( ImGui::Button ( "Yes" , { 200.0f, 0.0f } ) )
+					if (!m_selected_model.empty())
 					{
-						m_document_models.RemoveMember ( m_document_models.FindMember ( m_selected_model.c_str () ) );
-						god::WriteJSON ( m_document_models , AssetPath::File_ModelsConfig );
-						ReloadConfig ();
-						m_selected_model = { "" };
+						ImGui::Text("Delete %s?", m_selected_model.c_str());
+						if (ImGui::Button("Yes", { 200.0f, 0.0f }))
+						{
+							m_document_models.RemoveMember(m_document_models.FindMember(m_selected_model.c_str()));
+							god::WriteJSON(m_document_models, AssetPath::File_ModelsConfig);
+							ReloadConfig();
+							m_selected_model = { "" };
+						}
 					}
+					
 					ImGui::EndPopup ();
 				}
 
@@ -429,15 +433,21 @@ namespace god
 
 				if ( ImGui::BeginPopup ( "TextureConfirmDelete" ) )
 				{
-					ImGui::Text ( "Delete %s?" , m_selected_texture.c_str () );
-					if ( ImGui::Button ( "Yes" , { 200.0f, 0.0f } ) )
+
+					if (!m_selected_texture.empty())
 					{
-						m_document_textures.RemoveMember ( m_document_textures.FindMember ( m_selected_texture.c_str () ) );
-						god::WriteJSON ( m_document_textures , AssetPath::File_TexturesConfig );
-						ReloadConfig ();
-						m_selected_texture = { "" };
+						ImGui::Text("Delete %s?", m_selected_texture.c_str());
+
+						if (ImGui::Button("Yes", { 200.0f, 0.0f }))
+						{
+							m_document_textures.RemoveMember(m_document_textures.FindMember(m_selected_texture.c_str()));
+							god::WriteJSON(m_document_textures, AssetPath::File_TexturesConfig);
+							ReloadConfig();
+							m_selected_texture = { "" };
+						}
 					}
-					ImGui::EndPopup ();
+					ImGui::EndPopup();
+						
 				}
 
 				if ( !m_selected_texture.empty () && ImGui::Button ( "Delete" , { ImGui::GetWindowWidth (), 0.0f } ) )
@@ -604,14 +614,19 @@ namespace god
 
 				if (ImGui::BeginPopup("SoundConfirmDelete"))
 				{
-					ImGui::Text("Delete %s?", m_selected_sound.c_str());
-					if (ImGui::Button("Yes", { 200.0f, 0.0f }))
+
+					if (!m_selected_sound.empty())
 					{
-						m_document_sounds.RemoveMember(m_document_sounds.FindMember(m_selected_sound.c_str()));
-						god::WriteJSON(m_document_sounds, AssetPath::File_SoundsConfig);
-						ReloadConfig();
-						m_selected_sound = { "" };
+						ImGui::Text("Delete %s?", m_selected_sound.c_str());
+						if (ImGui::Button("Yes", { 200.0f, 0.0f }))
+						{
+							m_document_sounds.RemoveMember(m_document_sounds.FindMember(m_selected_sound.c_str()));
+							god::WriteJSON(m_document_sounds, AssetPath::File_SoundsConfig);
+							ReloadConfig();
+							m_selected_sound = { "" };
+						}
 					}
+				
 					ImGui::EndPopup();
 				}
 

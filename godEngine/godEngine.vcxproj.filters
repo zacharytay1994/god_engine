@@ -128,7 +128,6 @@
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Debug.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Static.h" />
-    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_DynamicMesh.h" />
     <ClInclude Include="OpenGL\Animation\AnimationModel3D.h" />
     <ClInclude Include="OpenGL\Animation\AnimationMesh.h" />
     <ClInclude Include="OpenGL\Animation\AssimpGLMHelpers.h" />

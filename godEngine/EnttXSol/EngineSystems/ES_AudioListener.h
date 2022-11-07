@@ -26,10 +26,9 @@ namespace god
 
 				AudioAPI::SetLoop(sound, audio_source.m_loop);
 
-				if (audio_source.m_play_on_awake)
+				if (audio_source.m_play_on_awake && !audio_source.m_awake_played)
 				{
-					if (!audio_source.m_awake_played)
-						AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_awake_played);
+					AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_awake_played);
 				}
 				else
 				{

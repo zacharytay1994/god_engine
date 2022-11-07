@@ -3,12 +3,13 @@
 -- 2) Attack
 -- 3) Any special behaviour
 
---[IsComponent]
-function C_SmallFastFish()
-    local var = {
-        --[SerializeString]
-        EnemySmallFastFish = "SmallFastFish",
+-- The suicide bomber will make a beeline towards the player and explode once it's right beside the player,
+-- dealing massive damage to the player and killing itself. 
+-- Leaves a crater in its wake.
 
+--[IsComponent]
+function C_SuicideBomber()
+    local var = {
         -- will be set by StateMoveEnemy.lua
         hasMoved = false,
         
@@ -27,22 +28,23 @@ function C_SmallFastFish()
 end
 
 --[IsSystem]
-function S_SmallFastFish(e)
+function S_SuicideBomber(e)
     
     --print("[SmallFastFish.lua] Start")
     
+    -- getting turn order manager
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
     local turnOrderManagerComponent
     if (turnOrderManagerEntity ~= -1) then
         turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
     end
 
-    local enemyComponent = GetComponent(e, "C_SmallFastFish")
+    local enemyComponent = GetComponent(e, "C_SuicideBomber")
     local entityDataComponent = GetEntityData(e)
 
     local playerEntity = GetEntity("Player")
     if (playerEntity == -1) then
-        print("[SmallFastFish.lua] ERROR: Player does not exist! Returning.")
+        print("[EnemySuicideBomber.lua] ERROR: Player does not exist! Returning.")
         return
     end
 
@@ -58,7 +60,7 @@ function S_SmallFastFish(e)
             -- StateMoveEnemy.lua will set C_Character.moved to true
 
             if (characterComponent.moved) then
-                print("[EnemySmallFastFish.lua] Done moving.")
+                print("[EnemySuicideBomber.lua] Done moving.")
                 enemyComponent.hasMoved = true
                 characterComponent.moved = false
             end
@@ -70,10 +72,29 @@ function S_SmallFastFish(e)
                 local playerCharacterComponent = GetComponent(playerEntity, "C_Character")
                 
                 --attack player
-                print("[SmallFastFish.lua] Player's HP before getting hit is", playerCharacterComponent.currentHP)
-                print("[SmallFastFish.lua] SmallFastFish attacks player!")
+                print("[EnemySuicideBomber.lua] Player's HP before getting hit is", playerCharacterComponent.currentHP)
+                print("[EnemySuicideBomber.lua] SuicideBomber exploding!")
 
-                playerCharacterComponent.currentHP = playerCharacterComponent.currentHP - 2
+                -- damage the player
+                playerCharacterComponent.currentHP = playerCharacterComponent.currentHP - 5
+                
+                -- kill off the suicide bomber
+                characterComponent.currentHP = 0
+
+                -- leave a crater
+                local enemyGrid = GetGridCell(e)
+                local tileList = EntitiesWithScriptComponent("C_FloorTile")
+                for i = 1, #tileList do
+                    local tileGrid = GetGridCell(tileList[i])
+                    
+                    if (tileGrid.x == enemyGrid.x and tileGrid.y == enemyGrid.y - 1 and tileGrid.z == enemyGrid.z) then
+                        -- remove the tile below the suicide bomber
+                        RemoveInstance(tileList[i])    
+                        print("[EnemySuicideBomber.lua] Removed the tile below suicide bomber")
+                        break
+                    end
+
+                end
 
                 -- activate screenshake
                 local screenShakeEntity = GetEntity("ScreenShake")
@@ -83,8 +104,7 @@ function S_SmallFastFish(e)
                     screenShakeComponent.doScreenShake = true
                 end
 
-                print("[SmallFastFish.lua] Player's HP after getting hit is", playerCharacterComponent.currentHP)
-
+                print("[EnemySuicideBomber.lua] Player's HP after getting hit is", playerCharacterComponent.currentHP)
             end
 
             -- set hasAttacked to true
@@ -93,7 +113,7 @@ function S_SmallFastFish(e)
         elseif (enemyComponent.hasPerformedSpecialBehaviour == false) then
 
             -- special action code here
-            print("[SmallFastFish.lua] Pretend to perform special action.")
+            print("[EnemySuicideBomber.lua] Pretend to perform special action.")
 
             -- set to true
             enemyComponent.hasPerformedSpecialBehaviour = true
@@ -106,9 +126,15 @@ function S_SmallFastFish(e)
             enemyComponent.hasMoved = false
             enemyComponent.hasAttacked = false
             enemyComponent.hasPerformedSpecialBehaviour = false
+            print("[EnemySuicideBomber.lua] Resetting hasMoved, hasAttacked, hasPerformedSpecialBehaviour.")
+
+            -- may need to move this to StateMoveEnemy.lua 
+            GetComponent(e, "C_Character").moved = false
             
             -- set next turn to true
             turnOrderManagerComponent.nextTurn = true
+
+            print("[EnemySuicideBomber.lua] Ending enemy turn!")
         end
     end
 

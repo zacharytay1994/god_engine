@@ -64,7 +64,7 @@ namespace god
 		{
 			transform.m_position.x = gui.m_position.x * window.GetWindowWidth ();
 			transform.m_position.y = gui.m_position.y * window.GetWindowHeight ();
-			transform.m_position.z = -251 + gui.m_layer;
+			transform.m_position.z = static_cast< float >( -251 + gui.m_layer );
 			transform.m_scale.x = gui.m_size.x * window.GetWindowWidth () / 2.0f;
 			if ( gui.m_fixed_aspect_ratio )
 			{
