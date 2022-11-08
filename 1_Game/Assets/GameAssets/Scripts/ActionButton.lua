@@ -67,6 +67,11 @@ function S_ActionButton(e)
                         "Special property:", playerAttackComponent.selectedAttack[3], "\n")
             
         end
+
+        -- -- un-hardcoded solution 
+        -- -- (diceValue will be a value from 0 to 8, colorModifier will be a value from 1 to 3.
+        -- -- On the dice side, need to map 0 to FrontJab, 1 to BigSweep, 2 to GroundSmash, 3 to EnergyBolt, etc.)
+        -- playerAttackComponent.selectedAttack = attackList[(diceValue * 3) + colorModifier]
         -- end of setting selected action --------------------------------------------------
 
         -- set all other Action Buttons as unselected --------------------------------------
