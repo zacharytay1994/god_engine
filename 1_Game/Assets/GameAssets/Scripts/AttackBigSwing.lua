@@ -82,6 +82,8 @@ function S_BigSwing(e)
     -- checking if player is able to use attack against the enemy --------------------------------------------------------
     if (attackComponent.startCheck == true) then
         
+        print("[AttackBigSwing.lua] Starting check!")
+        
         -- run the check only once per attack
         attackComponent.startCheck = false
 
@@ -92,7 +94,7 @@ function S_BigSwing(e)
         else
             
             -- check if selected tile is adjacent to Player
-            if (CheckPlayerAdjacentToEnemy(attackComponent.attacker, attackComponent.defender) == true) then
+            if (CheckTargetTileAdjacentToPlayer(attackComponent.attacker, attackComponent.defender, e) == true) then
                 
                 -- passed the check, allow the rest of the script to run
                 attackComponent.canAttack = true
@@ -130,7 +132,16 @@ function S_BigSwing(e)
 
         -- set playerAttackComponent.targetEntity to middleEnemy
         local playerAttackComponent = GetComponent(playerEntity, "C_PlayerAttack")
-        playerAttackComponent.targetEntity = attackComponent.middleEnemy
+
+        if (attackComponent.middleEnemy ~= nil) then
+            playerAttackComponent.targetEntity = attackComponent.middleEnemy
+        else
+            -- reset variables from here instead of PlayerAttack.lua
+            attackComponent.canAttack = false
+            playerComponent.playerAttacked = true
+            playerAttackComponent.resetVariables = true
+            attackComponent.checkCompleted = false
+        end
 
         -- deal damage to leftEnemy and rightEnemy
         if (attackComponent.leftEnemy ~= nil) then
@@ -145,6 +156,8 @@ function S_BigSwing(e)
         -- trigger particles (if any)
         
         -- play attack animation (if any)
+
+        print("[AttackBigSwing.lua] END.")
     end
     -- end of attack effects ---------------------------------------------------------------------------------------------
     
@@ -153,9 +166,19 @@ function S_BigSwing(e)
     attackComponent.attacker = -1
     attackComponent.defender = -1
     attackComponent.playerRotation = 0
+    attackComponent.middleEnemy = nil
+    attackComponent.leftEnemy = nil
+    attackComponent.rightEnemy = nil
+    attackComponent.leftTileX = nil
+    attackComponent.leftTileZ = nil
+    attackComponent.rightTileX = nil
+    attackComponent.rightTileZ = nil
+    attackComponent.playerY = nil
 end
 
-function CheckTargetTileAdjacentToPlayer(attacker)
+function CheckTargetTileAdjacentToPlayer(attacker, defender, e)
+    
+    print("[AttackBigSwing.lua] Starting CheckTargetTileAdjacentToPlayer().")
     
     -- init result
     result = false
@@ -168,28 +191,30 @@ function CheckTargetTileAdjacentToPlayer(attacker)
     local attackComponent = GetComponent(e, "C_BigSwing")
     attackComponent.playerY = attackerGrid.y
 
+    -- reference to the direction of attack (relative to Triton)
     local attackDirection = nil
-
-
-    if (attackerGrid.y == tileGrid.y + 1) then 
+    
+    if (attackerGrid.y == tileGrid.y + 1 or attackerGrid.y == tileGrid.y) then 
 
         -- enemy behind player
-        if (attackerGrid.x == tileGrid.x and attackerGrid.z == tileGrid.z - 1) then
+        if (attackerGrid.x == tileGrid.x and attackerGrid.z == tileGrid.z + 1) then
             result = true 
-            attackComponent.playerRotation = 0
+            attackComponent.playerRotation = 180
             attackComponent.leftTileX = attackerGrid.x - 1
             attackComponent.leftTileZ = attackerGrid.z - 1
             attackComponent.rightTileX = attackerGrid.x + 1
             attackComponent.rightTileZ = attackerGrid.z - 1
+            print("[AttackBigSwing.lua] Targeting Player's back!")
 
         -- enemy in front of player
-        elseif (attackerGrid.x == tileGrid.x and attackerGrid.z == tileGrid.z + 1) then
+        elseif (attackerGrid.x == tileGrid.x and attackerGrid.z == tileGrid.z - 1) then
             result = true 
-            attackComponent.playerRotation = 180
+            attackComponent.playerRotation = 0
             attackComponent.leftTileX = attackerGrid.x + 1
             attackComponent.leftTileZ = attackerGrid.z + 1
             attackComponent.rightTileX = attackerGrid.x - 1
             attackComponent.rightTileZ = attackerGrid.z + 1
+            print("[AttackBigSwing.lua] Targeting Player's front!")
 
         -- enemy to player's left
         elseif (attackerGrid.z == tileGrid.z and attackerGrid.x == tileGrid.x - 1) then
@@ -199,6 +224,7 @@ function CheckTargetTileAdjacentToPlayer(attacker)
             attackComponent.leftTileZ = attackerGrid.z - 1
             attackComponent.rightTileX = attackerGrid.x + 1
             attackComponent.rightTileZ = attackerGrid.z + 1
+            print("[AttackBigSwing.lua] Targeting Player's left!")
 
         -- enemy to player's right
         elseif(attackerGrid.z == tileGrid.z and attackerGrid.x == tileGrid.x + 1) then
@@ -208,6 +234,7 @@ function CheckTargetTileAdjacentToPlayer(attacker)
             attackComponent.leftTileZ = attackerGrid.z + 1
             attackComponent.rightTileX = attackerGrid.x - 1
             attackComponent.rightTileZ = attackerGrid.z - 1
+            print("[AttackBigSwing.lua] Targeting Player's right!")
         end
     end
 
@@ -227,6 +254,13 @@ function CheckTargetTileAdjacentToPlayer(attacker)
             -- this enemy is on the middle tile
             attackComponent.middleEnemy = characterList[i]
         end
+    end
+
+    if (attackComponent.leftEnemy == nil and 
+        attackComponent.rightEnemy == nil and
+        attackComponent.middleEnemy == nil) then
+        print("[AttackBigSwing.lua] No enemies in the attack range! Stopping attack.")
+        result = false
     end
 
     return result

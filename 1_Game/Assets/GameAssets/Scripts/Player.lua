@@ -38,23 +38,53 @@ function S_Player(e)
     playerComponent = GetComponent(e, "C_Player")
 
     if (CheckKeyPress(49)) then
+        print("[Player.lua] FrontJab selected through hotkey!")
         playerComponent.selectedAction = "FrontJab"
+        UnselectAllButtons()
     end
 
     if (CheckKeyPress(50)) then
+
+        local playerEntity = GetEntity("Player")
+        local playerAttackComponent
+    
+        if (playerEntity ~= -1) then
+            playerAttackComponent = GetComponent(playerEntity, "C_PlayerAttack")
+        else
+            print("[Player.lua] Player Entity not found! Returning.")
+            return
+        end
+
+        print("[Player.lua] BigSwing selected through hotkey!")
         playerComponent.selectedAction = "BigSwing"
-        playerAttackComponent.selectedAttack = attackList[10]
-            print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
-                        "Base damage:", playerAttackComponent.selectedAttack[2], 
-                        "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+        playerAttackComponent.selectedAttack = attackList[4]
+        print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                    "Base damage:", playerAttackComponent.selectedAttack[2], 
+                    "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+
+        UnselectAllButtons()
     end
 
     if (CheckKeyPress(51)) then
+        print("[Player.lua] EnergyBolt selected through hotkey!")
         playerComponent.selectedAction = "EnergyBolt"
+        UnselectAllButtons()
     end
 
     if (CheckKeyPress(52)) then 
+        print("[Player.lua] Move selected through hotkey!")
         playerComponent.selectedAction = "Move"
+        UnselectAllButtons()
     end
 
+end
+
+-- this is to prevent Action Buttons from resetting due to using attacks through hotkeys
+function UnselectAllButtons()
+    
+    print("[Player.lua] Un-selecting all other Action Buttons!")
+        local actionButtonList = EntitiesWithScriptComponent("C_ActionButton")
+        for i = 1, #actionButtonList do
+            GetComponent(actionButtonList[i], "C_ActionButton").buttonSelected = false
+        end
 end

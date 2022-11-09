@@ -31,6 +31,7 @@ function C_Character()
         defence = 10,
 
         -- set to true when character's HP hits zero. Makes TurnOrderManager skip this character's turn
+        --[SerializeBool]
         isDead = false,
 
         -- StateMoveEnemy will set this to true once it is finished. then the enemy-specific script will reset this.
@@ -58,29 +59,6 @@ function S_Character(e)
         local entityDataComponent = GetEntityData(e)
         local characterComponent = GetComponent(e, "C_Character")
 
-        -- press T to reset player stamina
-        if (CheckKeyPress(84) and EntityName(e) == "Player") then
-            characterComponent.currentStamina = characterComponent.maxStamina
-            print("[Character.lua] Player's stamina refreshed! Back to", characterComponent.currentStamina)
-        end
-
-        -- press Y to unselect the Move button
-        if (CheckKeyPress(89)) then
-            GetComponent(e, "C_Player").selectedAction = nil
-            print("Releasing MoveButton. Player's selectedAction is:", GetComponent(e, "C_Player").selectedAction)
-        end
-
-        -- press J to set all enemy HP to zero
-        if (CheckKeyPress(74)) then
-            
-            enemyList = EntitiesWithScriptComponent("C_StateMoveEnemy")
-            
-            for i = 1, #enemyList do
-                GetComponent(enemyList[i], "C_Character").currentHP = 0
-            end
-            print(#enemyList, "enemies set to 0 HP!")
-        end
-        
         if (characterComponent.currentHP <= 0) then 
             
             -- hide the character below the map
@@ -96,11 +74,34 @@ function S_Character(e)
         if (characterComponent.isDead) then
             return
         end
+        
+        -- press J to set all enemy HP to zero
+        if (CheckKeyPress(74)) then
+            
+            enemyList = EntitiesWithScriptComponent("C_StateMoveEnemy")
+            
+            for i = 1, #enemyList do
+                GetComponent(enemyList[i], "C_Character").currentHP = 0
+            end
+            print(#enemyList, "enemies set to 0 HP!")
+        end
 
         -- only run the rest of this script if it is currently this character's turn
         if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then
         
             -- refresh stamina will be refreshed by TurnOrderManager, after it builds the turnQueue
+
+            -- press T to reset player stamina
+            if (CheckKeyPress(84) and EntityName(e) == "Player") then
+                characterComponent.currentStamina = characterComponent.maxStamina
+                print("[Character.lua] Player's stamina refreshed! Back to", characterComponent.currentStamina)
+            end
+
+            -- -- press Y to unselect the Move button
+            -- if (CheckKeyPress(89)) then
+            --     GetComponent(e, "C_Player").selectedAction = nil
+            --     print("Releasing MoveButton. Player's selectedAction is:", GetComponent(e, "C_Player").selectedAction)
+            -- end
             
             -- press X to check character's coordinates on the grid
             if (CheckKeyPress(88) == true) then
@@ -128,10 +129,11 @@ function S_Character(e)
                 print("\n\n")
             end
 
-            -- -- press 0 (quick debug)
-            -- if (CheckKeyPress(48) == true) then   
-            --     util.doSomething()
-            -- end
+            -- press 0 (quick debug)
+            if (CheckKeyPress(48) == true) then   
+                -- util.doSomething()
+                print(GetComponent(e, "C_Player").selectedAction)
+            end
         end
     end
 end

@@ -20,6 +20,7 @@ end
 --[IsSystem]
 function S_ActionButton(e)
     
+    -- getting action button component and object
     local actionButtonComponent = GetComponent(e, "C_ActionButton")
     local actionButtonObject = GetGUIObject(e)
 
@@ -39,6 +40,8 @@ function S_ActionButton(e)
 
     if actionButtonObject.pressed then
         
+        print("[ActionButton.lua]", EntityName(e), "pressed!")
+        
         actionButtonComponent.buttonSelected = true
         
         -- getting the AttackList ----------------------------------------------------------
@@ -56,13 +59,13 @@ function S_ActionButton(e)
         -- hardcoded
         if (playerComponent.selectedAction == "FrontJab") then
             playerAttackComponent.selectedAttack = attackList[1]
-            print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+            print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
                         "Base damage:", playerAttackComponent.selectedAttack[2], 
                         "Special property:", playerAttackComponent.selectedAttack[3], "\n")
         
         elseif (playerComponent.selectedAction == "EnergyBolt") then
             playerAttackComponent.selectedAttack = attackList[10]
-            print("[PlayerAttack.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+            print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
                         "Base damage:", playerAttackComponent.selectedAttack[2], 
                         "Special property:", playerAttackComponent.selectedAttack[3], "\n")
             
@@ -75,6 +78,7 @@ function S_ActionButton(e)
         -- end of setting selected action --------------------------------------------------
 
         -- set all other Action Buttons as unselected --------------------------------------
+        print("[ActionButton.lua] Un-selecting all other Action Buttons!")
         local actionButtonList = EntitiesWithScriptComponent("C_ActionButton")
         for i = 1, #actionButtonList do
             if (actionButtonList[i] ~= e) then
@@ -86,6 +90,8 @@ function S_ActionButton(e)
 
     -- empty the button after the attack is used
     if (actionButtonComponent.buttonSelected == true and playerComponent.playerAttacked == true) then
+        
+        print("[ActionButton.lua]", EntityName(e), "has been used! Resetting to empty button.")
         
         -- reset the button texture and scale
         ChangeTexture(e, "empty_btn")

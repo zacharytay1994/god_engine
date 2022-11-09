@@ -127,6 +127,9 @@ function S_UIManager(e)
             elseif (GetComponent(turnOrderManagerComponent.turnQueue[i], "C_Character").characterType == "Squinky") then
                 ChangeTexture(UIManagerComponent.iconList[i], "SquinkyTurn")
             end
+
+            -- temp
+            if (i == 3) then break end
         end
 
         turnOrderManagerComponent.refreshTurnOrderUI = false

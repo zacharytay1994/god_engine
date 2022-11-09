@@ -63,12 +63,46 @@ function S_PlayerAttack(e)
                     attackList = attackListComponent.attackList
                 else
                     print("[PlayerAttack.lua] ERROR: attackListComponent is nil.")
-                end    
-            end 
+                end
+            else
+                print("[PlayerAttack.lua] ERROR: CombatManager entity does not exist!")    
+            end      
 
-            
-        
             -- select a target -----------------------------------------------------------------------------------------           
+            -- special case for BigSwing because it can also target tiles, not just characters
+            if (playerComponent.selectedAction == "BigSwing") then
+
+                local gridManipulateEntity = GetEntity("GridManipulate")
+                    
+                if (gridManipulateEntity ~= -1) then
+                    
+                    local gridManipulateComponent = GetGridManipulate(gridManipulateEntity)
+                    
+                    if (gridManipulateComponent.clicked) then
+                        
+                        -- note: last_clicked_cell.y will +1 automatically, so need to minus one first
+                        local enemyGridx = gridManipulateComponent.last_clicked_cell.x
+                        local enemyGridy = gridManipulateComponent.last_clicked_cell.y - 1
+                        local enemyGridz = gridManipulateComponent.last_clicked_cell.z
+
+                        local tileList = EntitiesWithScriptComponent("C_FloorTile")
+
+                        for i = 1, #tileList do
+                            
+                            local currentEntityGridCell = GetGridCell(tileList[i])
+
+                            if (currentEntityGridCell.x == enemyGridx and currentEntityGridCell.y == enemyGridy and currentEntityGridCell.z == enemyGridz) then
+                                print("[PlayerAttack.lua] Selected tile:", EntityName(tileList[i]), GetEntityData(tileList[i]).id, "(", currentEntityGridCell.x, currentEntityGridCell.z, ")")
+                                playerAttackComponent.targetEntity = tileList[i]
+                                break
+                            end
+                        end
+                    end
+                else
+                    print("[PlayerAttack.lua] ERROR: GridManipulate entity does not exist!")
+                end
+            end           
+
             if (playerComponent.selectedAction ~= "Move") then
                 
                 local gridManipulateEntity = GetEntity("GridManipulate")
@@ -110,13 +144,13 @@ function S_PlayerAttack(e)
             -- if attack type and attack target are chosen, then initiate combat
             if (playerAttackComponent.selectedAttack ~= nil and playerAttackComponent.targetEntity ~= -1 and playerAttackComponent.targetEntity ~= nil) then
                         
+                print("[PlayerAttack.lua] Attack Type and Attack Target are chosen, initiating combat!")
                 local selectedAttackComponent = GetComponent(combatManagerEntity, playerAttackComponent.selectedAttack[4])
                 
                 -- check whether player is able to attack the enemy (within range / no obstructions / etc) --------------
                 if (playerAttackComponent.attackCheckTriggered == false) then
                     
                     -- note: selectedAttack[4] is the attack's component name (refer to AttackList.lua)
-                    -- selectedAttackComponent = GetComponent(combatManagerEntity, playerAttackComponent.selectedAttack[4])
                     selectedAttackComponent.attacker = e
                     selectedAttackComponent.defender = playerAttackComponent.targetEntity
                     selectedAttackComponent.startCheck = true
@@ -125,10 +159,10 @@ function S_PlayerAttack(e)
                 end
                 ---end of range check -----------------------------------------------------------------------------------
                 
-                if (selectedAttackComponent.checkCompleted) then 
-                                        
+                if (selectedAttackComponent.checkCompleted) then                                             
+                    
                     if (selectedAttackComponent.canAttack) then
-                                            
+                                                             
                         -- pass this entity, attacktype, and target to CombatManager
                         combatManagerComponent = GetComponent(combatManagerEntity, "C_CombatManager")
                         combatManagerComponent.attacker = e
@@ -155,5 +189,7 @@ function S_PlayerAttack(e)
                 end
             end
         end
+    else
+        print("[PlayerAttack.lua] ERROR: TurnOrderManager entity does not exist!")
     end
 end
