@@ -7,9 +7,6 @@
 -- target is within 4 tiles away from player
 -- 4 tiles away meaning: |O| | | |X| 
 
--- TODO:
--- 1) Trigger sound effects / particles
-
 --[IsComponent]
 function C_EnergyBolt()
     local var = {
@@ -50,7 +47,7 @@ end
 --[IsSystem]
 function S_EnergyBolt(e)
     
-    attackComponent = GetComponent(e, "C_EnergyBolt")
+    local attackComponent = GetComponent(e, "C_EnergyBolt")
 
     -- checking if player is able to use attack against the enemy --------------------------------------------------------
     if (attackComponent.startCheck == true) then
@@ -89,8 +86,8 @@ function S_EnergyBolt(e)
 
         -- instantiate the energy bolt (a prefab with a script that makes it float towards the target)
         print("[AttackEnergyBolt.lua] Instantiating energy bolt!")
-        local playerPos = GetTransform(GetEntity("Player")).position
-        InstancePrefab("EnergyBolt", playerPos.x, playerPos.y, playerPos.z)
+        local attackerPos = GetTransform(attackComponent.attacker).position
+        InstancePrefab("EnergyBolt", attackerPos.x, attackerPos.y, attackerPos.z)
         
         -- trigger sound effect
         InstancePrefab("SFX_Jab",0,0,0)
@@ -135,12 +132,14 @@ function CheckEnemyWithinRange(attacker, defender, e)
                 -- enemy is behind player
                 if (attackerGrid.z > defenderGrid.z) then 
                     result = true 
-                    attackComponent.playerRotation = 270
+                    attackComponent.playerRotation = 180
+                    -- print("enemy is behind player")
                 
                 -- enemy is in front of player
                 else
                     result = true 
-                    attackComponent.playerRotation = 90
+                    attackComponent.playerRotation = 0
+                    -- print("enemy is in front of player")
                 end
 
             else
@@ -156,12 +155,14 @@ function CheckEnemyWithinRange(attacker, defender, e)
                 -- enemy to the player's right
                 if (attackerGrid.x > defenderGrid.x) then
                     result = true 
-                    attackComponent.playerRotation = 0    
+                    attackComponent.playerRotation = 270    
+                    -- print("enemy to the player's right")
                 
                 -- enemy to the player's left
                 else
                     result = true 
-                    attackComponent.playerRotation = 180
+                    attackComponent.playerRotation = 90
+                    -- print("enemy to the player's left")
                 end   
 
             else

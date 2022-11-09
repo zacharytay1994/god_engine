@@ -35,6 +35,17 @@ function S_StateMoveEnemy(e)
         local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
         local stateMoveEnemyComponent = GetComponent(e, "C_StateMoveEnemy")
         local enemyGridCell = GetGridCell(e)
+        local playerEntity = GetEntity("Player")
+
+        if (playerEntity == -1) then
+            print("[StateMoveEnemy.lua] ERROR: Player does not exist! Returning.")
+            return
+        end
+
+        if (GetComponent(e, "C_Character").moved == true) then
+            print("[StateMoveEnemy.lua] Enemy moved already, skipping this script!")
+            return
+        end
              
         -- if it's this character's turn, let it perform it actions
         if (turnOrderManagerComponent.currentTurn == entityDataComponent.id) then  
@@ -51,79 +62,84 @@ function S_StateMoveEnemy(e)
 
                 -- get the enemy's C_Pathfind component
                 pathfind = GetComponent(e, "C_Pathfind")
-                                
-                -- get player entity
-                playerEntity = (EntitiesWithScriptComponent("C_PlayerEndTurn"))[1]
 
-                -- checking that player entity exists
-                if (playerEntity ~= -1) then 
+                local targetTile = nil
 
-                    -- -- sanity check
-                    -- print("Player ID", GetEntityData(playerEntity).id)
-                    
-                    local targetTile = SuitableTile()
+                -- if enemy is already beside player, don't move 
+                if (CheckEnemyAdjacentToPlayer(e, playerEntity) == false) then
+                    targetTile = SuitableTile()
+                end
 
-                    -- if a suitable tile is found, then set it as target and move towards it
-                    if (targetTile ~= nil) then 
+                -- if a suitable tile is found, then set it as target and move towards it
+                if (targetTile ~= nil) then 
 
-                        local targetGridCell = GetGridCell(targetTile)
+                    local targetGridCell = GetGridCell(targetTile)
 
-                        -- start the pathfinding
-                        pathfind.x = targetGridCell.x
-                        pathfind.y = targetGridCell.y + 1
-                        pathfind.z = targetGridCell.z
-                        pathfind.Path = true
+                    -- start the pathfinding
+                    pathfind.x = targetGridCell.x
+                    pathfind.y = targetGridCell.y + 1
+                    pathfind.z = targetGridCell.z
+                    pathfind.Path = true
 
-                        stateMoveEnemyComponent.startedPathfind = true
+                    stateMoveEnemyComponent.startedPathfind = true
 
-                    -- else if no suitable tile is found, don't move and end turn
-                    else
-                        -- reset variables
-                        stateMoveEnemyComponent.Time = 0.0
-                        -- switch to next character's turn
-                        print("[StateMoveEnemy.lua] moved = true (line 84).")
-                        -- turnOrderManagerComponent.nextTurn = true
-                        GetComponent(e, "C_Character").moved = true
-                        print("[StateMoveEnemy.lua] No suitable tiles to move to, staying still and ending turn.")
-                        print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")                 
-                        return
-                    end
+                -- else if no suitable tile is found, don't move and end turn
+                else
+                    -- reset variables
+                    stateMoveEnemyComponent.Time = 0.0
+                    stateMoveEnemyComponent.startedPathfind = false
+                    pathfind.x = 0
+                    pathfind.y = 0
+                    pathfind.z = 0
+
+
+
+                    -- switch to next character's turn
+                    print("[StateMoveEnemy.lua] moved = true (line 84).")
+                    -- turnOrderManagerComponent.nextTurn = true
+                    GetComponent(e, "C_Character").moved = true
+                    print("[StateMoveEnemy.lua] No suitable tiles to move to, staying still and ending turn.")
+                    print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")                 
+                    return
                 end
             end   
 
-            -- once the enemy has reached its destination, end its turn
-            if (enemyGridCell.x == pathfind.x and enemyGridCell.y == pathfind.y and enemyGridCell.z == pathfind.z) then
+            if (GetComponent(e, "C_Character").moved == false) then
+                -- once the enemy has reached its destination, or if it's adjacent to the player, stop moving
+                if ((enemyGridCell.x == pathfind.x and enemyGridCell.y == pathfind.y and enemyGridCell.z == pathfind.z) or 
+                    CheckEnemyAdjacentToPlayer(e, playerEntity) == true)  then
 
-                -- reset variables
-                stateMoveEnemyComponent.Time = 0.0
-                stateMoveEnemyComponent.startedPathfind = false
-                pathfind.x = 0
-                pathfind.y = 0
-                pathfind.z = 0
+                    -- reset variables
+                    stateMoveEnemyComponent.Time = 0.0
+                    stateMoveEnemyComponent.startedPathfind = false
+                    pathfind.x = 0
+                    pathfind.y = 0
+                    pathfind.z = 0
 
-                -- switch to next character's turn
-                print("[StateMoveEnemy.lua] moved = true (line 104).")
-                -- turnOrderManagerComponent.nextTurn = true
-                GetComponent(e, "C_Character").moved = true
-                print("[StateMoveEnemy.lua] Destination reached!")
-                print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")  
-            
-            elseif (GetComponent(e, "C_Character").currentStamina <= 0) then
+                    -- switch to next character's turn
+                    print("[StateMoveEnemy.lua] moved = true (line 104).")
+                    -- turnOrderManagerComponent.nextTurn = true
+                    GetComponent(e, "C_Character").moved = true
+                    print("[StateMoveEnemy.lua] Destination reached!")
+                    print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")  
                 
-                -- reset variables
-                stateMoveEnemyComponent.Time = 0.0
-                stateMoveEnemyComponent.startedPathfind = false
-                pathfind.x = 0
-                pathfind.y = 0
-                pathfind.z = 0
+                elseif (GetComponent(e, "C_Character").currentStamina <= 0) then
+                    
+                    -- reset variables
+                    stateMoveEnemyComponent.Time = 0.0
+                    stateMoveEnemyComponent.startedPathfind = false
+                    pathfind.x = 0
+                    pathfind.y = 0
+                    pathfind.z = 0
 
-                -- switch to next character's turn
-                print("[StateMoveEnemy.lua] moved = true (line 119).")
-                -- turnOrderManagerComponent.nextTurn = true
-                GetComponent(e, "C_Character").moved = true
-                print("[StateMoveEnemy.lua] Stamina fully depleted!")
-                print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")  
-            
+                    -- switch to next character's turn
+                    print("[StateMoveEnemy.lua] moved = true (line 119).")
+                    -- turnOrderManagerComponent.nextTurn = true
+                    GetComponent(e, "C_Character").moved = true
+                    print("[StateMoveEnemy.lua] Stamina fully depleted!")
+                    print("[StateMoveEnemy.lua] End of movement for", EntityName(e), entityDataComponent.id, "\n")  
+                
+                end
             end
         end
     end
@@ -135,7 +151,7 @@ function SuitableTile()
     print("[StateMoveEnemy.lua] Start of SuitableTile().")
 
     -- getting player's location
-    local playerGridCell = GetGridCell(playerEntity)
+    local playerGridCell = GetGridCell(GetEntity("Player"))
     -- print("[StateMoveEnemy.lua] Player grid location:", playerGridCell.x, playerGridCell.y, playerGridCell.z)
 
     -- get all tiles
@@ -247,7 +263,7 @@ function SuitableTile()
     
     -- if the code reaches here then it means all 8 tiles surrounding the player are occupied.
     -- the enemy will just stay still
-    print("[StateMoveEnemy.lua] End of SuitableTile().")
+    print("[StateMoveEnemy.lua] End of SuitableTile(). Returning nil.")
     return nil
 end
 

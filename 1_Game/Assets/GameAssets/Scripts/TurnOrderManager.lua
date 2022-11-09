@@ -3,6 +3,9 @@
 -- While GlobalStatemachine.CurrentState is CharacterTurnState, this script will be responsible for switching to each 
 -- character's turn, before changing GlobalStatemachine.CurrentState to RandomEventState.
 
+-- TODO:
+-- 1) Trigger game over when player dies (can't trigger from Player.lua because it will stop working once Player entity is removed)
+
 --[IsComponent]
 function C_TurnOrderManager()
     local var = {
@@ -30,6 +33,7 @@ function C_TurnOrderManager()
         -- counts the number of turn cycles 
         turnCycleCounter = 0,
 
+        -- turn order UI will be refreshed at the start of each round
         refreshTurnOrderUI = false
     };
     return function()
@@ -39,71 +43,67 @@ end
 
 --[IsSystem]
 function S_TurnOrderManager(e)
-    
-    -- press L to remove instance of TestSubject
-    if (CheckKeyPress(76) == true) then
-        RemoveInstance(GetEntity("TestSubject"))
-    end
 
-    -- getting TurnOrderManager entity and component
+    -- getting TurnOrderManager entity and component ----------------------------------------------------------------
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
-    local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
+    local turnOrderManagerComponent
+    if (turnOrderManagerEntity ~= -1) then
+        turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
+    else
+        print("[TurnOrderManager.lua] ERROR: turnOrderManager entity is missing!")
+    end
+    -----------------------------------------------------------------------------------------------------------------
     
-    -- getting GlobalStatemachine entity and component
+    -- getting GlobalStatemachine entity and component --------------------------------------------------------------
     local globalStateMachineEntity = GetEntity("GlobalStatemachine")
-    local globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
+    local globalStateMachineComponent
+    if (globalStateMachineEntity ~= -1) then
+        globalStateMachineComponent = GetComponent(globalStateMachineEntity, "C_GlobalStatemachine")
+    else
+        print("[TurnOrderManager.lua] ERROR: globalStateMachineEntity entity is missing!")
+    end
+    -----------------------------------------------------------------------------------------------------------------
 
     -- only run the rest of this script if globalStateMachine allows it
     if (globalStateMachineComponent.CurrentState == turnOrderManagerComponent.TurnOrderState) then
             
-        -- press M to check ID of current active character
+        -- Debugging hotkeys and cheats -----------------------------------------------------------------------------
+        -- press M to check name and ID of current active character, as well as the current round number
         if (CheckKeyPress(77)) then
-            print("current active character:", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "    ID no.", turnOrderManagerComponent.currentTurn)
+            print("[TurnOrderManager.lua] Current active character:", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), turnOrderManagerComponent.currentTurn)
+            print("[TurnOrderManager.lua] Currently at turn no.", turnOrderManagerComponent.turnCycleCounter, "\n")
         end
-        -- press X to check the number of turn cycles so far
-        if (CheckKeyPress(78)) then
-            print("Currently at turn no.", turnOrderManagerComponent.turnCycleCounter)
-        end
+        -------------------------------------------------------------------------------------------------------------
 
-        -- if player is dead, don't do anything because the game is over
-        if (GetEntity("Player") == -1) then
-            
-            -- trigger any game over events here
-
-            return
-        end
+        -- if player is dead, don't do anything because the game is over --------------------------------------------
+        -- TODO: Trigger game over when player dies
+        -- if (GetEntity("Player") == -1) then
+        --     -- trigger any game over events here
+        --     return
+        -- end
+        -------------------------------------------------------------------------------------------------------------
         
-        -- if starting a new turn cycle, build the turn queue 
+        -- if starting a new turn cycle, build the turn queue -------------------------------------------------------
         if (turnOrderManagerComponent.buildTurnQueue == true) then        
 
             print("[TurnOrderManager.lua] Start of building turnQueue")
 
             -- incrementing the turn counter
             turnOrderManagerComponent.turnCycleCounter = turnOrderManagerComponent.turnCycleCounter + 1
-
-            -- reset nextTurn
-            -- print("Resetting nextTurn!!!")
-            turnOrderManagerComponent.nextTurn = false
             
             -- adding all entities with C_Character script into the turnQueue and print result
             print("[TurnOrderManager.lua] Entities added into turnQueue:")
             turnOrderManagerComponent.turnQueue = EntitiesWithScriptComponent("C_Character")
             for k = 1, #turnOrderManagerComponent.turnQueue do              
-                print(GetEntityData(turnOrderManagerComponent.turnQueue[k]).id)
+                print(EntityName(turnOrderManagerComponent.turnQueue[k]), GetEntityData(turnOrderManagerComponent.turnQueue[k]).id)
             end
-            print() -- print line break
 
-            -- sort all characters in turnQueue by remaining stamina (Selection Sort)//////////////
-            if (#turnOrderManagerComponent.turnQueue > 1) then 
-                                
-                local arrayLength = #turnOrderManagerComponent.turnQueue
-        
-                for i = 1, #turnOrderManagerComponent.turnQueue - 1 do
-                    
-                    if (i <= arrayLength) then 
-                                            
+            -- sort all characters in turnQueue by remaining stamina (Selection Sort)------------------------------------
+            if (#turnOrderManagerComponent.turnQueue > 1) then                           
+                local arrayLength = #turnOrderManagerComponent.turnQueue        
+                for i = 1, #turnOrderManagerComponent.turnQueue - 1 do                  
+                    if (i <= arrayLength) then                                         
                         indexLargest = i
-
                         for j = i + 1, #turnOrderManagerComponent.turnQueue do
                             if (j <= arrayLength) then
                                 if (GetComponent(turnOrderManagerComponent.turnQueue[j], "C_Character").currentStamina > GetComponent(turnOrderManagerComponent.turnQueue[indexLargest], "C_Character").currentStamina) then
@@ -117,18 +117,27 @@ function S_TurnOrderManager(e)
                         turnOrderManagerComponent.turnQueue[i] = temp
                     end
                 end
-            end
+            end 
+            -- end of selection sort ------------------------------------------------------------------------------------
 
             -- push player to the front as much as possible (e.g. if a bunch of characters have 0 stamina, the player will go first among the 0-stamina-ers) ------------------------------------------            
             print("[TurnOrderManager.lua] Pushing player to the front.")
+            
+            -- getting player's index in the turnQueue
             local playerIndex = 0
-            for n = 1, #turnOrderManagerComponent.turnQueue do
-                if (turnOrderManagerComponent.turnQueue[n] == GetEntityData(GetEntity("Player")).id) then
-                    playerIndex = n
-                    break;
+            local playerEntity = GetEntity("Player")
+            if (playerEntity ~= -1) then
+                for n = 1, #turnOrderManagerComponent.turnQueue do
+                    if (turnOrderManagerComponent.turnQueue[n] == GetEntityData(playerEntity).id) then
+                        playerIndex = n
+                        break;
+                    end
                 end
+            else
+                print("[TurnOrderManager.lua] Player Entity is missing!")
             end
 
+            -- while characters in front of the player have the same stamina as the player, swap their queue positions
             while ((playerIndex - 1) > 1) do
                 
                 if (GetComponent(turnOrderManagerComponent.turnQueue[playerIndex], "C_Character").currentStamina == GetComponent(turnOrderManagerComponent.turnQueue[playerIndex - 1], "C_Character").currentStamina) then
@@ -150,9 +159,8 @@ function S_TurnOrderManager(e)
                 print(l, EntityName(turnOrderManagerComponent.turnQueue[l]), GetEntityData(turnOrderManagerComponent.turnQueue[l]).id)
                 GetComponent(turnOrderManagerComponent.turnQueue[l], "C_Character").currentStamina = GetComponent(turnOrderManagerComponent.turnQueue[l], "C_Character").maxStamina
             end
-            -- END OF SELECTION SORT/////////////////////////////////////////////////////////////////////
-
-            -- reset to false so it doesn't keep running this chunk
+            
+            -- reset to false so it doesn't build the queue again for this round
             turnOrderManagerComponent.buildTurnQueue = false
 
             -- cue UIManager to refresh the turn order icons 
@@ -160,39 +168,42 @@ function S_TurnOrderManager(e)
 
             print("[TurnOrderManager.lua] End of building turnQueue.\n")
         end
+        -- end of building turn queue -------------------------------------------------------------------------------
      
-        -- while there are still characters who have not taken their turn for this cycle
+        -- cycling through character turns --------------------------------------------------------------------------
         if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
                      
             -- skip dead character's turn
             if (GetComponent(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex], "C_Character").isDead) then
                 turnOrderManagerComponent.nextTurn = true
+            else         
+                -- allow current character do perform their turn
+                turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
             end
-            
-            -- allow current character do perform their turn
-            turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
 
             -- turnOrderManagerComponent.nextTurn will be toggled to true when the current active character ends their turn
             if (turnOrderManagerComponent.nextTurn == true) then
                 
                 print("[TurnOrderManager.lua]", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "has set nextTurn to true.")
                 
-                -- reset to false
+                -- reset nextTurn to false
                 turnOrderManagerComponent.nextTurn = false    
                 -- increment queueIndex (next character in turnQueue will become active)
                 turnOrderManagerComponent.queueIndex = turnOrderManagerComponent.queueIndex + 1
 
+                -- activate the next character and print announcement
                 if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
                     print("[TurnOrderManager.lua] It is now", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "turn.")
                     turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
                 end
-
             end
         -- once all characters have taken their turn, reset variables and change global state to randomevents 
         else          
+            
+            -- reset variables
             turnOrderManagerComponent.buildTurnQueue = true
-            turnOrderManagerComponent.queueIndex = 1
             turnOrderManagerComponent.currentTurn = 0
+            turnOrderManagerComponent.queueIndex = 1
 
             -- remove all the dead characters
             print("[TurnOrderManager.lua] Removing dead characters.")
@@ -204,29 +215,10 @@ function S_TurnOrderManager(e)
                 end
             end
 
+            -- hand over control to RandomEventManager
             globalStateMachineComponent.CurrentState = "StateRandomEvent"
             print("[TurnOrderManager.lua] Setting globalStatemachine to StateRandomEvent.")
         end
+        -- end of cycling through character turns -------------------------------------------------------------------
     end
 end
-
-
-
-
---[[ PSEUDOCODE
-
-if starting a new turn cycle
-    init the turnQueue array
-    buildTurnQueue = false
-
-if (GlobalStatemachine.CurrentState = CharacterTurn)
-    while not every character has performed their turn
-        perform turn
-        if (nextTurn)
-            nextTurn = false
-            go to next character
-
-buildTurnQueue = true
-GlobalStatemachine.CurrentState = RandomEventState
-
---]]

@@ -3,12 +3,13 @@
 -- 2) Attack
 -- 3) Any special behaviour
 
---[IsComponent]
-function C_SmallFastFish()
-    local var = {
-        --[SerializeString]
-        EnemySmallFastFish = "SmallFastFish",
+-- The suicide bomber will make a beeline towards the player and explode once it's right beside the player,
+-- dealing massive damage to the player and killing itself. 
+-- Leaves a crater in its wake.
 
+--[IsComponent]
+function C_SuicideBomber()
+    local var = {
         -- will be set by StateMoveEnemy.lua
         hasMoved = false,
         
@@ -27,21 +28,25 @@ function C_SmallFastFish()
 end
 
 --[IsSystem]
-function S_SmallFastFish(e)
+function S_SuicideBomber(e)
     
     --print("[SmallFastFish.lua] Start")
     
+    -- getting turn order manager
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
     local turnOrderManagerComponent
     if (turnOrderManagerEntity ~= -1) then
         turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
     end
 
-    local enemyComponent = GetComponent(e, "C_SmallFastFish")
+    local enemyComponent = GetComponent(e, "C_SuicideBomber")
     local entityDataComponent = GetEntityData(e)
 
-    -- print(entityDataComponent.id)
-    -- print(turnOrderManagerComponent.currentTurn)
+    local playerEntity = GetEntity("Player")
+    if (playerEntity == -1) then
+        print("[EnemySuicideBomber.lua] ERROR: Player does not exist! Returning.")
+        return
+    end
 
     -- check if its this enemy's turn
     if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then
@@ -54,37 +59,52 @@ function S_SmallFastFish(e)
             -- wait for StateMoveEnemy.lua to finish.
             -- StateMoveEnemy.lua will set C_Character.moved to true
 
-            --print("[SmallFastFish.lua] characterComponent.moved", characterComponent.moved)
-
             if (characterComponent.moved) then
-                print("[EnemySmallFastFish.lua] Done moving.")
+                print("[EnemySuicideBomber.lua] Done moving.")
                 enemyComponent.hasMoved = true
                 characterComponent.moved = false
             end
 
         elseif (enemyComponent.hasAttacked == false) then
         
-            if (CheckEnemyAdjacentToPlayer(e, GetEntity("Player"))) then
+            if (CheckEnemyAdjacentToPlayer(e, playerEntity)) then
                 
-                local playerCharacterComponent = GetComponent(GetEntity("Player"), "C_Character")
+                local playerCharacterComponent = GetComponent(playerEntity, "C_Character")
                 
                 --attack player
-                print("[SmallFastFish.lua] Player's HP before getting hit is", playerCharacterComponent.currentHP)
-                print("[SmallFastFish.lua] SmallFastFish attacks player!")
+                print("[EnemySuicideBomber.lua] Player's HP before getting hit is", playerCharacterComponent.currentHP)
+                print("[EnemySuicideBomber.lua] SuicideBomber exploding!")
 
-                playerCharacterComponent.currentHP = playerCharacterComponent.currentHP - 1
+                -- damage the player
+                playerCharacterComponent.currentHP = playerCharacterComponent.currentHP - 5
+                
+                -- kill off the suicide bomber
+                characterComponent.currentHP = 0
+
+                -- leave a crater
+                local enemyGrid = GetGridCell(e)
+                local tileList = EntitiesWithScriptComponent("C_FloorTile")
+                for i = 1, #tileList do
+                    local tileGrid = GetGridCell(tileList[i])
+                    
+                    if (tileGrid.x == enemyGrid.x and tileGrid.y == enemyGrid.y - 1 and tileGrid.z == enemyGrid.z) then
+                        -- remove the tile below the suicide bomber
+                        RemoveInstance(tileList[i])    
+                        print("[EnemySuicideBomber.lua] Removed the tile below suicide bomber")
+                        break
+                    end
+
+                end
 
                 -- activate screenshake
-                print("triggering screenshake!")
-                screenShakeEntity = GetEntity("ScreenShake")
+                local screenShakeEntity = GetEntity("ScreenShake")
                 if (screenShakeEntity ~= -1) then
-                    screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
+                    local screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
                     screenShakeComponent.duration = 0.25
                     screenShakeComponent.doScreenShake = true
                 end
 
-                print("[SmallFastFish.lua] Player's HP after getting hit is", playerCharacterComponent.currentHP)
-
+                print("[EnemySuicideBomber.lua] Player's HP after getting hit is", playerCharacterComponent.currentHP)
             end
 
             -- set hasAttacked to true
@@ -93,7 +113,7 @@ function S_SmallFastFish(e)
         elseif (enemyComponent.hasPerformedSpecialBehaviour == false) then
 
             -- special action code here
-            print("[SmallFastFishSmallFastFish.lua] Pretend to perform special action.")
+            print("[EnemySuicideBomber.lua] Pretend to perform special action.")
 
             -- set to true
             enemyComponent.hasPerformedSpecialBehaviour = true
@@ -106,9 +126,15 @@ function S_SmallFastFish(e)
             enemyComponent.hasMoved = false
             enemyComponent.hasAttacked = false
             enemyComponent.hasPerformedSpecialBehaviour = false
+            print("[EnemySuicideBomber.lua] Resetting hasMoved, hasAttacked, hasPerformedSpecialBehaviour.")
+
+            -- may need to move this to StateMoveEnemy.lua 
+            GetComponent(e, "C_Character").moved = false
             
             -- set next turn to true
             turnOrderManagerComponent.nextTurn = true
+
+            print("[EnemySuicideBomber.lua] Ending enemy turn!")
         end
     end
 
@@ -145,12 +171,3 @@ function CheckEnemyAdjacentToPlayer(enemy, player)
 
     return result
 end
-
--- helper function template
--- function HelperFunction(attacker, defender, e)
-    
---     -- init result
---     result = false
-
---     return result
--- end

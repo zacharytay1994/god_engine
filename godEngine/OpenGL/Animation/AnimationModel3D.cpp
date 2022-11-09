@@ -167,10 +167,11 @@ namespace god
 
 		void Model::ExtractBoneWeightForVertices( std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene )
 		{
+			( scene );
 			auto& boneInfoMap = m_BoneInfoMap;
 			int& boneCount = m_BoneCounter;
 
-			for ( int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex )
+			for ( unsigned int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex )
 			{
 				int boneID = -1;
 				std::string boneName = mesh->mBones[boneIndex]->mName.data;
@@ -201,10 +202,11 @@ namespace god
 			}
 		}
 
-		unsigned int Model::TextureFromFile( const char* path, const string& directory, bool gamma )
+		unsigned int Model::TextureFromFile( const char* path, const string& _directory, bool gamma )
 		{
+			( gamma );
 			string filename = string( path );
-			filename = directory + '/' + filename;
+			filename = _directory + '/' + filename;
 
 			unsigned int textureID;
 			glGenTextures( 1, &textureID );
@@ -213,7 +215,7 @@ namespace god
 			unsigned char* data = stbi_load( filename.c_str(), &width, &height, &nrComponents, 0 );
 			if ( data )
 			{
-				GLenum format;
+				GLenum format {};
 				if ( nrComponents == 1 )
 					format = GL_RED;
 				else if ( nrComponents == 3 )

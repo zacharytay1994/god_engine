@@ -50,6 +50,7 @@ namespace detail
 			return TARGET_2D;
 	}
 
+#pragma warning(disable: 4100)
 	inline texture load_ktx10(char const* Data, std::size_t Size)
 	{
 		detail::ktx_header10 const & Header(*reinterpret_cast<detail::ktx_header10 const*>(Data));
@@ -96,6 +97,7 @@ namespace detail
 
 		return Texture;
 	}
+#pragma warning(default: 4100)
 }//namespace detail
 
 	inline texture load_ktx(char const* Data, std::size_t Size)

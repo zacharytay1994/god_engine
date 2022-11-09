@@ -17,6 +17,8 @@
 static const char *FMOD_ErrorString(FMOD_RESULT errcode) __attribute__((unused));
 #endif
 
+#pragma warning(disable: 4505)
+
 static const char *FMOD_ErrorString(FMOD_RESULT errcode)
 {
     switch (errcode)
@@ -106,5 +108,7 @@ static const char *FMOD_ErrorString(FMOD_RESULT errcode)
         default :                                return "Unknown error.";
     };
 }
+
+#pragma warning(default: 4505)
 
 #endif

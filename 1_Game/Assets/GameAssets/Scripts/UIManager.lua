@@ -1,4 +1,6 @@
-
+-- This script manages Action Buttons textures and the Turn Order UI.
+-- Action Button functionality is defined in ActionButton.lua.
+-- May separate this script into smaller scripts during M3.
 
 --[IsComponent]
 function C_UIManager()
@@ -6,14 +8,16 @@ function C_UIManager()
         --[SerializeString]
         UIManager = "UIManager",
 
+        -- only allow one dice roll per turn
         diceRolled = false,
         
-        diceHasZero = false,
+        -- list of all action buttons
+        actionButtonList = {},
 
-        buttonActionsList = {},
-
+        -- add the character icon UI entities into iconList (only once)
         characterIconsInit = false,
 
+        -- list of all character icons
         iconList = {} 
     };
     return function()
@@ -24,31 +28,33 @@ end
 --[IsSystem]
 function S_UIManager(e)
     
-    -- get list of all dice 
-    -- if all dice components value ~= 0 then change the buttons UI to the correct icons
-
     local UIManagerComponent = GetComponent(e, "C_UIManager")
-    
-    -- Updating action buttons -----------------------------------------------------------------------------------------------------------
-    -- only update action buttons on the player's turn
 
+    -- checking if player entity exists
+    local playerEntity = GetEntity("Player")
+    if (playerEntity == -1) then
+        print("[UIManager.lua] Player entity is missing! Returning.")
+        return
+    end
+
+    -- getting TurnOrderManager entity and component
     local turnOrderManagerEntity = GetEntity("TurnOrderManager")
     local turnOrderManagerComponent
     if (turnOrderManagerEntity ~= -1) then
         turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
     end
+    
+    -- updating action buttons -----------------------------------------------------------------------------------------------------------
+    -- only update action buttons on the player's turn
+    -- note that only the action buttons' textures are defined here. functionality is defined in ActionButton.lua
+    if (GetEntityData(playerEntity).id == turnOrderManagerComponent.currentTurn) then
 
-    if (GetEntityData(GetEntity("Player")).id == turnOrderManagerComponent.currentTurn) then
-
-        -- if have not gotten proper values from dice
+        -- wait until dice have finished rolling
         if (UIManagerComponent.diceRolled == false) then
-            
-            
+                  
             local diceList = EntitiesWithScriptComponent("C_DiceScript")
             local diceSettled = true
             
-            -- print("UIManagerComponent.diceRolled == false")
-
             -- if any die has a value of 0 then they have not properly settled down
             for i = 1, #diceList do
                 if (GetComponent(diceList[i], "C_DiceScript").value == 0) then
@@ -56,44 +62,35 @@ function S_UIManager(e)
                 end
             end
             
-            -- press T
             if (diceSettled) then
                 
+                -- don't allow player to roll anymore for this turn
                 UIManagerComponent.diceRolled = true
                             
                 -- change the button textures
                 for j = 1, #diceList do
                     
                     currentDiceComponent = GetComponent(diceList[j], "C_DiceScript")
-
-                    -- print("[UIManager.lua] Dice value:", currentDiceComponent.value)
                     
-                    if (currentDiceComponent.value == 1 or currentDiceComponent.value == 2 or currentDiceComponent.value == 3) then
-                        
-                        UIManagerComponent.buttonActionsList[#UIManagerComponent.buttonActionsList + 1] = "FrontJab"
-                        
-                    else
-                        
-                        UIManagerComponent.buttonActionsList[#UIManagerComponent.buttonActionsList + 1] = "EnergyBolt"
-                        
+                    -- currently only 2 attack types, will modify this part when more attack types are implemented
+                    if (currentDiceComponent.value == 1 or currentDiceComponent.value == 2 or currentDiceComponent.value == 3) then                       
+                        UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "FrontJab"                       
+                    else              
+                        UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "EnergyBolt"                      
                     end
                 end
                 
-                ChangeTexture(GetEntity("Button1"), UIManagerComponent.buttonActionsList[1])
-                ChangeTexture(GetEntity("Button2"), UIManagerComponent.buttonActionsList[2])
-                ChangeTexture(GetEntity("Button3"), UIManagerComponent.buttonActionsList[3])
-                --ChangeTexture(GetEntity("Button3"), UIManagerComponent.buttonActionsList[3])
-                
-                -- print(TextureName(GetEntity("Button1")))
-                
+                -- change button textures to show the available actions
+                ChangeTexture(GetEntity("Button1"), UIManagerComponent.actionButtonList[1])
+                ChangeTexture(GetEntity("Button2"), UIManagerComponent.actionButtonList[2])
+                ChangeTexture(GetEntity("Button3"), UIManagerComponent.actionButtonList[3])
+                                
                 -- reset dice value to zero
                 for k = 1, #diceList do
                     GetComponent(diceList[k], "C_DiceScript").value = 0
-                end
-                
+                end            
             end
         end
-
     else
 
         -- if not the player's turn, then reset diceRolled
@@ -104,32 +101,30 @@ function S_UIManager(e)
         ChangeTexture(GetEntity("Button2"), "empty_btn")
         ChangeTexture(GetEntity("Button3"), "empty_btn")
 
+        -- clear actionButtonList
+        UIManagerComponent.actionButtonList = {}
     end
-    -- End of updating buttons -----------------------------------------------------------------------------------------------------------
+    -- end of updating buttons -----------------------------------------------------------------------------------------------------------
 
-    -- Updating turn order icons ---------------------------------------------------------------------------------------------------------
-    -- if (UIManagerComponent.characterIconsInit == false) then
-    if (UIManagerComponent.characterIconsInit == false) then
-    
-        print("[UIManager.lua] Initialized character icons")
+    -- updating turn order icons ---------------------------------------------------------------------------------------------------------
+    if (UIManagerComponent.characterIconsInit == false) then  
+        print("[UIManager.lua] Initializing character icons")
         UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnOne")
         UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnTwo")
         UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnThree")
         UIManagerComponent.characterIconsInit = true
     end
 
-    local turnOrderManagerComponent = GetComponent(GetEntity("TurnOrderManager"), "C_TurnOrderManager")
-
     if (turnOrderManagerComponent.refreshTurnOrderUI == true) then
     
-        print("Refreshing turn order UI")
+        print("[UIManager.lua] Refreshing turn order UI.")
         
         for i = 1, #turnOrderManagerComponent.turnQueue do 
         
-            if (EntityName(turnOrderManagerComponent.turnQueue[i]) == "Player") then
+            if (GetComponent(turnOrderManagerComponent.turnQueue[i], "C_Character").characterType == "Player") then
                 ChangeTexture(UIManagerComponent.iconList[i], "TritonTurn")
 
-            else
+            elseif (GetComponent(turnOrderManagerComponent.turnQueue[i], "C_Character").characterType == "Squinky") then
                 ChangeTexture(UIManagerComponent.iconList[i], "SquinkyTurn")
             end
         end
@@ -137,27 +132,19 @@ function S_UIManager(e)
         turnOrderManagerComponent.refreshTurnOrderUI = false
     end
 
-    -- press I
-    if (CheckKeyPress(73)) then
-        ChangeTexture(GetEntity("TurnOne"), "TritonDark")
-
-    end
-
     -- darken icon for idle characters
     for k = 1, #UIManagerComponent.iconList do
                    
-        -- print("turnOrderManagerComponent.queueIndex", turnOrderManagerComponent.queueIndex
-        -- print(k)
-        if (turnOrderManagerComponent.queueIndex == k) then
-        
+        -- if current character is active, switch to lighter icon
+        if (turnOrderManagerComponent.queueIndex == k) then    
             if (TextureName(UIManagerComponent.iconList[k]) == "TritonDark") then
                 ChangeTexture(UIManagerComponent.iconList[k], "TritonTurn")
             elseif (TextureName(UIManagerComponent.iconList[k]) == "SquinkyDark") then
                 ChangeTexture(UIManagerComponent.iconList[k], "SquinkyTurn")
             end
 
-        else -- if not this char's turn, set to dark
-
+        -- if current character is not active, switch to darker icon
+        else 
             if (TextureName(UIManagerComponent.iconList[k]) == "TritonTurn") then
                 ChangeTexture(UIManagerComponent.iconList[k], "TritonDark")
             elseif (TextureName(UIManagerComponent.iconList[k]) == "SquinkyTurn") then
@@ -165,41 +152,5 @@ function S_UIManager(e)
             end
         end
     end
-
-
     -- End of updating turn order icons --------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
 end
-
-
-
-
---[[ PSEUDOCODE
-
-if starting a new turn cycle
-    init the turnQueue array
-    buildTurnQueue = false
-
-if (GlobalStatemachine.CurrentState = CharacterTurn)
-    while not every character has performed their turn
-        perform turn
-        if (nextTurn)
-            nextTurn = false
-            go to next character
-
-buildTurnQueue = true
-GlobalStatemachine.CurrentState = RandomEventState
-
---]]

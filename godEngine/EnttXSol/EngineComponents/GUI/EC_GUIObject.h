@@ -47,6 +47,7 @@ namespace god
 		RegisterInspector<GUIObject , EngineResources> ( entity , registry , imguiUniqueID , editorResources ,
 			[]( GUIObject& component , EngineResources& resources )
 			{
+				( resources );
 				ImGui::Separator ();
 				ImGui::Text ( "GUIObject" );
 				ImGui::Separator ();

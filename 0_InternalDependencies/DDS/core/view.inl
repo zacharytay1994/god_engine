@@ -129,6 +129,7 @@ namespace gli
 			Texture.base_level() + BaseLevel, Texture.base_level() + MaxLevel);
 	}
 
+#pragma warning(disable: 4100)
 	inline texture view
 	(
 		texture_cube const & Texture,
@@ -146,6 +147,7 @@ namespace gli
 			Texture.base_face(), Texture.base_face() + MaxFace,
 			Texture.base_level() + BaseLevel, Texture.base_level() + MaxLevel);
 	}
+#pragma warning(default: 4100)
 
 	inline texture view
 	(

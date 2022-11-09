@@ -44,12 +44,12 @@ namespace god
 
 		float Animation::GetTicksPerSecond()
 		{
-			return m_TicksPerSecond;
+			return static_cast<float>(m_TicksPerSecond);
 		}
 
 		float Animation::GetDuration()
 		{
-			return m_Duration;
+			return static_cast< float >(m_Duration);
 		}
 
 		const AssimpNodeData& Animation::GetRootNode()
@@ -95,7 +95,7 @@ namespace god
 			dest.transformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat( src->mTransformation );
 			dest.childrenCount = src->mNumChildren;
 
-			for ( int i = 0; i < src->mNumChildren; i++ )
+			for ( unsigned int i = 0; i < src->mNumChildren; i++ )
 			{
 				AssimpNodeData newData;
 				ReadHeirarchyData( newData, src->mChildren[i] );

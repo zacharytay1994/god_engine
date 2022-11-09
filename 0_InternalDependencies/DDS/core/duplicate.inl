@@ -211,6 +211,7 @@ namespace detail
 		return Duplicate;
 	}
 
+#pragma warning(disable: 4100)
 	inline texture duplicate
 	(
 		texture_cube const & Texture,
@@ -264,4 +265,5 @@ namespace detail
 
 		return Duplicate;
 	}
+#pragma warning(default: 4100)
 }//namespace gli
