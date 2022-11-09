@@ -8,6 +8,8 @@
 -- IMPORTANT NOTE: STAMINA MUST ONLY BE REFRESHED AT THE START OF CHARACTER'S TURN, NOT AFTER IT ENDS
 -- this is because their remaining stamina must be retained in order to calculate next turn's turn order.
 
+-- local util = require "util"
+
 --[IsComponent]
 function C_Character()
     local var = {     
@@ -125,6 +127,11 @@ function S_Character(e)
                 print("defence:", characterComponent.defence)
                 print("\n\n")
             end
+
+            -- -- press 0 (quick debug)
+            -- if (CheckKeyPress(48) == true) then   
+            --     util.doSomething()
+            -- end
         end
     end
 end
