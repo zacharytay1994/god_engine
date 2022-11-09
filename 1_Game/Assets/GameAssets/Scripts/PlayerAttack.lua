@@ -94,7 +94,7 @@ function S_PlayerAttack(e)
                                 local currentEntityGridCell = GetGridCell(characterList[i])
 
                                 if (currentEntityGridCell.x == enemyGridx and currentEntityGridCell.y == enemyGridy and currentEntityGridCell.z == enemyGridz) then
-                                    print("Selected target:", EntityName(characterList[i]), GetEntityData(characterList[i]).id)
+                                    print("[PlayerAttack.lua] Selected target:", EntityName(characterList[i]), GetEntityData(characterList[i]).id)
                                     playerAttackComponent.targetEntity = characterList[i]
                                     break
                                 end

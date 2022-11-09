@@ -1,15 +1,15 @@
--- This script will allow the player to perform a Big Sweep attack.
+-- This script will allow the player to perform a Big Swing attack.
 -- This script will be attached to CombatManager.
--- CombatManager will run this script whenever the player uses a Big Sweep attack.
+-- CombatManager will run this script whenever the player uses a Big Swing attack.
 
--- To use Big Sweep, the Player will have to select an adjacent tile. The attack will then hit
+-- To use Big Swing, the Player will have to select an adjacent tile. The attack will then hit
 -- that tile, as well as the tiles to its left and right.
 
 --[IsComponent]
-function C_BigSweep()
+function C_BigSwing()
     local var = {
         --[SerializeString]
-        AttackName = "BigSweep",
+        AttackName = "BigSwing",
 
         -- THE VARIABLES IN THIS SECTION IS REQUIRED BY ALL ATTACK SCRIPTS!!! -----------------------------------------
         -- the attacking entity, aka the player
@@ -28,7 +28,7 @@ function C_BigSweep()
         canAttack = false,
         
         -- error message (why the attack failed)
-        errorMessage = "[AttackBigSweep.lua] Player not adjacent to enemy.",
+        errorMessage = "[AttackBigSwing.lua] Selected tile is not adjacent to Player.",
         
         -- used to turn player to face the target
         playerRotation = 0,
@@ -59,10 +59,10 @@ function C_BigSweep()
 end
 
 --[IsSystem]
-function S_BigSweep(e)
+function S_BigSwing(e)
     
-    -- getting C_BigSweep component
-    local attackComponent = GetComponent(e, "C_BigSweep")
+    -- getting C_BigSwing component
+    local attackComponent = GetComponent(e, "C_BigSwing")
     
     -- getting C_Player component to check selected action
     local playerEntity = GetEntity("Player")
@@ -71,8 +71,8 @@ function S_BigSweep(e)
         playerComponent = GetComponent(playerEntity, "C_Player")
     end
     
-    -- if BigSweep is currently the selected attack, highlight the tiles that will be affected by Big Swing --------------
-    if (playerComponent.selectedAction == "BigSweep") then
+    -- if BigSwing is currently the selected attack, highlight the tiles that will be affected by Big Swing --------------
+    if (playerComponent.selectedAction == "BigSwing") then
         
         -- highlight tiles
 
@@ -87,7 +87,7 @@ function S_BigSweep(e)
 
         if (attackComponent.attacker == -1 or attackComponent.defender == -1) then 
 
-            print("[AttackBigSweep.lua] ERROR: Either attacker or defender is -1.")
+            print("[AttackBigSwing.lua] ERROR: Either attacker or defender is -1.")
 
         else
             
@@ -96,11 +96,11 @@ function S_BigSweep(e)
                 
                 -- passed the check, allow the rest of the script to run
                 attackComponent.canAttack = true
-                print("[AttackBigSweep.lua] Adjacent check passed!")
+                print("[AttackBigSwing.lua] Adjacent check passed!")
             else
                 
                 -- failed the check, print fail message
-                print("[AttackBigSweep.lua] Adjacent check failed.")
+                print("[AttackBigSwing.lua] Adjacent check failed.")
             end
             
             -- this will allow PlayerAttack.lua to proceed
@@ -165,7 +165,7 @@ function CheckTargetTileAdjacentToPlayer(attacker)
     local tileGrid = GetGridCell(defender)
 
     -- get rotation variable
-    local attackComponent = GetComponent(e, "C_BigSweep")
+    local attackComponent = GetComponent(e, "C_BigSwing")
     attackComponent.playerY = attackerGrid.y
 
     local attackDirection = nil
