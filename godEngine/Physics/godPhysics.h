@@ -35,9 +35,12 @@ namespace god
 		physx::PxCooking* const GetCooking() const;
 		physx::PxScene* const GetPhysicsScene() const;
 
+		
+		ContactReportCallback& getCRCB();
+
 		bool debugdraw;
 	private:
-		PhysicsAPI pAPI;
+	
 		
 		ContactReportCallback gContactReportCallback;
 

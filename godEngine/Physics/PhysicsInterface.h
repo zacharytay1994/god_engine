@@ -8,19 +8,16 @@ namespace god
 	{
 
 	public:
-		physx::PxVec3 const& GetForce(physx::PxRigidBody* rb);
-		physx::PxVec3 const& SetForce(physx::PxRigidBody* rb);
+		
+		static void SetForce(physx::PxRigidBody* rb, glm::vec3 const& force);
+		static physx::PxVec3 const& GetPhysicsPos(physx::PxRigidBody* rb);
+		static void SetPhysicsPos(physx::PxRigidBody* rb, glm::vec3 const& pos, glm::vec3 const& rot);
 
-		physx::PxVec3 const& GetPhysicsPos(physx::PxRigidBody* rb);
-		physx::PxVec3 const& SetPhysicsPos(physx::PxRigidBody* rb);
+		static PhysicsSystem* p_psys;
 
-
-		PhysicsAPI();
-		void init(PhysicsSystem* psys);
-		~PhysicsAPI();
 	private:
 
-		PhysicsSystem* mPhysics;
+		
 	};
 
 
