@@ -505,17 +505,16 @@ namespace god
 
 					if ( m_registry.storage<GUIText> ().contains ( m_entities[ e ].m_id ) )
 					{
-						GUIText& gui_text = m_registry.get<GUIText> ( m_entities[ e ].m_id );
-
 						auto const& characters = fonts.GetFont ( "Arial" ).GetCharacters ( F::DEFAULT_FONT_SIZE );
-
+						GUIText& gui_text = m_registry.get<GUIText> ( m_entities[ e ].m_id );
 						std::stringstream ss;
 						ss << gui_text.m_text;
-						std::string test_text { gui_text.m_text };
-						std::string::const_iterator c;
+						/*std::string test_text { gui_text.m_text };
+						std::string::const_iterator c;*/
 						float x { -1.0f } , y { 0 } , z { 0 };
 						float scale { 1.0f / 100.0f * 0.1 };
 
+						//if (gui_text.m_alignment ==  )
 						std::string word;
 						while ( ss >> word )
 						{
@@ -558,27 +557,6 @@ namespace god
 								//x += ch.m_size.x / 2.0f * scale;
 							}
 						}
-
-						//for ( c = test_text.begin (); c != test_text.end (); ++c )
-						//{
-						//	auto& ch = characters[ static_cast< uint32_t >( *c ) ];
-
-						//	float xpos = x + ( ch.m_bearing.x + ch.m_size.x / 2.0f ) * scale;
-						//	float ypos = y + ( ch.m_bearing.y - ch.m_size.y / 2.0f ) * scale;
-						//	//float ypos = 0.0f;
-						//	//x += ch.m_size.x / 2.0f * scale;
-
-						//	float w = ch.m_size.x * scale / 2.0f;
-						//	float h = ch.m_size.y * scale / 2.0f;
-
-						//	glm::mat4 character_transform = BuildModelMatrixRotDegrees ( { xpos,ypos,1 } , { 0,0,0 } , { w,-h,1 } );
-
-						//	scene.AddCharacter ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-						//		ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat * character_transform );
-
-						//	x += ( ch.m_advance >> 6 ) * scale;
-						//	//x += ch.m_size.x / 2.0f * scale;
-						//}
 					}
 				}
 				else

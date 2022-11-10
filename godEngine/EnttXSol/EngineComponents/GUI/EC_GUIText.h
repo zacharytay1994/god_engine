@@ -5,15 +5,25 @@
 namespace god
 {
 	/* ENGINE COMPONENTS */
+	enum class TextAlignment
+	{
+		LEFT = 0 ,
+		CENTER ,
+		RIGHT ,
+		COUNT
+	};
+
 	struct GUIText
 	{
 		std::string m_text { "" };
+		int m_alignment { static_cast< int >( TextAlignment::LEFT ) };
 	};
 	template <>
 	inline void NewLuaType<GUIText> ( sol::state& luaState , std::string const& name )
 	{
 		RegisterLuaType<GUIText> ( luaState , name ,
-			"text" , &GUIText::m_text );
+			"text" , &GUIText::m_text ,
+			"alignment" , &GUIText::m_alignment );
 	}
 	template<>
 	inline void ComponentInspector::operator() < GUIText > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
@@ -27,6 +37,13 @@ namespace god
 
 				ImGui::Separator ();
 				ImGui::InputText ( "Text" , &component.m_text );
+
+				ImGui::Text ( "Alignment" );
+				ImGui::RadioButton ( "Left" , &component.m_alignment , static_cast< int >( TextAlignment::LEFT ) );
+				ImGui::SameLine ();
+				ImGui::RadioButton ( "Center" , &component.m_alignment , static_cast< int >( TextAlignment::CENTER ) );
+				ImGui::SameLine ();
+				ImGui::RadioButton ( "Right" , &component.m_alignment , static_cast< int >( TextAlignment::RIGHT ) );
 			} );
 	}
 
@@ -36,6 +53,7 @@ namespace god
 		( engineResources );
 		// serialize
 		RapidJSON::JSONifyToValue ( value , document , "text" , component.m_text );
+		RapidJSON::JSONifyToValue ( value , document , "alignment" , component.m_alignment );
 
 	}
 
@@ -45,5 +63,6 @@ namespace god
 		( engineResources );
 		// deserialize
 		AssignIfExist ( jsonObj , component.m_text , "text" );
+		AssignIfExist ( jsonObj , component.m_alignment , "alignment" );
 	}
 }
