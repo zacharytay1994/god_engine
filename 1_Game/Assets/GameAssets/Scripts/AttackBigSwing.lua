@@ -5,6 +5,9 @@
 -- To use Big Swing, the Player will have to select an adjacent tile. The attack will then hit
 -- that tile, as well as the tiles to its left and right.
 
+-- TODO:
+-- 1) Disallow selection of BigSwing before selection of target.
+
 --[IsComponent]
 function C_BigSwing()
     local var = {

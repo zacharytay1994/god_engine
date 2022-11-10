@@ -37,24 +37,29 @@ function S_Player(e)
     
     playerComponent = GetComponent(e, "C_Player")
 
+    -- this part is for hotkey cheats, can remove this part if hotkeys are no longer needed ------------------------------
+    local playerAttackComponent
+    if (playerEntity ~= -1) then
+        playerAttackComponent = GetComponent(e, "C_PlayerAttack")
+    else
+        print("[Player.lua] Player Entity not found! Returning.")
+        return
+    end
+    ----------------------------------------------------------------------------------------------------------------------
+
+    -- press 1
     if (CheckKeyPress(49)) then
         print("[Player.lua] FrontJab selected through hotkey!")
         playerComponent.selectedAction = "FrontJab"
+        playerAttackComponent.selectedAttack = attackList[1]
+        print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                    "Base damage:", playerAttackComponent.selectedAttack[2], 
+                    "Special property:", playerAttackComponent.selectedAttack[3], "\n")
         UnselectAllButtons()
     end
 
+    -- press 2
     if (CheckKeyPress(50)) then
-
-        local playerEntity = GetEntity("Player")
-        local playerAttackComponent
-    
-        if (playerEntity ~= -1) then
-            playerAttackComponent = GetComponent(playerEntity, "C_PlayerAttack")
-        else
-            print("[Player.lua] Player Entity not found! Returning.")
-            return
-        end
-
         print("[Player.lua] BigSwing selected through hotkey!")
         playerComponent.selectedAction = "BigSwing"
         playerAttackComponent.selectedAttack = attackList[4]
@@ -65,18 +70,34 @@ function S_Player(e)
         UnselectAllButtons()
     end
 
+    -- press 3
     if (CheckKeyPress(51)) then
         print("[Player.lua] EnergyBolt selected through hotkey!")
         playerComponent.selectedAction = "EnergyBolt"
+        playerAttackComponent.selectedAttack = attackList[10]
+        print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                    "Base damage:", playerAttackComponent.selectedAttack[2], 
+                    "Special property:", playerAttackComponent.selectedAttack[3], "\n")
         UnselectAllButtons()
     end
 
+    -- press 4
     if (CheckKeyPress(52)) then 
         print("[Player.lua] Move selected through hotkey!")
         playerComponent.selectedAction = "Move"
         UnselectAllButtons()
     end
 
+    -- press 5
+    if (CheckKeyPress(53)) then 
+        print("[Player.lua] Projectile selected through hotkey!")
+        playerComponent.selectedAction = "Projectile"
+        playerAttackComponent.selectedAttack = attackList[13]
+            print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                        "Base damage:", playerAttackComponent.selectedAttack[2], 
+                        "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+        UnselectAllButtons()
+    end
 end
 
 -- this is to prevent Action Buttons from resetting due to using attacks through hotkeys

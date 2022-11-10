@@ -2,11 +2,11 @@
 -- Upon reaching target, it will trigger a screenshake.
 
 --[IsComponent]
-function C_MoveEnergyBolt()
+function C_MoveProjectile()
     local var = {
         
         --[SerializeString]
-        MoveEnergyBolt = "MoveEnergyBolt",
+        MoveEnergyBolt = "MoveProjectile",
 
         -- speed of the energy bolt
         speed = 0.5,
@@ -35,13 +35,13 @@ function C_MoveEnergyBolt()
 end
 
 --[IsSystem]
-function S_MoveEnergyBolt(e)
+function S_MoveProjectile(e)
     
     -- if the energy bolt instance exists
     if (e ~= nil and e ~= -1) then
 
         -- get the component
-        energyBoltComponent = GetComponent(e, "C_MoveEnergyBolt")
+        energyBoltComponent = GetComponent(e, "C_MoveProjectile")
 
         -- if not initialized yet, then initialize
         if (energyBoltComponent.initialized == false) then 
@@ -49,7 +49,7 @@ function S_MoveEnergyBolt(e)
             -- getting the main EnergyBolt component to get the attacker and defender entities + playerRotation
             local combatManagerEntity = GetEntity("CombatManager")
             if (combatManagerEntity ~= -1) then
-                attackComponent = GetComponent(combatManagerEntity, "C_EnergyBolt")
+                attackComponent = GetComponent(combatManagerEntity, "C_Projectile")
             end
 
             -- getting attacker and defender grid locations
@@ -57,7 +57,7 @@ function S_MoveEnergyBolt(e)
                 defenderGrid = GetGridCell(attackComponent.defender)
                 attackerGrid = GetGridCell(attackComponent.attacker)
             else
-                print("[MoveEnergyBolt.lua] attackComponent.defender == -1 or attackComponent.attacker == -1")
+                print("[MoveProjectile.lua] attackComponent.defender == -1 or attackComponent.attacker == -1")
             end
 
             -- storing starting position
@@ -96,7 +96,7 @@ function S_MoveEnergyBolt(e)
             
             energyBoltComponent.initialized = true
 
-            print("[MoveEnergyBolt.lua] Initialized energy bolt")
+            print("[MoveProjectile.lua] Initialized energy bolt")
         end
 
         -- moving the energy bolt
@@ -117,7 +117,8 @@ function S_MoveEnergyBolt(e)
                         screenShakeComponent.doScreenShake = true
                     end
 
-                    print("[MoveEnergyBolt.lua] EnergyBolt reached target!")
+                    -- trigger sound effect
+                    InstancePrefab("SFX_Jab",0,0,0)
 
                     -- destroy energy bolt
                     RemoveInstance(e)
@@ -135,8 +136,9 @@ function S_MoveEnergyBolt(e)
                         screenShakeComponent.duration = 0.25
                         screenShakeComponent.doScreenShake = true
                     end
-
-                    print("[MoveEnergyBolt.lua] EnergyBolt reached target!")
+                    
+                    -- trigger sound effect
+                    InstancePrefab("SFX_Jab",0,0,0)
                     
                     -- destroy energy bolt
                     RemoveInstance(e)
