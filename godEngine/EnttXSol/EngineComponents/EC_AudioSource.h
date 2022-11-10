@@ -35,7 +35,7 @@ namespace god
 		RegisterLuaType<AudioSource>(luaState, name,
 			"sound_id", &AudioSource::m_sound_id,
 			"played", &AudioSource::m_played,
-			"finish_playing", &AudioSource::m_played,
+			"finish_playing", &AudioSource::m_finish_playing,
 			"mute", &AudioSource::m_mute,
 			"loop", &AudioSource::m_loop,
 			"play_on_awake", &AudioSource::m_play_on_awake,
@@ -71,6 +71,8 @@ namespace god
 							}
 
 							component.m_sound_id = asset.second;
+							component.m_played = false;
+
 							ImGui::CloseCurrentPopup();
 						}
 					}
