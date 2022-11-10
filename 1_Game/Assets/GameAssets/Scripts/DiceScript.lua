@@ -68,7 +68,7 @@ function S_DiceScript(e)
 										c_dice.value = i + 1
 									end
 								end
-								print("Dice value:", c_dice.value)
+								print("[Dice Script] Dice value:", c_dice.value)
 							end
 						end
 					end
