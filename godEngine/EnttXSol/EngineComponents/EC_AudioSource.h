@@ -34,7 +34,6 @@ namespace god
 	{
 		RegisterLuaType<AudioSource>(luaState, name,
 			"sound_id", &AudioSource::m_sound_id,
-			//"played", &AudioSource::m_played,
 			"finish_playing", &AudioSource::m_played,
 			"mute", &AudioSource::m_mute,
 			"loop", &AudioSource::m_loop,
