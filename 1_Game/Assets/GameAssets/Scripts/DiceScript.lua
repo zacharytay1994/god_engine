@@ -121,6 +121,7 @@ end
 
 function DiceScript_DisableDice(e, c_dice)
 	c_dice.is_rolling = false
+	c_dice.value = 0
 	FreezeObject(e, true)
 	SetTransformPosition(e, 999, 999, 999)
 end
