@@ -45,6 +45,8 @@
     <ClCompile Include="OpenGL\Animation\Animation.cpp" />
     <ClCompile Include="OpenGL\Animation\Bone.cpp" />
     <ClCompile Include="Physics\SnippetUtils.cpp" />
+    <ClCompile Include="OpenGL\Font\Font.cpp" />
+    <ClCompile Include="OpenGL\Font\FontRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioAPI.h" />
@@ -138,6 +140,9 @@
     <ClInclude Include="EnttXSol\EngineSystems\GUI\ES_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Raycast.h" />
     <ClInclude Include="Physics\SnippetUtils.h" />
+    <ClInclude Include="OpenGL\Font\Font.h" />
+    <ClInclude Include="OpenGL\Font\FontRenderer.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIText.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

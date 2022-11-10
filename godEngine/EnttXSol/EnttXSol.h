@@ -135,10 +135,10 @@ namespace god
 		std::unordered_map<std::string , Script> const& GetScripts () const;
 
 		// S = scene, T = transform, R = renderable
-		template <typename S , typename T , typename R>
-		void PopulateScene ( S& scene );
-		template <typename S , typename T , typename R>
-		void RecursivePopulateScene ( S& scene , Entities::ID e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) );
+		template <typename S , typename T , typename R , typename F>
+		void PopulateScene ( S& scene , F& fonts );
+		template <typename S , typename T , typename R , typename F>
+		void RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) );
 
 		void SerializeStateV2 ( EngineResources& engineResources , std::string const& fileName );
 		void SerializeStateV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value );
@@ -450,8 +450,8 @@ namespace god
 		return component != nullptr;
 	}
 
-	template<typename S , typename T , typename R>
-	inline void EnttXSol::PopulateScene ( S& scene )
+	template<typename S , typename T , typename R , typename F>
+	inline void EnttXSol::PopulateScene ( S& scene , F& fonts )
 	{
 		// add objects to scene
 		scene.ClearInstancedScene ();
@@ -459,7 +459,7 @@ namespace god
 		{
 			if ( m_entities.Valid ( i ) && m_entities[ i ].m_parent_id == Entities::Null && m_registry.storage<ActiveComponent> ().contains ( m_entities[ i ].m_id ) )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , i );
+				RecursivePopulateScene<S , T , R , F> ( scene , fonts , i );
 			}
 		}
 
@@ -480,11 +480,94 @@ namespace god
 		}
 	}
 
-	template<typename S , typename T , typename R>
-	inline void EnttXSol::RecursivePopulateScene ( S& scene , Entities::ID e , glm::mat4 parentTransform )
+	template<typename S , typename T , typename R , typename F>
+	inline void EnttXSol::RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform )
 	{
 		// if parent has both transform and renderable component
-		if ( m_registry.all_of<T , R> ( m_entities[ e ].m_id ) )
+		if ( m_registry.all_of<T , R , GUIObject> ( m_entities[ e ].m_id ) )
+		{
+			auto [transform , renderable , gui_object] = m_registry.get<T , R , GUIObject> ( m_entities[ e ].m_id );
+
+			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
+
+			transform.m_parent_transform = parentTransform;
+			transform.m_local_transform = model_transform;
+
+			auto model_xform_cat = parentTransform * model_transform;
+
+			// add to scene
+			if ( renderable.m_model_id != -1 && gui_object.m_active )
+			{
+				scene.Add2DInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+					renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
+
+				if ( m_registry.storage<GUIText> ().contains ( m_entities[ e ].m_id ) )
+				{
+					auto const& characters = fonts.GetFont ( "Arial" ).GetCharacters ( F::DEFAULT_FONT_SIZE );
+					GUIText& gui_text = m_registry.get<GUIText> ( m_entities[ e ].m_id );
+					std::stringstream ss;
+					ss << gui_text.m_text;
+					/*std::string test_text { gui_text.m_text };
+					std::string::const_iterator c;*/
+					float x { -1.0f } , y { 0 } , z { 0 };
+					float scale { 1.0f / 100.0f * 0.1 };
+
+					//if (gui_text.m_alignment ==  )
+					std::string word;
+					while ( ss >> word )
+					{
+						// check if word length will exceed boundary
+						uint32_t word_length { 0 };
+						for ( auto const& c : word )
+						{
+							auto& ch = characters[ static_cast< uint32_t >( c ) ];
+							word_length += ch.m_advance;
+						}
+						if ( word_length * scale + x > 1.0f )
+						{
+							y -= 100.0f * scale;
+							x = -1.0f;
+						}
+						word.push_back ( ' ' );
+						for ( auto const& c : word )
+						{
+							auto& ch = characters[ static_cast< uint32_t >( c ) ];
+							if ( x + ch.m_advance * scale > 1.0f )
+							{
+								y -= 100.0f * scale;
+								x = -1.0f;
+							}
+
+							float xpos = x + ( ch.m_bearing.x + ch.m_size.x / 2.0f ) * scale;
+							float ypos = y + ( ch.m_bearing.y - ch.m_size.y / 2.0f ) * scale;
+							//float ypos = 0.0f;
+							//x += ch.m_size.x / 2.0f * scale;
+
+							float w = ch.m_size.x * scale / 2.0f;
+							float h = ch.m_size.y * scale / 2.0f;
+
+							glm::mat4 character_transform = BuildModelMatrixRotDegrees ( { xpos,ypos,1 } , { 0,0,0 } , { w,-h,1 } );
+
+							scene.AddCharacter ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+								ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat * character_transform );
+
+							x += ch.m_advance * scale;
+							//x += ch.m_size.x / 2.0f * scale;
+						}
+					}
+				}
+			}
+
+			if ( gui_object.m_active )
+			{
+				// populate scene with children
+				for ( auto const& child : m_entities[ e ].m_children )
+				{
+					RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat );
+				}
+			}
+		}
+		else if ( m_registry.all_of<T , R> ( m_entities[ e ].m_id ) )
 		{
 			auto [transform , renderable] = m_registry.get<T , R> ( m_entities[ e ].m_id );
 
@@ -498,22 +581,14 @@ namespace god
 			// add to scene
 			if ( renderable.m_model_id != -1 )
 			{
-				if ( m_registry.storage<GUIObject> ().contains ( m_entities[ e ].m_id ) )
-				{
-					scene.Add2DInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
-				}
-				else
-				{
-					scene.AddInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
-				}
+				scene.AddInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+					renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
 			}
 
 			// populate scene with children
 			for ( auto const& child : m_entities[ e ].m_children )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , child , model_xform_cat );
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat );
 			}
 		}
 		// if only transform component
@@ -531,7 +606,7 @@ namespace god
 			// populate scene with children
 			for ( auto const& child : m_entities[ e ].m_children )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , child , model_xform_cat );
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat );
 			}
 		}
 		// if neither, take the previous transform in the hierarchy, default identity matrix
@@ -540,7 +615,7 @@ namespace god
 			// populate scene with children
 			for ( auto const& child : m_entities[ e ].m_children )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , child , parentTransform );
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , parentTransform );
 			}
 		}
 	}

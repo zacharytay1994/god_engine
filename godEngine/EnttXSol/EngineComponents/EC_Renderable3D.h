@@ -13,7 +13,6 @@ namespace god
 		uint32_t m_diffuse_id { 0 };
 		uint32_t m_specular_id { 0 };
 		float m_shininess { 32.0f };
-		bool m_gui { false };
 	};
 	template <>
 	inline void NewLuaType<Renderable3D> ( sol::state& luaState , std::string const& name )
@@ -106,9 +105,6 @@ namespace god
 
 				ImGui::Text ( "- Shininess :" );
 				ImGui::InputFloat ( "##Shininess" , &component.m_shininess );
-
-				ImGui::Text ( "- Is GUI :" );
-				ImGui::Checkbox ( "##gui" , &component.m_gui );
 			} );
 	}
 
@@ -154,8 +150,6 @@ namespace god
 		{
 			std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to specular texture. Ignore this warning for now." << std::endl;
 		}
-
-		RapidJSON::JSONifyToValue ( value , document , "gui" , component.m_gui );
 	}
 
 	template<>
@@ -194,7 +188,5 @@ namespace god
 			}
 			++i;
 		}
-
-		AssignIfExist ( jsonObj , component.m_gui , "gui" );
 	}
 }
