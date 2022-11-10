@@ -11,20 +11,34 @@ function C_MoveProjectile()
         -- speed of the energy bolt
         speed = 0.5,
 
-        -- starting x position of the energy bolt
+        -- starting x position of the projectile
         xStart = 0,
 
-        -- starting x position of the energy bolt
+        -- starting z position of the projectile
         zStart = 0,
+
+        -- starting y position of the projectile
+        yStart = 0,
 
         -- how far the energy bolt needs to travel before hitting the target
         distanceToTravel = 0,
 
-        -- set by AttackEnergyBolt.lua
+        -- set by AttackProjectile.lua
         xDirection = 0,
 
-        -- set by AttackEnergyBolt.lua
+        -- set by AttackProjectile.lua
         zDirection = 0,
+
+        -- NOT set by AttackProjectile.lua
+        yDirection = 1,
+
+        -- speed of sine movement
+        frequency = 20.0,
+
+        -- size of sine movement
+        magnitude = 0.5,
+
+        accumTime = 0,
 
         -- initialize the variables once
         initialized = false
@@ -37,16 +51,16 @@ end
 --[IsSystem]
 function S_MoveProjectile(e)
     
-    -- if the energy bolt instance exists
+    -- if the projectile instance exists
     if (e ~= nil and e ~= -1) then
 
         -- get the component
-        energyBoltComponent = GetComponent(e, "C_MoveProjectile")
+        moveProjectileComponent = GetComponent(e, "C_MoveProjectile")
 
-        -- if not initialized yet, then initialize
-        if (energyBoltComponent.initialized == false) then 
+        -- if not initialized yet, then initialize -----------------------------------------------------------------------------
+        if (moveProjectileComponent.initialized == false) then 
             
-            -- getting the main EnergyBolt component to get the attacker and defender entities + playerRotation
+            -- getting the main Projectile component to get the attacker and defender entities + playerRotation
             local combatManagerEntity = GetEntity("CombatManager")
             if (combatManagerEntity ~= -1) then
                 attackComponent = GetComponent(combatManagerEntity, "C_Projectile")
@@ -61,53 +75,63 @@ function S_MoveProjectile(e)
             end
 
             -- storing starting position
-            energyBoltComponent.xStart = GetTransform(e).position.x
-            energyBoltComponent.zStart = GetTransform(e).position.z
+            moveProjectileComponent.xStart = GetTransform(e).position.x
+            moveProjectileComponent.zStart = GetTransform(e).position.z
+            moveProjectileComponent.yStart = GetTransform(e).position.y
 
             -- determining the direction of energy sphere based on player's direction
             -- note to self: xDirection = 1, the sphere goes to the left
             if (attackComponent.playerRotation == 180) then
                 
                 --print("sphere goes behind")
-                energyBoltComponent.zDirection = -1
-                energyBoltComponent.distanceToTravel = Abs(defenderGrid.z - attackerGrid.z)
+                moveProjectileComponent.zDirection = -1
+                moveProjectileComponent.distanceToTravel = Abs(defenderGrid.z - attackerGrid.z)
 
             elseif (attackComponent.playerRotation == 0) then
                 
                 -- print("sphere goes front")
-                energyBoltComponent.zDirection = 1
-                energyBoltComponent.distanceToTravel = Abs(defenderGrid.z - attackerGrid.z)
+                moveProjectileComponent.zDirection = 1
+                moveProjectileComponent.distanceToTravel = Abs(defenderGrid.z - attackerGrid.z)
 
             elseif (attackComponent.playerRotation == 270) then
                 
                 -- print("sphere goes right")
-                energyBoltComponent.xDirection = -1
-                energyBoltComponent.distanceToTravel = Abs(defenderGrid.x - attackerGrid.x)
+                moveProjectileComponent.xDirection = -1
+                moveProjectileComponent.distanceToTravel = Abs(defenderGrid.x - attackerGrid.x)
 
             elseif (attackComponent.playerRotation == 90) then
                 
                 -- print("sphere goes left")
-                energyBoltComponent.xDirection = 1
-                energyBoltComponent.distanceToTravel = Abs(defenderGrid.x - attackerGrid.x)
+                moveProjectileComponent.xDirection = 1
+                moveProjectileComponent.distanceToTravel = Abs(defenderGrid.x - attackerGrid.x)
             end
             
             -- each tile is 2 units long
-            energyBoltComponent.distanceToTravel = energyBoltComponent.distanceToTravel * 2
+            moveProjectileComponent.distanceToTravel = moveProjectileComponent.distanceToTravel * 2
             
-            energyBoltComponent.initialized = true
+            moveProjectileComponent.initialized = true
 
-            print("[MoveProjectile.lua] Initialized energy bolt")
+            print("[MoveProjectile.lua] Initialized projectile")
         end
+        -- end of initializing the projectile ----------------------------------------------------------------------------------
 
-        -- moving the energy bolt
+        -- moving the projectile -----------------------------------------------------------------------------------------------
         energyBoltPosition = GetTransform(e).position
-        energyBoltPosition.x = energyBoltPosition.x + energyBoltComponent.xDirection * energyBoltComponent.speed
-        energyBoltPosition.z = energyBoltPosition.z + energyBoltComponent.zDirection * energyBoltComponent.speed
+        energyBoltPosition.x = energyBoltPosition.x + moveProjectileComponent.xDirection * moveProjectileComponent.speed
+        energyBoltPosition.z = energyBoltPosition.z + moveProjectileComponent.zDirection * moveProjectileComponent.speed
 
+        moveProjectileComponent.accumTime = moveProjectileComponent.accumTime + GetDeltaTime()
+
+        energyBoltPosition.y = moveProjectileComponent.yStart + (moveProjectileComponent.yDirection * 4 * (Sin(moveProjectileComponent.accumTime * moveProjectileComponent.frequency) * moveProjectileComponent.magnitude))
+        -- end of moving the projectile ----------------------------------------------------------------------------------------
+
+
+
+        -- terminating the projectile when it reaches its destination  ---------------------------------------------------------
         -- if it's moving front or left, then destroy when position > starting position + distance to travel
-        if (energyBoltComponent.zDirection == 1 or energyBoltComponent.xDirection == 1) then
-            if (energyBoltPosition.x >= energyBoltComponent.xStart + energyBoltComponent.distanceToTravel or 
-                energyBoltPosition.z >= energyBoltComponent.zStart + energyBoltComponent.distanceToTravel) then
+        if (moveProjectileComponent.zDirection == 1 or moveProjectileComponent.xDirection == 1) then
+            if (energyBoltPosition.x >= moveProjectileComponent.xStart + moveProjectileComponent.distanceToTravel or 
+                energyBoltPosition.z >= moveProjectileComponent.zStart + moveProjectileComponent.distanceToTravel) then
                     
                     -- trigger a screenshake
                     screenShakeEntity = GetEntity("ScreenShake")
@@ -125,9 +149,9 @@ function S_MoveProjectile(e)
             end
         
         -- if it's moving back or right, then destroy when position < starting position - distance to travel
-        elseif (energyBoltComponent.zDirection == -1 or energyBoltComponent.xDirection == -1) then
-            if (energyBoltPosition.x <= energyBoltComponent.xStart - energyBoltComponent.distanceToTravel or 
-                energyBoltPosition.z <= energyBoltComponent.zStart - energyBoltComponent.distanceToTravel) then   
+        elseif (moveProjectileComponent.zDirection == -1 or moveProjectileComponent.xDirection == -1) then
+            if (energyBoltPosition.x <= moveProjectileComponent.xStart - moveProjectileComponent.distanceToTravel or 
+                energyBoltPosition.z <= moveProjectileComponent.zStart - moveProjectileComponent.distanceToTravel) then   
                     
                     -- trigger a screenshake
                     screenShakeEntity = GetEntity("ScreenShake")
@@ -144,5 +168,6 @@ function S_MoveProjectile(e)
                     RemoveInstance(e)
             end
         end
+        -- end of terminating projectile ---------------------------------------------------------------------------------------
     end    
 end
