@@ -290,7 +290,7 @@ inline texture flip(texture const & Texture)
 		return flip(texture_cube_array(Texture));
 
 	default:
-		assert(false && "Texture target does not support flipping.");
+		//assert(false && "Texture target does not support flipping.");
 		return Texture;
 	}
 }
