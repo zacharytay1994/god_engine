@@ -33,12 +33,16 @@ function C_MoveProjectile()
         yDirection = 1,
 
         -- speed of sine movement
-        frequency = 20.0,
+        frequency = 1.0,
 
         -- size of sine movement
-        magnitude = 0.5,
+        magnitude = 1.0,
+
+        -- height of the sine movement
+        amplitude = 5.0,
 
         accumTime = 0,
+        distanceTravelled = 0,
 
         -- initialize the variables once
         initialized = false
@@ -120,9 +124,13 @@ function S_MoveProjectile(e)
         energyBoltPosition.x = energyBoltPosition.x + moveProjectileComponent.xDirection * moveProjectileComponent.speed
         energyBoltPosition.z = energyBoltPosition.z + moveProjectileComponent.zDirection * moveProjectileComponent.speed
 
-        moveProjectileComponent.accumTime = moveProjectileComponent.accumTime + GetDeltaTime()
+        -- moveProjectileComponent.accumTime = moveProjectileComponent.accumTime + GetDeltaTime()
+        -- energyBoltPosition.y = moveProjectileComponent.yStart + (Sin(moveProjectileComponent.accumTime * moveProjectileComponent.frequency) * moveProjectileComponent.magnitude * moveProjectileComponent.amplitude)
 
-        energyBoltPosition.y = moveProjectileComponent.yStart + (moveProjectileComponent.yDirection * 4 * (Sin(moveProjectileComponent.accumTime * moveProjectileComponent.frequency) * moveProjectileComponent.magnitude))
+        local piFactor = moveProjectileComponent.distanceToTravel / 3.4
+        moveProjectileComponent.distanceTravelled = Abs(energyBoltPosition.x - moveProjectileComponent.xStart) / piFactor
+        print("moveProjectileComponent.distanceTravelled:", moveProjectileComponent.distanceTravelled);
+        energyBoltPosition.y = moveProjectileComponent.yStart + (Sin(moveProjectileComponent.distanceTravelled) * moveProjectileComponent.amplitude)
         -- end of moving the projectile ----------------------------------------------------------------------------------------
 
 
