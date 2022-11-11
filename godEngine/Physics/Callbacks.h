@@ -3,7 +3,7 @@
 #include "PxPhysicsAPI.h"
 #include "PhysicUtils.h"
 #include "DiceCallBack.h"
-#include "../PhysX/physx/snippets/snippetutils/SnippetUtils.h"
+#include "SnippetUtils.h"
 
 #include <vector>
 #include <unordered_map>
