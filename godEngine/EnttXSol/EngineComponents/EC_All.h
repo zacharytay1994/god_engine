@@ -18,6 +18,7 @@
 #include "Grid/EC_GridManipulate.h"
 
 #include "GUI/EC_GUIObject.h"
+#include "GUI/EC_GUIText.h"
 
 #include <tuple>
 #include <string>
@@ -39,7 +40,8 @@ namespace god
 			PointLight ,
 			DirectionalLight ,
 			GridManipulate ,
-			GUIObject
+			GUIObject ,
+			GUIText
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};

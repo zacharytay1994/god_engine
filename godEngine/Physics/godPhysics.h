@@ -2,6 +2,9 @@
 
 #include "PxPhysicsAPI.h"
 #include "PhysicUtils.h"
+#include "Callbacks.h"
+#include "PhysicsInterface.h"
+
 #include "../snippetutils/SnippetUtils.h"
 #include <godCamera/Camera.h>
 #include "../Window/GLFWWindow.h"
@@ -13,6 +16,7 @@
 namespace god
 {
 	using namespace physx;
+
 
 
 	struct PhysicsSystem
@@ -31,8 +35,16 @@ namespace god
 		physx::PxCooking* const GetCooking() const;
 		physx::PxScene* const GetPhysicsScene() const;
 
+		
+		ContactReportCallback& getCRCB();
+
 		bool debugdraw;
 	private:
+	
+		
+		ContactReportCallback gContactReportCallback;
+
+		CallbackFinishTask callbackFinishTask;
 
 		GLFWWindow* mWindow; 
 		Camera* mCamera;

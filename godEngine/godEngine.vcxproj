@@ -130,6 +130,7 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Grid\EC_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIObject.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIText.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Dynamic.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_DirectionalLight.h" />
@@ -172,6 +173,8 @@
     <ClInclude Include="OpenGL\Animation\Animator.h" />
     <ClInclude Include="OpenGL\Animation\AssimpGLMHelpers.h" />
     <ClInclude Include="OpenGL\Animation\Bone.h" />
+    <ClInclude Include="OpenGL\Font\Font.h" />
+    <ClInclude Include="OpenGL\Font\FontRenderer.h" />
     <ClInclude Include="OpenGL\Internal\OGLDebug.h" />
     <ClInclude Include="OpenGL\Internal\OGLTexture.h" />
     <ClInclude Include="OpenGL\Internal\OGLPrimitives.h" />
@@ -179,7 +182,10 @@
     <ClInclude Include="OpenGL\Internal\OGLShader.h" />
     <ClInclude Include="OpenGL\OpenGL.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Physics\Callbacks.h" />
+    <ClInclude Include="Physics\DiceCallBack.h" />
     <ClInclude Include="Physics\godPhysics.h" />
+    <ClInclude Include="Physics\PhysicsInterface.h" />
     <ClInclude Include="Physics\PhysicUtils.h" />
     <ClInclude Include="Physics\SnippetUtils.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
@@ -289,6 +295,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="OpenGL\Font\Font.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="OpenGL\Font\FontRenderer.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="OpenGL\Internal\OGLDebug.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../pch.h</PrecompiledHeaderFile>
@@ -317,9 +331,21 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Physics\Callbacks.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Physics\DiceCallBack.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="Physics\godPhysics.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Physics\PhysicsInterface.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Physics\PhysicUtils.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
