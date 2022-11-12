@@ -23,7 +23,8 @@ namespace god
 		physx::PxVec3 LinearVelocity;
 		float Density;
 		bool Active{ true };
-
+		bool Simulation{ true };
+		bool Gravity{ true };
 
 		//Non serialize data
 		physx::PxTriangleMesh* p_trimesh;
@@ -37,7 +38,8 @@ namespace god
 		//Ctor
 		RigidDynamic() :  
 			p_material{ nullptr }, p_RigidDynamic{ nullptr }, mScene{ nullptr }, p_trimesh{nullptr},
-			shapeid{ 0 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, p_shape{ nullptr },  locktoscale{ true },
+			shapeid{ 0 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, p_shape{ nullptr }, 
+			locktoscale{ true }, Active{ true }, Simulation{ true },
 			StaticFriction{ 0.5f }, DynamicFriction{ 0.5f }, Restitution{ 0.5f }, 
 			AngularVelocity{ 0.f,0.f,0.f }, LinearVelocity{ 0.f,0.f,0.f }, Density{ 1.f }
 		{};
@@ -116,7 +118,8 @@ namespace god
 				
 				}
 
-
+				ImGui::Checkbox("Simulation", &component.Simulation);
+				ImGui::Checkbox("Gravity", &component.Gravity);
 				ImGui::Checkbox("Lock Extents to Scale", &component.locktoscale);
 
 
@@ -148,6 +151,10 @@ namespace god
 		RapidJSON::JSONifyToValue(value, document, "x extent", component.extents.x);
 		RapidJSON::JSONifyToValue(value, document, "y extent", component.extents.y);
 		RapidJSON::JSONifyToValue(value, document, "z extent", component.extents.z);
+
+		RapidJSON::JSONifyToValue(value, document, "Simulation", component.Simulation);
+		RapidJSON::JSONifyToValue(value, document, "Gravity", component.Gravity);
+
 		RapidJSON::JSONifyToValue(value, document, "scale lock", component.locktoscale);
 		RapidJSON::JSONifyToValue(value, document, "shapeid", component.shapeid);
 
@@ -176,6 +183,11 @@ namespace god
 		AssignIfExist(jsonObj, component.extents.x, "x extent");
 		AssignIfExist(jsonObj, component.extents.y, "y extent");
 		AssignIfExist(jsonObj, component.extents.z, "z extent");
+		
+
+		AssignIfExist(jsonObj, component.Simulation, "Simulation");
+		AssignIfExist(jsonObj, component.Gravity, "Gravity");
+
 		AssignIfExist(jsonObj, component.locktoscale, "scale lock");
 		AssignIfExist(jsonObj, component.shapeid, "shapeid");
 

@@ -17,12 +17,14 @@ namespace god
 				return;
 		}
 		trackedrb.push_back({ rb, function });
-		std::cout << "added to cb\n";
+		//std::cout << "added to cb\n";
 	}
 
 
 	void ContactReportCallback::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 	{
+		
+
 		for (auto const& x : trackedrb)
 		{
 			const PxRigidActor* const localrb = x.first;
@@ -33,7 +35,8 @@ namespace god
 			}
 
 		}
-
+#define CONTACTPOINTS 0
+#if CONTACTPOINTS
 		//Maximum of 64 vertices can be produced by contact gen
 		const PxU32 bufferSize = 64;
 
@@ -48,10 +51,12 @@ namespace god
 				PxVec3 impulse = mContacts[j].impulse;
 				PxU32 internalFaceIndex0 = mContacts[j].internalFaceIndex0;
 				PxU32 internalFaceIndex1 = mContacts[j].internalFaceIndex1;
-				//...
-				//std::cout << "ContactReportCallback -> Point: " << point << std::endl;
+				
+				std::cout << "ContactReportCallback -> Point: " << point << std::endl;
 			}
+			
 		}
+#endif
 	}
 
 

@@ -13,10 +13,11 @@ namespace god
 		( entt );
 		PhysicsSystem& psystem = engineResources.Get<PhysicsSystem>().get();
 		RigidDynamic& rigiddynamic = std::get<2>(component);
-		//EntityData& edata = std::get<0>(component);
+		EntityData& edata = std::get<0>(component);
 		if (rigiddynamic.p_RigidDynamic == psystem.GetRayCastMouse())
 		{
 			//std::cout << "raycast: " << edata.m_id << std::endl;
+			psystem.SetRCMid(edata.m_id);
 
 		}
 	}
@@ -26,11 +27,11 @@ namespace god
 		( entt );
 		PhysicsSystem& psystem = engineResources.Get<PhysicsSystem>().get();
 		RigidStatic& rigidstatic = std::get<2>(component);
-		//EntityData& edata = std::get<0>(component);
+		EntityData& edata = std::get<0>(component);
 		if (rigidstatic.p_RigidStatic == psystem.GetRayCastMouse())
 		{
 			//std::cout << "raycast: " << edata.m_id << std::endl;
-
+			psystem.SetRCMid(edata.m_id);
 		}
 
 	}
