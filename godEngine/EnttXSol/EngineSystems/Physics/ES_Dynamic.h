@@ -13,7 +13,7 @@ namespace god
 		if ( !entt.m_pause )
 		{
 			return;
-		}
+		}//else if entt.m_pause
 		Transform& transform = std::get<1> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
 
@@ -31,7 +31,7 @@ namespace god
 		if ( !entt.m_pause )
 		{
 			return;
-		}
+		}//else if entt.m_pause
 		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1> ( component );
 		Renderable3D& renderable = std::get<3> ( component );
@@ -47,7 +47,6 @@ namespace god
 
 		if ( rigiddynamic.updateRigidDynamic )
 		{
-			rigiddynamic.p_RigidDynamic = nullptr;
 
 			if ( rigiddynamic.p_material == nullptr )
 			{
@@ -122,7 +121,23 @@ namespace god
 
 		}
 
+		if (rigiddynamic.Simulation)
+		{
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
+		}
+		else
+		{
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
+		}
 
+		if (rigiddynamic.Gravity)
+		{
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
+		}
+		else
+		{
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+		}
 
 		if ( rigiddynamic.locktoscale )
 		{
@@ -173,11 +188,7 @@ namespace god
 
 		Transform& transform = std::get<1> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
-		if ( rigiddynamic.Active == false )
-		{
-			rigiddynamic.mScene->removeActor ( *rigiddynamic.p_RigidDynamic );
 
-		}
 
 
 		if ( rigiddynamic.p_RigidDynamic )
