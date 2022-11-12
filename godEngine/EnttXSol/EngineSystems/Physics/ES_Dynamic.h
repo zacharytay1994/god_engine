@@ -2,6 +2,8 @@
 
 #include "../../EngineComponents/EC_All.h"
 #include "../../EnttXSol.h"
+#include "../../../Physics/DiceCallBack.h"
+
 using namespace physx;
 namespace god
 {
@@ -21,21 +23,27 @@ namespace god
 		}
 
 	}
+
+
+
 	void RigidDynamicUpdate ( EnttXSol& entt , EngineResources& engineResources , std::tuple< EntityData& , Transform& , RigidDynamic& , Renderable3D& > component )
 	{
 		if ( !entt.m_pause )
 		{
 			return;
 		}
-
+		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1> ( component );
 		Renderable3D& renderable = std::get<3> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
+		PhysicsSystem& psys = engineResources.Get<PhysicsSystem>().get();
 
 		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem> ().get ().GetPhysics ();
 		physx::PxCooking* mCooking = engineResources.Get<PhysicsSystem> ().get ().GetCooking ();
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem> ().get ().GetPhysicsScene ();
 		Asset3DManager& assetmgr = engineResources.Get<Asset3DManager> ().get ();
+
+
 
 		if ( rigiddynamic.updateRigidDynamic )
 		{
@@ -114,6 +122,8 @@ namespace god
 
 		}
 
+
+
 		if ( rigiddynamic.locktoscale )
 		{
 			rigiddynamic.extents = transform.m_scale;
@@ -139,6 +149,15 @@ namespace god
 			}
 
 		}
+
+
+
+		if (edata.m_id == 41 || edata.m_id == 48 || edata.m_id == 104)
+		{
+			psys.getCRCB().AddPosCb(rigiddynamic.p_RigidDynamic, DiceCallBack);
+		}
+
+	
 
 	}
 
