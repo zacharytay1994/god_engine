@@ -7,6 +7,7 @@
 
 -- TODO:
 -- 1) Disallow selection of BigSwing before selection of target.
+-- 2) Highlight potentially affected tiles when hovering over target
 
 --[IsComponent]
 function C_BigSwing()
@@ -80,7 +81,6 @@ function S_BigSwing(e)
         -- highlight tiles
 
     end
-    -- end of highlighting tiles -----------------------------------------------------------------------------------------
     
     -- checking if player is able to use attack against the enemy --------------------------------------------------------
     if (attackComponent.startCheck == true) then

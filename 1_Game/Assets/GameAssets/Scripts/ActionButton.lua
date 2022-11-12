@@ -1,8 +1,12 @@
--- Click on an Action Button to set it as the Player's selectedAction.
+-- What ActionButton.lua does:
+-- 1) When an Action Button is clicked, set C_Player.selectedAction to whatever that ActionButton represents, and mark that 
+--    Action Button as selected. All other Action Buttons will be un-selected.
+-- 2) If the Player performs an attack while an Action Button is marked as selected, that Action Button's texture will be reset.
+--    C_Player.selectedAction will be set to nil, and C_Player.playerAttacked will be set to false.
 
 -- IMPORTANT: Texture name for the action buttons must follow a format.
 --            Which is just the name of the attack.
---            e.g. FrontJab, EnergyBolt, BigSweep, etc.
+--            { FrontJab, BigSwing, GroundSmash, EnergyBolt, Projectile, Corporikinesis, Cryogenesis, Hydrokinesis, Levitation }
 
 
 --[IsComponent]
@@ -24,39 +28,37 @@ function S_ActionButton(e)
     local actionButtonComponent = GetComponent(e, "C_ActionButton")
     local actionButtonObject = GetGUIObject(e)
 
-    -- making sure playing entity exists -----------------------------------------------
+    -- making sure playing entity exists and getting PlayerAttack and Character components
     local playerEntity = GetEntity("Player")
-    local playerComponent
-    local playerAttackComponent
-    
+    local playerAttackComponent = nil
+    local playerComponent = nil
     if (playerEntity ~= -1) then
-        playerComponent = GetComponent(playerEntity, "C_Player")
         playerAttackComponent = GetComponent(playerEntity, "C_PlayerAttack")
+        playerComponent = GetComponent(playerEntity, "C_Player")
     else
         print("[ActionButton.lua] Player Entity not found! Returning.")
         return
     end
-    -- end of checking player entity ---------------------------------------------------
 
     if actionButtonObject.pressed then
         
         print("[ActionButton.lua]", EntityName(e), "pressed!")
         
-        actionButtonComponent.buttonSelected = true
-        
         -- getting the AttackList ----------------------------------------------------------
-        local attackList
+        local attackList = nil
         local combatManagerEntity = GetEntity("CombatManager")
         if (combatManagerEntity ~= -1) then
             attackList = GetComponent(combatManagerEntity, "C_AttackList").attackList
+        else
+            print("[ActionButton.lua] CombatManager Entity not found! Returning.")
+            return
         end
-        -- end of getting the AttackList ---------------------------------------------------
         
         -- set player's selected attack to whatever this button represents -----------------
         playerComponent.selectedAction = TextureName(e)
         print("[ActionButton.lua] playerComponent.selectedAction:", playerComponent.selectedAction)
         
-        -- hardcoded
+        -- hardcoded (will update soon)
         if (playerComponent.selectedAction == "FrontJab") then
             playerAttackComponent.selectedAttack = attackList[1]
             print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
@@ -77,7 +79,10 @@ function S_ActionButton(e)
         -- playerAttackComponent.selectedAttack = attackList[(diceValue * 3) + colorModifier]
         -- end of setting selected action --------------------------------------------------
 
-        -- set all other Action Buttons as unselected --------------------------------------
+        -- set this button as currently selected
+        actionButtonComponent.buttonSelected = true
+
+        -- set all other Action Buttons as unselected
         print("[ActionButton.lua] Un-selecting all other Action Buttons!")
         local actionButtonList = EntitiesWithScriptComponent("C_ActionButton")
         for i = 1, #actionButtonList do
@@ -85,7 +90,6 @@ function S_ActionButton(e)
                 GetComponent(actionButtonList[i], "C_ActionButton").buttonSelected = false
             end
         end
-        -- end of unselecting other Action Buttons -----------------------------------------
     end
 
     -- empty the button after the attack is used
