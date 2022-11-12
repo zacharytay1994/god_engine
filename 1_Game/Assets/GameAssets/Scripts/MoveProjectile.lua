@@ -121,15 +121,19 @@ function S_MoveProjectile(e)
 
         -- moving the projectile -----------------------------------------------------------------------------------------------
         energyBoltPosition = GetTransform(e).position
-        energyBoltPosition.x = energyBoltPosition.x + moveProjectileComponent.xDirection * moveProjectileComponent.speed
-        energyBoltPosition.z = energyBoltPosition.z + moveProjectileComponent.zDirection * moveProjectileComponent.speed
-
-        -- moveProjectileComponent.accumTime = moveProjectileComponent.accumTime + GetDeltaTime()
-        -- energyBoltPosition.y = moveProjectileComponent.yStart + (Sin(moveProjectileComponent.accumTime * moveProjectileComponent.frequency) * moveProjectileComponent.magnitude * moveProjectileComponent.amplitude)
-
+        
         local piFactor = moveProjectileComponent.distanceToTravel / 3.4
-        moveProjectileComponent.distanceTravelled = Abs(energyBoltPosition.x - moveProjectileComponent.xStart) / piFactor
-        print("moveProjectileComponent.distanceTravelled:", moveProjectileComponent.distanceTravelled);
+        
+        -- print("moveProjectileComponent.distanceTravelled:", moveProjectileComponent.distanceTravelled);
+        
+        if (moveProjectileComponent.zDirection == 1 or moveProjectileComponent.zDirection == -1) then
+            energyBoltPosition.z = energyBoltPosition.z + moveProjectileComponent.zDirection * moveProjectileComponent.speed
+            moveProjectileComponent.distanceTravelled = Abs(energyBoltPosition.z - moveProjectileComponent.zStart) / piFactor   
+        elseif (moveProjectileComponent.xDirection == 1 or moveProjectileComponent.xDirection == -1) then
+            energyBoltPosition.x = energyBoltPosition.x + moveProjectileComponent.xDirection * moveProjectileComponent.speed  
+            moveProjectileComponent.distanceTravelled = Abs(energyBoltPosition.x - moveProjectileComponent.xStart) / piFactor     
+        end
+         
         energyBoltPosition.y = moveProjectileComponent.yStart + (Sin(moveProjectileComponent.distanceTravelled) * moveProjectileComponent.amplitude)
         -- end of moving the projectile ----------------------------------------------------------------------------------------
 
