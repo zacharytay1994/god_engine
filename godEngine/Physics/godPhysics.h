@@ -21,6 +21,7 @@ namespace god
 
 	struct PhysicsSystem
 	{
+		static constexpr uint32_t Null = static_cast<uint32_t>(-1);
 	public:
 
 		PhysicsSystem();
@@ -28,8 +29,11 @@ namespace god
 		void Init(GLFWWindow* window, Camera* cam);
 		void Update(float dt, bool pause);
 		
-		void Raycast();
+		
 		physx::PxRigidActor* const GetRayCastMouse() const;
+		void SetRCMid(uint32_t id);
+		uint32_t getRCMid();
+
 		bool GetisRunning() const;
 		physx::PxPhysics* const GetPhysics() const;
 		physx::PxCooking* const GetCooking() const;
@@ -41,18 +45,25 @@ namespace god
 		bool debugdraw;
 	private:
 	
-		
-		ContactReportCallback gContactReportCallback;
 
-		CallbackFinishTask callbackFinishTask;
-
-		GLFWWindow* mWindow; 
-		Camera* mCamera;
 		
+		void Raycast();
 
 		//PhysX Visual Debugger
 		void CreatePVD();
 		void SetupPVD();
+
+
+		// Data members
+
+		uint32_t RayCastid;
+		ContactReportCallback gContactReportCallback;
+
+		CallbackFinishTask callbackFinishTask;
+
+		GLFWWindow* mWindow;
+		Camera* mCamera;
+
 
 		physx::PxRigidActor* mRayCastMouse;
 		
