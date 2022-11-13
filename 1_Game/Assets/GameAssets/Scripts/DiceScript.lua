@@ -5,7 +5,7 @@ function C_DiceScript()
 		fodder_text = "DiceScript is attached!",
 		is_init = false,
 		is_rolling = false,
-		value = 0,
+		value = -1,
 		gold_chance = 10,
 		pink_chance = 40,
 		blue_chance = 100,
@@ -121,7 +121,7 @@ end
 
 function DiceScript_DisableDice(e, c_dice)
 	c_dice.is_rolling = false
-	c_dice.value = 0
+	c_dice.value = -1
 	FreezeObject(e, true)
 	SetTransformPosition(e, 999, 999, 999)
 end

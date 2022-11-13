@@ -57,7 +57,7 @@ function S_UIManager(e)
             
             -- if any die has a value of 0 then they have not properly settled down
             for i = 1, #diceList do
-                if (GetComponent(diceList[i], "C_DiceScript").value == 0) then
+                if (GetComponent(diceList[i], "C_DiceScript").value == -1) then
                     diceSettled = false
                 end
             end
