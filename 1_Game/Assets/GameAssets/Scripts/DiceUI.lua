@@ -41,6 +41,19 @@ function S_DiceUI(e)
 	else
 		if (gui_object.active == false) then
 			gui_object.active = true
+			
+			local diceList = EntitiesWithScriptComponent("C_DiceScript")
+			for i = 1, #diceList do
+				print("[DiceUI] WHY NOT WORKING", GetComponent(diceList[i], "C_DiceScript").value)
+			end
+			
+			if c_dicemanager.button_name == "DiceIcon1" then
+				SetDiceIcon(e, 1)
+			elseif c_dicemanager.button_name == "DiceIcon2" then
+				SetDiceIcon(e, 2)
+			elseif c_dicemanager.button_name == "DiceIcon3" then
+				SetDiceIcon(e, 3)
+			end
 		end
 
 		
@@ -61,3 +74,23 @@ function S_DiceUI(e)
 		end
 	end
 end
+
+function SetDiceIcon(e, dicenumber)
+	print("[DiceUI] SetDiceIcon", dicenumber)
+	local diceList = EntitiesWithScriptComponent("C_DiceScript")
+	print("[DiceUI] Getting list successful", dicenumber)
+	print("[DiceUI] The impossible value", dicenumber, " + ", GetComponent(diceList[dicenumber], "C_DiceScript").value)
+	if (GetComponent(diceList[dicenumber], "C_DiceScript").value == 1) then
+		ChangeTexture(e, "dice_jab")
+	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 2) then
+		ChangeTexture(e, "dice_jab")
+	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 3) then
+		ChangeTexture(e, "dice_jab")
+	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 4) then
+		ChangeTexture(e, "dice_bolt")
+	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 5) then
+		ChangeTexture(e, "dice_bolt")
+	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 6) then
+		ChangeTexture(e, "dice_bolt")
+	end
+end 

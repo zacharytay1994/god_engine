@@ -68,7 +68,7 @@ function S_DiceScript(e)
 										c_dice.value = i + 1
 									end
 								end
-								print("[Dice Script] Dice value:", c_dice.value)
+								print("[DiceScript] Dice value:", c_dice.value)
 							end
 						end
 					end
@@ -108,6 +108,7 @@ function S_DiceScript(e)
 end
 
 function DiceScript_RollDice(e, c_dice)
+	print("[DiceScript] Roll Dice")
 	c_dice.is_rolling = true
 	FreezeObject(e, false)
 	local transform = GetTransform(e)
@@ -120,7 +121,7 @@ function DiceScript_RollDice(e, c_dice)
 end
 
 function DiceScript_DisableDice(e, c_dice)
-	print("===[DiceScript] DISABLE DICE FUNCTION TRIGGERED")
+	print("[DiceScript] Disabled Dice")
 	c_dice.is_rolling = false
 	c_dice.value = -1
 	FreezeObject(e, true)
