@@ -120,6 +120,7 @@ function DiceScript_RollDice(e, c_dice)
 end
 
 function DiceScript_DisableDice(e, c_dice)
+	print("===[DiceScript] DISABLE DICE FUNCTION TRIGGERED")
 	c_dice.is_rolling = false
 	c_dice.value = -1
 	FreezeObject(e, true)
