@@ -74,6 +74,7 @@ function S_EnemyController(e)
 
     -- after enemy has moved and attacked, reset variables and end turn
     else
+        print("[C_EnemyController.lua] Enemy", EntityName(e), "has moved and attacked, ending turn.")
         enemyController.hasMoved = false
         enemyController.hasAttacked = false
         characterComponent.endTurn = true

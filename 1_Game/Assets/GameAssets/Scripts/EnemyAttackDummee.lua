@@ -7,9 +7,8 @@
 --                  If it hits an indestructible object (like a floor tile), Dummee will stop in its track instead of bouncing back.
 
 -- TODO:
--- 1) Apply damage to victim
+-- 1) Destroy destructible rocks
 -- 2) Apply pushback to victim
--- 3) Apply recoil to Dummee
 
 --[IsComponent]
 function C_EnemyAttackDummee()
@@ -18,6 +17,13 @@ function C_EnemyAttackDummee()
         -- cue to attempt a Charging Attack
         executeAttack = false,
 
+        -- to stop Dummee's charge
+        stopCharge = false,
+
+        damageApplied = false,
+
+        recoilComplete = false,
+
         -- for turning the Dummee when it does the Charging Attack
         dummeeRotation = 0,
 
@@ -25,14 +31,19 @@ function C_EnemyAttackDummee()
         -- could be a floor tile, a rock, the player, or another Dummee
         victim = nil,
 
-        -- to stop Dummee's charge
-        stopCharge = false,
+        -- for EnemyAttackDummeeMoveDummeeTowardsPlayer() to use for pausing
+        accumTime = 0,
+
+        recoilDestination = nil,
+
+        recoilPath = { },
 
         -- amount of time to pause between each tile while charging
         chargeInterval = 0.3,
 
-        -- for EnemyAttackDummeeMoveDummeeTowardsPlayer() to use for pausing
-        accumTime = 0
+        
+
+        chargeDamage = 2
 
     }
     return function()
@@ -80,33 +91,45 @@ function S_EnemyAttackDummee(e)
 
     if (attackComponent.stopCharge) then
     
-        -- apply damage to victim (if applicable)
-    
-        -- apply push to victim (if applicable)
+        -- apply damage to victim (if applicable) OR destroy rock (if applicable)
+        if (attackComponent.damageApplied == false) then
+            EnemyAttackDummeeApplyDamage(e, attackComponent.victim)
 
-        -- apply recoil to Dummee (if applicable)
-        
-        -- trigger screenshake
-        local screenShakeEntity = GetEntity("ScreenShake")
-        if (screenShakeEntity ~= -1) then
-            local screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
-            screenShakeComponent.duration = 0.25
-            screenShakeComponent.doScreenShake = true
-        end
+            -- trigger screenshake
+            local screenShakeEntity = GetEntity("ScreenShake")
+            if (screenShakeEntity ~= -1) then
+                local screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
+                screenShakeComponent.duration = 0.25
+                screenShakeComponent.doScreenShake = true
+            end
 
-        -- trigger sound effect
-        InstancePrefab("SFX_Jab",0,0,0)
+            -- trigger sound effect
+            InstancePrefab("SFX_Jab",0,0,0)
 
-        -- reset variables
-        attackComponent.executeAttack = false
-        attackComponent.dummeeRotation = 0
-        attackComponent.victim = nil
-        attackComponent.stopCharge = false
-        attackComponent.accumTime = 0
-        
-        -- end the attack
-        enemyController.hasAttacked = true
-        print("[EnemyAttackDummee.lua] Dummee has completed Charging Attack!")
+            -- set recoil destination (doesn't do anything if victim is a floor tile)
+            EnemyAttackDummeeSetRecoilDestination(e, attackComponent.victim)
+
+            -- apply push to victim (if applicable)
+
+        end 
+           
+        if (attackComponent.recoilComplete == false) then
+            EnemyAttackDummeeMoveToRecoilDestination(e)
+        else
+            -- reset variables
+            attackComponent.executeAttack = false
+            attackComponent.stopCharge = false
+            attackComponent.damageApplied = false
+            attackComponent.recoilComplete = false
+            attackComponent.dummeeRotation = 0
+            attackComponent.victim = nil
+            attackComponent.accumTime = 0
+            attackComponent.recoilPath = { }
+            
+            -- end the attack
+            enemyController.hasAttacked = true
+            print("[EnemyAttackDummee.lua] Dummee has completed Charging Attack!")
+        end    
     end
 end
 
@@ -124,7 +147,7 @@ function EnemyAttackDummeeSameLane(dummee, player)
 
     if (dummeeGrid.y ~= playerGrid.y) then 
         print("[EnemyAttackDummee.lua] Dummee and Player are on different y-axis! Cannot use Charging Attack! Returning.")
-        return
+        return result
     end
 
     -- Dummee and player on the same x-axis
@@ -277,6 +300,160 @@ function EnemyAttackDummeeMoveDummeeTowardsPlayer(dummee, player)
             dummeeGrid.x = dummeeGrid.x + 1
         else
             attackComponent.stopCharge = true 
+        end
+    end
+
+    print("[EnemyAttackDummee.lua] Charging towards Player!")
+    attackComponent.accumTime = 0
+end
+
+function EnemyAttackDummeeApplyDamage(dummee, victim)
+
+    local characterList = EntitiesWithScriptComponent("C_Character")
+
+    for i = 1, #characterList do
+        
+        if (characterList[i] == victim) then
+            
+            local attackComponent = GetComponent(dummee, "C_EnemyAttackDummee")
+            local victimCharacterComponent = GetComponent(victim, "C_Character")
+            victimCharacterComponent.currentHP = victimCharacterComponent.currentHP - attackComponent.chargeDamage
+            print("[EnemyAttackDummee.lua]", EntityName(victim), "currentHP after getting charged is", victimCharacterComponent.currentHP)
+            GetComponent(dummee, "C_EnemyAttackDummee").damageApplied = true
+            return
+        end
+    end
+
+    -- break rocks here 
+
+end
+
+function EnemyAttackDummeeSetRecoilDestination(dummee, victim)
+
+    print("[EnemyAttackDummee.lua] Figuring out recoil destination!")
+    
+    -- check whether victim is a floor tile
+    local tileList = EntitiesWithScriptComponent("C_FloorTile")
+
+    for i = 1, #tileList do
+        if (tileList[i] == victim) then
+            print("[EnemyAttackDummee.lua] Charge Attack victim is a floor tile! No recoil applied.")
+            return
+        end
+    end
+
+    -- Note: if code reaches here, then victim is defo not a floor tile and we can apply recoil to Dummee.
+    local dummeeGrid = GetGridCell(dummee)
+    local currentX = dummeeGrid.x
+    local currentY = dummeeGrid.y
+    local currentZ = dummeeGrid.z
+    
+    local attackComponent = GetComponent(dummee, "C_EnemyAttackDummee")
+
+    -- player is behind Dummee
+    if (attackComponent.dummeeRotation == 180) then
+                
+        -- make a list of all GridCells to check against (the 3 tiles (globally) in front of Dummee)
+        local recoilGridZ = dummeeGrid.z + 3
+        while (currentZ ~= recoilGridZ) do
+            currentZ = currentZ + 1
+            attackComponent.recoilPath[#attackComponent.recoilPath + 1] = { currentX, currentY, currentZ } 
+        end
+
+    -- player is in front of Dummee
+    elseif (attackComponent.dummeeRotation == 0) then
+        
+        -- make a list of all GridCells to check against (the 3 tiles (globally) behind Dummee)
+        local recoilGridZ = dummeeGrid.z - 3
+        while (currentZ ~= recoilGridZ) do
+            currentZ = currentZ - 1
+            attackComponent.recoilPath[#attackComponent.recoilPath + 1] = { currentX, currentY, currentZ } 
+        end
+
+    -- player is to Dummee's right
+    elseif (attackComponent.dummeeRotation == 270) then
+        
+        -- make a list of all GridCells to check against (the 3 tiles (globally) left of Dummee)
+        local recoilGridX = dummeeGrid.x + 3
+        while (currentX ~= recoilGridX) do
+            currentX = currentX + 1
+            attackComponent.recoilPath[#attackComponent.recoilPath + 1] = { currentX, currentY, currentZ } 
+        end
+
+    -- player is to Dummee's left
+    elseif (attackComponent.dummeeRotation == 90) then
+
+        -- make a list of all GridCells to check against (the 3 tiles (globally) right of Dummee)
+        local recoilGridX = dummeeGrid.x - 3
+        while (currentX ~= recoilGridX) do
+            currentX = currentX - 1
+            attackComponent.recoilPath[#attackComponent.recoilPath + 1] = { currentX, currentY, currentZ } 
+        end
+    end
+
+    -- if there are any objects in Dummee's recoil path, then set recoil destination as the tile right in front of that object.
+    local gridCellList = EntitiesWithEngineComponent("GridCell")
+    local collidedIndex = -1
+
+    for j = 1, #attackComponent.recoilPath do
+        for k = 1, #gridCellList do
+            local currentGridCell = GetGridCell(gridCellList[k])
+            -- print(attackComponent.recoilPath[j][1], attackComponent.recoilPath[j][2], attackComponent.recoilPath[j][3], "vs", currentGridCell.x, currentGridCell.y, currentGridCell.z)
+            
+            if (attackComponent.recoilPath[j][1] == currentGridCell.x and attackComponent.recoilPath[j][2] == currentGridCell.y and attackComponent.recoilPath[j][3] == currentGridCell.z) then
+                collidedIndex = j
+                break
+            end
+        end
+
+        if (collidedIndex ~= -1) then
+            break
+        end
+    end
+
+    -- if collidedIndex == -1 then there are not obstacles in Dummee's recoil path
+    if (collidedIndex == -1) then
+        attackComponent.recoilDestination = attackComponent.recoilPath[3]
+        print("[EnemyAttackDummee.lua] There are no obstacles in Dummee's recoil path.")
+    
+    -- else, there is an obstacle, and Dummee's recoil will end at collidedIndex - 1
+    else
+        if (collidedIndex - 1 <= 0) then
+            print("[EnemyAttackDummee.lua] There is an obstacle right behind Dummee, cannot bounce back.")
+            attackComponent.recoilComplete = true
+        else
+            print("[EnemyAttackDummee.lua] There is an obstacle", j, "tile(s) behind Dummee.") 
+            attackComponent.recoilDestination = attackComponent.recoilPath[collidedIndex - 1]
+        end
+    end
+end
+
+function EnemyAttackDummeeMoveToRecoilDestination(dummee)
+
+    -- getting EnemyAttackDummee component
+    local attackComponent = GetComponent(dummee, "C_EnemyAttackDummee")
+
+    -- get attacker and defenders' locations
+    local dummeeGrid = GetGridCell(dummee)
+    local recoilGrid = attackComponent.recoilDestination
+
+    -- Note: impossible to do smooth charging animation because Dummee position is locked to the grid.
+
+    if (attackComponent.accumTime < attackComponent.chargeInterval) then
+        attackComponent.accumTime = attackComponent.accumTime + GetDeltaTime()
+        return
+    end
+
+    for i = 1, #attackComponent.recoilPath do
+    
+        dummeeGrid.x = attackComponent.recoilPath[i][1]
+        dummeeGrid.y = attackComponent.recoilPath[i][2]
+        dummeeGrid.z = attackComponent.recoilPath[i][3]
+
+        if (dummeeGrid.x == recoilGrid[1] and dummeeGrid.y == recoilGrid[2] and dummeeGrid.z == recoilGrid[3]) then
+            attackComponent.recoilComplete = true
+            print("[EnemyAttackDummee.lua] Recoil destination reached!")
+            break
         end
     end
 

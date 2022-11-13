@@ -80,6 +80,13 @@ function S_Character(e)
         -- RemoveInstance will be called by TurnOrderManager at the end of current round
     end
 
+    if (characterComponent.endTurn) then
+        characterComponent.endTurn = false
+        turnOrderManagerComponent.nextTurn = true
+        characterComponent.isActive = false
+        return
+    end
+    
     -- set character to active if its ID matches TurnOrderManager.currentTurn
     if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then
         characterComponent.isActive = true
@@ -87,10 +94,7 @@ function S_Character(e)
         characterComponent.isActive = false
     end
 
-    if (characterComponent.endTurn) then
-        characterComponent.endTurn = false
-        turnOrderManagerComponent.nextTurn = true
-    end
+    
 
     -- CHEATS -----------------------------------------------------------------------------------------------------------------------
     -- press J to set all enemy HP to zero

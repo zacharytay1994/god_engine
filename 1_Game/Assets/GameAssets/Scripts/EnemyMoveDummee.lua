@@ -1,7 +1,8 @@
 -- MoveDummee contains Dummees' movement code. 
 
 -- How this script works:
--- It will first check if it's in the same lane as the Player.
+-- It will first check if Dummee is in the same y-axis as Player. If no then it will not move.
+-- It will then check if it's in the same lane as the Player.
 -- If yes, then it won't move, because it can use the Charging Attack on the Player.
 -- If no, then it will set the Player's position as its destination, and move one tile towards it each turn.
 -- To limit movement to one tile per turn, I have given it a stamina of 1.
@@ -37,7 +38,7 @@ function S_EnemyMoveDummee(e)
     if (moveComponent.executeMove == false) then
         return
     end
-    
+
     -- getting necessary entities and components
     local entityDataComponent = GetEntityData(e)
     local enemyGridCell = GetGridCell(e)
@@ -69,7 +70,15 @@ function S_EnemyMoveDummee(e)
             GetComponent(e, "C_EnemyController").hasMoved = true
             moveComponent.executeMove = false
             return
-        else
+        
+            -- if enemy is on different y-axis as player, don't move
+        elseif (enemyGridCell.y ~= GetGridCell(playerEntity).y) then
+            print("[EnemyMoveDummee.lua] Dummee is not on the same level as player. Returning.")
+            GetComponent(e, "C_EnemyController").hasMoved = true
+            moveComponent.executeMove = false
+            return
+
+        else   
             targetTile = EnemyMoveDummeeSuitableTile()
         end
 
