@@ -2,6 +2,8 @@
 
 #include "../../EngineComponents/EC_All.h"
 #include "../../EnttXSol.h"
+#include "../../../Physics/DiceCallBack.h"
+
 using namespace physx;
 namespace god
 {
@@ -11,7 +13,7 @@ namespace god
 		if ( !entt.m_pause )
 		{
 			return;
-		}
+		}//else if entt.m_pause
 		Transform& transform = std::get<1> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
 
@@ -21,25 +23,30 @@ namespace god
 		}
 
 	}
+
+
+
 	void RigidDynamicUpdate ( EnttXSol& entt , EngineResources& engineResources , std::tuple< EntityData& , Transform& , RigidDynamic& , Renderable3D& > component )
 	{
 		if ( !entt.m_pause )
 		{
 			return;
-		}
-
+		}//else if entt.m_pause
+		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1> ( component );
 		Renderable3D& renderable = std::get<3> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
+		PhysicsSystem& psys = engineResources.Get<PhysicsSystem>().get();
 
 		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem> ().get ().GetPhysics ();
 		physx::PxCooking* mCooking = engineResources.Get<PhysicsSystem> ().get ().GetCooking ();
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem> ().get ().GetPhysicsScene ();
 		Asset3DManager& assetmgr = engineResources.Get<Asset3DManager> ().get ();
 
+
+
 		if ( rigiddynamic.updateRigidDynamic )
 		{
-			rigiddynamic.p_RigidDynamic = nullptr;
 
 			if ( rigiddynamic.p_material == nullptr )
 			{
@@ -114,6 +121,24 @@ namespace god
 
 		}
 
+		if (rigiddynamic.Simulation)
+		{
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
+		}
+		else
+		{
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
+		}
+
+		if (rigiddynamic.Gravity)
+		{
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
+		}
+		else
+		{
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+		}
+
 		if ( rigiddynamic.locktoscale )
 		{
 			rigiddynamic.extents = transform.m_scale;
@@ -140,6 +165,15 @@ namespace god
 
 		}
 
+
+
+		if (edata.m_id == 41 || edata.m_id == 48 || edata.m_id == 104)
+		{
+			psys.getCRCB().AddPosCb(rigiddynamic.p_RigidDynamic, DiceCallBack);
+		}
+
+	
+
 	}
 
 	void RigidDynamicFrameEnd ( EnttXSol& entt , EngineResources& engineResources , std::tuple< EntityData& , Transform& , RigidDynamic& > component )
@@ -154,11 +188,7 @@ namespace god
 
 		Transform& transform = std::get<1> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
-		if ( rigiddynamic.Active == false )
-		{
-			rigiddynamic.mScene->removeActor ( *rigiddynamic.p_RigidDynamic );
 
-		}
 
 
 		if ( rigiddynamic.p_RigidDynamic )
