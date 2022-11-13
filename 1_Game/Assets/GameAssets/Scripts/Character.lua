@@ -70,6 +70,8 @@ function S_Character(e)
     -- set character to dead if HP falls to zero and below
     if (characterComponent.currentHP <= 0) then 
         
+        print("[Character.lua]", EntityName(e), entityDataComponent.id, "has died, hiding body.")
+
         -- hide the character below the map for now
         GetTransform(e).position.y = -100
         GetGridCell(e).y = -100

@@ -6,9 +6,12 @@
 --                  If it hits a destructible rock, the rock will be destroyed, while Dummee will bounce back 3 tiles.
 --                  If it hits an indestructible object (like a floor tile), Dummee will stop in its track instead of bouncing back.
 
+-- A lot of redundant code, will optimize when there's time :(
+
 -- TODO:
 -- 1) Destroy destructible rocks
--- 2) Apply pushback to victim
+-- 2) Destructible rocks and Floor Tiles will break the pushback chain
+-- 3) Remove Destructible rocks and Floor Tiles from affectedEntities before applying pushback
 
 --[IsComponent]
 function C_EnemyAttackDummee()
@@ -20,8 +23,10 @@ function C_EnemyAttackDummee()
         -- to stop Dummee's charge
         stopCharge = false,
 
+        -- to check if damage from Charging Attack has been applied to target
         damageApplied = false,
 
+        -- to check if Dummee has fully bounced back after Charging
         recoilComplete = false,
 
         -- for turning the Dummee when it does the Charging Attack
@@ -34,17 +39,18 @@ function C_EnemyAttackDummee()
         -- for EnemyAttackDummeeMoveDummeeTowardsPlayer() to use for pausing
         accumTime = 0,
 
+        -- recoilDestination is a "vector3" containing the ending coordinates for Dummee after bouncing back
+        -- e.g. { 1, 1, 1 }
         recoilDestination = nil,
 
+        -- an array of "vector3"s containing the coordinates for all gridcells in Dummee's recoil path
         recoilPath = { },
 
         -- amount of time to pause between each tile while charging
         chargeInterval = 0.3,
 
-        
-
+        -- damage for Charging Attack
         chargeDamage = 2
-
     }
     return function()
         return var
@@ -109,7 +115,8 @@ function S_EnemyAttackDummee(e)
             -- set recoil destination (doesn't do anything if victim is a floor tile)
             EnemyAttackDummeeSetRecoilDestination(e, attackComponent.victim)
 
-            -- apply push to victim (if applicable)
+            -- apply push to victim (doesn't do anything if victim is a floor tile)
+            EnemyAttackDummeeApplyPushback(e, attackComponent.victim)
 
         end 
            
@@ -336,7 +343,6 @@ function EnemyAttackDummeeSetRecoilDestination(dummee, victim)
     
     -- check whether victim is a floor tile
     local tileList = EntitiesWithScriptComponent("C_FloorTile")
-
     for i = 1, #tileList do
         if (tileList[i] == victim) then
             print("[EnemyAttackDummee.lua] Charge Attack victim is a floor tile! No recoil applied.")
@@ -459,4 +465,330 @@ function EnemyAttackDummeeMoveToRecoilDestination(dummee)
     end
 
     attackComponent.accumeTime = 0
+end
+
+function EnemyAttackDummeeApplyPushback(dummee, victim)
+
+    print("[EnemyAttackDummee.lua] Applying pushback!")
+
+    -- check whether victim is a floor tile
+    local tileList = EntitiesWithScriptComponent("C_FloorTile")
+    for i = 1, #tileList do
+        if (tileList[i] == victim) then
+            print("[EnemyAttackDummee.lua] Charge Attack victim is a floor tile! No pushback applied.")
+            return
+        end
+    end
+
+    local attackComponent = GetComponent(dummee, "C_EnemyAttackDummee")
+
+    local entitiesWithGridCell = EntitiesWithEngineComponent("GridCell")
+    local affectedEntity = nil
+    local affectedEntities = { }
+    local victimGrid = GetGridCell(victim)
+    local currentGrid = { victimGrid.x, victimGrid.y, victimGrid.z }
+    local loopCounter = 1 -- arbitrary condition for the while loop
+    local pushbackDirection = { 0, 0, 0 }
+
+    -- add the victim to affectedEntities first, before checking if there's anything behind the player
+    affectedEntities[#affectedEntities + 1] = victim
+
+    -- Player behind Dummee
+    if (attackComponent.dummeeRotation == 180) then
+                
+        -- set currentGrid to be the gridcell behind the victim
+        currentGrid[3] = currentGrid[3] - 1
+
+        -- set pushbackDirection
+        pushbackDirection[3] = -1
+        
+        -- while loop will break once no affectedEntity is found in an iteration
+        while (loopCounter <= 8) do
+
+            for i = 1, #entitiesWithGridCell do
+                
+                -- could be any entity on the map with a GridCell component
+                local currentEntityGrid = GetGridCell(entitiesWithGridCell[i])
+                
+                -- if that entity's gridcell matches currentGrid then it will be affected by pushback
+                if (currentEntityGrid.x == currentGrid[1] and currentEntityGrid.y == currentGrid[2] and currentEntityGrid.z == currentGrid[3]) then
+                    
+                    -- mark this entity as affected
+                    affectedEntity = entitiesWithGridCell[i]      
+
+                    -- break the for-loop as no other entity can possibly have the same grid coordinates
+                    break
+                end
+            end
+
+            -- if an affectedEntity was found, then add to affectedEntities and continue checking behind the affectedEntity
+            if (affectedEntity ~= nil) then
+                
+                -- add affectedEntity to the list
+                affectedEntities[#affectedEntities + 1] = affectedEntity
+
+                -- set currentGrid to be the gridcell behind the last affectedEntity
+                currentGrid[3] = currentGrid[3] - 1
+
+                -- increment loopCounter
+                loopCounter = loopCounter + 1
+
+                -- reset affectedEntity
+                affectedEntity = nil
+            
+            -- else if no affectedEntity was found, then the pushback chain breaks and we can break the while loop.
+            else
+                break
+            end   
+        end
+
+    -- Player in front of Dummee
+    elseif (attackComponent.dummeeRotation == 0) then
+        
+        -- set currentGrid to be the gridcell behind the victim
+        currentGrid[3] = currentGrid[3] + 1
+
+        -- set pushbackDirection
+        pushbackDirection[3] = 1
+        
+        -- while loop will break once no affectedEntity is found in an iteration
+        while (loopCounter <= 8) do
+
+            for i = 1, #entitiesWithGridCell do
+                
+                -- could be any entity on the map with a GridCell component
+                local currentEntityGrid = GetGridCell(entitiesWithGridCell[i])
+                
+                -- if that entity's gridcell matches currentGrid then it will be affected by pushback
+                if (currentEntityGrid.x == currentGrid[1] and currentEntityGrid.y == currentGrid[2] and currentEntityGrid.z == currentGrid[3]) then
+                    
+                    -- mark this entity as affected
+                    affectedEntity = entitiesWithGridCell[i]      
+
+                    -- break the for-loop as no other entity can possibly have the same grid coordinates
+                    break
+                end
+            end
+
+            -- if an affectedEntity was found, then add to affectedEntities and continue checking behind the affectedEntity
+            if (affectedEntity ~= nil) then
+                
+                -- add affectedEntity to the list
+                affectedEntities[#affectedEntities + 1] = affectedEntity
+
+                -- set currentGrid to be the gridcell behind the last affectedEntity
+                currentGrid[3] = currentGrid[3] + 1
+
+                -- increment loopCounter
+                loopCounter = loopCounter + 1
+
+                -- reset affectedEntity
+                affectedEntity = nil
+            
+            -- else if no affectedEntity was found, then the pushback chain breaks and we can break the while loop.
+            else
+                break
+            end   
+        end
+
+    -- Player to Dummee's right
+    elseif (attackComponent.dummeeRotation == 270) then
+        
+        -- set currentGrid to be the gridcell behind the victim
+        currentGrid[1] = currentGrid[1] - 1
+
+        -- set pushbackDirection
+        pushbackDirection[1] = -1
+        
+        -- while loop will break once no affectedEntity is found in an iteration
+        while (loopCounter <= 8) do
+
+            for i = 1, #entitiesWithGridCell do
+                
+                -- could be any entity on the map with a GridCell component
+                local currentEntityGrid = GetGridCell(entitiesWithGridCell[i])
+                
+                -- if that entity's gridcell matches currentGrid then it will be affected by pushback
+                if (currentEntityGrid.x == currentGrid[1] and currentEntityGrid.y == currentGrid[2] and currentEntityGrid.z == currentGrid[3]) then
+                    
+                    -- mark this entity as affected
+                    affectedEntity = entitiesWithGridCell[i]      
+
+                    -- break the for-loop as no other entity can possibly have the same grid coordinates
+                    break
+                end
+            end
+
+            -- if an affectedEntity was found, then add to affectedEntities and continue checking behind the affectedEntity
+            if (affectedEntity ~= nil) then
+                
+                -- add affectedEntity to the list
+                affectedEntities[#affectedEntities + 1] = affectedEntity
+
+                -- set currentGrid to be the gridcell behind the last affectedEntity
+                currentGrid[1] = currentGrid[1] - 1
+
+                -- increment loopCounter
+                loopCounter = loopCounter + 1
+
+                -- reset affectedEntity
+                affectedEntity = nil
+            
+            -- else if no affectedEntity was found, then the pushback chain breaks and we can break the while loop.
+            else
+                break
+            end   
+        end
+
+    -- Player to Dummee's left
+    elseif (attackComponent.dummeeRotation == 90) then
+
+        -- set currentGrid to be the gridcell behind the victim
+        currentGrid[1] = currentGrid[1] + 1
+
+        -- set pushbackDirection
+        pushbackDirection[1] = 1
+        
+        -- while loop will break once no affectedEntity is found in an iteration
+        while (loopCounter <= 8) do
+
+            for i = 1, #entitiesWithGridCell do
+                
+                -- could be any entity on the map with a GridCell component
+                local currentEntityGrid = GetGridCell(entitiesWithGridCell[i])
+                
+                -- if that entity's gridcell matches currentGrid then it will be affected by pushback
+                if (currentEntityGrid.x == currentGrid[1] and currentEntityGrid.y == currentGrid[2] and currentEntityGrid.z == currentGrid[3]) then
+                    
+                    -- mark this entity as affected
+                    affectedEntity = entitiesWithGridCell[i]      
+
+                    -- break the for-loop as no other entity can possibly have the same grid coordinates
+                    break
+                end
+            end
+
+            -- if an affectedEntity was found, then add to affectedEntities and continue checking behind the affectedEntity
+            if (affectedEntity ~= nil) then
+                
+                -- add affectedEntity to the list
+                affectedEntities[#affectedEntities + 1] = affectedEntity
+
+                -- set currentGrid to be the gridcell behind the last affectedEntity
+                currentGrid[1] = currentGrid[1] + 1
+
+                -- increment loopCounter
+                loopCounter = loopCounter + 1
+
+                -- reset affectedEntity
+                affectedEntity = nil
+            
+            -- else if no affectedEntity was found, then the pushback chain breaks and we can break the while loop.
+            else
+                break
+            end   
+        end
+    end
+
+    -- TODO: Check for any floor tiles or destructible rocks in the affectedEntities list, 
+    -- and remove all entities behind the first found floor tile or destructible rock entity.
+    print("[EnemyAttackDummee.lua] TODO: remove non-character entities from affectedEntities. Game will crash if pushback is applied to non-character entities.")
+
+    -- for each entity in affectedEntities, push back 1 tile
+    for k = 1, #affectedEntities do
+        local currentEntityGrid = GetGridCell(affectedEntities[k])
+        currentEntityGrid.x = currentEntityGrid.x + pushbackDirection[1]
+        currentEntityGrid.y = currentEntityGrid.y + pushbackDirection[2]
+        currentEntityGrid.z = currentEntityGrid.z + pushbackDirection[3]
+    end
+
+    -- tileList is an array of an array of tiles that are above / below the corresponding entity in the affectedEntities list
+    local tileList = { }
+    
+    -- for each entity in affectedEntities, if they are not standing on a tile, check if there is a tile below them (aka same x and z axis but different y axis)
+    -- if there is a tile somewhere below them, drop them down there and apply fall damage
+    -- if there is no tile at all below them, then kill them off
+    local allTiles = EntitiesWithScriptComponent("C_FloorTile")
+    for l = 1, #affectedEntities do
+
+        local currentEntityGrid = GetGridCell(affectedEntities[l])
+        local tileArray = { }
+
+        for m = 1, #allTiles do
+            local currentTileGrid = GetGridCell(allTiles[m])
+            if (currentTileGrid.x == currentEntityGrid.x and currentTileGrid.z == currentEntityGrid.z) then
+            
+                tileArray[#tileArray + 1] = allTiles[m]
+            end
+        end
+        tileList[#tileList + 1] = tileArray
+    end
+
+    -- for each affectedEntity, check if there are any tiles below them.
+    -- if there aren't any, then reduce their HP to zero.
+    -- if there are, then check if there is a tile right below them.
+    -- if there is, then do nothing.
+    -- if there isn't, drop them onto the next highest tile (that's below them) and apply fall damage.
+    for n = 1, #affectedEntities do
+    
+        local currentEntityGrid = GetGridCell(affectedEntities[n])
+        local tileToFallOnto = nil
+        local willFall = true
+
+        -- if there are no other tiles along the y-axis then reduce their HP to zero.
+        if (#tileList[n] == 0) then
+            GetComponent(affectedEntities[n], "C_Character").currentHP = 0
+            print("[EnemyAttackDummee.lua]", EntityName(affectedEntities[n]), "was pushed into the void and died.")
+        
+        -- else if there are tiles along the y-axis
+        else
+
+            -- go through all tiles in tileList to see if character is safely standing on a tile
+            for o = 1, #tileList[n] do
+                
+                local currentTileGrid = GetGridCell(tileList[n][o])
+
+                -- if there is a tile right below this character, then it shall not fall
+                if (currentTileGrid.y == currentEntityGrid.y - 1) then
+                    willFall = false
+                    break
+
+                -- else, find the tile with highest y-position that is below this character
+                else
+                    -- if currentTile is below the character
+                    if (currentTileGrid.y < currentEntityGrid.y) then
+                    
+                        -- if tileToFallOnto is nil then simply assign currentTile to tileToFallOnto
+                        if (tileToFallOnto == nil) then
+                            tileToFallOnto = tileList[n][o]
+                        
+                        -- else if currentTileGrid is higher than tileToFallOnto, then overwrite tileToFallOnto
+                        elseif (currentTileGrid.y > GetGridCell(tileToFallOnto).y) then
+                            tileToFallOnto = tileList[n][o]
+                        end
+                    end
+                end            
+            end
+
+            -- if char willFall then make it fall onto tileToFallOnto
+            if (willFall) then
+                
+                -- move the character down
+                currentEntityGrid.y = GetGridCell(tileToFallOnto).y + 1
+
+                -- deal fall damage
+                local affectedCharacterComponent = GetComponent(affectedEntities[n], "C_Character")
+                local combatManagerEntity = GetEntity("CombatManager")
+                local combatManagerComponent = nil
+                if (combatManagerEntity ~= -1) then
+                    combatManagerComponent = GetComponent(combatManagerEntity, "C_CombatManager")
+                else
+                    print("[EnemyAttackDummee.lua] ERROR: Cannot find CombatManager! Unable to deal fall damage.")
+                end
+                 
+                affectedCharacterComponent.currentHP = affectedCharacterComponent.currentHP - combatManagerComponent.fallDamage
+                print("[EnemyAttackDummee.lua]", EntityName(affectedEntities[n]), "was pushed off a ledge and suffered fall damage.")
+            end
+        end
+    end
 end
