@@ -167,6 +167,9 @@ function S_TurnOrderManager(e)
             turnOrderManagerComponent.refreshTurnOrderUI = true
 
             print("[TurnOrderManager.lua] End of building turnQueue.\n")
+
+            -- announce the first character's turn
+            print("[TurnOrderManager.lua] It is now", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "turn.")
         end
         -- end of building turn queue -------------------------------------------------------------------------------
      
@@ -195,11 +198,16 @@ function S_TurnOrderManager(e)
                 if (turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex] ~= nil) then
                     print("[TurnOrderManager.lua] It is now", EntityName(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]), "turn.")
                     turnOrderManagerComponent.currentTurn = GetEntityData(turnOrderManagerComponent.turnQueue[turnOrderManagerComponent.queueIndex]).id
+                else
+                    print("[TurnOrderManager.lua] Reached end of turnQueue, setting currentTurn to 0.")
+                    turnOrderManagerComponent.currentTurn = 0
                 end
             end
         -- once all characters have taken their turn, reset variables and change global state to randomevents 
         else          
             
+            print("[TurnOrderManager.lua] End of round", turnOrderManagerComponent.turnCycleCounter)
+
             -- reset variables
             turnOrderManagerComponent.buildTurnQueue = true
             turnOrderManagerComponent.currentTurn = 0
