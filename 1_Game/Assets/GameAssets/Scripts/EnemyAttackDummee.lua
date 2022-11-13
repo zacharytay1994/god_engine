@@ -87,7 +87,7 @@ function S_EnemyAttackDummee(e)
     end
 
     -- start moving Dummee, stop when it hits the first obstacle in its path
-    EnemyAttackDummeeMoveDummeeTowardsPlayer(e, playerEntity)
+    EnemyAttackDummeeMoveDummeeTowardsPlayer(e, attackComponent.victim)
 
     if (attackComponent.stopCharge) then
     
@@ -303,7 +303,7 @@ function EnemyAttackDummeeMoveDummeeTowardsPlayer(dummee, player)
         end
     end
 
-    print("[EnemyAttackDummee.lua] Charging towards Player!")
+    print("[EnemyAttackDummee.lua] Charging towards victim!")
     attackComponent.accumTime = 0
 end
 
@@ -331,6 +331,8 @@ end
 function EnemyAttackDummeeSetRecoilDestination(dummee, victim)
 
     print("[EnemyAttackDummee.lua] Figuring out recoil destination!")
+
+    local attackComponent = GetComponent(dummee, "C_EnemyAttackDummee")
     
     -- check whether victim is a floor tile
     local tileList = EntitiesWithScriptComponent("C_FloorTile")
@@ -338,6 +340,7 @@ function EnemyAttackDummeeSetRecoilDestination(dummee, victim)
     for i = 1, #tileList do
         if (tileList[i] == victim) then
             print("[EnemyAttackDummee.lua] Charge Attack victim is a floor tile! No recoil applied.")
+            attackComponent.recoilComplete = true
             return
         end
     end
@@ -348,8 +351,6 @@ function EnemyAttackDummeeSetRecoilDestination(dummee, victim)
     local currentY = dummeeGrid.y
     local currentZ = dummeeGrid.z
     
-    local attackComponent = GetComponent(dummee, "C_EnemyAttackDummee")
-
     -- player is behind Dummee
     if (attackComponent.dummeeRotation == 180) then
                 
