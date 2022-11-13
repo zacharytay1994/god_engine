@@ -76,7 +76,7 @@ namespace god
 				texture,
 				glm::ivec2 ( m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows ),
 				glm::ivec2 ( m_face->glyph->bitmap_left, m_face->glyph->bitmap_top ),
-				( m_face->glyph->advance.x >> 6 )
+				static_cast<uint32_t>( m_face->glyph->advance.x >> 6 )
 			};
 			characters[ static_cast< uint32_t >( c ) ] = character;
 		}
