@@ -50,7 +50,10 @@ function C_EnemyAttackDummee()
         chargeInterval = 0.3,
 
         -- damage for Charging Attack
-        chargeDamage = 2
+        chargeDamage = 2,
+
+        -- only do the lane check once per turn
+        laneChecked = false
     }
     return function()
         return var
@@ -78,7 +81,7 @@ function S_EnemyAttackDummee(e)
     end
 
     -- stop the script if Dummee and Player are not in the same lane
-    if (EnemyAttackDummeeSameLane(e, playerEntity) == false) then
+    if (attackComponent.laneChecked == false and EnemyAttackDummeeSameLane(e, playerEntity) == false) then
         attackComponent.executeAttack = false
         enemyController.hasAttacked = true
         print("[EnemyAttackDummee.lua] Dummee is not in the same lane as Player, cannot use Charging Attack!")
@@ -131,7 +134,9 @@ function S_EnemyAttackDummee(e)
             attackComponent.dummeeRotation = 0
             attackComponent.victim = nil
             attackComponent.accumTime = 0
+            attackComponent.recoilDestination = nil
             attackComponent.recoilPath = { }
+            attackComponent.laneChecked = false
             
             -- end the attack
             enemyController.hasAttacked = true
@@ -187,6 +192,8 @@ function EnemyAttackDummeeSameLane(dummee, player)
     else
         attackComponent.errorMessage = "[EnemyAttackDummee.lua] Cannot use Charging Attack as Dummee is not in same lane as Player."
     end
+
+    attackComponent.laneChecked = true
 
     return result
 end
@@ -443,6 +450,8 @@ function EnemyAttackDummeeMoveToRecoilDestination(dummee)
     -- get attacker and defenders' locations
     local dummeeGrid = GetGridCell(dummee)
     local recoilGrid = attackComponent.recoilDestination
+
+    -- print("[EnemyAttackDummee.lua] recoilGrid:", recoilGrid[1], recoilGrid[2], recoilGrid[3])
 
     -- Note: impossible to do smooth charging animation because Dummee position is locked to the grid.
 
