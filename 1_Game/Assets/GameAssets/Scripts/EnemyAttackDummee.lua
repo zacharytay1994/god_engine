@@ -12,6 +12,8 @@
 -- 1) Destroy destructible rocks
 -- 2) Destructible rocks and Floor Tiles will break the pushback chain
 -- 3) Remove Destructible rocks and Floor Tiles from affectedEntities before applying pushback
+-- 4) Deal with character falling onto each other
+-- 5) Check if Dummee recoils to a safe location or if it will fall
 
 --[IsComponent]
 function C_EnemyAttackDummee()
