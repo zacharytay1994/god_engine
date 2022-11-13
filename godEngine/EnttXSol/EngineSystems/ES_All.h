@@ -35,9 +35,6 @@ namespace god
 		//Physics
 		if (isPause)
 		{
-			enttxsol.RunEngineSystem(engineResources, RayCastDynamic);
-			enttxsol.RunEngineSystem(engineResources, RayCastStatic);
-
 			enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
 			enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);
 		}
@@ -63,18 +60,19 @@ namespace god
 	// also guaranteed to run after any other major system update.
 	void EngineSystemsFrameEnd ( EnttXSol& enttxsol , EngineResources& engineResources )
 	{
+		enttxsol.RunEngineSystem(engineResources, RayCastDynamic);
+		enttxsol.RunEngineSystem(engineResources, RayCastStatic);
+
 		if ( !enttxsol.m_pause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameEnd );
-			enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
-		}
-		if (enttxsol.m_pause)
-		{
-			//physics
 
+			//physics
 			enttxsol.RunEngineSystem(engineResources, DebugDynamic);
 			enttxsol.RunEngineSystem(engineResources, DebugStatic);
+			enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
 		}
+
 	}
 
 	// runs at the start just after loading the scene

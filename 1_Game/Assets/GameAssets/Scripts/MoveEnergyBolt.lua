@@ -117,6 +117,8 @@ function S_MoveEnergyBolt(e)
                         screenShakeComponent.doScreenShake = true
                     end
 
+                    print("[MoveEnergyBolt.lua] EnergyBolt reached target!")
+
                     -- destroy energy bolt
                     RemoveInstance(e)
             end
@@ -133,6 +135,8 @@ function S_MoveEnergyBolt(e)
                         screenShakeComponent.duration = 0.25
                         screenShakeComponent.doScreenShake = true
                     end
+
+                    print("[MoveEnergyBolt.lua] EnergyBolt reached target!")
                     
                     -- destroy energy bolt
                     RemoveInstance(e)

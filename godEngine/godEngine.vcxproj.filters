@@ -47,6 +47,9 @@
     <ClCompile Include="Physics\SnippetUtils.cpp" />
     <ClCompile Include="OpenGL\Font\Font.cpp" />
     <ClCompile Include="OpenGL\Font\FontRenderer.cpp" />
+    <ClCompile Include="Physics\PhysicsInterface.cpp" />
+    <ClCompile Include="Physics\Callbacks.cpp" />
+    <ClCompile Include="Physics\DiceCallBack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioAPI.h" />
@@ -143,6 +146,9 @@
     <ClInclude Include="OpenGL\Font\Font.h" />
     <ClInclude Include="OpenGL\Font\FontRenderer.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIText.h" />
+    <ClInclude Include="Physics\Callbacks.h" />
+    <ClInclude Include="Physics\PhysicsInterface.h" />
+    <ClInclude Include="Physics\DiceCallBack.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

@@ -2,75 +2,13 @@
 #include "godPhysics.h"
 #include "../Editor/EngineResources.h"
 
+
+
 #include <assert.h>
 namespace god
 {
 
-	PxI32 gSharedIndex = 0;
-
-
-	class ContactReportCallback : public PxSimulationEventCallback
-	{
-		void onConstraintBreak(PxConstraintInfo* constraints, PxU32 count) { PX_UNUSED(constraints); PX_UNUSED(count); }
-		void onWake(PxActor** actors, PxU32 count) { PX_UNUSED(actors); PX_UNUSED(count); }
-		void onSleep(PxActor** actors, PxU32 count) { PX_UNUSED(actors); PX_UNUSED(count); }
-		void onTrigger(PxTriggerPair* pairs, PxU32 count) { PX_UNUSED(pairs); PX_UNUSED(count); }
-		void onAdvance(const PxRigidBody* const*, const PxTransform*, const PxU32) {}
-		void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
-		{
-			PX_UNUSED((pairHeader));
-			//Maximum of 64 vertices can be produced by contact gen
-			const PxU32 bufferSize = 64;
-			PxContactPairPoint contacts[bufferSize];
-			for (PxU32 i = 0; i < nbPairs; i++)
-			{
-				//const PxContactPair& cp = pairs[i];
-
-				PxU32 nbContacts = pairs[i].extractContacts(contacts, bufferSize);
-				for (PxU32 j = 0; j < nbContacts; j++)
-				{
-					PxVec3 point = contacts[j].position;
-					PxVec3 impulse = contacts[j].impulse;
-					//PxU32 internalFaceIndex0 = contacts[j].internalFaceIndex0;
-					//PxU32 internalFaceIndex1 = contacts[j].internalFaceIndex1;
-					//...
-					//std::cout << "ContactReportCallback -> Point: " << point << std::endl;
-				}
-			}
-		}
-	};
-
-	ContactReportCallback gContactReportCallback;
-
-
-	class CallbackFinishTask : public PxLightCpuTask
-	{
-		SnippetUtils::Sync* mSync;
-	public:
-		CallbackFinishTask() { mSync = SnippetUtils::syncCreate(); }
-		~CallbackFinishTask() {
-			
-		}
-
-		void free()
-		{
-			SnippetUtils::syncRelease(mSync);
-		}
-		virtual void release()
-		{
-			PxLightCpuTask::release();
-			SnippetUtils::syncSet(mSync);
-		}
-
-		void reset() { SnippetUtils::syncReset(mSync); }
-
-		void wait() { SnippetUtils::syncWait(mSync); }
-
-		virtual void run() { /*Do nothing - release the sync in the release method for thread-safety*/ }
-
-		virtual const char* getName() const { return "CallbackFinishTask"; }
-	}
-	callbackFinishTask;
+	
 
 	
 	PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
@@ -92,10 +30,10 @@ namespace god
 		return PxFilterFlag::eDEFAULT;
 	}
 
-
-
 	PhysicsSystem::PhysicsSystem() 
+
 	{
+		RayCastid = Null;
 		mRunning = false;
 		mCamera = nullptr;
 		mWindow = nullptr;
@@ -111,6 +49,7 @@ namespace god
 
 		std::cout << "Physics Constructed" << std::endl;
 	}
+
 	PhysicsSystem::~PhysicsSystem()
 	{
 		while (mRunning)
@@ -135,8 +74,10 @@ namespace god
 		mFoundation->release();
 		
 	}
+
 	void PhysicsSystem::Init(GLFWWindow* window, Camera* cam)
 	{
+		
 		// Fouundation (required)
 		mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
 		if (!mFoundation) throw("PxCreateFoundation failed!");
@@ -174,6 +115,8 @@ namespace god
 			mScene->setSimulationEventCallback(&gContactReportCallback);
 		
 			SetupPVD();
+			
+			PhysicsAPI::p_psys = this;
 
 			std::cout << "Bound Physics" << std::endl;
 			
@@ -182,6 +125,9 @@ namespace god
 
 	void PhysicsSystem::Update(float dt , bool pause)
 	{
+		Raycast();
+
+
 		if (pause)
 			return;
 		//mStepSize is 1/60 Physics at 60fps by default
@@ -200,24 +146,15 @@ namespace god
 		}
 		for (uint16_t i = 0; i < numSteps; ++i)
 		{
-		#if 0
 			mAccumulator -= mStepSize;
-			mScene->simulate(mStepSize);
-			mScene->fetchResults(true);
-			Raycast();
-		#else
-			gSharedIndex = 0;
 			mRunning = true;
-			mScene->simulate(1.0f / 60.0f);
+			mScene->simulate(mStepSize);
 
 			//Call fetchResultsStart. Get the set of pair headers
 			const physx::PxContactPairHeader* pairHeader;
 			physx::PxU32 nbContactPairs;
 
-
 			mScene->fetchResultsStart(pairHeader, nbContactPairs, true);
-
-			
 
 			//Set up continuation task to be run after callbacks have been processed in parallel
 			callbackFinishTask.setContinuation(*mScene->getTaskManager(), NULL);
@@ -231,21 +168,12 @@ namespace god
 			callbackFinishTask.wait();
 
 			mScene->fetchResultsFinish();
-			mRunning = false;
-
-			Raycast();
-
-		#endif
-
-
-
-
-
-			
+			mRunning = false;		
 		}
 
-
+		
 	}
+
 	void PhysicsSystem::CreatePVD()
 	{
 		//PVD
@@ -277,12 +205,12 @@ namespace god
 		
 		physx::PxVec3 origin = mCamera->m_position;                 // [in] Ray origin
 		physx::PxVec3 unitDir = ray_dir;                // [in] Normalized ray direction
-		//physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
+		physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
 		physx::PxRaycastBuffer hit;                 // [out] Raycast results
 		
 		// Raycast against all static & dynamic objects (no filtering)
 		// The main result from this call is the closest hit, stored in the 'hit.block' structure
-		//bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
+		bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
 		if (hit.hasBlock)
 		{
 			mRayCastMouse = hit.block.actor;
@@ -290,12 +218,23 @@ namespace god
 		else
 		{
 			mRayCastMouse = nullptr;
+			SetRCMid(Null);
 		}
 	}
 
 	physx::PxRigidActor* const PhysicsSystem::GetRayCastMouse() const
 	{
 		return mRayCastMouse;
+	}
+
+	void PhysicsSystem::SetRCMid(uint32_t id)
+	{
+		RayCastid = id;
+	}
+
+	uint32_t PhysicsSystem::getRCMid()
+	{
+		return RayCastid;
 	}
 
 	bool PhysicsSystem::GetisRunning() const
@@ -319,6 +258,11 @@ namespace god
 		return mScene;
 	}
 
+	ContactReportCallback& PhysicsSystem::getCRCB()
+	{
+		return gContactReportCallback;
+	}
 
 
-}
+
+}//god
