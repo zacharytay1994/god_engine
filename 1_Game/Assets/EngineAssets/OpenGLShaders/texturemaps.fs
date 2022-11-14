@@ -179,7 +179,8 @@ vec3 PointLight(int i)
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
     diffuse_scalar  *= attenuation * distance_clamp;
 
-    vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * vec4(pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma)),1.0));
+    // vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * vec4(pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma)),1.0));
+    vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * vec4(texture(uMaterial.diffuse_map, vUV).rgb,1.0));
 
     // cubemap reflection
     vec3 I = normalize (vWorldPos - uViewPosition) ; //--
@@ -210,7 +211,8 @@ vec3 DirectLight(int i, float shadow)
 	vec3 normal = normalize(vNormal);
     vec3 light_direction = normalize(-uDirectionalLight[i].direction);
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
-    vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma));
+    // vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma));
+    vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * texture(uMaterial.diffuse_map, vUV).rgb;
 
     // specular
     vec3 view_direction = normalize(uViewPosition - vWorldPos);

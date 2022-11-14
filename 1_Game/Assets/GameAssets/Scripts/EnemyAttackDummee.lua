@@ -9,7 +9,7 @@
 -- A lot of redundant code, will optimize when there's time :(
 
 -- TODO:
--- 1) Destroy destructible rocks
+-- 1) Destroy destructible rocks (when charging into them) or when another character is pushed against them
 -- 2) Destructible rocks and Floor Tiles will break the pushback chain
 -- 3) Remove Destructible rocks and Floor Tiles from affectedEntities before applying pushback
 -- 4) Deal with character falling onto each other
@@ -55,7 +55,9 @@ function C_EnemyAttackDummee()
         chargeDamage = 2,
 
         -- only do the lane check once per turn
-        laneChecked = false
+        laneChecked = false,
+
+        sameLane = false
     }
     return function()
         return var
@@ -82,10 +84,15 @@ function S_EnemyAttackDummee(e)
         return
     end
 
+    if (attackComponent.laneChecked == false) then
+        attackComponent.sameLane = EnemyAttackDummeeSameLane(e, playerEntity)
+    end
+
     -- stop the script if Dummee and Player are not in the same lane
-    if (attackComponent.laneChecked == false and EnemyAttackDummeeSameLane(e, playerEntity) == false) then
+    if (attackComponent.laneChecked == true and attackComponent.sameLane == false) then
         attackComponent.executeAttack = false
         enemyController.hasAttacked = true
+        attackComponent.laneChecked = false
         print("[EnemyAttackDummee.lua] Dummee is not in the same lane as Player, cannot use Charging Attack!")
         return
     end
@@ -139,6 +146,7 @@ function S_EnemyAttackDummee(e)
             attackComponent.recoilDestination = nil
             attackComponent.recoilPath = { }
             attackComponent.laneChecked = false
+            attackComponent.sameLane = false
             
             -- end the attack
             enemyController.hasAttacked = true
@@ -171,11 +179,13 @@ function EnemyAttackDummeeSameLane(dummee, player)
         if (dummeeGrid.z > playerGrid.z) then 
             result = true 
             attackComponent.dummeeRotation = 180
+            print("[EnemyAttackDummee.lua] Player is behind Dummee, dummeeRotation = 180.")
 
         -- player is in front of Dummee
         else
             result = true 
             attackComponent.dummeeRotation = 0
+            print("[EnemyAttackDummee.lua] Player is in front of Dummee, dummeeRotation = 0.")
         end
 
     -- enemy and player on the same z-axis
@@ -185,11 +195,13 @@ function EnemyAttackDummeeSameLane(dummee, player)
         if (dummeeGrid.x > playerGrid.x) then
             result = true 
             attackComponent.dummeeRotation = 270    
+            print("[EnemyAttackDummee.lua] Player is to Dummee's right, dummeeRotation = 270.")
         
         -- player is to Dummee's left
         else
             result = true 
             attackComponent.dummeeRotation = 90
+            print("[EnemyAttackDummee.lua] Player is to Dummee's left, dummeeRotation = 90.")
         end   
     else
         attackComponent.errorMessage = "[EnemyAttackDummee.lua] Cannot use Charging Attack as Dummee is not in same lane as Player."
@@ -220,6 +232,7 @@ function EnemyAttackDummeeFirstVictim(dummee, player)
 
     if (attackComponent.dummeeRotation == 180) then
                 
+        print("[EnemyAttackDummee.lua] Player behind Dummee.")
         -- make a list of all GridCells to check against (GridCells between Dummee and Player)
         while (currentZ ~= playerGrid.z) do
             currentZ = currentZ - 1
@@ -228,14 +241,16 @@ function EnemyAttackDummeeFirstVictim(dummee, player)
 
     elseif (attackComponent.dummeeRotation == 0) then
         
+        print("[EnemyAttackDummee.lua] Player in front of Dummee.")
         -- make a list of all GridCells to check against (GridCells between Dummee and Player)
         while (currentZ ~= playerGrid.z) do
             currentZ = currentZ + 1
             affectedGridList[#affectedGridList + 1] = { currentX, currentZ } 
         end
-
+    
     elseif (attackComponent.dummeeRotation == 270) then
         
+        print("[EnemyAttackDummee.lua] Player is to Dummee's right.")
         -- make a list of all GridCells to check against (GridCells between Dummee and Player)
         while (currentX ~= playerGrid.x) do
             currentX = currentX - 1
@@ -244,6 +259,7 @@ function EnemyAttackDummeeFirstVictim(dummee, player)
 
     elseif (attackComponent.dummeeRotation == 90) then
 
+        print("[EnemyAttackDummee.lua] Player is to Dummee's right.")
         -- make a list of all GridCells to check against (GridCells between Dummee and Player)
         while (currentX ~= playerGrid.x) do
             currentX = currentX + 1
@@ -457,10 +473,10 @@ function EnemyAttackDummeeMoveToRecoilDestination(dummee)
 
     -- Note: impossible to do smooth charging animation because Dummee position is locked to the grid.
 
-    if (attackComponent.accumTime < attackComponent.chargeInterval) then
-        attackComponent.accumTime = attackComponent.accumTime + GetDeltaTime()
-        return
-    end
+    -- if (attackComponent.accumTime < attackComponent.chargeInterval) then
+    --     attackComponent.accumTime = attackComponent.accumTime + GetDeltaTime()
+    --     return
+    -- end
 
     for i = 1, #attackComponent.recoilPath do
     
@@ -473,9 +489,12 @@ function EnemyAttackDummeeMoveToRecoilDestination(dummee)
             print("[EnemyAttackDummee.lua] Recoil destination reached!")
             break
         end
+
+        -- attackComponent.accumTime = 0
     end
 
-    attackComponent.accumeTime = 0
+    -- TODO: CHECK WHETHER DUMMEE HAS LANDED SAFELY AFTER RECOIL
+    
 end
 
 function EnemyAttackDummeeApplyPushback(dummee, victim)
@@ -784,6 +803,11 @@ function EnemyAttackDummeeApplyPushback(dummee, victim)
             -- if char willFall then make it fall onto tileToFallOnto
             if (willFall) then
                 
+                -- TODO: FIRST CHECK IF THERE IS ANOTHER CHARACTER BELOW THEM.
+                -- IF THERE IS THEN KILL THE MF
+                
+                
+                
                 -- move the character down
                 currentEntityGrid.y = GetGridCell(tileToFallOnto).y + 1
 
@@ -802,4 +826,17 @@ function EnemyAttackDummeeApplyPushback(dummee, victim)
             end
         end
     end
+end
+
+-- checks if there is a character below the entity being pushed back
+-- if there is then the character below will get squashed to death
+function EnemyAttackDummeeCheckCharacterBelow(e)
+
+end
+
+
+-- checks if there is a tile below Dummee after recoil
+-- if no tile below then this will deal fall damage / kill Dummee accordingly
+function EnemyAttackDummeeCheckDummeeSafeLanding(e)
+
 end
