@@ -202,9 +202,6 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/texturemaps.fs"
 		);
 
-		//Temperory hard coded (reset)
-		shark_temp_x = -12.0f ;
-		shark_start =  false ;
 		//----------------------------------------
 
 		// initialize fonts
@@ -221,7 +218,7 @@ namespace god
 
 	void OpenGL::ClearColour() const
 	{
-		glClearColor( 0.2f, 0.2f, 0.2f, 1.0f );
+		glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 	}
 
@@ -275,9 +272,9 @@ namespace god
 		for ( auto const& data : scene.m_instanced_render_data )
 		{
 			// Make it so the stencil test always passes
-			glStencilFunc( GL_ALWAYS, 1, 0xFF );
-			// Enable modifying of the stencil buffer
-			glStencilMask( 0xFF );
+			//glStencilFunc( GL_ALWAYS, 1, 0xFF );
+			//// Enable modifying of the stencil buffer
+			//glStencilMask( 0xFF );
 
 			// Draw the normal model
 			m_textured_shader.Use();
@@ -375,6 +372,8 @@ namespace god
 			// Set Tint
 			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uTint", glm::vec4( 0.0f ) );
 
+			OGLShader::SetUniform( m_textured_shader.GetShaderID(), "uEmissive", data.first.m_emissive );
+
 			// draw model
 			for ( auto& mesh : m_models[data.first.m_model_id] )
 			{
@@ -383,36 +382,36 @@ namespace god
 			}
 
 			// Make it so only the pixels without the value 1 pass the test
-			glStencilFunc( GL_NOTEQUAL, 1, 0xFF );
-			// Disable modifying of the stencil buffer
-			glStencilMask( 0x00 );
-			// Disable the depth buffer
-			glDisable( GL_DEPTH_TEST );
+			//glStencilFunc( GL_NOTEQUAL, 1, 0xFF );
+			//// Disable modifying of the stencil buffer
+			//glStencilMask( 0x00 );
+			//// Disable the depth buffer
+			//glDisable( GL_DEPTH_TEST );
 
-			m_single_colour_outline_shader.Use();
-			OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uProjection", projection );
-			OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uView", view );
-			OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uOutlining", 0.01f );
+			//m_single_colour_outline_shader.Use();
+			//OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uProjection", projection );
+			//OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uView", view );
+			//OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uOutlining", 0.01f );
 
-			for ( auto& mesh : m_models[data.first.m_model_id] )
-			{
-				mesh.SetTransformData( data.second );
-				mesh.DrawInstanced( GL_TRIANGLES );
-			}
+			//for ( auto& mesh : m_models[data.first.m_model_id] )
+			//{
+			//	mesh.SetTransformData( data.second );
+			//	mesh.DrawInstanced( GL_TRIANGLES );
+			//}
 
-			// Enable modifying of the stencil buffer
-			glStencilMask( 0xFF );
-			// Clear stencil buffer
-			glStencilFunc( GL_ALWAYS, 0, 0xFF );
-			// Enable the depth buffer
-			glEnable( GL_DEPTH_TEST );
+			//// Enable modifying of the stencil buffer
+			//glStencilMask( 0xFF );
+			//// Clear stencil buffer
+			//glStencilFunc( GL_ALWAYS, 0, 0xFF );
+			//// Enable the depth buffer
+			//glEnable( GL_DEPTH_TEST );
 
-			shark_start = true; // temperory hard coded 
 		}
 
 		//[SPACE]-----------------------------------------------------------------------------------
 
 		//[Animation - START]-----------------------------------------------------------------------
+		
 		// Draw the normal model
 		m_animation_shader.Use();
 
@@ -527,13 +526,17 @@ namespace god
 		// draw model
 		glm::mat4 model = glm::mat4( 1.0f );
 
-		if ( shark_start )
-			shark_temp_x += 0.02f; // speed of temperory animationn shark
-		model = glm::translate( model, glm::vec3( shark_temp_x, 1.0f, 5.0f ) ); // translate it down so it's at the center of the scene
+		model = glm::translate( model, glm::vec3( 1.0f, 1.0f, 5.0f ) ); // translate it down so it's at the center of the scene
 		model = glm::rotate( model, glm::radians( 90.0f ), glm::vec3( 0.0f, 1.0f, 0.0f ) );// rotate at y-axis
 		model = glm::scale( model, glm::vec3( 1.0f ) );	// it's a bit too big for our scene, so scale it down
 		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "uModel", model );
+
+		OGLShader::SetUniform( m_animation_shader.GetShaderID(), "uEmissive", 100.0f );
 		m_animation_model.Draw( m_animation_shader );
+
+	
+
+
 		//[Animation - END]-------------------------------------------------------------------------
 
 		//[SPACE]-----------------------------------------------------------------------------------

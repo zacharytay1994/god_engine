@@ -5,7 +5,7 @@ function C_DiceScript()
 		fodder_text = "DiceScript is attached!",
 		is_init = false,
 		is_rolling = false,
-		value = 0,
+		value = -1,
 		gold_chance = 10,
 		pink_chance = 40,
 		blue_chance = 100,
@@ -68,7 +68,7 @@ function S_DiceScript(e)
 										c_dice.value = i + 1
 									end
 								end
-								print("Dice value:", c_dice.value)
+								print("[DiceScript] Dice value:", c_dice.value)
 							end
 						end
 					end
@@ -108,6 +108,7 @@ function S_DiceScript(e)
 end
 
 function DiceScript_RollDice(e, c_dice)
+	print("[DiceScript] Roll Dice")
 	c_dice.is_rolling = true
 	FreezeObject(e, false)
 	local transform = GetTransform(e)
@@ -120,7 +121,9 @@ function DiceScript_RollDice(e, c_dice)
 end
 
 function DiceScript_DisableDice(e, c_dice)
+	print("[DiceScript] Disabled Dice")
 	c_dice.is_rolling = false
+	c_dice.value = -1
 	FreezeObject(e, true)
 	SetTransformPosition(e, 999, 999, 999)
 end

@@ -70,6 +70,8 @@ function S_Character(e)
     -- set character to dead if HP falls to zero and below
     if (characterComponent.currentHP <= 0) then 
         
+        print("[Character.lua]", EntityName(e), entityDataComponent.id, "has died, hiding body.")
+
         -- hide the character below the map for now
         GetTransform(e).position.y = -100
         GetGridCell(e).y = -100
@@ -80,6 +82,13 @@ function S_Character(e)
         -- RemoveInstance will be called by TurnOrderManager at the end of current round
     end
 
+    if (characterComponent.endTurn) then
+        characterComponent.endTurn = false
+        turnOrderManagerComponent.nextTurn = true
+        characterComponent.isActive = false
+        return
+    end
+    
     -- set character to active if its ID matches TurnOrderManager.currentTurn
     if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then
         characterComponent.isActive = true
@@ -87,10 +96,7 @@ function S_Character(e)
         characterComponent.isActive = false
     end
 
-    if (characterComponent.endTurn) then
-        characterComponent.endTurn = false
-        turnOrderManagerComponent.nextTurn = true
-    end
+    
 
     -- CHEATS -----------------------------------------------------------------------------------------------------------------------
     -- press J to set all enemy HP to zero
