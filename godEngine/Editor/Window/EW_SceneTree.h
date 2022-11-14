@@ -69,12 +69,12 @@ namespace god
 		PhysicsSystem& psys = engineResources.Get< PhysicsSystem>().get();
 		if (psys.getRCMid()!= PhysicsSystem::Null)
 		{
-	/*		if(glwind.MouseRPressed())
-				m_selected_entity = psys.getRCMid();*/
-
-
-			if (glwind.KeyPressed(GLFW_KEY_P))
+			if(glwind.MouseRPressed())
 				m_selected_entity = psys.getRCMid();
+
+
+	/*		if (glwind.KeyPressed(GLFW_KEY_P))
+				m_selected_entity = psys.getRCMid();*/
 
 		}
 

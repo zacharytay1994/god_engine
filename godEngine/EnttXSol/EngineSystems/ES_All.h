@@ -60,6 +60,9 @@ namespace god
 	// also guaranteed to run after any other major system update.
 	void EngineSystemsFrameEnd ( EnttXSol& enttxsol , EngineResources& engineResources )
 	{
+		//physics
+		enttxsol.RunEngineSystem(engineResources, DebugDynamic);
+		enttxsol.RunEngineSystem(engineResources, DebugStatic);
 		enttxsol.RunEngineSystem(engineResources, RayCastDynamic);
 		enttxsol.RunEngineSystem(engineResources, RayCastStatic);
 
@@ -67,9 +70,7 @@ namespace god
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameEnd );
 
-			//physics
-			enttxsol.RunEngineSystem(engineResources, DebugDynamic);
-			enttxsol.RunEngineSystem(engineResources, DebugStatic);
+
 			enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
 		}
 
