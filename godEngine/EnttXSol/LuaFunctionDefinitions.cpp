@@ -104,7 +104,7 @@ namespace god
 		);
 
 		entt.RegisterLuaFunction ( "GetPath3D" ,
-			[&entt , &engineResources]( entt::entity e , int x , int y , int z , int maxDown , int maxUp )-> std::vector<glm::ivec3>
+			[&entt , &engineResources]( entt::entity e , int x , int y , int z , int maxDown , int maxUp , int verticalHeuristic )-> std::vector<glm::ivec3>
 			{
 				GridCell* grid_cell = entt.GetEngineComponent<GridCell> ( e );
 				EntityData* entity_data = entt.GetEngineComponent<EntityData> ( e );
@@ -115,7 +115,7 @@ namespace god
 						grid_cell->m_cell_size ,
 						{ grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } ,
 						{ x, y, z } ,
-						maxDown , maxUp
+						maxDown , maxUp , verticalHeuristic
 					);
 
 					std::vector<glm::ivec3> out;
