@@ -86,9 +86,9 @@ function S_UIManager(e)
                 ChangeTexture(GetEntity("Button3"), UIManagerComponent.actionButtonList[3])
                                 
                 -- reset dice value to zero
-                for k = 1, #diceList do
-                    GetComponent(diceList[k], "C_DiceScript").value = 0
-                end            
+                -- for k = 1, #diceList do
+                --     GetComponent(diceList[k], "C_DiceScript").value = 0
+                -- end            
             end
         end
     else
