@@ -43,7 +43,7 @@ namespace god
 		void RunOver ( float granularity , Coordinate const& coord , FN fn , ARGS...args );
 
 		// pathfinding
-		std::vector<Coordinate> GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 , int maxDown = 0 , int maxUp = 0 , float verticalHeuristic = 1.0f );
+		std::vector<Coordinate> GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 , int maxDown = 0 , int maxUp = 0 , int verticalHeuristic = 1 );
 
 		bool RayCastToGrid ( Coordinate& coordinate , glm::vec3 const& origin , glm::vec3 const& scale , float granularity , glm::vec3 const& start , glm::vec3 const& end , int depth = 100 );
 
@@ -148,7 +148,7 @@ namespace god
 	using AStarGrid = std::unordered_map<Coordinate , AStarNode , CoordinateHash>;
 
 	template<typename T>
-	inline std::vector<Coordinate> Grid3D<T>::GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 , int maxDown , int maxUp , float verticalHeuristic )
+	inline std::vector<Coordinate> Grid3D<T>::GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 , int maxDown , int maxUp , int verticalHeuristic )
 	{
 		// max iterations if no solution found
 		int32_t max_iteration = 1000;
@@ -280,9 +280,9 @@ namespace god
 					if ( new_g_cost < neighbour_node.m_g || !neighbour_node.m_open )
 					{
 						neighbour_node.m_g = new_g_cost;
-						neighbour_node.m_h = 
+						neighbour_node.m_h =
 							abs ( std::get<0> ( neighbour_coordinate ) - std::get<0> ( c2 ) ) +
-							abs ( std::get<1> ( neighbour_coordinate ) - std::get<1> ( c2 ) ) + 
+							abs ( std::get<1> ( neighbour_coordinate ) - std::get<1> ( c2 ) ) +
 							abs ( std::get<2> ( neighbour_coordinate ) - std::get<2> ( c2 ) );
 						neighbour_node.m_parent = lowest_f_coordinate;
 

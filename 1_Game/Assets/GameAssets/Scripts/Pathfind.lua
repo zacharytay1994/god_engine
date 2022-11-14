@@ -14,7 +14,9 @@ function C_Pathfind()
         --[SerializeInt]
         MaxDown = 1,
         --[SerializeInt]
-        MaxUp = 1
+        MaxUp = 1,
+        --[SerializeInt]
+        HeuristicMultiplier = 1
     }
     return function()
         return var
@@ -33,7 +35,7 @@ function S_Pathfind(e)
             local current_cell = GetGridCell(e);
             -- if cell position not match, pathfind to cell
             if (current_cell.x ~= pathfind.x or current_cell.y ~= pathfind.y or current_cell.z ~= pathfind.z) then
-                local path = GetPath3D(e, pathfind.x, pathfind.y, pathfind.z, pathfind.MaxDown, pathfind.MaxUp);
+                local path = GetPath3D(e, pathfind.x, pathfind.y, pathfind.z, pathfind.MaxDown, pathfind.MaxUp, pathfind.HeuristicMultiplier);
                 if (#path > 1) then
                            
                     -- -- adjust player's rotation here -----------------------------------------------------------
