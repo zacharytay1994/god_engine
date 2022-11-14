@@ -58,8 +58,13 @@ function S_StateMovePlayer(e)
                         pathfind.z = gm.last_clicked_cell.z
                         pathfind.Path = true
                     end
-                end
-            end
+
+                    local playerGridCell = GetGridCell(e)
+                    if (playerGridCell.x == gm.last_clicked_cell.x and playerGridCell.y == gm.last_clicked_cell.y and playerGridCell.z == gm.last_clicked_cell.z) then
+                        pathfind.Path = false
+                    end
+                end             
+            end            
         end
     end
 end
