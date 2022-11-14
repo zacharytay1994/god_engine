@@ -507,53 +507,116 @@ namespace god
 					GUIText& gui_text = m_registry.get<GUIText> ( m_entities[ e ].m_id );
 					std::stringstream ss;
 					ss << gui_text.m_text;
-					/*std::string test_text { gui_text.m_text };
-					std::string::const_iterator c;*/
-					float x { -1.0f } , y { 0 } , z { 0 };
-					float scale { 1.0f / 100.0f * 0.1 };
+					float scale { 1.0f / 100.0f * gui_text.m_size };
 
-					//if (gui_text.m_alignment ==  )
-					std::string word;
+					float x { -1.0f } , y { 1.0f - gui_text.m_padding_top };
+					std::string word , sentence;
+					float sentence_length { 0.0f };
+					float space_length = static_cast< float >( characters[ static_cast< uint32_t >( ' ' ) ].m_advance );
+					float sentence_max_length { 2.0f - gui_text.m_padding_left - gui_text.m_padding_right };
+					float sentence_left = -1.0f + gui_text.m_padding_left;
+					float sentence_right = -1.0f - gui_text.m_padding_right;
+
+					float scale_y { scale * ( model_xform_cat[ 0 ].x / model_xform_cat[ 1 ].y ) };
+
 					while ( ss >> word )
 					{
-						// check if word length will exceed boundary
-						uint32_t word_length { 0 };
-						for ( auto const& c : word )
-						{
-							auto& ch = characters[ static_cast< uint32_t >( c ) ];
-							word_length += ch.m_advance;
-						}
-						if ( word_length * scale + x > 1.0f )
-						{
-							y -= 100.0f * scale;
-							x = -1.0f;
-						}
 						word.push_back ( ' ' );
+						float word_length { 0.0f };
 						for ( auto const& c : word )
 						{
-							auto& ch = characters[ static_cast< uint32_t >( c ) ];
-							if ( x + ch.m_advance * scale > 1.0f )
+							word_length += characters[ static_cast< uint32_t >( c ) ].m_advance;
+						}
+						if ( ( sentence_length + word_length ) * scale < sentence_max_length )
+						{
+							// add word to sentence if not exceed right
+							sentence_length += word_length;
+							sentence.append ( word );
+						}
+						else
+						{
+							// set starting x
+							switch ( gui_text.m_alignment )
 							{
-								y -= 100.0f * scale;
-								x = -1.0f;
+							case ( static_cast< int >( TextAlignment::LEFT ) ):
+							{
+								x = sentence_left;
+								break;
+							}
+							case ( static_cast< int >( TextAlignment::CENTER ) ):
+							{
+								x = -1.0f + ( 2.0f - ( sentence_length - space_length ) * scale ) / 2.0f;
+								break;
+							}
+							case ( static_cast< int >( TextAlignment::RIGHT ) ):
+							{
+								x = sentence_right + ( 2.0f - ( sentence_length - space_length ) * scale );
+								break;
+							}
 							}
 
-							float xpos = x + ( ch.m_bearing.x + ch.m_size.x / 2.0f ) * scale;
-							float ypos = y + ( ch.m_bearing.y - ch.m_size.y / 2.0f ) * scale;
-							//float ypos = 0.0f;
-							//x += ch.m_size.x / 2.0f * scale;
+							// draw sentence
+							for ( auto const& c : sentence )
+							{
+								auto& ch = characters[ static_cast< uint32_t >( c ) ];
 
-							float w = ch.m_size.x * scale / 2.0f;
-							float h = ch.m_size.y * scale / 2.0f;
+								float xpos = x + ( ch.m_bearing.x + ch.m_size.x / 2.0f ) * scale;
+								float ypos = y + ( ch.m_bearing.y - ch.m_size.y / 2.0f ) * scale_y;
 
-							glm::mat4 character_transform = BuildModelMatrixRotDegrees ( { xpos,ypos,1 } , { 0,0,0 } , { w,-h,1 } );
+								float w = ch.m_size.x * scale / 2.0f;
+								float h = ch.m_size.y * scale_y / 2.0f;
 
-							scene.AddCharacter ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-								ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat * character_transform );
+								glm::mat4 character_transform = BuildModelMatrixRotDegrees ( { xpos,ypos,1 } , { 0,0,0 } , { w,-h,1 } );
 
-							x += ch.m_advance * scale;
-							//x += ch.m_size.x / 2.0f * scale;
+								scene.AddCharacter ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+									ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat * character_transform );
+
+								x += ch.m_advance * scale;
+							}
+
+							// new line and reset sentence
+							y -= 100.0f * scale_y;
+							sentence = word;
+							sentence_length = word_length;
 						}
+					}
+					// set starting x
+					switch ( gui_text.m_alignment )
+					{
+					case ( static_cast< int >( TextAlignment::LEFT ) ):
+					{
+						x = sentence_left;
+						break;
+					}
+					case ( static_cast< int >( TextAlignment::CENTER ) ):
+					{
+						x = -1.0f + ( 2.0f - ( sentence_length - space_length ) * scale ) / 2.0f;
+						break;
+					}
+					case ( static_cast< int >( TextAlignment::RIGHT ) ):
+					{
+						x = sentence_right + ( 2.0f - ( sentence_length - space_length ) * scale );
+						break;
+					}
+					}
+
+					// draw sentence
+					for ( auto const& c : sentence )
+					{
+						auto& ch = characters[ static_cast< uint32_t >( c ) ];
+
+						float xpos = x + ( ch.m_bearing.x + ch.m_size.x / 2.0f ) * scale;
+						float ypos = y + ( ch.m_bearing.y - ch.m_size.y / 2.0f ) * scale_y;
+
+						float w = ch.m_size.x * scale / 2.0f;
+						float h = ch.m_size.y * scale_y / 2.0f;
+
+						glm::mat4 character_transform = BuildModelMatrixRotDegrees ( { xpos,ypos,1 } , { 0,0,0 } , { w,-h,1 } );
+
+						scene.AddCharacter ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+							ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat * character_transform );
+
+						x += ch.m_advance * scale;
 					}
 				}
 			}
