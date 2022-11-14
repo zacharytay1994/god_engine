@@ -12,6 +12,7 @@ void main()
 { 
    fFragColor = texture(diffuse_map, vUV);
    // gamma correction, gamma 2.2
-   fFragColor.rgb = pow(fFragColor.rgb, vec3(1.0/2.2));
+   // fFragColor.rgb = pow(fFragColor.rgb, vec3(1.0/2.2));
+   fFragColor.rgb = fFragColor.rgb;
 }
 

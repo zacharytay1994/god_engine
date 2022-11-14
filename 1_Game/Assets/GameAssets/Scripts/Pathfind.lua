@@ -10,7 +10,13 @@ function C_Pathfind()
         Path = false,
         --[SerializeFloat]
         Interval = 1.0,
-        Timer = 0.0
+        Timer = 0.0,
+        --[SerializeInt]
+        MaxDown = 1,
+        --[SerializeInt]
+        MaxUp = 1,
+        --[SerializeInt]
+        HeuristicMultiplier = 1
     }
     return function()
         return var
@@ -29,26 +35,24 @@ function S_Pathfind(e)
             local current_cell = GetGridCell(e);
             -- if cell position not match, pathfind to cell
             if (current_cell.x ~= pathfind.x or current_cell.y ~= pathfind.y or current_cell.z ~= pathfind.z) then
-                local path = GetPath(e, pathfind.x, pathfind.y, pathfind.z);
+                local path = GetPath3D(e, pathfind.x, pathfind.y, pathfind.z, pathfind.MaxDown, pathfind.MaxUp, pathfind.HeuristicMultiplier);
                 if (#path > 1) then
                            
-                    -- -- adjust player's rotation here -----------------------------------------------------------
-                    if (EntityName(e) == "Player") then
-                        local playerTransform = GetTransform(e)
-                        
-                        if (path[2].x > current_cell.x) then
-                            -- face left
-                            playerTransform.rotation.y = 90
-                        elseif (path[2].x < current_cell.x) then
-                            -- face right
-                            playerTransform.rotation.y = 270
-                        elseif (path[2].z > current_cell.z) then
-                            -- face front
-                            playerTransform.rotation.y = 0
-                        else
-                            -- face back
-                            playerTransform.rotation.y = 180         
-                        end
+                    -- -- adjust character's rotation here -----------------------------------------------------------
+                    local characterTransform = GetTransform(e)
+                    
+                    if (path[2].x > current_cell.x) then
+                        -- face left
+                        characterTransform.rotation.y = 90
+                    elseif (path[2].x < current_cell.x) then
+                        -- face right
+                        characterTransform.rotation.y = 270
+                    elseif (path[2].z > current_cell.z) then
+                        -- face front
+                        characterTransform.rotation.y = 0
+                    else
+                        -- face back
+                        characterTransform.rotation.y = 180         
                     end
                     -- -- end of adjusting rotation ------------------------------------------------------------------
                     
@@ -61,7 +65,7 @@ function S_Pathfind(e)
                     -- reduce stamina by one for each step
                     charComp = GetComponent(e, "C_Character")
                     charComp.currentStamina = charComp.currentStamina - 1
-                    print("[Pathfind.lua] Stamina after moving:", charComp.currentStamina)
+                    print("[Pathfind.lua]", EntityName(e), "Stamina after moving:", charComp.currentStamina)
 
                     if (charComp.currentStamina <= 0) then
                         pathfind.Path = false
