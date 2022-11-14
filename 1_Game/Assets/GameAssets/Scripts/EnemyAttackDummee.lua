@@ -46,6 +46,9 @@ function C_EnemyAttackDummee()
         -- an array of "vector3"s containing the coordinates for all gridcells in Dummee's recoil path
         recoilPath = { },
 
+        -- for iterating through recoilPath as Dummee moves towards its recoilDestination
+        recoilIndex = 1,
+
         -- amount of time to pause between each tile while charging
         chargeInterval = 0.3,
 
@@ -475,25 +478,37 @@ function EnemyAttackDummeeMoveToRecoilDestination(dummee)
 
     -- Note: impossible to do smooth charging animation because Dummee position is locked to the grid.
 
-    -- if (attackComponent.accumTime < attackComponent.chargeInterval) then
-    --     attackComponent.accumTime = attackComponent.accumTime + GetDeltaTime()
-    --     return
-    -- end
-
-    for i = 1, #attackComponent.recoilPath do
-    
-        dummeeGrid.x = attackComponent.recoilPath[i][1]
-        dummeeGrid.y = attackComponent.recoilPath[i][2]
-        dummeeGrid.z = attackComponent.recoilPath[i][3]
-
-        if (dummeeGrid.x == recoilGrid[1] and dummeeGrid.y == recoilGrid[2] and dummeeGrid.z == recoilGrid[3]) then
-            attackComponent.recoilComplete = true
-            print("[EnemyAttackDummee.lua] Recoil destination reached!")
-            break
-        end
-
-        -- attackComponent.accumTime = 0
+    if (attackComponent.accumTime < attackComponent.chargeInterval) then
+        attackComponent.accumTime = attackComponent.accumTime + GetDeltaTime()
+        return
     end
+
+    dummeeGrid.x = attackComponent.recoilPath[attackComponent.recoilIndex][1]
+    dummeeGrid.y = attackComponent.recoilPath[attackComponent.recoilIndex][2]
+    dummeeGrid.z = attackComponent.recoilPath[attackComponent.recoilIndex][3]
+    attackComponent.recoilIndex = attackComponent.recoilIndex + 1
+
+    if (dummeeGrid.x == recoilGrid[1] and dummeeGrid.y == recoilGrid[2] and dummeeGrid.z == recoilGrid[3]) then
+        attackComponent.recoilComplete = true
+        attackComponent.recoilIndex = 1
+        print("[EnemyAttackDummee.lua] Recoil destination reached!")
+    else
+        attackComponent.accumTime = 0
+    end
+
+    -- for instant teleportation to recoilDestination ---------------------------------------------------------------------
+    -- for i = 1, #attackComponent.recoilPath do
+    --     dummeeGrid.x = attackComponent.recoilPath[i][1]
+    --     dummeeGrid.y = attackComponent.recoilPath[i][2]
+    --     dummeeGrid.z = attackComponent.recoilPath[i][3]
+        
+    --     if (dummeeGrid.x == recoilGrid[1] and dummeeGrid.y == recoilGrid[2] and dummeeGrid.z == recoilGrid[3]) then
+    --         attackComponent.recoilComplete = true
+    --         print("[EnemyAttackDummee.lua] Recoil destination reached!")
+    --         break
+    --     end
+    -- end
+    -- end of instant teleportation to recoilDestination-------------------------------------------------------------------
 
     -- make sure Dummee lands properly
     EnemyAttackDummeeCheckDummeeSafeLanding(dummee)
