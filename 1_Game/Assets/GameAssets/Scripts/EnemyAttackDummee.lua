@@ -6,14 +6,15 @@
 --                  If it hits a destructible rock, the rock will be destroyed, while Dummee will bounce back 3 tiles.
 --                  If it hits an indestructible object (like a floor tile), Dummee will stop in its track instead of bouncing back.
 
--- A lot of redundant code, will optimize when there's time :(
+-- A lot of redundant code, will optimize when there's time. Focusing on pushing out features first.
 
 -- TODO:
 -- 1) Destroy destructible rocks (when charging into them) or when another character is pushed against them
 -- 2) Destructible rocks and Floor Tiles will break the pushback chain
 -- 3) Remove Destructible rocks and Floor Tiles from affectedEntities before applying pushback
--- 4) Deal with character falling onto each other
+-- 4) Deal with characters falling onto each other
 -- 5) Check if Dummee recoils to a safe location or if it will fall
+-- 6) Make Dummee face where he is charging
 
 --[IsComponent]
 function C_EnemyAttackDummee()
@@ -169,6 +170,7 @@ function EnemyAttackDummeeSameLane(dummee, player)
 
     if (dummeeGrid.y ~= playerGrid.y) then 
         print("[EnemyAttackDummee.lua] Dummee and Player are on different y-axis! Cannot use Charging Attack! Returning.")
+        attackComponent.laneChecked = true
         return result
     end
 
@@ -803,11 +805,9 @@ function EnemyAttackDummeeApplyPushback(dummee, victim)
             -- if char willFall then make it fall onto tileToFallOnto
             if (willFall) then
                 
-                -- TODO: FIRST CHECK IF THERE IS ANOTHER CHARACTER BELOW THEM.
-                -- IF THERE IS THEN KILL THE MF
-                
-                
-                
+                -- the current affectedEntity will squash any characters below them, killing them
+                EnemyAttackDummeeCheckCharacterBelow(affectedEntities[n])
+                  
                 -- move the character down
                 currentEntityGrid.y = GetGridCell(tileToFallOnto).y + 1
 
@@ -832,6 +832,21 @@ end
 -- if there is then the character below will get squashed to death
 function EnemyAttackDummeeCheckCharacterBelow(e)
 
+    local characterList = EntitiesWithScriptComponent("C_Character")
+    local entityGrid = GetGridCell(e)
+
+    for i = 1, #characterList do
+        
+        if (characterList[i] ~= e) then
+            
+            local characterGrid = GetGridCell(characterList[i])
+
+            if (characterGrid.y < entityGrid.y) then
+                GetComponent(characterList[i], "C_Character").currentHP = 0
+                print("[EnemyAttackDummee.lua]", EntityName(characterList[i]), "has been squashed to death by", EntityName(e), ".")
+            end
+        end     
+    end
 end
 
 
