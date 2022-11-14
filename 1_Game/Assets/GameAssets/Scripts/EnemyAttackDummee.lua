@@ -12,9 +12,6 @@
 -- 1) Destroy destructible rocks (when charging into them) or when another character is pushed against them
 -- 2) Destructible rocks and Floor Tiles will break the pushback chain
 -- 3) Remove Destructible rocks and Floor Tiles from affectedEntities before applying pushback
--- 4) Deal with characters falling onto each other
--- 5) Check if Dummee recoils to a safe location or if it will fall
--- 6) Make Dummee face where he is charging
 
 --[IsComponent]
 function C_EnemyAttackDummee()
@@ -297,6 +294,9 @@ function EnemyAttackDummeeMoveDummeeTowardsPlayer(dummee, player)
     local dummeeGrid = GetGridCell(dummee)
     local playerGrid = GetGridCell(player)
 
+    -- make Dummee face the direction it is charging 
+    GetTransform(dummee).rotation.y = attackComponent.dummeeRotation
+
     -- Note: impossible to do smooth charging animation because Dummee position is locked to the grid.
 
     if (attackComponent.accumTime < attackComponent.chargeInterval) then
@@ -495,8 +495,8 @@ function EnemyAttackDummeeMoveToRecoilDestination(dummee)
         -- attackComponent.accumTime = 0
     end
 
-    -- TODO: CHECK WHETHER DUMMEE HAS LANDED SAFELY AFTER RECOIL
-    
+    -- make sure Dummee lands properly
+    EnemyAttackDummeeCheckDummeeSafeLanding(dummee)
 end
 
 function EnemyAttackDummeeApplyPushback(dummee, victim)
@@ -854,4 +854,61 @@ end
 -- if no tile below then this will deal fall damage / kill Dummee accordingly
 function EnemyAttackDummeeCheckDummeeSafeLanding(e)
 
+    local tileList = EntitiesWithScriptComponent("C_FloorTile")
+    local tilesBelow = { }
+    local entityGrid = GetGridCell(e)
+
+    for i = 1, #tileList do
+    
+        local currentTileGrid = GetGridCell(tileList[i])
+
+        if (currentTileGrid.x == entityGrid.x and currentTileGrid.y == entityGrid.y - 1 and currentTileGrid.z == entityGrid.z) then
+            print("[EnemyAttackDummee.lua] Dummee has safely recoiled onto a floor tile.")
+            return
+        elseif (currentTileGrid.x == entityGrid.x and currentTileGrid.y < entityGrid.y - 1 and currentTileGrid.z == entityGrid.z) then
+            tilesBelow[#tilesBelow + 1] = tileList[i]
+        end
+    end
+
+    -- Note: if code reaches here then it means Dummee is not in a safe position
+
+    local characterComponent = GetComponent(e, "C_Character")
+    local tileToFallOnto = nil
+    
+    -- if there are not tilesBelow then Dummee has fallen off the map, kill it
+    if (#tilesBelow == 0) then
+        characterComponent.currentHP = 0
+        print("[EnemyAttackDummee.lua] Dummee has recoiled off the map and died.")
+        return
+    
+    -- else, find the highest tile in tilesBelow and place Dummee there, applying fall damage
+    else
+        for j = 1, #tilesBelow do
+              
+            local currentTileBelowGrid = GetGridCell(tilesBelow[j])
+
+            -- if tileToFallOnto is nil then simply assign currentTile to tileToFallOnto
+            if (tileToFallOnto == nil) then
+                tileToFallOnto = tilesBelow[j]
+            
+            -- else if currentTileGrid is higher than tileToFallOnto, then overwrite tileToFallOnto
+            elseif (currentTileBelowGrid.y > GetGridCell(tileToFallOnto).y) then
+                tileToFallOnto = tilesBelow[j]
+            end
+        end
+
+        entityGrid.y = GetGridCell(tileToFallOnto).y + 1
+        
+        local combatManagerEntity = GetEntity("CombatManager")
+        local combatManagerComponent = nil
+        if (combatManagerEntity ~= -1) then
+            combatManagerComponent = GetComponent(combatManagerEntity, "C_CombatManager")
+        else
+            print("[EnemyAttackDummee.lua] ERROR: Cannot find CombatManager! Unable to deal fall damage.")
+        end
+        characterComponent.currentHP = characterComponent.currentHP - combatManagerComponent.fallDamage
+        print("[EnemyAttackDummee.lua] Dummee has recoiled off a ledge and received fall damage.")
+    end
+
+    EnemyAttackDummeeCheckCharacterBelow(e)
 end
