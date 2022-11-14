@@ -18,6 +18,7 @@ namespace god
 		if (rigidstatic.p_RigidStatic)
 		{
 			rigidstatic.p_RigidStatic->setGlobalPose(ConvertToPhysXTransform(transform.m_position, transform.m_rotation));
+			
 		}
 		
 	}
@@ -86,6 +87,15 @@ namespace god
 			}
 			
 			rigidstatic.updateRigidStatic = false;
+		}
+
+		if (rigidstatic.Simulation)
+		{
+			rigidstatic.p_RigidStatic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
+		}
+		else
+		{
+			rigidstatic.p_RigidStatic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
 		}
 
 		if (rigidstatic.locktoscale)

@@ -1,18 +1,14 @@
 -- C_Character contains basic data that all characters (players and enemies) will need, such as maxHP,
 -- currentHP, maxStamina, currentStamina, strength, defence. 
+-- Note that stamina is refreshed by TurnOrderManager.
 
--- TODO: 
--- 1) 
--- 2)
-
--- IMPORTANT NOTE: STAMINA MUST ONLY BE REFRESHED AT THE START OF CHARACTER'S TURN, NOT AFTER IT ENDS
--- this is because their remaining stamina must be retained in order to calculate next turn's turn order.
+-- local util = require "util"
 
 --[IsComponent]
 function C_Character()
     local var = {     
         -- for identifying the type of character 
-        -- e.g. Player, Squinky, etc
+        -- e.g. Player, Squinky, Dummee, etc.
         --[SerializeString]
         characterType = "",
         --[SerializeInt]
@@ -28,14 +24,21 @@ function C_Character()
         --[SerializeInt]
         defence = 10,
 
-        -- set to true when character's HP hits zero. Makes TurnOrderManager skip this character's turn
+        -- will be true when it's this character's turn
+        --[SerializeBool]
+        isActive = false,
+        
+        -- enemyController will set this to true when the enemy ends it turns.
+        -- this will, in turn, inform TurnOrderManager to go to next turn.
+        endTurn = false,
+
+        -- set to true when character's HP hits zero. Makes TurnOrderManager skip this character's turn,
+        -- and then call RemoveInstance() on this entity at the end of the round.
+        --[SerializeBool]
         isDead = false,
 
-        -- StateMoveEnemy will set this to true once it is finished. then the enemy-specific script will reset this.
-        moved = false
-
-        -- name of icon texture (for turn order UI)
-        -- iconName = ""
+        -- Frozen, Immobilised, Berserk, etc.
+        statusAilment = nil
     };
     return function()
         return var
@@ -45,86 +48,112 @@ end
 --[IsSystem]
 function S_Character(e)
     
-    -- getting TurnOrderManager entity to check whether it's this character's turn
+    -- getting TurnOrderManager component
     local turnOrderManagerEntity = GetEntity("TurnOrderManager") 
-
-    -- checking whether turnOrderManager is nil
+    local turnOrderManagerComponent = nil
     if (turnOrderManagerEntity ~= -1) then
+        turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")  
+    else
+        print("[Character.lua] ERROR: TurnOrderManager entity does not exist! Returning.")
+        return
+    end
     
-        -- getting required components
-        local turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")       
-        local entityDataComponent = GetEntityData(e)
-        local characterComponent = GetComponent(e, "C_Character")
+    -- getting required components
+    local entityDataComponent = GetEntityData(e)
+    local characterComponent = GetComponent(e, "C_Character")
 
-        -- press T to reset player stamina
-        if (CheckKeyPress(84) and EntityName(e) == "Player") then
-            characterComponent.currentStamina = characterComponent.maxStamina
-            print("[Character.lua] Player's stamina refreshed! Back to", characterComponent.currentStamina)
-        end
+    -- don't run this script if the character is already dead
+    if (characterComponent.isDead) then
+        return
+    end
 
-        -- press Y to unselect the Move button
-        if (CheckKeyPress(89)) then
-            GetComponent(e, "C_Player").selectedAction = nil
-            print("Releasing MoveButton. Player's selectedAction is:", GetComponent(e, "C_Player").selectedAction)
-        end
-
-        -- press J to set all enemy HP to zero
-        if (CheckKeyPress(74)) then
-            
-            enemyList = EntitiesWithScriptComponent("C_StateMoveEnemy")
-            
-            for i = 1, #enemyList do
-                GetComponent(enemyList[i], "C_Character").currentHP = 0
-            end
-            print(#enemyList, "enemies set to 0 HP!")
-        end
+    -- set character to dead if HP falls to zero and below
+    if (characterComponent.currentHP <= 0) then 
         
-        if (characterComponent.currentHP <= 0) then 
-            
-            -- hide the character below the map
-            GetTransform(e).position.y = -100
-            GetGridCell(e).y = -100
-            
-            -- set character to dead
-            characterComponent.isDead = true
+        print("[Character.lua]", EntityName(e), entityDataComponent.id, "has died, hiding body.")
 
-            -- RemoveInstance will be called by TurnOrderManager (near the end of the script)
-        end
-
-        if (characterComponent.isDead) then
-            return
-        end
-
-        -- only run the rest of this script if it is currently this character's turn
-        if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then
+        -- hide the character below the map for now
+        GetTransform(e).position.y = -100
+        GetGridCell(e).y = -100
         
-            -- refresh stamina will be refreshed by TurnOrderManager, after it builds the turnQueue
-            
-            -- press X to check character's coordinates on the grid
-            if (CheckKeyPress(88) == true) then
-                local cell = GetGridCell(e)
-                print(EntityName(e), "GridCell location:", cell.x, cell.y, cell.z)
-                local position = GetTransform(e).position
-                print(EntityName(e), "Transform position:", position.x, position.y, position.z)
-            end
+        -- set character to dead
+        characterComponent.isDead = true
 
-            -- press C to print character's ID number
-            if (CheckKeyPress(67) == true) then           
-                
-                local cell = GetGridCell(e)
-                
-                print("[ACTIVE CHARACTER'S DETAILS]")
-                print("Name:      ", EntityName(e))
-                print("ID no.     ", entityDataComponent.id)
-                print("Current location:", cell.x, cell.y, cell.z)
-                print("maxHP:    ", characterComponent.maxHP)
-                print("currentHP:", characterComponent.currentHP)
-                print("maxStamina:", characterComponent.maxStamina)
-                print("currentStamina:", characterComponent.currentStamina)
-                print("strength:", characterComponent.strength)
-                print("defence:", characterComponent.defence)
-                print("\n\n")
-            end
+        -- RemoveInstance will be called by TurnOrderManager at the end of current round
+    end
+
+    if (characterComponent.endTurn) then
+        characterComponent.endTurn = false
+        turnOrderManagerComponent.nextTurn = true
+        characterComponent.isActive = false
+        return
+    end
+    
+    -- set character to active if its ID matches TurnOrderManager.currentTurn
+    if (entityDataComponent.id == turnOrderManagerComponent.currentTurn) then
+        characterComponent.isActive = true
+    else
+        characterComponent.isActive = false
+    end
+
+    
+
+    -- CHEATS -----------------------------------------------------------------------------------------------------------------------
+    -- press J to set all enemy HP to zero
+    if (CheckKeyPress(74)) then
+        
+        enemyList = EntitiesWithScriptComponent("C_EnemyController")
+        
+        for i = 1, #enemyList do
+            GetComponent(enemyList[i], "C_Character").currentHP = 0
+        end
+        print("[Character.lua]", #enemyList, "enemies set to 0 HP!")
+    end
+
+    -- press T to reset player stamina
+    if (CheckKeyPress(84) and EntityName(e) == "Player") then
+        characterComponent.currentStamina = characterComponent.maxStamina
+        print("[Character.lua] Player's stamina refreshed! Back to", characterComponent.currentStamina)
+    end
+
+    -- -- press Y to unselect the Move button
+    -- if (CheckKeyPress(89)) then
+    --     GetComponent(e, "C_Player").selectedAction = nil
+    --     print("Releasing MoveButton. Player's selectedAction is:", GetComponent(e, "C_Player").selectedAction)
+    -- end
+
+    if (characterComponent.isActive) then
+        -- press X to check character's coordinates on the grid
+        if (CheckKeyPress(88) == true) then
+            local cell = GetGridCell(e)
+            print(EntityName(e), "GridCell location:", cell.x, cell.y, cell.z)
+            local position = GetTransform(e).position
+            print(EntityName(e), "Transform position:", position.x, position.y, position.z)
+        end
+
+        -- press C to print character's ID number
+        if (CheckKeyPress(67) == true) then           
+            
+            local cell = GetGridCell(e)
+            
+            print("[ACTIVE CHARACTER'S DETAILS]")
+            print("Name:      ", EntityName(e))
+            print("ID no.     ", entityDataComponent.id)
+            print("Current location:", cell.x, cell.y, cell.z)
+            print("maxHP:    ", characterComponent.maxHP)
+            print("currentHP:", characterComponent.currentHP)
+            print("maxStamina:", characterComponent.maxStamina)
+            print("currentStamina:", characterComponent.currentStamina)
+            print("strength:", characterComponent.strength)
+            print("defence:", characterComponent.defence)
+            print("\n\n")
+        end
+
+        -- press 0 (quick debug)
+        if (CheckKeyPress(48) == true) then   
+            -- util.doSomething()
+            print(GetComponent(e, "C_Player").selectedAction)
         end
     end
+    -- END OF CHEATS ----------------------------------------------------------------------------------------------------------------   
 end

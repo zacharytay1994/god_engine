@@ -34,7 +34,7 @@ namespace god
 	{
 		RegisterLuaType<AudioSource>(luaState, name,
 			"sound_id", &AudioSource::m_sound_id,
-			"played", &AudioSource::m_played,
+			//"played", &AudioSource::m_played,
 			"finish_playing", &AudioSource::m_played,
 			"mute", &AudioSource::m_mute,
 			"loop", &AudioSource::m_loop,
@@ -71,6 +71,8 @@ namespace god
 							}
 
 							component.m_sound_id = asset.second;
+							component.m_played = false;
+
 							ImGui::CloseCurrentPopup();
 						}
 					}
@@ -123,7 +125,7 @@ namespace god
 				ImGui::Checkbox("Loop", &component.m_loop);
 				ImGui::Checkbox("Play On Awake", &component.m_play_on_awake);
 
-				ImGui::SliderFloat("Volume", &component.m_volume, 0.f, 1.f, "%.01f", 1.f);
+				ImGui::SliderFloat("Volume", &component.m_volume, 0.f, 2.f, "%.01f", 1.f);
 				ImGui::SliderFloat("Pitch", &component.m_pitch, 0.f, 1.5f, "%.01f", 1.f);
 				ImGui::InputFloat("Min Distance", &component.m_min_distance);
 				ImGui::InputFloat("Max Distance", &component.m_max_distance);
