@@ -42,6 +42,9 @@ function S_EndTurnButton(e)
             -- only end the turn if it is actually the player's turn
             if (turnOrderManagerComponent.currentTurn == GetEntityData(playerEntity).id) then
                 
+				-- trigger sound effect
+				InstancePrefab("SFX_EndTurn",0,0,0)
+				
                 -- signal turnOrderManager to move on to the next character's turn
                 turnOrderManagerComponent.nextTurn = true
                 print("[EndTurnButton.lua] EndTurnButton clicked! Ending player turn.")

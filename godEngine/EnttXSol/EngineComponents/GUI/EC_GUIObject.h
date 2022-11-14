@@ -24,6 +24,7 @@ namespace god
 		bool m_released { false };
 		bool m_enter { false };
 		bool m_exit { false };
+		bool m_active { true };
 	};
 	template <>
 	inline void NewLuaType<GUIObject> ( sol::state& luaState , std::string const& name )
@@ -39,7 +40,8 @@ namespace god
 			"down" , &GUIObject::m_down ,
 			"up" , &GUIObject::m_released ,
 			"enter" , &GUIObject::m_enter ,
-			"exit" , &GUIObject::m_exit );
+			"exit" , &GUIObject::m_exit ,
+			"active" , &GUIObject::m_active );
 	}
 	template<>
 	inline void ComponentInspector::operator() < GUIObject > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
@@ -62,6 +64,8 @@ namespace god
 				{
 					ImGui::DragFloat ( "Aspect-Ratio" , &component.m_aspect_ratio , 0.05f , 0.0f );
 				}
+
+				ImGui::Checkbox ( "Active" , &component.m_active );
 			} );
 	}
 
@@ -78,6 +82,7 @@ namespace god
 		RapidJSON::JSONifyToValue ( value , document , "size_z" , component.m_size.z );
 		RapidJSON::JSONifyToValue ( value , document , "fixed_ar" , component.m_fixed_aspect_ratio );
 		RapidJSON::JSONifyToValue ( value , document , "ar" , component.m_aspect_ratio );
+		RapidJSON::JSONifyToValue ( value , document , "active" , component.m_active );
 
 	}
 
@@ -94,5 +99,6 @@ namespace god
 		AssignIfExist ( jsonObj , component.m_size.z , "size_z" );
 		AssignIfExist ( jsonObj , component.m_fixed_aspect_ratio , "fixed_ar" );
 		AssignIfExist ( jsonObj , component.m_aspect_ratio , "ar" );
+		AssignIfExist ( jsonObj , component.m_active , "active" );
 	}
 }

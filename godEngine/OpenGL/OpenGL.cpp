@@ -77,6 +77,11 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/texturemaps2D.vs",
 			"Assets/EngineAssets/OpenGLShaders/texturemaps2D.fs" );
 
+		// Create font shader
+		m_font_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/font.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/font.fs" );
+
 		// Calculation for shadow map
 		m_light_space_matrix =
 			glm::ortho( -10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 20.0f ) *
@@ -198,6 +203,9 @@ namespace god
 		);
 
 		//----------------------------------------
+
+		// initialize fonts
+		m_font_renderer.Initialize ();
 
 		glCheckError();
 		std::cout << "OpenGL constructed." << std::endl;
@@ -558,20 +566,6 @@ namespace god
 
 		OGLShader::SetUniform( m_2D_shader.GetShaderID(), "uProjection", projection );
 
-		/*std::vector<std::tuple< Scene::InstancedRenderData , glm::mat4>> m_sort_container;
-		for ( auto const& data : scene.m_2D_instanced_render_data )
-		{
-			m_sort_container.emplace_back ( data.first , data.second.begin () );
-		}
-		std::sort ( m_sort_container.begin () , m_sort_container.end () ,
-			[]( auto const& lhs , auto const& rhs )
-			{
-				auto& [lhs_first , lhs_second] = lhs;
-				auto& [rhs_first , rhs_second] = rhs;
-				return lhs_second[ 3 ].z < rhs_second[ 3 ].z;
-			}
-		);*/
-
 		for ( auto const& data : scene.m_2D_instanced_render_data )
 		{
 			OGLShader::SetUniform( m_2D_shader.GetShaderID(), "uMaterial.diffuse_map", 0 );
@@ -583,22 +577,25 @@ namespace god
 				mesh.DrawInstanced( GL_TRIANGLES );
 			}
 		}
-		/*for ( auto const& key_pair : m_sort_container )
+
+		m_font_shader.Use ();
+
+		OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uProjection" , projection );
+
+		for ( auto const& data : scene.m_characters )
 		{
-			auto& [key , t] = key_pair;
-			auto& value = scene.m_2D_instanced_render_data[ key ];
+			OGLShader::SetUniform ( m_font_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			glActiveTexture ( GL_TEXTURE0 + 0 );
+			glBindTexture ( GL_TEXTURE_2D , data.first.m_diffuse_id );
 
-			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
-			std::get<1> ( textures.Get ( key.m_diffuse_id ) ).Bind ( 0 );
-
-			for ( auto& mesh : m_models[ key.m_model_id ] )
+			for ( auto& mesh : m_models[ data.first.m_model_id ] )
 			{
-				mesh.SetTransformData ( value );
+				mesh.SetTransformData ( data.second );
 				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
-		}*/
+		}
 
-		m_2D_shader.UnUse ();
+		OGLShader::UnUse ();
 		glDisable ( GL_BLEND );
 	}
 

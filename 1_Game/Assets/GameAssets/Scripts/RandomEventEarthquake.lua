@@ -176,6 +176,9 @@ function S_RandomEventEarthquake(e)
                     end
                     screenShakeComponent.duration = 0.75
                     screenShakeComponent.doScreenShake = true
+					
+					-- trigger sound effect
+					InstancePrefab("SFX_Earthquake",0,0,0)
                     
                     -- get another randomprob to determine move up or down
                     local directionProb = GenerateRandomProbability()

@@ -43,7 +43,7 @@ namespace god
 		void RunOver ( float granularity , Coordinate const& coord , FN fn , ARGS...args );
 
 		// pathfinding
-		std::vector<Coordinate> GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 );
+		std::vector<Coordinate> GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 , int maxDown = 0 , int maxUp = 0 , int verticalHeuristic = 1 );
 
 		bool RayCastToGrid ( Coordinate& coordinate , glm::vec3 const& origin , glm::vec3 const& scale , float granularity , glm::vec3 const& start , glm::vec3 const& end , int depth = 100 );
 
@@ -148,7 +148,7 @@ namespace god
 	using AStarGrid = std::unordered_map<Coordinate , AStarNode , CoordinateHash>;
 
 	template<typename T>
-	inline std::vector<Coordinate> Grid3D<T>::GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 )
+	inline std::vector<Coordinate> Grid3D<T>::GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 , int maxDown , int maxUp , int verticalHeuristic )
 	{
 		// max iterations if no solution found
 		int32_t max_iteration = 1000;
@@ -245,27 +245,51 @@ namespace god
 			// for each neighbour
 			for ( auto i = 0; i < 4; ++i )
 			{
-				Coordinate& neighbour_coordinate = neighbours[ i ];
-				// if in close or not traversable, for now treat any occupied cell as untraversable
-				if ( astar_grid[ neighbour_coordinate ].m_close || ( grid.find ( neighbour_coordinate ) != grid.end () && grid[ neighbour_coordinate ].m_values.size () > 0 ) )
+				// loop through vertical levels
+				for ( auto j = -maxDown; j < maxUp + 1; ++j )
 				{
-					continue;
-				}
+					Coordinate neighbour_coordinate = neighbours[ i ];
+					// set the y coordinate of the neighbour
+					std::get<1> ( neighbour_coordinate ) += j;
 
-				int new_g_cost = astar_grid[ lowest_f_coordinate ].m_g + 1;
-
-				// if not in open or new g cost lower than old
-				auto& neighbour_node = astar_grid[ neighbour_coordinate ];
-				if ( new_g_cost < neighbour_node.m_g || !neighbour_node.m_open )
-				{
-					neighbour_node.m_g = new_g_cost;
-					neighbour_node.m_h = abs ( std::get<0> ( neighbour_coordinate ) - std::get<0> ( c2 ) ) +
-						abs ( std::get<1> ( neighbour_coordinate ) - std::get<1> ( c2 ) );
-					neighbour_node.m_parent = lowest_f_coordinate;
-
-					if ( !neighbour_node.m_open )
+					// check if untraversable
+					// case 1 : if in close
+					if ( astar_grid[ neighbour_coordinate ].m_close )
 					{
-						astar_grid[ neighbour_coordinate ].m_open = true;
+						continue;
+					}
+
+					// case 2: if occupied
+					if ( grid.find ( neighbour_coordinate ) != grid.end () && grid[ neighbour_coordinate ].m_values.size () > 0 )
+					{
+						continue;
+					}
+
+					// case 3: if cell below nothing
+					Coordinate floor = neighbour_coordinate;
+					std::get<1> ( floor ) -= 1;
+					if ( !( grid.find ( floor ) != grid.end () && grid[ floor ].m_values.size () > 0 ) )
+					{
+						continue;
+					}
+
+					int new_g_cost = astar_grid[ lowest_f_coordinate ].m_g + 1 + abs ( j ) * verticalHeuristic;
+
+					// if not in open or new g cost lower than old
+					auto& neighbour_node = astar_grid[ neighbour_coordinate ];
+					if ( new_g_cost < neighbour_node.m_g || !neighbour_node.m_open )
+					{
+						neighbour_node.m_g = new_g_cost;
+						neighbour_node.m_h =
+							abs ( std::get<0> ( neighbour_coordinate ) - std::get<0> ( c2 ) ) +
+							abs ( std::get<1> ( neighbour_coordinate ) - std::get<1> ( c2 ) ) +
+							abs ( std::get<2> ( neighbour_coordinate ) - std::get<2> ( c2 ) );
+						neighbour_node.m_parent = lowest_f_coordinate;
+
+						if ( !neighbour_node.m_open )
+						{
+							astar_grid[ neighbour_coordinate ].m_open = true;
+						}
 					}
 				}
 			}
