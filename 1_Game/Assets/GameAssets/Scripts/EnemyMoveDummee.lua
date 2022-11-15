@@ -52,7 +52,7 @@ function S_EnemyMoveDummee(e)
     end
                     
     -- allow movement after 1 second has passed
-    if (moveComponent.Time < 1.0) then
+    if (moveComponent.Time < 0.5) then
 
         -- accumulate time
         moveComponent.Time = moveComponent.Time + GetDeltaTime()
