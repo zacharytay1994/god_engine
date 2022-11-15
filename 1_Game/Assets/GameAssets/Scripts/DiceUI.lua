@@ -67,7 +67,6 @@ function S_DiceUI(e)
 				
 				GetComponent(GetEntity("Level1GUI"), "C_UIManager").diceRolled = false
 				GetComponent(GetEntity("Level1GUI"), "C_UIManager").actionButtonList = {}
-				print("[DiceUI] UIManager shit works!")
 				
 			elseif c_dicemanager.button_name == "Ready" then
 				local diceUIList = EntitiesWithScriptComponent("C_DiceUI")
