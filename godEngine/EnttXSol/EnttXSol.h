@@ -630,6 +630,30 @@ namespace god
 				}
 			}
 		}
+		else if ( m_registry.all_of<T , R , Billboard> ( m_entities[ e ].m_id ) )
+		{
+			auto [transform , renderable , billboard] = m_registry.get<T , R , Billboard> ( m_entities[ e ].m_id );
+
+			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
+
+			transform.m_parent_transform = parentTransform;
+			transform.m_local_transform = model_transform;
+
+			auto model_xform_cat = parentTransform * model_transform;
+
+			// add to scene
+			if ( renderable.m_model_id != -1 )
+			{
+				scene.AddBillboard ( { static_cast< uint32_t >( renderable.m_model_id ) ,
+						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive } , model_xform_cat );
+			}
+
+			// populate scene with children
+			for ( auto const& child : m_entities[ e ].m_children )
+			{
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat );
+			}
+		}
 		else if ( m_registry.all_of<T , R> ( m_entities[ e ].m_id ) )
 		{
 			auto [transform , renderable] = m_registry.get<T , R> ( m_entities[ e ].m_id );
