@@ -2,7 +2,7 @@
 -- During the Squinkies' turn, if it is adjacent to the Player, it will do a melee attack.
 
 --[IsComponent]
-function C_EnemyAttackDummee()
+function C_EnemyAttackSquinky()
     local var = {
 
         -- cue to attempt a Charging Attack
@@ -21,10 +21,12 @@ function C_EnemyAttackDummee()
 end
 
 --[IsSystem]
-function S_EnemyAttackDummee(e)
+function S_EnemyAttackSquinky(e)
         
+    -- print("[EnemyAttackSquinky.lua] Start of S_EnemyAttackSquinky()")
+    
     -- get EnemyAttackDummee component
-    local attackComponent = GetComponent(e, "C_EnemyAttackDummee")
+    local attackComponent = GetComponent(e, "C_EnemyAttackSquinky")
     
     -- if enemy is not cued to attack, then don't run this script
     if (attackComponent.executeAttack == false) then

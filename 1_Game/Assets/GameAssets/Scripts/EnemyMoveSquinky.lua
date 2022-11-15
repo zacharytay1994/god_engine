@@ -39,6 +39,8 @@ end
 --[IsSystem]
 function S_EnemyMoveSquinky(e)
             
+    -- print("[EnemyMoveSquinky.lua] Start of S_EnemyMoveSquinky()")
+    
     -- get movement component
     local moveComponent = GetComponent(e, "C_EnemyMoveSquinky")
     
@@ -68,6 +70,7 @@ function S_EnemyMoveSquinky(e)
     -- after 1 second has passed and pathfinding has not been initialized
     elseif (moveComponent.startedPathfind == false) then
         
+        
         print("[EnemyMoveSquinky.lua] Start of movement for", EntityName(e), entityDataComponent.id)
 
         -- if enemy is already beside player or in same lane as player, don't move 
@@ -89,6 +92,10 @@ function S_EnemyMoveSquinky(e)
             -- Cannot use C_Pathfind here because then Squinky will never walk diagonally
             
             -- TODO: just teleport squinky here
+            local targetTileGrid = GetGridCell(moveComponent.targetTile)
+            enemyGridCell.x = targetTileGrid.x
+            enemyGridCell.y = targetTileGrid.y + 1
+            enemyGridCell.z = targetTileGrid.z
 
 
             -- reset variables
@@ -139,8 +146,12 @@ function EnemyMoveSquinkySuitablePath(Squinky, targetEntity)
         -- location of the current tile
         local currentGridCell = GetGridCell(allTiles[i])
 
-       -- if the current tile is directly adjacent or diagonal to Squinky
-       if (currentGridCell.x == squinkyGridCell.x and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1 or -- behind player
+        -- if the current tile is the one that the target is standing on, store it in tileBelowTarget
+        if (currentGridCell.x == destinationGridCell.x and currentGridCell.y == destinationGridCell.y - 1 and currentGridCell.z == destinationGridCell.z) then
+            tileBelowTarget = allTiles[i]
+
+       -- elseif the current tile is directly adjacent or diagonal to Squinky
+        elseif (currentGridCell.x == squinkyGridCell.x and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1 or -- behind player
            currentGridCell.x == squinkyGridCell.x and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z + 1 or -- in front of player
            currentGridCell.z == squinkyGridCell.z and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.x == squinkyGridCell.x - 1 or -- to the right
            currentGridCell.z == squinkyGridCell.z and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.x == squinkyGridCell.x + 1 or
@@ -150,10 +161,7 @@ function EnemyMoveSquinkySuitablePath(Squinky, targetEntity)
            currentGridCell.x == squinkyGridCell.x - 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1) then -- to the left
                
             -- add current tile to adjacentCandidates
-            allCandidates[#allCandidates + 1] = allTiles[i]
-
-        elseif (currentGridCell.x == destinationGridCell.x and currentGridCell.y == destinationGridCell.y - 1 and currentGridCell.z == destinationGridCell.z) then
-            tileBelowTarget = allTiles[i]
+            allCandidates[#allCandidates + 1] = allTiles[i]            
        end  
     end
 
