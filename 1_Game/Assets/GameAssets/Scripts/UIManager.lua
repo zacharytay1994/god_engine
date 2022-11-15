@@ -63,7 +63,7 @@ function S_UIManager(e)
             end
             
             if (diceSettled) then
-                
+                print("[UIManager] Dice Has Settled!, diceRolled = true now!")
                 -- don't allow player to roll anymore for this turn
                 UIManagerComponent.diceRolled = true
                             

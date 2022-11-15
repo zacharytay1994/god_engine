@@ -65,6 +65,10 @@ function S_DiceUI(e)
 					DiceScript_RollDice(diceList[i], GetComponent(diceList[i], "C_DiceScript"))
 				end
 				
+				GetComponent(GetEntity("Level1GUI"), "C_UIManager").diceRolled = false
+				GetComponent(GetEntity("Level1GUI"), "C_UIManager").actionButtonList = {}
+				print("[DiceUI] UIManager shit works!")
+				
 			elseif c_dicemanager.button_name == "Ready" then
 				local diceUIList = EntitiesWithScriptComponent("C_DiceUI")
 				for i = 1, #diceUIList do
