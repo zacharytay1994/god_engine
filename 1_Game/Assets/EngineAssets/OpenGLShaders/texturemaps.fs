@@ -287,7 +287,8 @@ void main( )
     output_color = vec4( ( point_lights_value + directional_lights_value ) , 1.0 );
 
     // emissive
-    output_color *= uEmissive;
+    // output_color *= uEmissive;
+    output_color += uEmissive * texture( uMaterial.diffuse_map , vUV );
 
     float brightness = dot( output_color.rgb , vec3( 0.2126 , 0.7152 , 0.0722 ) );
     // float brightness = dot(output_color.rgb, vec3(50.2126, 50.7152, 50.0722));
