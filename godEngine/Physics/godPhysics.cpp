@@ -113,7 +113,8 @@ namespace god
 
 			mScene = mPhysics->createScene(sceneDesc);
 			mScene->setSimulationEventCallback(&gContactReportCallback);
-		
+			
+
 			SetupPVD();
 			
 			PhysicsAPI::p_psys = this;
@@ -258,7 +259,7 @@ namespace god
 		return mScene;
 	}
 
-	ContactReportCallback& PhysicsSystem::getCRCB()
+	ContactReportCallback& PhysicsSystem::getContactReportCallback()
 	{
 		return gContactReportCallback;
 	}

@@ -32,7 +32,7 @@ namespace god
 		physx::PxShape* p_shape;	
 		physx::PxRigidDynamic* p_RigidDynamic;
 
-		bool updateRigidDynamic{ true };
+		bool initRigidDynamic{ true };
 		physx::PxScene* mScene;
 
 		//Ctor
@@ -95,7 +95,7 @@ namespace god
 						{
 							selected_shape = i;
 							component.shapeid = i;
-							component.updateRigidDynamic = true;
+							component.initRigidDynamic = true;
 							ImGui::CloseCurrentPopup();
 						}
 					ImGui::EndPopup();

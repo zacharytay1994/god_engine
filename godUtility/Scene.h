@@ -22,6 +22,7 @@ namespace god
 			uint32_t	m_diffuse_id { 0 };
 			uint32_t	m_specular_id { 0 };
 			float		m_shininess { 0.0f };
+			float		m_emissive{ 1.0f };
 		};
 
 		struct PointLightData

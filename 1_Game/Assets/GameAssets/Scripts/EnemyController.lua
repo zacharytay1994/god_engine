@@ -49,11 +49,11 @@ function S_EnemyController(e)
 
     -- enemy shouldn't do anything if afflicted with Frozen or Immobilised status
     if (characterComponent.statusAilment == "Frozen") then
-        print("[C_EnemyController.lua]", EntityName(e), GetEntityData(e).id, "is Frozen. Ending turn.")
+        print("[EnemyController.lua]", EntityName(e), GetEntityData(e).id, "is Frozen. Ending turn.")
         characterComponent.endTurn = true
         return
     elseif (characterComponent.statusAilment == "Immobilised") then
-        print("[C_EnemyController.lua]", EntityName(e), GetEntityData(e).id, "is Immobilised. Ending turn.")
+        print("[EnemyController.lua]", EntityName(e), GetEntityData(e).id, "is Immobilised. Ending turn.")
         characterComponent.endTurn = true
         return
     end
@@ -74,7 +74,7 @@ function S_EnemyController(e)
 
     -- after enemy has moved and attacked, reset variables and end turn
     else
-        print("[C_EnemyController.lua] Enemy", EntityName(e), "has moved and attacked, ending turn.")
+        print("[EnemyController.lua] Enemy", EntityName(e), "has moved and attacked, ending turn.")
         enemyController.hasMoved = false
         enemyController.hasAttacked = false
         characterComponent.endTurn = true

@@ -18,7 +18,7 @@ function C_UIManager()
         characterIconsInit = false,
 
         -- list of all character icons
-        iconList = {} 
+        iconList = {}
     };
     return function()
         return var
@@ -57,13 +57,13 @@ function S_UIManager(e)
             
             -- if any die has a value of 0 then they have not properly settled down
             for i = 1, #diceList do
-                if (GetComponent(diceList[i], "C_DiceScript").value == 0) then
+                if (GetComponent(diceList[i], "C_DiceScript").value == -1) then
                     diceSettled = false
                 end
             end
             
             if (diceSettled) then
-                
+
                 -- don't allow player to roll anymore for this turn
                 UIManagerComponent.diceRolled = true
                             
@@ -86,9 +86,9 @@ function S_UIManager(e)
                 ChangeTexture(GetEntity("Button3"), UIManagerComponent.actionButtonList[3])
                                 
                 -- reset dice value to zero
-                for k = 1, #diceList do
-                    GetComponent(diceList[k], "C_DiceScript").value = 0
-                end            
+                -- for k = 1, #diceList do
+                --     GetComponent(diceList[k], "C_DiceScript").value = 0
+                -- end            
             end
         end
     else
@@ -104,6 +104,9 @@ function S_UIManager(e)
         -- clear actionButtonList
         UIManagerComponent.actionButtonList = {}
     end
+
+	GetGUIText(GetEntity("StaminaIcon")).text = tostring(GetComponent(GetEntity("Player"), "C_Character").currentStamina)
+	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------
 
     -- updating turn order icons ---------------------------------------------------------------------------------------------------------

@@ -45,7 +45,7 @@ namespace god
 
 
 
-		if ( rigiddynamic.updateRigidDynamic )
+		if ( rigiddynamic.initRigidDynamic)
 		{
 
 			if ( rigiddynamic.p_material == nullptr )
@@ -116,8 +116,31 @@ namespace god
 			physx::PxRigidBodyExt::updateMassAndInertia ( *rigiddynamic.p_RigidDynamic , rigiddynamic.Density );
 
 			mScene->addActor ( *rigiddynamic.p_RigidDynamic );
+			rigiddynamic.p_RigidDynamic->setContactReportThreshold(0.01f);
 
-			rigiddynamic.updateRigidDynamic = false;
+
+			for (auto const& tracked : ContactCallBack)
+			{
+				if (edata.m_id == tracked.first)
+				{
+					psys.getContactReportCallback().AddToContactTrack(rigiddynamic.p_RigidDynamic, tracked.second);
+				}
+			}
+
+			for (auto& [entt1, entt2, fp, actor1, actor2] : psys.getContactReportCallback().getContactPairTrack() )
+			{
+				if (edata.m_id == entt1)
+				{
+					actor1 = rigiddynamic.p_RigidDynamic;
+				}
+				if (edata.m_id == entt2)
+				{
+					actor2 = rigiddynamic.p_RigidDynamic;
+				}
+			}
+
+
+			rigiddynamic.initRigidDynamic = false;
 
 		}
 
@@ -166,11 +189,6 @@ namespace god
 		}
 
 
-
-		if (edata.m_id == 41 || edata.m_id == 48 || edata.m_id == 104)
-		{
-			psys.getCRCB().AddPosCb(rigiddynamic.p_RigidDynamic, DiceCallBack);
-		}
 
 	
 
