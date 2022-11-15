@@ -18,7 +18,7 @@ function C_UIManager()
         characterIconsInit = false,
 
         -- list of all character icons
-        iconList = {} 
+        iconList = {}
     };
     return function()
         return var
@@ -63,7 +63,7 @@ function S_UIManager(e)
             end
             
             if (diceSettled) then
-                print("[UIManager] Dice Has Settled!, diceRolled = true now!")
+
                 -- don't allow player to roll anymore for this turn
                 UIManagerComponent.diceRolled = true
                             
@@ -104,6 +104,9 @@ function S_UIManager(e)
         -- clear actionButtonList
         UIManagerComponent.actionButtonList = {}
     end
+
+	GetGUIText(GetEntity("StaminaIcon")).text = tostring(GetComponent(GetEntity("Player"), "C_Character").currentStamina)
+	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------
 
     -- updating turn order icons ---------------------------------------------------------------------------------------------------------
