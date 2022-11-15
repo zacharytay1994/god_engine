@@ -13,7 +13,7 @@ namespace god
 		uint32_t m_diffuse_id { 0 };
 		uint32_t m_specular_id { 0 };
 		float m_shininess { 32.0f };
-		float m_emissive { 1.0f };
+		float m_emissive { 0.0f };
 	};
 	template <>
 	inline void NewLuaType<Renderable3D> ( sol::state& luaState , std::string const& name )
@@ -154,6 +154,9 @@ namespace god
 		{
 			std::cerr << "EC_Renderable3D::ComponentInspector - Oops something might be wrong, no uid corresponding to specular texture. Ignore this warning for now." << std::endl;
 		}
+
+		// serialize emissive
+		RapidJSON::JSONifyToValue ( value , document , "emissive" , component.m_emissive );
 	}
 
 	template<>
@@ -192,5 +195,7 @@ namespace god
 			}
 			++i;
 		}
+
+		AssignIfExist ( jsonObj , component.m_emissive , "emissive" );
 	}
 }
