@@ -569,17 +569,52 @@ namespace god
 
 		OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uProjection" , projection );
 
-		for ( auto const& data : scene.m_2D_instanced_render_data )
+		using RenderDataReference = std::tuple<Scene::InstancedRenderData , std::reference_wrapper<std::vector<glm::mat4>>>;
+		std::vector<RenderDataReference> sorted_render_data;
+		sorted_render_data.reserve ( scene.m_2D_instanced_render_data.size () );
+		for ( auto& data : scene.m_2D_instanced_render_data )
 		{
-			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
-			std::get<1> ( textures.Get ( data.first.m_diffuse_id ) ).Bind ( 0 );
-
-			for ( auto& mesh : m_models[ data.first.m_model_id ] )
+			if ( !data.second.empty () )
 			{
-				mesh.SetTransformData ( data.second );
+				sorted_render_data.push_back ( { data.first, data.second } );
+			}
+		}
+		std::sort ( sorted_render_data.begin () , sorted_render_data.end () , []( auto const& lhs , auto const& rhs )
+			{
+				return std::get<1> ( lhs ).get ()[ 0 ][3].z < std::get<1> ( rhs ).get ()[ 0 ][3].z;
+			} );
+
+		for ( auto const& data : sorted_render_data )
+		{
+			auto& [first , second] = data;
+			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			std::get<1> ( textures.Get ( first.m_diffuse_id ) ).Bind ( 0 );
+
+			for ( auto& mesh : m_models[ first.m_model_id ] )
+			{
+				mesh.SetTransformData ( second.get() );
 				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
 		}
+
+		//for ( auto const& data : scene.m_2D_instanced_render_data )
+		//{
+		//	OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+		//	std::get<1> ( textures.Get ( data.first.m_diffuse_id ) ).Bind ( 0 );
+
+		//	// sort transforms by z
+		//	/*auto sorted_data = data.second;
+		//	std::sort ( sorted_data.begin () , sorted_data.end () , []( auto const& m1 , auto const& m2 )
+		//		{
+		//			return m1[ 2 ].z > m2[ 2 ].z;
+		//		} );*/
+
+		//	for ( auto& mesh : m_models[ data.first.m_model_id ] )
+		//	{
+		//		mesh.SetTransformData ( data.second );
+		//		mesh.DrawInstanced ( GL_TRIANGLES );
+		//	}
+		//}
 
 		m_font_shader.Use ();
 
