@@ -54,6 +54,16 @@ function S_DiceUI(e)
 		
 		if gui_object.pressed then
 			if c_dicemanager.button_name == "Reroll" then
+				local diceUIList = EntitiesWithScriptComponent("C_DiceUI")
+				for i = 1, #diceUIList do
+					GetComponent(diceUIList[i], "C_DiceUI").is_active = false
+				end
+				
+				local diceList = EntitiesWithScriptComponent("C_DiceScript")
+				for i = 1, #diceList do
+					DiceScript_DisableDice(diceList[i], GetComponent(diceList[i], "C_DiceScript"))
+					DiceScript_RollDice(diceList[i], GetComponent(diceList[i], "C_DiceScript"))
+				end
 				
 			elseif c_dicemanager.button_name == "Ready" then
 				local diceUIList = EntitiesWithScriptComponent("C_DiceUI")
