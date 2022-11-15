@@ -7,6 +7,11 @@
 -- To limit movement to one tile per turn, I have given it a stamina of 1.
 -- Squinky can move diagonally and traverse up and down.
 
+-- TODO:
+-- 1) 
+-- 2)  
+-- 3) 
+
 --[IsComponent]
 function C_EnemyMoveSquinky()
     local var = {
@@ -21,7 +26,8 @@ function C_EnemyMoveSquinky()
         startedPathfind = false,
 
         -- Squinky-specific variables ---------------------
-        targetPath = { }
+        -- the tile that Squinky will move to for current turn
+        targetTile = nil
         -- End of Squinky-specific variables --------------
 
     }
@@ -67,87 +73,65 @@ function S_EnemyMoveSquinky(e)
         -- if enemy is already beside player or in same lane as player, don't move 
         if (EnemyMoveSquinkyAdjacentToPlayer(e, playerEntity)) then
             print("[EnemyMoveSquinky.lua] Squinky is already adjacent to Player, don't move. Returning.")
-            GetComponent(e, "C_EnemyController").hasMoved = true
+            moveComponent.Time = 0
             moveComponent.executeMove = false
+            GetComponent(e, "C_EnemyController").hasMoved = true
             return
 
         -- else, find a suitable tile for Squinky to move to
         else   
-            moveComponent.targetPath = EnemyMoveSquinkySuitablePath(e)
+            moveComponent.targetTile = EnemyMoveSquinkySuitablePath(e, playerEntity)
         end
 
         -- if a suitable tile is found, then set it as target and move towards it
-        if (#moveComponent.targetPath > 1) then 
+        if (moveComponent.targetTile ~= nil) then 
 
             -- Cannot use C_Pathfind here because then Squinky will never walk diagonally
-            moveComponent.startedPathfind = true
-            print("[EnemyMoveSquinky.lua] Starting pathfind!")
+            
+            -- TODO: just teleport squinky here
 
-        -- else if no suitable path is found, don't move and end turn
-        else
+
             -- reset variables
             moveComponent.Time = 0.0
             moveComponent.startedPathfind = false
+            moveComponent.targetTile = nil
 
-            print("[EnemyMoveSquinky.lua] No suitable tiles to move to, staying still and ending turn.")
-            GetComponent(e, "C_EnemyController").hasMoved = true
             moveComponent.executeMove = false
+            GetComponent(e, "C_EnemyController").hasMoved = true
+            print("[EnemyMoveSquinky.lua] Destination reached!")
+
+        -- else if no suitable target tile is found, don't move and end turn
+        else
+            -- reset variables
+            moveComponent.Time = 0
+            moveComponent.startedPathfind = false
+
+            moveComponent.executeMove = false
+            GetComponent(e, "C_EnemyController").hasMoved = true
+            print("[EnemyMoveSquinky.lua] No suitable tiles to move to, staying still and ending turn.")
             return
         end
-    end   
-
-    -- Note: once pathfinding has been initialized, the enemy will start moving.
-    -- We will need to terminate pathfinding once the enemy has reached the desired location.
-
-
-    -- once the Squinky has reached the last position in the targetPath, or if it's adjacent to the player, stop moving
-    if ((enemyGridCell.x == moveComponent.targetPath[#moveComponent.targetPath][1] and 
-         enemyGridCell.y == moveComponent.targetPath[#moveComponent.targetPath][2] and 
-         enemyGridCell.z == moveComponent.targetPath[#moveComponent.targetPath][3]) or 
-         EnemyMoveSquinkyAdjacentToPlayer(e, playerEntity) == true) then
-    
-        -- reset variables
-        moveComponent.Time = 0.0
-        moveComponent.startedPathfind = false
-        moveComponent.targetPath = { }
-
-        moveComponent.executeMove = false
-        GetComponent(e, "C_EnemyController").hasMoved = true
-        print("[EnemyMoveSquinky.lua] Destination reached!")
-
-    elseif (GetComponent(e, "C_Character").currentStamina <= 0) then
-
-        -- reset variables
-        moveComponent.Time = 0.0
-        moveComponent.startedPathfind = false
-        moveComponent.targetPath = { }
-
-        moveComponent.executeMove = false
-        GetComponent(e, "C_EnemyController").hasMoved = true
-        print("[EnemyMoveSquinky.lua] Stamina fully depleted! Returning.")    
-        return
-
     end
 end
 
 -- checks all 8 tiles around Squinky to see which one is closest to the Player, then returns a path to that tile.
-function EnemyMoveSquinkySuitablePath(Squinky)
-    
-    print("[EnemyMoveDummee.lua] Start of EnemyMoveDummeeSuitableTile().")
+function EnemyMoveSquinkySuitablePath(Squinky, targetEntity)
 
-    -- getting player's location
-    local playerGridCell = GetGridCell(GetEntity("Player"))
-    -- print("[StateMoveEnemy.lua] Player grid location:", playerGridCell.x, playerGridCell.y, playerGridCell.z)
+    print("[EnemyMoveSquinky.lua] Start of EnemyMoveSquinkySuitablePath().")
+
+    -- getting target's location
+    local destinationGridCell = GetGridCell(targetEntity)
+    local squinkyGridCell = GetGridCell(Squinky)
 
     -- get all tiles
     local allTiles = EntitiesWithScriptComponent("C_FloorTile")
-    -- print("[StateMoveEnemy.lua] Inside SuitableTile(), checking #allTiles:", #allTiles)
 
-    -- a list of possible adjacent tiles to set as destination. this list is prioritized over diagonalCandidates
-    local adjacentCandidates = { }
+    -- the tile that the target is standing on
+    local tileBelowTarget = nil
+    local tileToMoveTo = nil
 
-    -- a list of possible diagonal tiles to set as destination. will only use this if none of the adjacentCandidates are suitable
-    local diagonalCandidates = { } 
+    -- a list of possible adjacent tiles to set as destination
+    local allCandidates = { }
 
     -- loop through all tiles to find a valid adjacent tile, set destination to the first tile to be found valid
     for i = 1, #allTiles do
@@ -155,91 +139,33 @@ function EnemyMoveSquinkySuitablePath(Squinky)
         -- location of the current tile
         local currentGridCell = GetGridCell(allTiles[i])
 
-       -- if the current tile is directly adjacent to the player
-       if (currentGridCell.x == playerGridCell.x and currentGridCell.y == playerGridCell.y -1 and currentGridCell.z == playerGridCell.z - 1 or -- behind player
-           currentGridCell.x == playerGridCell.x and currentGridCell.y == playerGridCell.y -1 and currentGridCell.z == playerGridCell.z + 1 or -- in front of player
-           currentGridCell.z == playerGridCell.z and currentGridCell.y == playerGridCell.y -1 and currentGridCell.x == playerGridCell.x - 1 or -- to the right
-           currentGridCell.z == playerGridCell.z and currentGridCell.y == playerGridCell.y -1 and currentGridCell.x == playerGridCell.x + 1 ) then -- to the left
+       -- if the current tile is directly adjacent or diagonal to Squinky
+       if (currentGridCell.x == squinkyGridCell.x and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1 or -- behind player
+           currentGridCell.x == squinkyGridCell.x and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z + 1 or -- in front of player
+           currentGridCell.z == squinkyGridCell.z and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.x == squinkyGridCell.x - 1 or -- to the right
+           currentGridCell.z == squinkyGridCell.z and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.x == squinkyGridCell.x + 1 or
+           currentGridCell.x == squinkyGridCell.x + 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z + 1 or -- forward right
+           currentGridCell.x == squinkyGridCell.x + 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1 or -- backward right
+           currentGridCell.x == squinkyGridCell.x - 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z + 1 or -- forward left
+           currentGridCell.x == squinkyGridCell.x - 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1) then -- to the left
                
             -- add current tile to adjacentCandidates
-            adjacentCandidates[#adjacentCandidates + 1] = allTiles[i]
-           
-        -- else if current tile is diagonal to the player
-        elseif (currentGridCell.x == playerGridCell.x + 1 and currentGridCell.y == playerGridCell.y -1 and currentGridCell.z == playerGridCell.z + 1 or -- forward right
-                currentGridCell.x == playerGridCell.x + 1 and currentGridCell.y == playerGridCell.y -1 and currentGridCell.z == playerGridCell.z - 1 or -- backward right
-                currentGridCell.x == playerGridCell.x - 1 and currentGridCell.y == playerGridCell.y -1 and currentGridCell.z == playerGridCell.z + 1 or -- forward left
-                currentGridCell.x == playerGridCell.x - 1 and currentGridCell.y == playerGridCell.y -1 and currentGridCell.z == playerGridCell.z - 1 ) then -- backward left
+            allCandidates[#allCandidates + 1] = allTiles[i]
 
-            -- add current tile to diagonalCandidates
-            diagonalCandidates[#diagonalCandidates + 1] = allTiles[i]
-       end
-   end
+        elseif (currentGridCell.x == destinationGridCell.x and currentGridCell.y == destinationGridCell.y - 1 and currentGridCell.z == destinationGridCell.z) then
+            tileBelowTarget = allTiles[i]
+       end  
+    end
 
-   -- get all entities with gridcell component
-   entitiesWithGridCell = EntitiesWithEngineComponent("GridCell") 
-   
-   -- go through adjacentCandidates first, if a tile in this list is empty, immediately return it
-    for j = 1, #adjacentCandidates do
-
-        currentTileSuitable = true
-                
-        -- if GetGridCell(adjacentCandidates[j]).y + 1 == the gridcell of anther object then break,
-        -- because it means there is something occupying the current adjacentCandidates[j]
-        for l = 1, #entitiesWithGridCell do
-
-            adjacentCandidatesGridCell = GetGridCell(adjacentCandidates[j])
-            local otherEntityGridCell = GetGridCell(entitiesWithGridCell[l])
-
-            if (adjacentCandidatesGridCell.y + 1 == otherEntityGridCell.y and
-                adjacentCandidatesGridCell.x     == otherEntityGridCell.x and
-                adjacentCandidatesGridCell.z     == otherEntityGridCell.z) then 
-                
-                -- print("[StateMoveEnemy.lua] Current tile is unsuitable.")  
-                currentTileSuitable = false
-            end
-        end
-
-        if (currentTileSuitable) then
-            -- if code reaches here then it means there is nothing occupying adjacentCandidates[j]
-            -- and the enemy can move here
-            print("[EnemyMoveDummee.lua] Returning adjacentCandidates[j]", adjacentCandidatesGridCell.x, adjacentCandidatesGridCell.y, adjacentCandidatesGridCell.z)
-            return adjacentCandidates[j]
+    local shortestDistance = 1000
+    for j = 1, #allCandidates do
+        if (EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget) < shortestDistance) then
+            shortestDistance = EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget)
+            tileToMoveTo = allCandidates[j]
         end
     end
 
-    -- if no tiles in adjacentCandidates are suitable, then go through diagonalCandidates
-    for k = 1, #diagonalCandidates do
-
-        currentTileSuitable = true
-        
-        -- if GetGridCell(diagonalCandidates[k]).y + 1 == the gridcell of anther object then break,
-        -- because it means there is something occupying the current diagonalCandidates[k]
-        for m = 1, #entitiesWithGridCell do
-            
-            diagonalCandidatesGridCell = GetGridCell(diagonalCandidates[k])
-            local otherEntityGridCell = GetGridCell(entitiesWithGridCell[m])
-
-            if (diagonalCandidatesGridCell.y + 1 == otherEntityGridCell.y and
-                diagonalCandidatesGridCell.x     == otherEntityGridCell.x and
-                diagonalCandidatesGridCell.z     == otherEntityGridCell.z) then 
-                
-                -- print("[StateMoveEnemy.lua] Current tile is unsuitable.")
-                currentTileSuitable = false
-            end
-        end
-
-        if (currentTileSuitable) then
-            -- if code reaches here then it means there is nothing occupying diagonalCandidates[m]
-            -- and the enemy can move here
-            print("[EnemyMoveDummee.lua] Returning diagonalCandidates[m]", diagonalCandidatesGridCell.x, diagonalCandidatesGridCell.y, diagonalCandidatesGridCell.z)
-            return diagonalCandidates[k]
-        end
-    end
-    
-    -- if the code reaches here then it means all 8 tiles surrounding the player are occupied.
-    -- the enemy will just stay still
-    print("[EnemyMoveDummee.lua] End of EnemyMoveDummeeSuitableTile(). Returning nil.")
-    return nil
+    return tileToMoveTo
 end
 
 function EnemyMoveSquinkyAdjacentToPlayer(enemy, player)
@@ -274,8 +200,17 @@ function EnemyMoveSquinkyAdjacentToPlayer(enemy, player)
     return result
 end
 
-function EnemyMoveSquinkyWalk(squinky)
+-- calculate and return the grid distance between two tile entities
+function EnemyMoveSquinkyCalculateDistance(firstTile, secondTile)
 
-    -- todo: make squinky walk the targetPath (refer to EnemyAttackDummeeMoveDummeeTowardsPlayer())
+    local firstTileGrid = GetGridCell(firstTile)
+    local secondTileGrid = GetGridCell(secondTile)
 
+    local totalDistance = 0
+
+    totalDistance = totalDistance + Abs(firstTileGrid.x - secondTileGrid.x)
+    totalDistance = totalDistance + Abs(firstTileGrid.y - secondTileGrid.y)
+    totalDistance = totalDistance + Abs(firstTileGrid.z - secondTileGrid.z)
+
+    return totalDistance
 end
