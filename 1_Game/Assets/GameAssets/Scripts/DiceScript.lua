@@ -37,7 +37,7 @@ function S_DiceScript(e)
 		c_dice.start_position_x = transform.position.x
 		c_dice.start_position_y = transform.position.y
 		c_dice.start_position_z = transform.position.z
-		ChangeTexture(e, "Dice_Blue")
+		ChangeTexture(e, "Pixel_Blue")
 		c_dice.current_timer = GenerateRandomNumberInRange(0, c_dice.blue_chance)
 		DiceScript_DisableDice(e, c_dice)
 		c_dice.is_init = true
@@ -98,11 +98,11 @@ function S_DiceScript(e)
 		c_dice.current_timer = c_dice.current_timer - (10 * GetDeltaTime())
 		if (c_dice.current_timer < 0) then
 			c_dice.current_timer = c_dice.current_timer + c_dice.blue_chance
-			ChangeTexture(e, "Dice_Blue")
+			ChangeTexture(e, "Pixel_Blue")
 		elseif (c_dice.current_timer < c_dice.gold_chance) then
-			ChangeTexture(e, "Dice_Gold")
+			ChangeTexture(e, "Pixel_Gold")
 		elseif (c_dice.current_timer < c_dice.pink_chance) then
-			ChangeTexture(e, "Dice_Pink")
+			ChangeTexture(e, "Pixel_Pink")
 		end
 	end
 end
