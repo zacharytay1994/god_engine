@@ -563,6 +563,7 @@ namespace god
 		// enable blending
 		glEnable ( GL_BLEND );
 		glBlendFunc ( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
+		glDisable ( GL_CULL_FACE );
 
 		m_2D_shader.Use ();
 
@@ -599,6 +600,7 @@ namespace god
 
 		OGLShader::UnUse ();
 		glDisable ( GL_BLEND );
+		glEnable ( GL_CULL_FACE );
 	}
 
 	void OpenGL::ResizeViewport ( int width , int height )

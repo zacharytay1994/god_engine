@@ -2,6 +2,7 @@
 #include "../Editor.h"
 #include "../../imgui/imgui_stdlib.h" 
 #include <sstream>
+#include <algorithm>
 
 namespace god
 {
@@ -30,6 +31,15 @@ namespace god
 		ImGui::Begin ( "Performance View" );
 		ImGui::Text ( "Time in microseconds. i.e. 1/1,000,000 seconds" );
 		auto const& time_segments = SystemTimer::GetTimeSegments ();
+
+		std::vector<std::pair<std::string , SystemTimer::TimeSegment>> sorted_time_segments;
+		std::copy ( time_segments.begin () , time_segments.end () , std::back_inserter ( sorted_time_segments ) );
+		std::sort ( sorted_time_segments.begin () , sorted_time_segments.end () ,
+			[]( auto const& t1 , auto const& t2 )
+			{
+				return std::get<1> ( std::get<1> ( t1 ) ) > std::get<1> ( std::get<1> ( t2 ) );
+			} );
+
 		float overall = std::get<1> ( time_segments.at ( "Overall" ) );
 
 		float overall_percentage = ( overall / overall ) * 100.0f;
@@ -37,7 +47,7 @@ namespace god
 		ImGui::PushID ( i++ );
 		ImGui::SliderFloat ( "% Overall" , &overall_percentage , 0.0f , 100.0f );
 		ImGui::PopID ();
-		for ( auto const& time_segment : time_segments )
+		for ( auto const& time_segment : sorted_time_segments )
 		{
 			if ( time_segment.first != "Overall" )
 			{
