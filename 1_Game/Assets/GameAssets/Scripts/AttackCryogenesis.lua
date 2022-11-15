@@ -92,7 +92,7 @@ function S_AttackCryogenesis(e)
         transformComponent.rotation.y = attackComponent.playerRotation
 
         -- create an instance of a blue tile
-        InstancePrefab("IceTile", attackComponent.iceLocation.x, attackComponent.iceLocation.y, attackComponent.iceLocation.z)
+        InstancePrefabParentedOnGrid(GetEntity("Floor"), "IceTile", attackComponent.iceLocation[1], attackComponent.iceLocation[2], attackComponent.iceLocation[3])
 
         -- no screenshake for cryo
         
@@ -133,10 +133,11 @@ function CheckCryo(clickedEntity, e)
 
         -- FOR NOW: just allow to freeze character even if its blue
         local clickedGrid = GetGridCell(clickedEntity)
-        cryoComponent.iceLocation = GetTransform(clickedEntity).position
-        -- cryoComponent.iceLocation[1] = clickedGrid.x
-        -- cryoComponent.iceLocation[2] = clickedGrid.y
-        -- cryoComponent.iceLocation[3] = clickedGrid.z
+        -- cryoComponent.iceLocation = GetTransform(clickedEntity).position
+
+        cryoComponent.iceLocation[1] = clickedGrid.x
+        cryoComponent.iceLocation[2] = clickedGrid.y
+        cryoComponent.iceLocation[3] = clickedGrid.z
 
         print("[AttackCryogenesis.lua] Cryo target is a character! Freezing it.")
 
@@ -157,10 +158,11 @@ function CheckCryo(clickedEntity, e)
                 -- there is a character standing on the tile, then if pink or gold, return true
 
                 -- but for now just return true regardless of color
-                cryoComponent.iceLocation = GetTransform(clickedEntity).position
+                -- cryoComponent.iceLocation = GetTransform(clickedEntity).position
+
+                cryoComponent.iceLocation = gridToCheck
                 
                 -- plus 2 to the y-position because we want it to be above the clickedTile
-                cryoComponent.iceLocation.y = cryoComponent.iceLocation.y + 2
                 print("[AttackCryogenesis.lua] Character found standing on selected tile! Freezing it.")
                 return true
 
@@ -169,9 +171,11 @@ function CheckCryo(clickedEntity, e)
 
         -- code reach here means no character is standing on top, can freeze
         print("[AttackCryogenesis.lua] No one standing on selected tile! Freezing it.")
-        cryoComponent.iceLocation = GetTransform(clickedEntity).position
+        -- cryoComponent.iceLocation = GetTransform(clickedEntity).position
+
+        cryoComponent.iceLocation = gridToCheck
         -- plus 2 to the y-position because we want it to be above the clickedTile
-        cryoComponent.iceLocation.y = cryoComponent.iceLocation.y + 2
+        -- cryoComponent.iceLocation.y = cryoComponent.iceLocation.y + 2
         return true
 
     end
