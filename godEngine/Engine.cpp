@@ -236,7 +236,7 @@ namespace god
 			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
 
 			// free camera update
-			camera.FreeCamera ( 0.02f ,
+		/*	camera.FreeCamera ( 0.02f ,
 				true ,
 				window.KeyDown ( GLFW_KEY_W ) ,
 				window.KeyDown ( GLFW_KEY_S ) ,
@@ -252,7 +252,7 @@ namespace god
 				window.MouseScrollDown () ,
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
-				window.MouseScrollDown () );
+				window.MouseScrollDown () );*/
 			/*camera.SceneCamera(
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				0.5f ,

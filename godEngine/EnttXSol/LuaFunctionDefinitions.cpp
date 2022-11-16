@@ -32,7 +32,9 @@ namespace god
 
 		// Camera
 		entt.RegisterLuaType<Camera> ( "Camera" ,
-			"position" , &Camera::m_position );
+			"position"	, &Camera::m_position	, 
+			"lookat"	, &Camera::m_look_at	);
+
 
 		// GetComponent(e,componentName)
 		// ==============================================================================================
