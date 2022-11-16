@@ -27,7 +27,7 @@ function S_ButtonOnHoverPopup(e)
         InstancePrefab("SFX_Bloop",0,0,0)
     end
 
-    if gui_object.exit then
+    if gui_object.exit or ~gui_object.active then
         gui_object.size.x = on_hover_popup.InitialScaleX
         gui_object.size.y = on_hover_popup.InitialScaleY
     end

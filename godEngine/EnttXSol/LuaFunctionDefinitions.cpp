@@ -90,7 +90,34 @@ namespace god
 					auto path = grid[ entity_data->m_parent_id ].GetPathAStar (
 						grid_cell->m_cell_size ,
 						{ grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } ,
-						{ x, y, z }
+						{ x, y, z } ,
+						0 , 0
+					);
+
+					std::vector<glm::ivec3> out;
+					for ( auto const& coordinate : path )
+					{
+						out.push_back ( { std::get<0> ( coordinate ),std::get<1> ( coordinate ) ,std::get<2> ( coordinate ) } );
+					}
+					return out;
+				}
+				return std::vector<glm::ivec3> ();
+			}
+		);
+
+		entt.RegisterLuaFunction ( "GetPath3D" ,
+			[&entt , &engineResources]( entt::entity e , int x , int y , int z , int maxDown , int maxUp , int verticalHeuristic )-> std::vector<glm::ivec3>
+			{
+				GridCell* grid_cell = entt.GetEngineComponent<GridCell> ( e );
+				EntityData* entity_data = entt.GetEngineComponent<EntityData> ( e );
+				if ( grid_cell && entity_data )
+				{
+					auto& grid = engineResources.Get<EntityGrid> ().get ();
+					auto path = grid[ entity_data->m_parent_id ].GetPathAStar (
+						grid_cell->m_cell_size ,
+						{ grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } ,
+						{ x, y, z } ,
+						maxDown , maxUp , verticalHeuristic
 					);
 
 					std::vector<glm::ivec3> out;
@@ -363,6 +390,19 @@ namespace god
 				if ( r )
 				{
 					r->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( texture_name );
+				}
+			}
+		);
+
+		// ChangeModel(e, model name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("ChangeModel",
+			[&entt, &engineResources](entt::entity e, std::string model_name)
+			{
+				Renderable3D* r = entt.GetEngineComponent<Renderable3D>(e);
+				if (r)
+				{
+					r->m_model_id = engineResources.Get<Asset3DManager>().get().GetID(model_name);
 				}
 			}
 		);

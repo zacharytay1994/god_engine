@@ -35,7 +35,10 @@ function C_CombatManager()
         critDamageMultiplier = 1.5,
 
         -- set to true if player manages to pass the crit hit mini game
-        critSuccess = false
+        critSuccess = false,
+
+        -- damage dealt to characters that fall off a ledge
+        fallDamage = 3
     }
     return function()
         return var

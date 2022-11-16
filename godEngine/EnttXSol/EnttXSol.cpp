@@ -2,6 +2,7 @@
 #include "EnttXSol.h"
 
 #include "LuaFunctionDefinitions.h"
+#include "../Window/SystemTimer.h"
 
 namespace god
 {
@@ -72,6 +73,7 @@ namespace god
 				// i.e. process all entities
 				for ( auto const& system : script.second.m_systems )
 				{
+					SystemTimer::StartTimeSegment ( system.first );
 					auto first = system.first.find_first_of ( "_" );
 					if ( first != std::string::npos )
 					{
@@ -82,6 +84,7 @@ namespace god
 					{
 						GetView ( system.second.m_used_script_components , system.second.m_used_engine_components ).each ( m_lua[ frame_end_identifier + system.first.substr ( first + 1 , system.first.size () - first ) ] );
 					}
+					SystemTimer::EndTimeSegment ( system.first );
 				}
 			}
 		}

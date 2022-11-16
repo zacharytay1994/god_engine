@@ -31,8 +31,9 @@ namespace god
 	}
 
 	PhysicsSystem::PhysicsSystem() 
+
 	{
-	
+		RayCastid = Null;
 		mRunning = false;
 		mCamera = nullptr;
 		mWindow = nullptr;
@@ -112,7 +113,8 @@ namespace god
 
 			mScene = mPhysics->createScene(sceneDesc);
 			mScene->setSimulationEventCallback(&gContactReportCallback);
-		
+			
+
 			SetupPVD();
 			
 			PhysicsAPI::p_psys = this;
@@ -124,6 +126,9 @@ namespace god
 
 	void PhysicsSystem::Update(float dt , bool pause)
 	{
+		Raycast();
+
+
 		if (pause)
 			return;
 		//mStepSize is 1/60 Physics at 60fps by default
@@ -142,15 +147,9 @@ namespace god
 		}
 		for (uint16_t i = 0; i < numSteps; ++i)
 		{
-		#if 0
 			mAccumulator -= mStepSize;
-			mScene->simulate(mStepSize);
-			mScene->fetchResults(true);
-			Raycast();
-		#else
-			
 			mRunning = true;
-			mScene->simulate(1.0f / 60.0f);
+			mScene->simulate(mStepSize);
 
 			//Call fetchResultsStart. Get the set of pair headers
 			const physx::PxContactPairHeader* pairHeader;
@@ -170,15 +169,10 @@ namespace god
 			callbackFinishTask.wait();
 
 			mScene->fetchResultsFinish();
-			mRunning = false;
-
-			Raycast();
-
-		#endif
-			
+			mRunning = false;		
 		}
 
-
+		
 	}
 
 	void PhysicsSystem::CreatePVD()
@@ -212,12 +206,12 @@ namespace god
 		
 		physx::PxVec3 origin = mCamera->m_position;                 // [in] Ray origin
 		physx::PxVec3 unitDir = ray_dir;                // [in] Normalized ray direction
-		//physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
+		physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
 		physx::PxRaycastBuffer hit;                 // [out] Raycast results
 		
 		// Raycast against all static & dynamic objects (no filtering)
 		// The main result from this call is the closest hit, stored in the 'hit.block' structure
-		//bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
+		bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
 		if (hit.hasBlock)
 		{
 			mRayCastMouse = hit.block.actor;
@@ -225,12 +219,23 @@ namespace god
 		else
 		{
 			mRayCastMouse = nullptr;
+			SetRCMid(Null);
 		}
 	}
 
 	physx::PxRigidActor* const PhysicsSystem::GetRayCastMouse() const
 	{
 		return mRayCastMouse;
+	}
+
+	void PhysicsSystem::SetRCMid(uint32_t id)
+	{
+		RayCastid = id;
+	}
+
+	uint32_t PhysicsSystem::getRCMid()
+	{
+		return RayCastid;
 	}
 
 	bool PhysicsSystem::GetisRunning() const
@@ -254,7 +259,7 @@ namespace god
 		return mScene;
 	}
 
-	ContactReportCallback& PhysicsSystem::getCRCB()
+	ContactReportCallback& PhysicsSystem::getContactReportCallback()
 	{
 		return gContactReportCallback;
 	}

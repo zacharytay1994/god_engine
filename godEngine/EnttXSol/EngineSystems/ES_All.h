@@ -16,6 +16,8 @@
 
 #include "GUI/ES_GUIObject.h"
 
+#include "../../Window/SystemTimer.h"
+
 namespace god
 {
 	// runs in the middle of a frame
@@ -23,23 +25,34 @@ namespace god
 	{
 		if ( !isPause )
 		{
+			SystemTimer::StartTimeSegment ( "ExampleSystem" );
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystem );
+			SystemTimer::EndTimeSegment ( "ExampleSystem" );
+			SystemTimer::StartTimeSegment ( "GridManipulateSystem" );
 			enttxsol.RunEngineSystem ( engineResources , GridManipulateSystem );
+			SystemTimer::EndTimeSegment ( "GridManipulateSystem" );
+			SystemTimer::StartTimeSegment ( "AudioListenerSystem" );
 			enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
+			SystemTimer::EndTimeSegment ( "AudioListenerSystem" );
 		}
 
 		// gui
+		SystemTimer::StartTimeSegment ( "GUIObjectUpdate" );
 		enttxsol.RunEngineSystem ( engineResources , GUIObjectUpdate );
-		
+		SystemTimer::EndTimeSegment ( "GUIObjectUpdate" );
+		SystemTimer::StartTimeSegment ( "GridSystem" );
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
-		//Physics
-		if (isPause)
-		{
-			enttxsol.RunEngineSystem(engineResources, RayCastDynamic);
-			enttxsol.RunEngineSystem(engineResources, RayCastStatic);
+		SystemTimer::EndTimeSegment ( "GridSystem" );
 
-			enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
-			enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);
+		//Physics
+		if ( isPause )
+		{
+			SystemTimer::StartTimeSegment ( "RigidStaticUpdate" );
+			enttxsol.RunEngineSystem ( engineResources , RigidStaticUpdate );
+			SystemTimer::EndTimeSegment ( "RigidStaticUpdate" );
+			SystemTimer::StartTimeSegment ( "RigidDynamicUpdate" );
+			enttxsol.RunEngineSystem ( engineResources , RigidDynamicUpdate );
+			SystemTimer::EndTimeSegment ( "RigidDynamicUpdate" );
 		}
 	}
 
@@ -48,14 +61,22 @@ namespace god
 	{
 		if ( !enttxsol.m_pause )
 		{
+			SystemTimer::StartTimeSegment ( "ExampleSystemFrameStart" );
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameStart );
+			SystemTimer::EndTimeSegment ( "ExampleSystemFrameStart" );
+			SystemTimer::StartTimeSegment ( "AudioSourceSystem" );
 			enttxsol.RunEngineSystem ( engineResources , AudioSourceSystem );
+			SystemTimer::EndTimeSegment ( "AudioSourceSystem" );
 
 		}
-		if (enttxsol.m_pause)
+		if ( enttxsol.m_pause )
 		{
-			enttxsol.RunEngineSystem(engineResources, RigidStaticFrameBegin);
-			enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameBegin);
+			SystemTimer::StartTimeSegment ( "RigidStaticFrameBegin" );
+			enttxsol.RunEngineSystem ( engineResources , RigidStaticFrameBegin );
+			SystemTimer::EndTimeSegment ( "RigidStaticFrameBegin" );
+			SystemTimer::StartTimeSegment ( "RigidDynamicFrameBegin" );
+			enttxsol.RunEngineSystem ( engineResources , RigidDynamicFrameBegin );
+			SystemTimer::EndTimeSegment ( "RigidDynamicFrameBegin" );
 		}
 	}
 
@@ -63,18 +84,22 @@ namespace god
 	// also guaranteed to run after any other major system update.
 	void EngineSystemsFrameEnd ( EnttXSol& enttxsol , EngineResources& engineResources )
 	{
+		//physics
+		SystemTimer::StartTimeSegment ( "Physics Frame End" );
+		enttxsol.RunEngineSystem ( engineResources , DebugDynamic );
+		enttxsol.RunEngineSystem ( engineResources , DebugStatic );
+		enttxsol.RunEngineSystem ( engineResources , RayCastDynamic );
+		enttxsol.RunEngineSystem ( engineResources , RayCastStatic );
+		SystemTimer::EndTimeSegment ( "Physics Frame End" );
+
 		if ( !enttxsol.m_pause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameEnd );
-			enttxsol.RunEngineSystem(engineResources, RigidDynamicFrameEnd);
+			SystemTimer::StartTimeSegment ( "RigidDynamicFrameEnd" );
+			enttxsol.RunEngineSystem ( engineResources , RigidDynamicFrameEnd );
+			SystemTimer::EndTimeSegment ( "RigidDynamicFrameEnd" );
 		}
-		if (enttxsol.m_pause)
-		{
-			//physics
 
-			enttxsol.RunEngineSystem(engineResources, DebugDynamic);
-			enttxsol.RunEngineSystem(engineResources, DebugStatic);
-		}
 	}
 
 	// runs at the start just after loading the scene
@@ -82,7 +107,6 @@ namespace god
 	{
 		enttxsol.RunEngineSystem ( engineResources , ExampleSystemInit );
 		enttxsol.RunEngineSystem ( engineResources , GridManipulateInit );
-
 	}
 
 	// runs at the end before unloading the scene 

@@ -22,6 +22,7 @@ namespace god
 			uint32_t	m_diffuse_id { 0 };
 			uint32_t	m_specular_id { 0 };
 			float		m_shininess { 0.0f };
+			float		m_emissive{ 1.0f };
 		};
 
 		struct PointLightData
@@ -49,6 +50,7 @@ namespace god
 		std::unordered_map<InstancedRenderData , std::vector<glm::mat4> , InstancedRenderData> m_instanced_render_data;
 		std::unordered_map<InstancedRenderData , std::vector<glm::mat4> , InstancedRenderData> m_2D_instanced_render_data;
 		std::unordered_map<InstancedRenderData , std::vector<glm::mat4> , InstancedRenderData> m_characters;
+		std::unordered_map<InstancedRenderData , std::vector<glm::mat4> , InstancedRenderData> m_billboard_sprites;
 
 		std::vector<PointLightData> m_point_light_data;
 		std::vector<DirectionalLightData> m_directional_light_data;
@@ -58,6 +60,7 @@ namespace god
 		GODUTILITY_API void	AddInstancedObject ( InstancedRenderData const& data , glm::mat4 const& transform );
 		GODUTILITY_API void	Add2DInstancedObject ( InstancedRenderData const& data , glm::mat4 const& transform );
 		GODUTILITY_API void AddCharacter ( InstancedRenderData const& data , glm::mat4 const& transform );
+		GODUTILITY_API void AddBillboard ( InstancedRenderData const& data , glm::mat4 const& transform );
 		GODUTILITY_API void	ClearInstancedScene ();
 
 		GODUTILITY_API void AddPointLight ( PointLightData const& pld );

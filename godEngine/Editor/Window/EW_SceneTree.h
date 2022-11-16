@@ -64,6 +64,20 @@ namespace god
 	inline void EW_SceneTree<EDITOR_RESOURCES>::Update ( float dt , EDITOR_RESOURCES& engineResources )
 	{
 		( dt );
+
+		GLFWWindow& glwind = engineResources.Get< GLFWWindow>().get();
+		PhysicsSystem& psys = engineResources.Get< PhysicsSystem>().get();
+		if (psys.getRCMid()!= PhysicsSystem::Null)
+		{
+			if(glwind.KeyDown(GLFW_KEY_LEFT_CONTROL) && glwind.MouseLPressed())
+				m_selected_entity = psys.getRCMid();
+
+
+	/*		if (glwind.KeyPressed(GLFW_KEY_P))
+				m_selected_entity = psys.getRCMid();*/
+
+		}
+
 		ImGui::Begin ( "Scene Tree" );
 
 		if ( ImGui::BeginTabBar ( "Scene" ) )

@@ -89,6 +89,15 @@ namespace god
 			rigidstatic.updateRigidStatic = false;
 		}
 
+		if (rigidstatic.Simulation)
+		{
+			rigidstatic.p_RigidStatic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
+		}
+		else
+		{
+			rigidstatic.p_RigidStatic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
+		}
+
 		if (rigidstatic.locktoscale)
 		{
 			rigidstatic.extents = transform.m_scale;

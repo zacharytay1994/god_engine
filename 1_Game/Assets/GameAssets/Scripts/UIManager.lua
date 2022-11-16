@@ -18,7 +18,7 @@ function C_UIManager()
         characterIconsInit = false,
 
         -- list of all character icons
-        iconList = {} 
+        iconList = {}
     };
     return function()
         return var
@@ -57,13 +57,13 @@ function S_UIManager(e)
             
             -- if any die has a value of 0 then they have not properly settled down
             for i = 1, #diceList do
-                if (GetComponent(diceList[i], "C_DiceScript").value == 0) then
+                if (GetComponent(diceList[i], "C_DiceScript").value == -1) then
                     diceSettled = false
                 end
             end
             
             if (diceSettled) then
-                
+
                 -- don't allow player to roll anymore for this turn
                 UIManagerComponent.diceRolled = true
                             
@@ -86,9 +86,9 @@ function S_UIManager(e)
                 ChangeTexture(GetEntity("Button3"), UIManagerComponent.actionButtonList[3])
                                 
                 -- reset dice value to zero
-                for k = 1, #diceList do
-                    GetComponent(diceList[k], "C_DiceScript").value = 0
-                end            
+                -- for k = 1, #diceList do
+                --     GetComponent(diceList[k], "C_DiceScript").value = 0
+                -- end            
             end
         end
     else
@@ -104,56 +104,59 @@ function S_UIManager(e)
         -- clear actionButtonList
         UIManagerComponent.actionButtonList = {}
     end
+
+	GetGUIText(GetEntity("StaminaIcon")).text = tostring(GetComponent(GetEntity("Player"), "C_Character").currentStamina)
+	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------
 
     -- updating turn order icons ---------------------------------------------------------------------------------------------------------
-    if (UIManagerComponent.characterIconsInit == false) then  
-        print("[UIManager.lua] Initializing character icons")
-        UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnOne")
-        UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnTwo")
-        UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnThree")
-        UIManagerComponent.characterIconsInit = true
-    end
+    -- if (UIManagerComponent.characterIconsInit == false) then  
+    --     print("[UIManager.lua] Initializing character icons")
+    --     UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnOne")
+    --     UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnTwo")
+    --     UIManagerComponent.iconList[#UIManagerComponent.iconList + 1] = GetEntity("TurnThree")
+    --     UIManagerComponent.characterIconsInit = true
+    -- end
 
-    if (turnOrderManagerComponent.refreshTurnOrderUI == true) then
+    -- if (turnOrderManagerComponent.refreshTurnOrderUI == true) then
     
-        print("[UIManager.lua] Refreshing turn order UI.")
+    --     print("[UIManager.lua] Refreshing turn order UI.")
         
-        for i = 1, #turnOrderManagerComponent.turnQueue do 
+    --     for i = 1, #turnOrderManagerComponent.turnQueue do 
         
-            if (GetComponent(turnOrderManagerComponent.turnQueue[i], "C_Character").characterType == "Player") then
-                ChangeTexture(UIManagerComponent.iconList[i], "TritonTurn")
+    --         if (GetComponent(turnOrderManagerComponent.turnQueue[i], "C_Character").characterType == "Player") then
+    --             ChangeTexture(UIManagerComponent.iconList[i], "TritonTurn")
 
-            elseif (GetComponent(turnOrderManagerComponent.turnQueue[i], "C_Character").characterType == "Squinky") then
-                ChangeTexture(UIManagerComponent.iconList[i], "SquinkyTurn")
-            end
+    --         elseif (GetComponent(turnOrderManagerComponent.turnQueue[i], "C_Character").characterType == "Squinky") then
+    --             ChangeTexture(UIManagerComponent.iconList[i], "SquinkyTurn")
+    --         end
 
-            -- temp
-            if (i == 3) then break end
-        end
+    --         -- temp
+    --         if (i == 3) then break end
+    --     end
 
-        turnOrderManagerComponent.refreshTurnOrderUI = false
-    end
+    --     turnOrderManagerComponent.refreshTurnOrderUI = false
+    -- end
 
-    -- darken icon for idle characters
-    for k = 1, #UIManagerComponent.iconList do
+    -- -- darken icon for idle characters
+    -- for k = 1, #UIManagerComponent.iconList do
                    
-        -- if current character is active, switch to lighter icon
-        if (turnOrderManagerComponent.queueIndex == k) then    
-            if (TextureName(UIManagerComponent.iconList[k]) == "TritonDark") then
-                ChangeTexture(UIManagerComponent.iconList[k], "TritonTurn")
-            elseif (TextureName(UIManagerComponent.iconList[k]) == "SquinkyDark") then
-                ChangeTexture(UIManagerComponent.iconList[k], "SquinkyTurn")
-            end
+    --     -- if current character is active, switch to lighter icon
+    --     if (turnOrderManagerComponent.queueIndex == k) then    
+    --         if (TextureName(UIManagerComponent.iconList[k]) == "TritonDark") then
+    --             ChangeTexture(UIManagerComponent.iconList[k], "TritonTurn")
+    --         elseif (TextureName(UIManagerComponent.iconList[k]) == "SquinkyDark") then
+    --             ChangeTexture(UIManagerComponent.iconList[k], "SquinkyTurn")
+    --         end
 
-        -- if current character is not active, switch to darker icon
-        else 
-            if (TextureName(UIManagerComponent.iconList[k]) == "TritonTurn") then
-                ChangeTexture(UIManagerComponent.iconList[k], "TritonDark")
-            elseif (TextureName(UIManagerComponent.iconList[k]) == "SquinkyTurn") then
-                ChangeTexture(UIManagerComponent.iconList[k], "SquinkyDark")
-            end
-        end
-    end
+    --     -- if current character is not active, switch to darker icon
+    --     else 
+    --         if (TextureName(UIManagerComponent.iconList[k]) == "TritonTurn") then
+    --             ChangeTexture(UIManagerComponent.iconList[k], "TritonDark")
+    --         elseif (TextureName(UIManagerComponent.iconList[k]) == "SquinkyTurn") then
+    --             ChangeTexture(UIManagerComponent.iconList[k], "SquinkyDark")
+    --         end
+    --     end
+    -- end
     -- End of updating turn order icons --------------------------------------------------------------------------------------------------
 end
