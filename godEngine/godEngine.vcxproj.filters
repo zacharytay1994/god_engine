@@ -149,6 +149,7 @@
     <ClInclude Include="Physics\Callbacks.h" />
     <ClInclude Include="Physics\PhysicsInterface.h" />
     <ClInclude Include="Physics\DiceCallBack.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Render\EC_Transparent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

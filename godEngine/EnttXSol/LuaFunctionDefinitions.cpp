@@ -392,6 +392,19 @@ namespace god
 			}
 		);
 
+		// ChangeModel(e, model name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("ChangeModel",
+			[&entt, &engineResources](entt::entity e, std::string model_name)
+			{
+				Renderable3D* r = entt.GetEngineComponent<Renderable3D>(e);
+				if (r)
+				{
+					r->m_model_id = engineResources.Get<Asset3DManager>().get().GetID(model_name);
+				}
+			}
+		);
+
 		// TextureName(e)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "TextureName" ,
