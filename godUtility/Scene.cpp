@@ -25,6 +25,11 @@ namespace god
 		m_characters[ data ].push_back ( transform );
 	}
 
+	void Scene::AddBillboard ( InstancedRenderData const& data , glm::mat4 const& transform )
+	{
+		m_billboard_sprites[ data ].push_back ( transform );
+	}
+
 	void Scene::ClearInstancedScene ()
 	{
 		for ( auto& instance : m_instanced_render_data )
@@ -36,6 +41,10 @@ namespace god
 			instance.second.clear ();
 		}
 		for ( auto& instance : m_characters )
+		{
+			instance.second.clear ();
+		}
+		for ( auto& instance : m_billboard_sprites )
 		{
 			instance.second.clear ();
 		}

@@ -89,17 +89,13 @@ end
 
 function SetDiceIcon(e, dicenumber)
 	local diceList = EntitiesWithScriptComponent("C_DiceScript")
-	if (GetComponent(diceList[dicenumber], "C_DiceScript").value == 1) then
+	if (GetComponent(diceList[dicenumber], "C_DiceScript").value == 0) then
 		ChangeTexture(e, "dice_jab")
+	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 1) then
+		ChangeTexture(e, "dice_swing")
 	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 2) then
-		ChangeTexture(e, "dice_jab")
+		ChangeTexture(e, "dice_smash")
 	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 3) then
-		ChangeTexture(e, "dice_jab")
-	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 4) then
-		ChangeTexture(e, "dice_bolt")
-	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 5) then
-		ChangeTexture(e, "dice_bolt")
-	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 6) then
 		ChangeTexture(e, "dice_bolt")
 	end
 end 
