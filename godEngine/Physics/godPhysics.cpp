@@ -136,7 +136,8 @@ namespace god
 
 	void PhysicsSystem::Update(float dt , bool pause)
 	{
-		Raycast();
+		if(!mWindow->WindowsMinimized())
+			Raycast();
 
 
 		if (pause)
