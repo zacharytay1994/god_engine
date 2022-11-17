@@ -18,7 +18,7 @@ namespace god
 		}
 		ContactTrack.push_back({ rb, function });
 
-		//std::cout << "added to cb\n";
+		std::cout << "added to cb\n";
 	}
 
 	std::vector < std::tuple <uint32_t, uint32_t, void (*)(glm::vec3 const& pos, glm::vec3 const& pos1),
@@ -37,7 +37,7 @@ namespace god
 				PxTriggerPairFlag::eREMOVED_SHAPE_OTHER))
 				continue*/;
 
-			//std::cout << " Triggered" << std::endl;	
+			std::cout << " Triggered" << std::endl;	
 			
 			//if ((&pairs[i].otherShape->getActor() == mSubmarineActor) &&
 			//	(&pairs[i].triggerShape->getActor() == gTreasureActor))

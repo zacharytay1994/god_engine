@@ -29,6 +29,7 @@ namespace god
 		{
 			return;
 		}
+		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1>(component);
 		RigidStatic& rigidstatic = std::get<2>(component);
 
@@ -53,17 +54,17 @@ namespace god
 				//exclusive shape (can be modified)
 
 
-				switch (rigidstatic.shapeid)
+				switch (rigidstatic.PhysicsTypeid)
 				{
-				case RigidStatic::Cube:
+				case PhysicsTypes::Cube:
 					rigidstatic.p_shape = mPhysics->createShape(physx::PxBoxGeometry(rigidstatic.extents.x, rigidstatic.extents.y, rigidstatic.extents.z), *rigidstatic.p_material, true);
 					rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 					break;
-				case RigidStatic::Sphere:
+				case PhysicsTypes::Sphere:
 					rigidstatic.p_shape = mPhysics->createShape(physx::PxSphereGeometry(rigidstatic.extents.x), *rigidstatic.p_material, true);
 					rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 					break;
-				case RigidStatic::Capsule:
+				case PhysicsTypes::Capsule:
 					rigidstatic.p_shape = mPhysics->createShape(physx::PxCapsuleGeometry(rigidstatic.extents.x, rigidstatic.extents.y), *rigidstatic.p_material, true);
 					rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 					break;
@@ -85,7 +86,9 @@ namespace god
 				mScene->addActor(*rigidstatic.p_RigidStatic);
 
 			}
-			
+			//rigidstatic.p_RigidStatic->setActorFlag()
+			rigidstatic.p_RigidStatic->userData = &edata;
+
 			rigidstatic.updateRigidStatic = false;
 		}
 
@@ -102,17 +105,17 @@ namespace god
 		{
 			rigidstatic.extents = transform.m_scale;
 
-			switch (rigidstatic.shapeid)
+			switch (rigidstatic.Shapeid)
 			{
-			case RigidStatic::Cube:
+			case PhysicsTypes::Cube:
 				rigidstatic.p_shape->setGeometry(physx::PxBoxGeometry(rigidstatic.extents.x, rigidstatic.extents.y, rigidstatic.extents.z));
 				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 				break;
-			case RigidStatic::Sphere:
+			case PhysicsTypes::Sphere:
 				rigidstatic.p_shape->setGeometry(physx::PxSphereGeometry(rigidstatic.extents.x));
 				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 				break;
-			case RigidStatic::Capsule:
+			case PhysicsTypes::Capsule:
 				rigidstatic.p_shape->setGeometry(physx::PxCapsuleGeometry(rigidstatic.extents.x, rigidstatic.extents.y));
 				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 				break;

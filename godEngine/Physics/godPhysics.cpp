@@ -1,7 +1,7 @@
 #include "../pch.h"
 #include "godPhysics.h"
 #include "../Editor/EngineResources.h"
-
+#include "../EnttXSol/EngineComponents/EC_All.h"
 
 
 #include <assert.h>
@@ -88,7 +88,7 @@ namespace god
 	void PhysicsSystem::Init(GLFWWindow* window, Camera* cam)
 	{
 		
-		// Fouundation (required)
+		// Foundation (required)
 		mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, mDefaultAllocatorCallback, mDefaultErrorCallback);
 		if (!mFoundation) throw("PxCreateFoundation failed!");
 
@@ -136,10 +136,6 @@ namespace god
 
 	void PhysicsSystem::Update(float dt , bool pause)
 	{
-		if(!mWindow->WindowsMinimized())
-			Raycast();
-
-
 		if (pause)
 			return;
 		//mStepSize is 1/60 Physics at 60fps by default
@@ -226,27 +222,33 @@ namespace god
 		if (hit.hasBlock)
 		{
 			mRayCastMouse = hit.block.actor;
+			//SetRCMid(reinterpret_cast<EntityData*>(mRayCastMouse->userData)->m_id);
 		}
 		else
 		{
 			mRayCastMouse = nullptr;
-			SetRCMid(Null);
+			//SetRCMid(Null);
 		}
 	}
 
-	physx::PxRigidActor* const PhysicsSystem::GetRayCastMouse() const
+	physx::PxRigidActor* const PhysicsSystem::GetRayCastMouse()
 	{
+
+		if (!mWindow->WindowsMinimized())
+			Raycast();
 		return mRayCastMouse;
 	}
 
-	void PhysicsSystem::SetRCMid(uint32_t id)
-	{
-		RayCastid = id;
-	}
 
-	uint32_t PhysicsSystem::getRCMid()
+	const uint32_t PhysicsSystem::getRCMid()
 	{
-		return RayCastid;
+		physx::PxRigidActor* rcm = GetRayCastMouse();
+		
+		if (!rcm)
+			return Null;
+		else
+			return reinterpret_cast<EntityData*>(rcm->userData)->m_id;
+		 
 	}
 
 	bool PhysicsSystem::GetisRunning() const

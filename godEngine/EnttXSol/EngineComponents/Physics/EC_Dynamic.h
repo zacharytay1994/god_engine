@@ -2,6 +2,8 @@
 
 #include "../EngineComponents.h"
 #include "../../Physics/godPhysics.h"
+#include "../../godEngine/Physics/Types.h"
+
 
 namespace god
 {
@@ -13,20 +15,21 @@ namespace god
 		//shape
 		physx::PxVec3 extents;
 		bool locktoscale;
-		enum shapetype
-		{
-			Cube, Sphere, Capsule, TriangleMesh
-		};
-		int shapeid;
+		//PhysicsTypes IDs
+		int Shapeid;	//Default = 0 = Cube
+		int PhysicsTypeid;	//Default = 0
 		//Dynamic Properties
 		physx::PxVec3 AngularVelocity;
 		physx::PxVec3 LinearVelocity;
 		float Density;
+
+		/* Actor Flags*/
 		bool Active{ true };
+		bool Gravity{ true };
+		/* Shape Flags*/
 		bool Simulation{ true };
 		bool Trigger{ false };
-		bool Gravity{ true };
-
+		
 		//Non serialize data
 		physx::PxTriangleMesh* p_trimesh;
 		physx::PxMaterial* p_material;
@@ -39,7 +42,7 @@ namespace god
 		//Ctor
 		RigidDynamic() :  
 			p_material{ nullptr }, p_RigidDynamic{ nullptr }, mScene{ nullptr }, p_trimesh{nullptr},
-			shapeid{ 0 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, p_shape{ nullptr }, 
+			Shapeid{ 0 }, PhysicsTypeid{ 0 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, p_shape{ nullptr },
 			locktoscale{ true }, Active{ true }, Simulation{ true }, Trigger{ false }, Gravity{ true },
 			StaticFriction{ 0.5f }, DynamicFriction{ 0.5f }, Restitution{ 0.5f }, 
 			AngularVelocity{ 0.f,0.f,0.f }, LinearVelocity{ 0.f,0.f,0.f }, Density{ 1.f }
@@ -50,7 +53,6 @@ namespace god
 			if (mScene)
 			{
 				mScene->removeActor(*p_RigidDynamic);
-				//p_RigidDynamic->release();
 			}
 
 		};
@@ -73,12 +75,14 @@ namespace god
 				ImGui::Separator();
 
 
+				ImGui::Checkbox("Active", &component.Active);
+
 				ImGui::InputFloat("StaticFriction", &component.StaticFriction);
 				ImGui::InputFloat("DynamicFriction", &component.DynamicFriction);
 				ImGui::InputFloat("Restitution", &component.Restitution);
 
 
-				int selected_shape = component.shapeid;
+				int selected_shape = component.Shapeid;
 				const char* names[] = { "Cube", "Sphere", "Capsule","Triangle Mesh" };
 				char buf[64];
 				sprintf_s(buf, "%s###", names[selected_shape]); // ### operator override ID ignoring the preceding label
@@ -89,41 +93,43 @@ namespace god
 				//ImGui::TextUnformatted( names[selected_shape] );
 				if (ImGui::BeginPopup("shape popup"))
 				{
-					//ImGui::Text("Shape type");
-					//ImGui::Separator();
+					ImGui::Text("Shape type");
+					ImGui::Separator();
 					for (int i = 0; i < IM_ARRAYSIZE(names); i++)
 						if (ImGui::Selectable(names[i]))
 						{
 							selected_shape = i;
-							component.shapeid = i;
+							component.Shapeid = i;
 							component.initRigidDynamic = true;
 							ImGui::CloseCurrentPopup();
 						}
 					ImGui::EndPopup();
 				}
 
-				switch (component.shapeid)
+				switch (component.Shapeid)
 				{
-				case RigidDynamic::Cube:
+				case PhysicsTypes::Cube:
 					ImGui::InputFloat("X Extent", &component.extents.x);
 					ImGui::InputFloat("Y Extent", &component.extents.y);
 					ImGui::InputFloat("Z Extent", &component.extents.z);
 					break;
-				case RigidDynamic::Sphere:
+				case PhysicsTypes::Sphere:
 					ImGui::InputFloat("Radius", &component.extents.x);
 					break;
-				case RigidDynamic::Capsule:
+				case PhysicsTypes::Capsule:
 					ImGui::InputFloat("Radius", &component.extents.x);
 					ImGui::InputFloat("Half Height", &component.extents.y);
 					break;
 				
 				}
-
-				ImGui::Checkbox("Simulation", &component.Simulation);
+				ImGui::Separator();
+				ImGui::Text("Shape Flags");
+	
 				ImGui::Checkbox("Gravity", &component.Gravity);
 				ImGui::Checkbox("Trigger", &component.Trigger);
+				ImGui::Checkbox("Simulation", &component.Simulation);
 				ImGui::Checkbox("Lock Extents to Scale", &component.locktoscale);
-
+				ImGui::Separator();
 
 
 				ImGui::InputFloat("AngularVelocity x", &component.AngularVelocity.x);
@@ -137,7 +143,7 @@ namespace god
 				ImGui::InputFloat("Density", &component.Density);
 
 
-
+				ImGui::Separator();
 			});
 	}
 
@@ -159,8 +165,8 @@ namespace god
 		RapidJSON::JSONifyToValue(value, document, "Trigger", component.Trigger);
 
 		RapidJSON::JSONifyToValue(value, document, "scale lock", component.locktoscale);
-		RapidJSON::JSONifyToValue(value, document, "shapeid", component.shapeid);
-
+		RapidJSON::JSONifyToValue(value, document, "shapeid", component.Shapeid);
+		RapidJSON::JSONifyToValue(value, document, "PhysicsTypeid", component.PhysicsTypeid);
 
 		RapidJSON::JSONifyToValue(value, document, "AngularVelocity x", component.AngularVelocity.x);
 		RapidJSON::JSONifyToValue(value, document, "AngularVelocity y", component.AngularVelocity.y);
@@ -187,15 +193,14 @@ namespace god
 		AssignIfExist(jsonObj, component.extents.y, "y extent");
 		AssignIfExist(jsonObj, component.extents.z, "z extent");
 		
-
 		AssignIfExist(jsonObj, component.Simulation, "Simulation");
 		AssignIfExist(jsonObj, component.Gravity, "Gravity");
 		AssignIfExist(jsonObj, component.Trigger, "Trigger");
 
 		AssignIfExist(jsonObj, component.locktoscale, "scale lock");
-		AssignIfExist(jsonObj, component.shapeid, "shapeid");
-
-
+		AssignIfExist(jsonObj, component.Shapeid, "shapeid");
+		AssignIfExist(jsonObj, component.PhysicsTypeid, "PhysicsTypeid");
+		
 		AssignIfExist(jsonObj, component.AngularVelocity.x, "AngularVelocity x");
 		AssignIfExist(jsonObj, component.AngularVelocity.y, "AngularVelocity y");
 		AssignIfExist(jsonObj, component.AngularVelocity.z, "AngularVelocity z");

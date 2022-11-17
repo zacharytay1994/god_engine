@@ -1,5 +1,7 @@
 #pragma once
 #include "PhysicUtils.h"
+#include "Types.h"
+
 #include <vector>
 namespace god
 {
@@ -13,19 +15,19 @@ namespace god
 
 
 	// Will be called every time the Entity has Contact
-	// EntityData.m_id ,  Callback function( position of the entt) 
-	static std::vector< std::pair<uint32_t, void (*)(glm::vec3 const& pos)> > ContactCallBack
+	// PhysicsTypes ,  Callback function( position of the entt) 
+	static std::vector< std::pair<int, void (*)(glm::vec3 const& pos)> > ContactCallBack
 	{
-		{41,DiceCallBack},{48,DiceCallBack},{104,DiceCallBack}
+		{PhysicsTypes::Dice,DiceCallBack}
 	};
 
 
 	// Will be called every time the pair of Entities has Contact
 	// EntityData.m_id 0 , EntityData.m_id 1,  Callback function( position of entt 0 ,position of entt 1 ) 
-	static std::vector< std::tuple<uint32_t, uint32_t, void (*)(glm::vec3 const& pos, glm::vec3 const& pos1)> > ContactCallBackPair
+	static std::vector< std::tuple<int, int, void (*)(glm::vec3 const& pos, glm::vec3 const& pos1)> > ContactCallBackPair
 	{
 		
-		{0, 1, ExamplePairCallBack}
+		{PhysicsTypes::Bullet, PhysicsTypes::Player, ExamplePairCallBack}
 	};
 
 }
