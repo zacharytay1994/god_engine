@@ -85,7 +85,7 @@ namespace god
 
 			}
 			//rigidstatic.p_RigidStatic->setActorFlag()
-			rigidstatic.p_RigidStatic->userData = &edata;
+			rigidstatic.p_RigidStatic->userData = &rigidstatic;
 
 			rigidstatic.updateRigidStatic = false;
 		}

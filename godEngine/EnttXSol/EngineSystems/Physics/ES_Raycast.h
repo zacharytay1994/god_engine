@@ -17,7 +17,7 @@ namespace god
 		if (rigiddynamic.p_RigidDynamic == psystem.GetRayCastMouse())
 		{
 			//std::cout << "raycast: " << edata.m_id << std::endl;
-			//psystem.SetRCMid(edata.m_id);
+			psystem.setRCMid(edata.m_id);
 
 		}
 	}
@@ -31,7 +31,7 @@ namespace god
 		if (rigidstatic.p_RigidStatic == psystem.GetRayCastMouse())
 		{
 			//std::cout << "raycast: " << edata.m_id << std::endl;
-			//psystem.SetRCMid(edata.m_id);
+			psystem.setRCMid(edata.m_id);
 		}
 
 	}

@@ -36,8 +36,8 @@ namespace god
 		}//else if entt.m_pause
 		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1> ( component );
+		RigidDynamic& rigiddynamic = std::get<2>(component);
 		Renderable3D& renderable = std::get<3> ( component );
-		RigidDynamic& rigiddynamic = std::get<2> ( component );
 		PhysicsSystem& psys = engineResources.Get<PhysicsSystem>().get();
 
 		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem> ().get ().GetPhysics ();
@@ -54,7 +54,12 @@ namespace god
 			{
 				rigiddynamic.p_material = mPhysics->createMaterial ( rigiddynamic.StaticFriction , rigiddynamic.DynamicFriction , rigiddynamic.Restitution );
 			}
-
+			else
+			{
+				rigiddynamic.p_material->setStaticFriction(rigiddynamic.StaticFriction);
+				rigiddynamic.p_material->setDynamicFriction(rigiddynamic.DynamicFriction);
+				rigiddynamic.p_material->setRestitution(rigiddynamic.Restitution);
+			}
 			//exclusive shape (can be modified)
 			switch ( rigiddynamic.Shapeid )
 			{
@@ -103,9 +108,6 @@ namespace god
 				rigiddynamic.p_shape = mPhysics->createShape ( physx::PxTriangleMeshGeometry ( rigiddynamic.p_trimesh , scale ) , *rigiddynamic.p_material , true );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
 				break;
-
-			
-
 			}
 
 			rigiddynamic.p_RigidDynamic = mPhysics->createRigidDynamic ( physx::PxTransform ( transform.m_position.x ,
@@ -123,26 +125,8 @@ namespace god
 			rigiddynamic.p_RigidDynamic->setContactReportThreshold(0.01f);
 
 
-			for (auto const& tracked : ContactCallBack)
-			{
-				if (rigiddynamic.PhysicsTypeid == tracked.first)
-				{
-					psys.getContactReportCallback().AddToContactTrack(rigiddynamic.p_RigidDynamic, tracked.second);
-				}
-			}
-
-			for (auto& [entt1, entt2, fp, actor1, actor2] : psys.getContactReportCallback().getContactPairTrack() )
-			{
-				if (edata.m_id == entt1)
-				{
-					actor1 = rigiddynamic.p_RigidDynamic;
-				}
-				if (edata.m_id == entt2)
-				{
-					actor2 = rigiddynamic.p_RigidDynamic;
-				}
-			}
-			rigiddynamic.p_RigidDynamic->userData = &edata;
+			rigiddynamic.m_id = edata.m_id;
+			rigiddynamic.p_RigidDynamic->userData = &rigiddynamic;
 
 			rigiddynamic.initRigidDynamic = false;
 

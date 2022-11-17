@@ -12,22 +12,39 @@ namespace god
 	void ExamplePairCallBack(glm::vec3 const& pos, glm::vec3 const& pos1);
 
 
-
-
-	// Will be called every time the Entity has Contact
-	// PhysicsTypes ,  Callback function( position of the entt) 
-	static std::vector< std::pair<int, void (*)(glm::vec3 const& pos)> > ContactCallBack
+	// Will be called every frame as long as the pair of Entities has Contact
+	//Requires 2 Simulation Shape
+	// PhysicsTypes id ,  Callback function( position of the entt) 
+	static std::vector< std::pair<PhysicsTypes::physicstype, void (*)(glm::vec3 const& pos)> > ContactCallBack
 	{
-		{PhysicsTypes::Dice,DiceCallBack}
+		{PhysicsTypes::Dice , DiceCallBack}
 	};
 
 
-	// Will be called every time the pair of Entities has Contact
-	// EntityData.m_id 0 , EntityData.m_id 1,  Callback function( position of entt 0 ,position of entt 1 ) 
-	static std::vector< std::tuple<int, int, void (*)(glm::vec3 const& pos, glm::vec3 const& pos1)> > ContactCallBackPair
-	{
-		
-		{PhysicsTypes::Bullet, PhysicsTypes::Player, ExamplePairCallBack}
-	};
+	//// Will be called every frame as long as the pair of Entities has Contact
+	////Requires 2 Simulation Shape
+	//// EntityData.m_id 0 , EntityData.m_id 1,  Callback function( position of entt 0 ,position of entt 1 ) 
+	//static std::vector< std::tuple<PhysicsTypes::physicstype, PhysicsTypes::physicstype, void (*)(glm::vec3 const& pos, glm::vec3 const& pos1)> > ContactCallBackPair
+	//{
+	//	{PhysicsTypes::Bullet, PhysicsTypes::Player, ExamplePairCallBack}
+	//};
+
+	//// Will be called once upon contact and once again upon no contact
+	//// Requires 1 Trigger Shape and 1 Simulation Shape
+	//// PhysicsTypes id ,  Callback function( position of the entt) 
+	//static std::vector< std::pair<PhysicsTypes::physicstype, void (*)(glm::vec3 const& pos)> > TriggerCallBack
+	//{
+	//	{PhysicsTypes::Dice , DiceTriggerCallBack}
+	//};
+
+
+	//// Will be called once upon contact and once again upon no contact
+	//// Requires 1 Trigger Shape and 1 Simulation Shape
+	//// EntityData.m_id 0 , EntityData.m_id 1,  Callback function( position of entt 0 ,position of entt 1 ) 
+	//static std::vector< std::tuple<PhysicsTypes::physicstype, PhysicsTypes::physicstype, void (*)(glm::vec3 const& pos, glm::vec3 const& pos1)> >TriggerCallBackPair
+	//{
+
+	//	//{PhysicsTypes::Bullet, PhysicsTypes::Player, ExamplePairCallBack}
+	//};
 
 }

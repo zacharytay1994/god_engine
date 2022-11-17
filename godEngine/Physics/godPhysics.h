@@ -32,7 +32,7 @@ namespace god
 		
 		physx::PxRigidActor* const GetRayCastMouse();
 		const uint32_t getRCMid();
-
+		void setRCMid(uint32_t id);
 		bool GetisRunning() const;
 		physx::PxPhysics* const GetPhysics() const;
 		physx::PxCooking* const GetCooking() const;

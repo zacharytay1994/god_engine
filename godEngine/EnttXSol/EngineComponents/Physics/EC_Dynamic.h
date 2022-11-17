@@ -16,8 +16,8 @@ namespace god
 		physx::PxVec3 extents;
 		bool locktoscale;
 		//PhysicsTypes IDs
-		int Shapeid;	//Default = 0 = Cube
-		int PhysicsTypeid;	//Default = 0
+		int Shapeid;	// Cube=0, Sphere, Capsule, TriangleMesh
+		int PhysicsTypeid;	//Dice = 0, Player, Enemy, Bullet, Tile
 		//Dynamic Properties
 		physx::PxVec3 AngularVelocity;
 		physx::PxVec3 LinearVelocity;
@@ -31,12 +31,13 @@ namespace god
 		bool Trigger{ false };
 		
 		//Non serialize data
+		uint32_t m_id;
 		physx::PxTriangleMesh* p_trimesh;
 		physx::PxMaterial* p_material;
 		physx::PxShape* p_shape;	
 		physx::PxRigidDynamic* p_RigidDynamic;
 
-		bool initRigidDynamic{ true };
+		bool initRigidDynamic;
 		physx::PxScene* mScene;
 
 		//Ctor
@@ -45,7 +46,7 @@ namespace god
 			Shapeid{ 0 }, PhysicsTypeid{ 0 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, p_shape{ nullptr },
 			locktoscale{ true }, Active{ true }, Simulation{ true }, Trigger{ false }, Gravity{ true },
 			StaticFriction{ 0.5f }, DynamicFriction{ 0.5f }, Restitution{ 0.5f }, 
-			AngularVelocity{ 0.f,0.f,0.f }, LinearVelocity{ 0.f,0.f,0.f }, Density{ 1.f }
+			AngularVelocity{ 0.f,0.f,0.f }, LinearVelocity{ 0.f,0.f,0.f }, Density{ 1.f }, initRigidDynamic{ true } 
 		{};
 
 		~RigidDynamic()
@@ -83,23 +84,52 @@ namespace god
 
 
 				int selected_shape = component.Shapeid;
-				const char* names[] = { "Cube", "Sphere", "Capsule","Triangle Mesh" };
+				const char* names[] = { "Cube", "Sphere", "Capsule" };
 				char buf[64];
 				sprintf_s(buf, "%s###", names[selected_shape]); // ### operator override ID ignoring the preceding label
+				ImGui::Text("Shape Type :");
 				if (ImGui::Button(buf))
 				{
 					ImGui::OpenPopup("shape popup");
 				}
-				//ImGui::TextUnformatted( names[selected_shape] );
 				if (ImGui::BeginPopup("shape popup"))
 				{
-					ImGui::Text("Shape type");
-					ImGui::Separator();
+
 					for (int i = 0; i < IM_ARRAYSIZE(names); i++)
 						if (ImGui::Selectable(names[i]))
 						{
 							selected_shape = i;
 							component.Shapeid = i;
+							component.initRigidDynamic = true;
+							ImGui::CloseCurrentPopup();
+						}
+					ImGui::EndPopup();
+				}
+
+
+				int selected_type = component.PhysicsTypeid;
+				const char* typenames[] = { "Default", "Dice", "Player", "Enemy", "Bullet", "Tile" };
+				char buf1[64];
+				sprintf_s(buf1, "%s###", typenames[selected_type]); // ### operator override ID ignoring the preceding label
+				ImGui::Text("Physics Type :");
+				ImGui::PushID(1);
+				if (ImGui::Button(buf1))
+				{
+					ImGui::PopID();
+					ImGui::OpenPopup("type popup");
+				}
+				else
+				{
+					ImGui::PopID();
+				}
+				//ImGui::TextUnformatted( names[selected_shape] );
+				if (ImGui::BeginPopup("type popup"))
+				{
+					for (int i = 0; i < IM_ARRAYSIZE(typenames); i++)
+						if (ImGui::Selectable(typenames[i]))
+						{
+							selected_type = i;
+							component.PhysicsTypeid = i;
 							component.initRigidDynamic = true;
 							ImGui::CloseCurrentPopup();
 						}

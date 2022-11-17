@@ -239,7 +239,6 @@ namespace god
 		return mRayCastMouse;
 	}
 
-
 	const uint32_t PhysicsSystem::getRCMid()
 	{
 		physx::PxRigidActor* rcm = GetRayCastMouse();
@@ -247,12 +246,19 @@ namespace god
 		if (!rcm)
 			return Null;
 		else
-			return reinterpret_cast<EntityData*>(rcm->userData)->m_id;
+			return RayCastid;
 		 
+	}
+
+	void PhysicsSystem::setRCMid(uint32_t id)
+	{
+		RayCastid = id;
 	}
 
 	bool PhysicsSystem::GetisRunning() const
 	{
+
+
 		return mRunning;
 	}
 

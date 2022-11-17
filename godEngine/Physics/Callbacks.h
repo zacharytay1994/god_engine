@@ -5,6 +5,8 @@
 #include "DiceCallBack.h"
 #include "SnippetUtils.h"
 
+
+
 #include <vector>
 #include <unordered_map>
 namespace god
@@ -20,18 +22,12 @@ namespace god
 		ContactReportCallback() 
 		{
 			mContacts.resize(64);
-			for (auto& [id1,id2,fp] : ContactCallBackPair)
-			{
-				ContactPairTrack.push_back({ id1,id2,fp ,nullptr,nullptr });
-			}
+
 		}
 		~ContactReportCallback() {}
 
 
-		void AddToContactTrack(const PxRigidBody* const rb, void (*function)(glm::vec3 const& pos));
-		
-		std::vector < std::tuple <uint32_t, uint32_t, void (*)(glm::vec3 const& pos, glm::vec3 const& pos1),
-			PxRigidActor*, PxRigidActor*  > >& getContactPairTrack();
+
 
 	
 
@@ -39,10 +35,7 @@ namespace god
 
 
 		std::vector< PxContactPairPoint> mContacts;
-		std::vector < std::pair< const PxRigidActor* const, void (*)(glm::vec3 const& pos) > > ContactTrack;
-		std::vector < std::tuple <uint32_t, uint32_t, void (*)(glm::vec3 const& pos, glm::vec3 const& pos1),
-			 PxRigidActor* ,	 PxRigidActor*  > > 
-			ContactPairTrack;
+
 
 
 		void onConstraintBreak(PxConstraintInfo* constraints, PxU32 count) { PX_UNUSED(constraints); PX_UNUSED(count); }

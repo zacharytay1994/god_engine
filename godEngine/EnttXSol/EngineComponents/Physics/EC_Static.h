@@ -14,8 +14,8 @@ namespace god
 		physx::PxVec3 extents;
 		bool locktoscale;
 		//PhysicsTypes IDs
-		int Shapeid;	//Default = 0 = Cube
-		int PhysicsTypeid;	//Default = 0
+		int Shapeid;	//Cube, Sphere, Capsule, TriangleMesh
+		int PhysicsTypeid;	//Default, Dice, Player, Enemy, Bullet, Tile
 		//Offset
 		physx::PxVec3 Offset;
 
@@ -36,7 +36,7 @@ namespace god
 
 		//Ctor
 		RigidStatic() :  StaticFriction{ 0.5f }, DynamicFriction{ 0.5f }, Restitution{ 0.5f }, p_material{ nullptr }, 
-			Shapeid{ 0 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, locktoscale{ true }, Offset{ 0.f, 0.f, 0.f },
+			Shapeid{ 0 }, PhysicsTypeid{ 5 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, locktoscale{ true }, Offset{ 0.f, 0.f, 0.f },
 			Active{ true },  Simulation{ true },  Trigger{ false }, p_shape{ nullptr }, p_RigidStatic{ nullptr }, mScene{nullptr}
 		{};
 
