@@ -664,21 +664,35 @@ namespace god
 			RapidJSON::JSONifyToValue ( value , document , "Type" , "Prefab" );
 
 			// serialize the prefab transform if any
-			Transform* transform = m_registry.try_get<Transform> ( m_entities[ entity ].m_id );
-			if ( transform )
-			{
-				rapidjson::Value transform_value { rapidjson::kObjectType };
-				JSONify ( engineResources , document , transform_value , *transform );
-				RapidJSON::JSONifyToValue ( value , document , "Transform" , transform_value );
-			}
+			//Transform* transform = m_registry.try_get<Transform> ( m_entities[ entity ].m_id );
+			//if ( transform )
+			//{
+			//	rapidjson::Value transform_value { rapidjson::kObjectType };
+			//	JSONify ( engineResources , document , transform_value , *transform );
+			//	RapidJSON::JSONifyToValue ( value , document , "Transform" , transform_value );
+			//}
 
-			// serialize grid cell if any
-			GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
-			if ( grid_cell )
+			//// serialize grid cell if any
+			//GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
+			//if ( grid_cell )
+			//{
+			//	rapidjson::Value grid_cell_value { rapidjson::kObjectType };
+			//	JSONify ( engineResources , document , grid_cell_value , *grid_cell );
+			//	RapidJSON::JSONifyToValue ( value , document , "Grid Cell" , grid_cell_value );
+			//}
+
+			if ( m_entity_pool.find ( m_entities[ entity ].m_name ) == m_entity_pool.end () )
 			{
-				rapidjson::Value grid_cell_value { rapidjson::kObjectType };
-				JSONify ( engineResources , document , grid_cell_value , *grid_cell );
-				RapidJSON::JSONifyToValue ( value , document , "Grid Cell" , grid_cell_value );
+				// create original, to compare when writing
+				PrefabSetMaster ( engineResources , m_entities[ entity ].m_name );
+			}
+			auto i { 0 };
+			std::array<std::string , 2> temp_component_names { "Transform", "Renderable3D" };
+			for ( auto const& component_name : temp_component_names )
+			{
+				T_Manip::RunOnType ( std::tuple<Transform , Renderable3D> () , i ,
+					WriteUniqueEngineComponentsToSON () , std::ref ( *this ) , engineResources , std::ref ( document ) , std::ref ( value ) , entity , m_entities[ entity ].m_name , component_name );
+				++i;
 			}
 		}
 	}
@@ -708,21 +722,30 @@ namespace god
 			Entities::ID prefab_root = LoadPrefabV2 ( engineResources , name , parent , true , grid );
 
 			// deserialize transform component if has transform in file and in prefab
-			Transform* transform = m_registry.try_get<Transform> ( m_entities[ prefab_root ].m_id );
-			if ( transform )
-			{
-				if ( value.HasMember ( "Transform" ) )
-				{
-					DeJSONify ( engineResources , *transform , value[ "Transform" ] );
-				}
-			}
+			//Transform* transform = m_registry.try_get<Transform> ( m_entities[ prefab_root ].m_id );
+			//if ( transform )
+			//{
+			//	if ( value.HasMember ( "Transform" ) )
+			//	{
+			//		DeJSONify ( engineResources , *transform , value[ "Transform" ] );
+			//	}
+			//}
 
-			// if prefab was part of a grid before, load its grid cell data
-			if ( value.HasMember ( "Grid Cell" ) )
+			//// if prefab was part of a grid before, load its grid cell data
+			//if ( value.HasMember ( "Grid Cell" ) )
+			//{
+			//	AttachComponent<GridCell> ( prefab_root );
+			//	GridCell* grid_cell = GetEngineComponent<GridCell> ( prefab_root );
+			//	DeJSONify ( engineResources , *grid_cell , value[ "Grid Cell" ] );
+			//}
+			// 
+			// load all existing engine components, assuming the prefab loaded has the component, and there is a unique property saved
+			auto i { 0 };
+			for ( auto const& component_name : EngineComponents::m_component_names )
 			{
-				AttachComponent<GridCell> ( prefab_root );
-				GridCell* grid_cell = GetEngineComponent<GridCell> ( prefab_root );
-				DeJSONify ( engineResources , *grid_cell , value[ "Grid Cell" ] );
+				T_Manip::RunOnType ( EngineComponents::Components () , i ,
+					LoadUniqueEngineComponentsFromJSON () , std::ref ( *this ) , engineResources , std::ref ( value ) , prefab_root , component_name );
+				++i;
 			}
 		}
 		else if ( std::string ( value[ "Type" ].GetString () ) == "Default" )
@@ -924,21 +947,36 @@ namespace god
 				RapidJSON::JSONifyToValue ( value , document , "Type" , "Prefab" );
 
 				// serialize the prefab transform if any
-				Transform* transform = m_registry.try_get<Transform> ( m_entities[ entity ].m_id );
-				if ( transform )
-				{
-					rapidjson::Value transform_value { rapidjson::kObjectType };
-					JSONify ( engineResources , document , transform_value , *transform );
-					RapidJSON::JSONifyToValue ( value , document , "Transform" , transform_value );
-				}
+				//Transform* transform = m_registry.try_get<Transform> ( m_entities[ entity ].m_id );
+				//if ( transform )
+				//{
+				//	rapidjson::Value transform_value { rapidjson::kObjectType };
+				//	JSONify ( engineResources , document , transform_value , *transform );
+				//	RapidJSON::JSONifyToValue ( value , document , "Transform" , transform_value );
+				//}
 
-				// serialize grid cell if any
-				GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
-				if ( grid_cell )
+				//// serialize grid cell if any
+				//GridCell* grid_cell = GetEngineComponent<GridCell> ( entity );
+				//if ( grid_cell )
+				//{
+				//	rapidjson::Value grid_cell_value { rapidjson::kObjectType };
+				//	JSONify ( engineResources , document , grid_cell_value , *grid_cell );
+				//	RapidJSON::JSONifyToValue ( value , document , "Grid Cell" , grid_cell_value );
+				//}
+
+				// write all existing engine components, if different from original
+				if ( m_entity_pool.find ( m_entities[ entity ].m_name ) == m_entity_pool.end () )
 				{
-					rapidjson::Value grid_cell_value { rapidjson::kObjectType };
-					JSONify ( engineResources , document , grid_cell_value , *grid_cell );
-					RapidJSON::JSONifyToValue ( value , document , "Grid Cell" , grid_cell_value );
+					// create original, to compare when writing
+					PrefabSetMaster ( engineResources , m_entities[ entity ].m_name );
+				}
+				auto i { 0 };
+				std::array<std::string , 2> temp_component_names { "Transform", "Renderable3D" };
+				for ( auto const& component_name : temp_component_names )
+				{
+					T_Manip::RunOnType ( std::tuple<Transform , Renderable3D> () , i ,
+						WriteUniqueEngineComponentsToSON () , std::ref ( *this ) , engineResources , std::ref ( document ) , std::ref ( value ) , entity , m_entities[ entity ].m_name , component_name );
+					++i;
 				}
 			}
 		}
@@ -961,21 +999,30 @@ namespace god
 			Entities::ID prefab_root = LoadPrefabV2 ( engineResources , name , parent , true , grid );
 
 			// deserialize transform component if has transform in file and in prefab
-			Transform* transform = m_registry.try_get<Transform> ( m_entities[ prefab_root ].m_id );
+			/*Transform* transform = m_registry.try_get<Transform> ( m_entities[ prefab_root ].m_id );
 			if ( transform )
 			{
 				if ( value.HasMember ( "Transform" ) )
 				{
 					DeJSONify ( engineResources , *transform , value[ "Transform" ] );
 				}
-			}
+			}*/
 
 			// if prefab was part of a grid before, load its grid cell data
-			if ( value.HasMember ( "Grid Cell" ) )
+			/*if ( value.HasMember ( "Grid Cell" ) )
 			{
 				AttachComponent<GridCell> ( prefab_root );
 				GridCell* grid_cell = GetEngineComponent<GridCell> ( prefab_root );
 				DeJSONify ( engineResources , *grid_cell , value[ "Grid Cell" ] );
+			}*/
+
+			// load all existing engine components, assuming the prefab loaded has the component, and there is a unique property saved
+			auto i { 0 };
+			for ( auto const& component_name : EngineComponents::m_component_names )
+			{
+				T_Manip::RunOnType ( EngineComponents::Components () , i ,
+					LoadUniqueEngineComponentsFromJSON () , std::ref ( *this ) , engineResources , std::ref ( value ) , prefab_root , component_name );
+				++i;
 			}
 		}
 		else if ( std::string ( value[ "Type" ].GetString () ) == "Default" )
@@ -1224,7 +1271,7 @@ namespace god
 		}
 	}
 
-	void EnttXSol::PrefabSetMaster ( EngineResources& engineResources , std::string const& fileName )
+	void EnttXSol::PrefabSetMaster ( EngineResources& engineResources , std::string fileName )
 	{
 		auto entity = AddPrefabToScene ( engineResources , fileName , Entities::Null , { 0,0,0 } , false );
 		m_entity_pool[ fileName ] = entity;

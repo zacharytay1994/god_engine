@@ -31,6 +31,7 @@
 #include <functional>
 #include <type_traits>
 #include <queue>
+#include <algorithm>
 
 namespace god
 {
@@ -221,7 +222,7 @@ namespace god
 		std::queue<std::tuple<std::string , Entities::ID , float , float , float , bool>> m_instance_queue;
 		std::queue<Entities::ID> m_delete_queue;
 		void SetEntityActive ( EnttXSol::Entities::ID entity , bool active );
-		void PrefabSetMaster ( EngineResources& engineResources , std::string const& fileName );
+		void PrefabSetMaster ( EngineResources& engineResources , std::string fileName );
 		EnttXSol::Entities::ID InstancePrefabFromMaster ( std::string const& fileName , Entities::ID parent = Entities::Null );
 		Entities::ID MakeEntityCopy ( Entities::ID src , Entities::ID parent );
 
@@ -288,6 +289,68 @@ namespace god
 				}
 			}
 		};
+
+		// help add valid engine components from json
+		struct LoadUniqueEngineComponentsFromJSON
+		{
+			template <typename T>
+			void operator()( EnttXSol& entt , EngineResources& engineResources , rapidjson::Value& jsonObj , Entities::ID id , std::string const& engineComponentName )
+			{
+				// update unique property exist and prefab has component
+				T* engine_component = entt.GetEngineComponent<T> ( id );
+				if ( jsonObj.HasMember ( engineComponentName.c_str () ) && engine_component != nullptr )
+				{
+					DeJSONify ( engineResources , *engine_component , jsonObj[ engineComponentName.c_str () ] );
+				}
+			}
+		};
+
+		struct simple_compare
+		{
+			template <typename A>
+			bool operator()( A const& a , A const& b ) const
+			{
+				return a == b;
+			}
+		};
+
+		// help write valid engine components that are unique to json
+		struct WriteUniqueEngineComponentsToSON
+		{
+			template <typename T>
+			void operator()( EnttXSol& entt , EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& jsonObj , Entities::ID id , std::string const& prefabName , std::string const& engineComponentName )
+			{
+				// if has engine component
+				T* engine_component = entt.GetEngineComponent<T> ( id );
+				T* master_component { nullptr };
+				if ( entt.m_entity_pool.find ( prefabName ) != entt.m_entity_pool.end () )
+				{
+					master_component = entt.GetEngineComponent<T> ( entt.m_entity_pool[ prefabName ] );
+				}
+				if ( engine_component != nullptr && master_component != nullptr )
+				{
+					// if is unique, i.e. diff from original saved one
+					// compare with master copy
+					if ( !( *engine_component == *master_component ) )
+					{
+						rapidjson::Value component_value { rapidjson::kObjectType };
+						JSONify ( engineResources , document , component_value , *engine_component );
+						RapidJSON::JSONifyToValue ( jsonObj , document , engineComponentName , component_value );
+						std::cout << "Found and Wrote unique property of :" << engineComponentName << " of " << id << std::endl;
+					}
+				}
+			}
+		};
+
+		/*struct testtmpalte
+		{
+			template<typename T>
+			bool operator()()
+			{
+				T a , b;
+				return a == b;
+			}
+		};*/
 	};
 
 	template<typename ENGINE_COMPONENTS>
