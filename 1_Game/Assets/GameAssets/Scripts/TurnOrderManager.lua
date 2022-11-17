@@ -128,7 +128,8 @@ function S_TurnOrderManager(e)
             local playerEntity = GetEntity("Player")
             if (playerEntity ~= -1) then
                 for n = 1, #turnOrderManagerComponent.turnQueue do
-                    if (turnOrderManagerComponent.turnQueue[n] == GetEntityData(playerEntity).id) then
+                    if (turnOrderManagerComponent.turnQueue[n] == playerEntity) then
+                    -- if (turnOrderManagerComponent.turnQueue[n] == GetEntityData(playerEntity).id) then
                         playerIndex = n
                         break;
                     end
