@@ -408,7 +408,6 @@ namespace god
 			//glStencilFunc( GL_ALWAYS, 0, 0xFF );
 			//// Enable the depth buffer
 			//glEnable( GL_DEPTH_TEST );
-
 		}
 
 		// [Draw Billboard Sprites]

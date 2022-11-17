@@ -20,6 +20,7 @@ namespace god
 		// lua copy table function
 		const auto& table_copy = R"(
 			local t = ...
+			print("Copied t")
 			local t2 = {}
 			for k,v in pairs(t) do
 				t2[k] = v
@@ -1250,7 +1251,8 @@ namespace god
 				// if its sol::table component, aka. script component, need special copy
 				if ( storage.type ().name () == typeid( sol::table ).name () )
 				{
-					sol::table new_table = m_copy_table ( *static_cast< sol::table* >( storage.get ( m_entities[ src ].m_id ) ) );
+					sol::table new_table = m_lua[ "CopyTable" ] ( *static_cast< sol::table* >( storage.get ( m_entities[ src ].m_id ) ) );
+					//sol::table new_table = m_copy_table ( *static_cast< sol::table* >( storage.get ( m_entities[ src ].m_id ) ) );
 					storage.emplace ( m_entities[ new_entity ].m_id , static_cast< void* >( &new_table ) );
 				}
 				else
