@@ -20,6 +20,7 @@ function C_EnemyForecast()
     local var = {
 
         -- will be set to true by TurnOrderManager, at the start of each round.
+        -- reset once to false once done
         performForecast = false
 
     }
@@ -30,16 +31,16 @@ end
 
 --[IsSystem]
 function S_EnemyForecast(e)
-    
-    local enemyCharacterComponent = GetComponent(e, "C_Character")
-    
-    -- if it's currently the enemy's turn or if the enemy is dead, don't forecast.
-    if (enemyCharacterComponent.isActive or enemyCharacterComponent.isDead) then
-        return
-    end
 
-    local enemyController = GetComponent(e, "C_EnemyController")
+
+
+    -- local enemiesList = EntitiesWithScriptComponent("C_EnemyController")
+    -- for m = 1, #enemiesList do     
     
+    --     local forecastObject = Child(enemiesList[m], 0)
+    --     print("Testing forecastObject name:", EntityName(forecastObject))
+    
+    -- end
 
 
 end

@@ -31,10 +31,10 @@ function C_TurnOrderManager()
         turnQueue = {},
 
         -- counts the number of turn cycles 
-        turnCycleCounter = 0,
+        turnCycleCounter = 0
 
         -- turn order UI will be refreshed at the start of each round
-        refreshTurnOrderUI = false
+        --refreshTurnOrderUI = false
     };
     return function()
         return var
@@ -169,8 +169,15 @@ function S_TurnOrderManager(e)
             -- reset to false so it doesn't build the queue again for this round
             turnOrderManagerComponent.buildTurnQueue = false
 
-            -- cue UIManager to refresh the turn order icons 
-            turnOrderManagerComponent.refreshTurnOrderUI = true
+            local enemyForecastEntity = GetEntity("EnemyForecast")
+            if (enemyForecastEntity ~= -1) then
+                GetComponent(enemyForecastEntity, "C_EnemyForecast").performForecast = true
+            else
+                print("[TurnOrderManager.lua] ERROR: EnemyForecast entity not found!")
+            end
+
+            -- -- cue UIManager to refresh the turn order icons 
+            -- turnOrderManagerComponent.refreshTurnOrderUI = true
 
             print("[TurnOrderManager.lua] End of building turnQueue.\n")
 
