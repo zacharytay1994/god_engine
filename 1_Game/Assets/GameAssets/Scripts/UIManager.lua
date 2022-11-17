@@ -18,7 +18,13 @@ function C_UIManager()
         characterIconsInit = false,
 
         -- list of all character icons
-        iconList = {}
+        iconList = {},
+		
+		-- Size of healthbar
+		healthbar_size = 0.0,
+		
+		-- Health record, used to optimize the healthbar UI
+		health_record = 0.0
     };
     return function()
         return var
@@ -28,7 +34,12 @@ end
 --[IsSystem]
 function S_UIManager(e)
     
+
     local UIManagerComponent = GetComponent(e, "C_UIManager")
+	
+	if (UIManagerComponent.healthbar_size == 0.0) then
+		UIManagerComponent.healthbar_size = GetGUIObject(GetEntity("HealthbarRed")).size.x
+	end
 
     -- checking if player entity exists
     local playerEntity = GetEntity("Player")
@@ -112,8 +123,15 @@ function S_UIManager(e)
         -- clear actionButtonList
         UIManagerComponent.actionButtonList = {}
     end
-
-	GetGUIText(GetEntity("StaminaIcon")).text = tostring(GetComponent(GetEntity("Player"), "C_Character").currentStamina)
+	
+	local playerComponent = GetComponent(playerEntity, "C_Character")
+	GetGUIText(GetEntity("StaminaIcon")).text = tostring(playerComponent.currentStamina)
+	if(UIManagerComponent.health_record ~= playerComponent.currentHP) then
+		UIManagerComponent.health_record = playerComponent.currentHP
+		GetGUIText(GetEntity("HealthHeart")).text = tostring(playerComponent.currentHP)
+		GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
+	end
+	-- print(UIManagerComponent.healthbar_size)
 	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------
 

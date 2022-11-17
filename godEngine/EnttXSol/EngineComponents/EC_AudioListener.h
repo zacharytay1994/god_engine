@@ -10,7 +10,6 @@ namespace god
 		int m_listener_id{ 0 }; // output
 
 		FMOD_VECTOR m_position;
-		FMOD_VECTOR m_velocity; // for doppler effects, not really needed?
 		FMOD_VECTOR m_forward;
 		FMOD_VECTOR m_up;
 	};
