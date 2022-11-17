@@ -1,7 +1,8 @@
 -- This script will allow the player to select an enemy as an attack target.
 
--- TODO:
--- 1) 
+-- Note: when implementing a new player attack / action:
+-- 1) Write the new attack script and attach it to CombatManager.
+-- 2) Add debug shortcut to Player.lua
 
 --[IsComponent]
 function C_PlayerAttack()
@@ -69,8 +70,8 @@ function S_PlayerAttack(e)
             end      
 
             -- select a target -----------------------------------------------------------------------------------------           
-            -- special case for BigSwing because it can also target tiles, not just characters
-            if (playerComponent.selectedAction == "BigSwing") then
+            -- special case for BigSwing / Cryogenesis because it can also target tiles, not just characters
+            if (playerComponent.selectedAction == "BigSwing" or playerComponent.selectedAction == "Cryogenesis") then
 
                 local gridManipulateEntity = GetEntity("GridManipulate")
                     

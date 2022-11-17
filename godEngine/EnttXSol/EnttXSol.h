@@ -159,7 +159,7 @@ namespace god
 		template<typename...COMPONENTS>
 		auto GetView ();
 
-		friend void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources );
+		friend void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources , MainVariables& name );
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -630,9 +630,9 @@ namespace god
 				}
 			}
 		}
-		else if ( m_registry.all_of<T , R , Billboard> ( m_entities[ e ].m_id ) )
+		else if ( m_registry.all_of<T , R , Transparent> ( m_entities[ e ].m_id ) )
 		{
-			auto [transform , renderable , billboard] = m_registry.get<T , R , Billboard> ( m_entities[ e ].m_id );
+			auto [transform , renderable , transparent] = m_registry.get<T , R , Transparent> ( m_entities[ e ].m_id );
 
 			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
 

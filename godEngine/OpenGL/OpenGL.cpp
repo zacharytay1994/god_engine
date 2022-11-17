@@ -3,6 +3,7 @@
 #include "../godUtility/Scene.h"
 #include <godUtility/Math.h>
 #include "../Window/DeltaTimer.h"
+#include "../Window/SystemTimer.h"
 
 #include "Internal/OGLDebug.h"
 
@@ -249,6 +250,7 @@ namespace god
 	void OpenGL::RenderScene ( Scene& scene ,
 		glm::mat4 const& projection ,
 		glm::mat4 const& view ,
+		glm::mat4 const& viewNoRot ,
 		glm::vec3 const& camera_position ,
 		OGLTextureManager& textures ,
 		glm::vec3 const& camera_front )
@@ -269,6 +271,15 @@ namespace god
 		// Reset directional light uniforms
 		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uNumDirectionalLight" , 0 );
 
+		// projection matrix
+		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uProjection" , projection );
+
+		// view matrix
+		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , view );
+
+		// set view position
+		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uViewPosition" , camera_position );
+
 		for ( auto const& data : scene.m_instanced_render_data )
 		{
 			// Make it so the stencil test always passes
@@ -277,17 +288,9 @@ namespace god
 			//glStencilMask( 0xFF );
 
 			// Draw the normal model
-			m_textured_shader.Use ();
-
-			// projection matrix
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uProjection" , projection );
-
-			// view matrix
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , view );
+			//m_textured_shader.Use ();
 
 			// set uniforms for fragment shader
-			// set view position
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uViewPosition" , camera_position );
 
 			// set material
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
@@ -410,6 +413,10 @@ namespace god
 
 		// [Draw Billboard Sprites]
 		// billboard sprites are not depth tested and not backface culled
+
+		// view matrix
+		//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , viewNoRot );
+
 		//glDisable ( GL_DEPTH_TEST );
 		glEnable ( GL_BLEND );
 		glBlendFunc ( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
@@ -425,14 +432,14 @@ namespace god
 			m_textured_shader.Use ();
 
 			// projection matrix
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uProjection" , projection );
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uProjection" , projection );
 
-			// view matrix
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , view );
+			//// view matrix
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , view );
 
-			// set uniforms for fragment shader
-			// set view position
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uViewPosition" , camera_position );
+			//// set uniforms for fragment shader
+			//// set view position
+			//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uViewPosition" , camera_position );
 
 			// set material
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
@@ -691,6 +698,7 @@ namespace god
 
 		OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uProjection" , projection );
 
+		SystemTimer::StartTimeSegment ( "Sorting GUI" );
 		using RenderDataReference = std::tuple<Scene::InstancedRenderData , std::reference_wrapper<std::vector<glm::mat4>>>;
 		std::vector<RenderDataReference> sorted_render_data;
 		sorted_render_data.reserve ( scene.m_2D_instanced_render_data.size () );
@@ -703,8 +711,9 @@ namespace god
 		}
 		std::sort ( sorted_render_data.begin () , sorted_render_data.end () , []( auto const& lhs , auto const& rhs )
 			{
-				return std::get<1> ( lhs ).get ()[ 0 ][3].z < std::get<1> ( rhs ).get ()[ 0 ][3].z;
+				return std::get<1> ( lhs ).get ()[ 0 ][ 3 ].z < std::get<1> ( rhs ).get ()[ 0 ][ 3 ].z;
 			} );
+		SystemTimer::EndTimeSegment ( "Sorting GUI" );
 
 		for ( auto const& data : sorted_render_data )
 		{
@@ -714,7 +723,7 @@ namespace god
 
 			for ( auto& mesh : m_models[ first.m_model_id ] )
 			{
-				mesh.SetTransformData ( second.get() );
+				mesh.SetTransformData ( second.get () );
 				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
 		}

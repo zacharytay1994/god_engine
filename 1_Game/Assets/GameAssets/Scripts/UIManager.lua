@@ -18,7 +18,13 @@ function C_UIManager()
         characterIconsInit = false,
 
         -- list of all character icons
-        iconList = {}
+        iconList = {},
+		
+		-- Size of healthbar
+		healthbar_size = 0.0,
+		
+		-- Health record, used to optimize the healthbar UI
+		health_record = 0.0
     };
     return function()
         return var
@@ -28,7 +34,12 @@ end
 --[IsSystem]
 function S_UIManager(e)
     
+
     local UIManagerComponent = GetComponent(e, "C_UIManager")
+	
+	if (UIManagerComponent.healthbar_size == 0.0) then
+		UIManagerComponent.healthbar_size = GetGUIObject(GetEntity("HealthbarRed")).size.x
+	end
 
     -- checking if player entity exists
     local playerEntity = GetEntity("Player")
@@ -73,10 +84,18 @@ function S_UIManager(e)
                     currentDiceComponent = GetComponent(diceList[j], "C_DiceScript")
                     
                     -- currently only 2 attack types, will modify this part when more attack types are implemented
-                    if (currentDiceComponent.value == 1 or currentDiceComponent.value == 2 or currentDiceComponent.value == 3) then                       
+                    if (currentDiceComponent.value == 0) then                       
                         UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "FrontJab"                       
-                    else              
-                        UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "EnergyBolt"                      
+                    elseif (currentDiceComponent.value == 1) then                       
+                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "BigSwing"                       
+                    elseif (currentDiceComponent.value == 2) then                       
+                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "GroundSmash"                       
+                    elseif (currentDiceComponent.value == 3) then
+                        UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "EnergyBolt"
+					elseif (currentDiceComponent.value == 4) then
+                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Projectile"             
+					elseif (currentDiceComponent.value == 5) then
+                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Corporikinesis"             
                     end
                 end
                 
@@ -104,8 +123,15 @@ function S_UIManager(e)
         -- clear actionButtonList
         UIManagerComponent.actionButtonList = {}
     end
-
-	GetGUIText(GetEntity("StaminaIcon")).text = tostring(GetComponent(GetEntity("Player"), "C_Character").currentStamina)
+	
+	local playerComponent = GetComponent(playerEntity, "C_Character")
+	GetGUIText(GetEntity("StaminaIcon")).text = tostring(playerComponent.currentStamina)
+	if(UIManagerComponent.health_record ~= playerComponent.currentHP) then
+		UIManagerComponent.health_record = playerComponent.currentHP
+		GetGUIText(GetEntity("HealthHeart")).text = tostring(playerComponent.currentHP)
+		GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
+	end
+	-- print(UIManagerComponent.healthbar_size)
 	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------
 

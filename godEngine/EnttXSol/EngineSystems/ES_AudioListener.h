@@ -7,8 +7,6 @@ namespace god
 {
 	void AudioListenerSystem(EnttXSol& entt, EngineResources& engineResources, std::tuple<EntityData&, AudioListener, Transform&> components)
 	{
-		(entt);
-
 		// NOTE: ONLY ONE AUDIO LISTENER ALLOWED
 		AudioListener& audio_listener = std::get<1>(components);
 		Transform& al_transform = std::get<2>(components);
@@ -35,10 +33,6 @@ namespace god
 					if (!audio_source.m_played)
 						AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
 				}
-				//if (audio_source.m_play_on_awake && !audio_source.m_played) // modify a bit to check for m_play_on_awake
-				//{
-				//	AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
-				//}
 			}
 		}
 

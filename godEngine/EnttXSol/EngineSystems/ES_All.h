@@ -31,9 +31,6 @@ namespace god
 			SystemTimer::StartTimeSegment ( "GridManipulateSystem" );
 			enttxsol.RunEngineSystem ( engineResources , GridManipulateSystem );
 			SystemTimer::EndTimeSegment ( "GridManipulateSystem" );
-			SystemTimer::StartTimeSegment ( "AudioListenerSystem" );
-			enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
-			SystemTimer::EndTimeSegment ( "AudioListenerSystem" );
 		}
 
 		// gui
@@ -64,11 +61,13 @@ namespace god
 			SystemTimer::StartTimeSegment ( "ExampleSystemFrameStart" );
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameStart );
 			SystemTimer::EndTimeSegment ( "ExampleSystemFrameStart" );
-			SystemTimer::StartTimeSegment ( "AudioSourceSystem" );
-			enttxsol.RunEngineSystem ( engineResources , AudioSourceSystem );
-			SystemTimer::EndTimeSegment ( "AudioSourceSystem" );
 
 		}
+
+		SystemTimer::StartTimeSegment ( "AudioSourceSystem" );
+		enttxsol.RunEngineSystem ( engineResources , AudioSourceSystem );
+		SystemTimer::EndTimeSegment ( "AudioSourceSystem" );
+
 		if ( enttxsol.m_pause )
 		{
 			SystemTimer::StartTimeSegment ( "RigidStaticFrameBegin" );
@@ -98,6 +97,10 @@ namespace god
 			SystemTimer::StartTimeSegment ( "RigidDynamicFrameEnd" );
 			enttxsol.RunEngineSystem ( engineResources , RigidDynamicFrameEnd );
 			SystemTimer::EndTimeSegment ( "RigidDynamicFrameEnd" );
+
+			SystemTimer::StartTimeSegment("AudioListenerSystem");
+			enttxsol.RunEngineSystem(engineResources, AudioListenerSystem);
+			SystemTimer::EndTimeSegment("AudioListenerSystem");
 		}
 
 	}

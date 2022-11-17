@@ -327,6 +327,46 @@
             "UID": 2529729546
         }
     ],
+    "healthbar_heart": [
+        {
+            "Raw": "healthbar_heart.dds",
+            "Source": "D:\\Downloads\\healthbar_heart.dds",
+            "Last Edited": "17-11-2022 09-40-17",
+            "UID": 52944521
+        }
+    ],
+    "healthbar_redlong": [
+        {
+            "Raw": "healthbar_redlong.dds",
+            "Source": "D:\\Downloads\\healthbar_redlong.dds",
+            "Last Edited": "17-11-2022 09-44-52",
+            "UID": 394788064
+        }
+    ],
+    "healthbar_red": [
+        {
+            "Raw": "healthbar_red.dds",
+            "Source": "D:\\Downloads\\healthbar_red.dds",
+            "Last Edited": "17-11-2022 09-44-52",
+            "UID": 2178268523
+        }
+    ],
+    "healthbar_back": [
+        {
+            "Raw": "healthbar_back.dds",
+            "Source": "D:\\Downloads\\healthbar_back.dds",
+            "Last Edited": "17-11-2022 09-44-52",
+            "UID": 1112754194
+        }
+    ],
+    "healthbar_redlonglong": [
+        {
+            "Raw": "healthbar_redlonglong.dds",
+            "Source": "D:\\Downloads\\healthbar_redlonglong.dds",
+            "Last Edited": "17-11-2022 09-55-21",
+            "UID": 596405181
+        }
+    ],
     "Textures_Grass": [
         {
             "Raw": "ground_grass_3264_4062_Small.jpg",

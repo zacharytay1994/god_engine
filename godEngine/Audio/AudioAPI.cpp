@@ -16,7 +16,6 @@ namespace god
 	FMOD::ChannelGroup* AudioAPI::m_master_channel_group;
 	FMOD::SoundGroup* AudioAPI::m_master_sound_group;
 
-	//std::vector<FMOD::Channel*> AudioAPI::m_channels;
 	std::list<FMOD::Channel*> AudioAPI::m_channels;
 	std::unordered_map<int, FMOD::ChannelGroup*> AudioAPI::m_channel_groups;
 
@@ -120,7 +119,6 @@ namespace god
 	void AudioAPI::LoadSound(const char* filePath, Sound& sound)
 	{
 		// change the mode when creating sound
-		//FMOD_MODE mode = FMOD_LOOP_OFF | FMOD_3D | FMOD_3D_HEADRELATIVE | FMOD_3D_INVERSEROLLOFF;
 		FMOD_MODE mode = FMOD_3D;
 
 		FMOD_RESULT result = m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample);
@@ -173,6 +171,11 @@ namespace god
 	void AudioAPI::PauseSound(Sound& sound, bool paused)
 	{
 		sound.m_channel->setPaused(paused);
+	}
+
+	void AudioAPI::PauseSound(FMOD::Channel* channel, bool paused)
+	{
+		channel->setPaused(paused);
 	}
 
 	void AudioAPI::StopSound(FMOD::Channel* channel)

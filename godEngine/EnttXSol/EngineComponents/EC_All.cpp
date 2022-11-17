@@ -18,6 +18,6 @@ namespace god
 		"GridManipulate" ,
 		"GUIObject" ,
 		"GUIText" ,
-		"Billboard"
+		"Transparent"
 	};
 }

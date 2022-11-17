@@ -23,12 +23,12 @@ function C_EnemyController()
         -- name of the enemy's movement script (e.g. MoveDummee)
         -- movementScriptName will be initialized by using the inspector
         --[SerializeString]
-        movementScriptName = nil,
+        movementScriptName = "",
 
         -- name of the enemy's movement script (e.g. EnemyDummee)
         -- attackScriptName will be initialized by using the inspector
         --[SerializeString]
-        attackScriptName = nil
+        attackScriptName = ""
 
     }
     return function()
@@ -41,9 +41,13 @@ function S_EnemyController(e)
 
     local characterComponent = GetComponent(e, "C_Character")
     local enemyEntity = e
+
+    local enemyController = GetComponent(e, "C_EnemyController")
     
     -- don't run the script if the enemy is not currently active
     if (characterComponent.isActive == false) then
+        enemyController.hasMoved = false
+        enemyController.hasAttacked = false
         return
     end
 
@@ -58,7 +62,7 @@ function S_EnemyController(e)
         return
     end
 
-    local enemyController = GetComponent(e, "C_EnemyController")
+    
 
     -- inform movementScript to start moving the enemy.
     -- once done, movementScript will set hasMoved to true.
