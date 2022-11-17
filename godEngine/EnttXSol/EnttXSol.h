@@ -159,7 +159,7 @@ namespace god
 		template<typename...COMPONENTS>
 		auto GetView ();
 
-		friend void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources );
+		friend void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources , std::string& name );
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
