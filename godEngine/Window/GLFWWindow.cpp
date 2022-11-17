@@ -338,23 +338,28 @@ namespace god
 		return y;
 	}
 
-#define EditorMode
 	double GLFWWindow::ViewportMouseX ()
 	{
-#ifdef EditorMode
-		return m_viewport_mouse_x;
-#else
-		return ScreenMouseX ();
-#endif
+		if ( m_fullscreen )
+		{
+			return ScreenMouseX ();
+		}
+		else
+		{
+			return m_viewport_mouse_x;
+		}
 	}
 
 	double GLFWWindow::ViewportMouseY ()
 	{
-#ifdef EditorMode
-		return m_viewport_mouse_y;
-#else
-		return ScreenMouseY ();
-#endif
+		if ( m_fullscreen )
+		{
+			return ScreenMouseY ();
+		}
+		else
+		{
+			return m_viewport_mouse_y;
+		}
 	}
 
 	bool GLFWWindow::MouseLDown ( uint32_t priority )
@@ -435,5 +440,10 @@ namespace god
 	{
 		m_viewport_mouse_x = x;
 		m_viewport_mouse_y = y;
+	}
+
+	void GLFWWindow::SetWindowTitle ( std::string const& title )
+	{
+		glfwSetWindowTitle ( m_window , title.c_str () );
 	}
 }

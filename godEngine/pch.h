@@ -17,5 +17,6 @@
 #include <fstream>
 #include <sstream>
 #include <cctype>
+#include <tuple>
 
 #endif //PCH_H

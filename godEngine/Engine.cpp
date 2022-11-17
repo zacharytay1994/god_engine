@@ -41,7 +41,7 @@
 #include <godUtility/Math.h>
 #include <godUtility/Grid3D.h>
 
-#include <tuple>
+#define ENABLE_EDITOR
 
 namespace god
 {
@@ -55,6 +55,9 @@ namespace god
 		std::cout << "godEngine Update." << std::endl;
 		// create window
 		GLFWWindow window ( 1920 , 1080 );
+#ifndef ENABLE_EDITOR
+		window.m_fullscreen = true;
+#endif
 		DeltaTimer delta_timer;
 		OpenGL opengl ( window.GetWindowHandle () , window.GetWindowWidth () , window.GetWindowHeight () );
 		Fonts fonts;
@@ -104,7 +107,9 @@ namespace god
 		EntityGrid grid;
 
 		// glfw+opengl imgui setup
+#ifdef ENABLE_EDITOR
 		ImGuiOpenGLEditor ogl_editor ( window );
+#endif
 
 		// engine resources used by imgui as defined in EditorResourcesDefinition.h
 		EngineResources engine_resources (
@@ -119,10 +124,17 @@ namespace god
 			scene
 		);
 
+#ifdef ENABLE_EDITOR
+		// starting scene for editor mode
 		MainVariables main_variables = { "nil", false };
+#else
+		// starting scene for non editor mode
+		MainVariables main_variables = { "Level_1", true };
+#endif
 		RegisterLuaCPP ( enttxsol , engine_resources , main_variables );
 
 		// imgui editor windows
+#ifdef ENABLE_EDITOR
 		EditorWindows<EngineResources> editor_windows;
 		editor_windows.AddWindow<god::EW_MainMenuBar> ( true );
 		editor_windows.AddWindow<god::EW_EditorStyles> ( false );
@@ -133,6 +145,7 @@ namespace god
 		editor_windows.AddWindow<god::EW_SceneView> ( true , std::ref ( enttxsol ) );
 		editor_windows.AddWindow<god::EW_Performance> ( true );
 		editor_windows.AddWindow<god::EW_TilemapEditor> ( true , std::ref ( enttxsol ) );
+#endif
 
 		godPhysicsSystem.Init ( &window , &camera );
 
@@ -175,7 +188,10 @@ namespace god
 			SystemTimer::EndTimeSegment ( "Physics System" );
 
 			// render scene
+#ifdef ENABLE_EDITOR
 			SystemTimer::StartTimeSegment ( "Rendering" );
+#endif
+
 			// depth map pass
 			opengl.FirstPassRenderToDepthmap (
 				scene ,
@@ -216,25 +232,51 @@ namespace god
 
 			auto& blur = opengl.BlurTexture ( hdr_renderpass.GetTexture ( 1 ) );
 
-			extra_renderpass.Bind ();
-			opengl.RenderBlendTextures ( imgui_renderpass.GetTexture () , blur.GetTexture () );
-			opengl.RenderGUI ( scene , camera.GetOrthographicProjectionMatrix ( static_cast< float >( window.GetWindowWidth () ) , static_cast< float >( window.GetWindowHeight () ) ) , ogl_textures );
-			extra_renderpass.UnBind ();
+#ifdef ENABLE_EDITOR
+			if ( !window.m_fullscreen )
+			{
+				extra_renderpass.Bind ();
+				opengl.RenderBlendTextures ( imgui_renderpass.GetTexture () , blur.GetTexture () );
+				opengl.RenderGUI ( scene , camera.GetOrthographicProjectionMatrix ( static_cast< float >( window.GetWindowWidth () ) , static_cast< float >( window.GetWindowHeight () ) ) , ogl_textures );
+				extra_renderpass.UnBind ();
+			}
 
 			SystemTimer::EndTimeSegment ( "Rendering" );
 
 			// ... render imgui windows
 			SystemTimer::StartTimeSegment ( "Editor" );
 			ogl_editor.BeginFrame ();
+
+			if ( ImGui::BeginPopupModal ( "pausemodal" ) )
+			{
+				if ( !window.m_fullscreen )
+				{
+					ImGui::CloseCurrentPopup ();
+				}
+				ImGui::EndPopup ();
+			}
+			if ( window.m_fullscreen )
+			{
+				ImGui::OpenPopup ( "pausemodal" );
+			}
+
 			// pass scene view the renderpass texture
-			//editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( imgui_renderpass.GetTexture () );
-			//editor_windows.GetWindow<EW_SceneView>()->SetRenderpassTexture( hdr_renderpass.GetTexture(1) );
-			editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( extra_renderpass.GetTexture () );
-			//editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( opengl.m_blur_pingpong_1.GetTexture() );
-			editor_windows.Update ( 0.02f , engine_resources );
+			if ( !window.m_fullscreen )
+			{
+				editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( extra_renderpass.GetTexture () );
+				editor_windows.Update ( 0.02f , engine_resources );
+			}
 			ogl_editor.Render ();
 			ogl_editor.EndFrame ();
 			SystemTimer::EndTimeSegment ( "Editor" );
+#endif
+
+			// if fullscreen, render game over imgui
+			if ( window.m_fullscreen )
+			{
+				opengl.RenderBlendTextures ( imgui_renderpass.GetTexture () , blur.GetTexture () );
+				opengl.RenderGUI ( scene , camera.GetOrthographicProjectionMatrix ( static_cast< float >( window.GetWindowWidth () ) , static_cast< float >( window.GetWindowHeight () ) ) , ogl_textures );
+			}
 
 			SystemTimer::StartTimeSegment ( "Window Buffer Swap" );
 			window.SwapWindowBuffers ();
@@ -258,19 +300,6 @@ namespace god
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );
-			/*camera.SceneCamera(
-				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
-				0.5f ,
-				0.7f , // value between 0-1
-				scene_camera_position_offset ,
-				window.MouseLDown () ,
-				window.MouseRDown () ,
-				static_cast< float >( window.ScreenMouseX () ) ,
-				static_cast< float >( window.ScreenMouseY () ) ,
-				scene_camera_zoom_distance ,
-				window.MouseScrollUp () ,
-				window.MouseScrollDown ()
-			);*/
 
 			EngineSystemsFrameEnd ( enttxsol , engine_resources );
 
@@ -279,18 +308,23 @@ namespace god
 
 			// change scene if any
 			auto& [scene_to_change , play_on_change] = main_variables;
+
 			if ( scene_to_change != "nil" )
 			{
 				std::cout << "Attempting to change scene to " << scene_to_change << std::endl;
 
+#ifdef ENABLE_EDITOR
 				editor_windows.GetWindow<EW_TilemapEditor> ()->ClearPreview ( engine_resources );
-				EntityGrid& grid = engine_resources.Get<EntityGrid> ().get ();
-				grid = EntityGrid ();
 				auto scene_tree = editor_windows.GetWindow<EW_SceneTree> ();
 				scene_tree->Reset ();
+				scene_tree->m_select_hierarchy_tab = true;
+#endif
+
+				EntityGrid& grid = engine_resources.Get<EntityGrid> ().get ();
+				grid = EntityGrid ();
+
 				enttxsol.ClearEntt ( engine_resources );
 				enttxsol.DeserializeStateV2 ( engine_resources , scene_to_change , &grid );
-				scene_tree->m_select_hierarchy_tab = true;
 
 				SoundManager& sound_manager = engine_resources.Get<SoundManager> ().get ();
 				auto& sounds = sound_manager.GetResources ();
@@ -306,8 +340,19 @@ namespace god
 				std::cout << "Change Scene attempt done." << std::endl;
 			}
 
+			if ( window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) && window.KeyPressed ( GLFW_KEY_F ) )
+			{
+				window.m_fullscreen = !window.m_fullscreen;
+			}
+
+
 			delta_timer.EndFrame ();
 			SystemTimer::EndTimeSegment ( "Overall" );
+
+			// set window title fps
+			std::stringstream ss;
+			ss << "God Engine - " << DeltaTimer::m_fps;
+			window.SetWindowTitle ( ss.str () );
 		}
 	}
 }

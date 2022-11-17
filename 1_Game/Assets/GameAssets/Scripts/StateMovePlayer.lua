@@ -43,7 +43,7 @@ function S_StateMovePlayer(e)
             end
 
             -- allow movement after 1 second has passed
-            if (stateMovePlayerComponent.Time < 1.0) then
+            if (stateMovePlayerComponent.Time < 0.1) then
                 -- accumulate time
                 stateMovePlayerComponent.Time = stateMovePlayerComponent.Time + GetDeltaTime()
             else

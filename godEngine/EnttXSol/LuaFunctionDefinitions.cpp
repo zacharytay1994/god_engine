@@ -240,6 +240,76 @@ namespace god
 			}
 		);
 
+		// InstancePrefabNow(name,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "InstancePrefabNow" ,
+			[&entt , &engineResources]( std::string const& name , float x , float y , float z )->entt::entity
+			{
+				auto e = entt.InstancePrefab ( engineResources , name );
+				Transform* transform = entt.GetEngineComponent<Transform> ( e );
+				if ( transform )
+				{
+					transform->m_position = { x, y, z };
+				}
+				return entt.m_entities[ e ].m_id;
+			}
+		);
+
+		// InstancePrefabParentedNow(parent,name,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "InstancePrefabParentedNow" ,
+			[&entt , &engineResources]( entt::entity parent , std::string const& name , float x , float y , float z )->entt::entity
+			{
+				auto e = entt.InstancePrefab ( engineResources , name , entt.GetEngineComponent<EntityData> ( parent )->m_id );
+				Transform* transform = entt.GetEngineComponent<Transform> ( e );
+				if ( transform )
+				{
+					transform->m_position = { x, y, z };
+				}
+				return entt.m_entities[ e ].m_id;
+			}
+		);
+
+		// InstancePrefabOnGridNow(name,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "InstancePrefabOnGridNow" ,
+			[&entt , &engineResources]( std::string const& name , float x , float y , float z )->entt::entity
+			{
+				auto e = entt.InstancePrefab ( engineResources , name );
+				Transform* transform = entt.GetEngineComponent<Transform> ( e );
+				if ( transform )
+				{
+					transform->m_position = { x, y, z };
+				}
+				entt.AttachComponent<GridCell> ( e );
+				GridCell* grid_cell = entt.GetEngineComponent<GridCell> ( e );
+				grid_cell->m_cell_x = static_cast< uint32_t >( x );
+				grid_cell->m_cell_y = static_cast< uint32_t >( y );
+				grid_cell->m_cell_z = static_cast< uint32_t >( z );
+				return entt.m_entities[ e ].m_id;
+			}
+		);
+
+		// InstancePrefabOnGridNow(name,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "InstancePrefabParentedOnGridNow" ,
+			[&entt , &engineResources]( entt::entity parent , std::string const& name , float x , float y , float z )->entt::entity
+			{
+				auto e = entt.InstancePrefab ( engineResources , name , entt.GetEngineComponent<EntityData> ( parent )->m_id );
+				Transform* transform = entt.GetEngineComponent<Transform> ( e );
+				if ( transform )
+				{
+					transform->m_position = { x, y, z };
+				}
+				entt.AttachComponent<GridCell> ( e );
+				GridCell* grid_cell = entt.GetEngineComponent<GridCell> ( e );
+				grid_cell->m_cell_x = static_cast< uint32_t >( x );
+				grid_cell->m_cell_y = static_cast< uint32_t >( y );
+				grid_cell->m_cell_z = static_cast< uint32_t >( z );
+				return entt.m_entities[ e ].m_id;
+			}
+		);
+
 		// InstancePrefab(name,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "InstancePrefab" ,
@@ -342,17 +412,17 @@ namespace god
 
 		// SetVelocity(e,x,y,z)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("SetVelocity",
-			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+		entt.RegisterLuaFunction ( "SetVelocity" ,
+			[&entt , &engineResources]( entt::entity e , float x , float y , float z )
 			{
-				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+				while ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () )
 					;
 
-				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				if ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () == false )
 				{
-					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setLinearVelocity(ConvertToPhysXVector({ x, y, z }));
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setLinearVelocity ( ConvertToPhysXVector ( { x, y, z } ) );
 					}
 				}
 			}
@@ -425,13 +495,13 @@ namespace god
 
 		// ChangeModel(e, model name)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("ChangeModel",
-			[&entt, &engineResources](entt::entity e, std::string model_name)
+		entt.RegisterLuaFunction ( "ChangeModel" ,
+			[&entt , &engineResources]( entt::entity e , std::string model_name )
 			{
-				Renderable3D* r = entt.GetEngineComponent<Renderable3D>(e);
-				if (r)
+				Renderable3D* r = entt.GetEngineComponent<Renderable3D> ( e );
+				if ( r )
 				{
-					r->m_model_id = engineResources.Get<Asset3DManager>().get().GetID(model_name);
+					r->m_model_id = engineResources.Get<Asset3DManager> ().get ().GetID ( model_name );
 				}
 			}
 		);
