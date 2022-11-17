@@ -11,19 +11,16 @@ end
 
 --[IsSystem]
 function S_WinLose(e)
-    print("Hi winlose")
+   
     local winLose = GetComponent(e, "C_WinLose")
-    print("Hi")
-    local player = GetComponent(GetEntity("Player"), "C_Character")
-    print("Hi player")
+
     local gui_object = GetGUIObject(e)
-    print("Hi UI")
     
-    if(player.isDead == true)
+    if(isAlive == false)
     then
-        print("Player is dead")
+        --print("Player is dead")
         gui_object.active = true
     else
-        print("Player is still alive")
+        --print("Player is still alive")
     end
 end
