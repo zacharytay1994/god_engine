@@ -96,14 +96,18 @@ function S_DiceScript(e)
 		
 		if (transform.position.x > 10) then
 			SetTransformPosition(e, 9.9, transform.position.y, transform.position.z)
+			SetVelocity(e, 0, 0, 0)
 		elseif (transform.position.x < -5) then
 			SetTransformPosition(e, -4.9, transform.position.y, transform.position.z)
+			SetVelocity(e, 0, 0, 0)
 		end
 		
 		if (transform.position.z > 3) then
 			SetTransformPosition(e, transform.position.x, transform.position.y, 2.9)
+			SetVelocity(e, 0, 0, 0)
 		elseif (transform.position.z < -11) then
 			SetTransformPosition(e, transform.position.x, transform.position.y, -10.9)
+			SetVelocity(e, 0, 0, 0)
 		end
 
 		c_dice.position_x = transform.position.x
