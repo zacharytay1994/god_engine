@@ -335,6 +335,24 @@ namespace god
 			}
 		);
 
+		// SetVelocity(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("SetVelocity",
+			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+			{
+				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+					;
+
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				{
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setLinearVelocity(ConvertToPhysXVector({ x, y, z }));
+					}
+				}
+			}
+		);
+
 		// AddForce(e,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "AddForce" ,
@@ -396,6 +414,19 @@ namespace god
 				if ( r )
 				{
 					r->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( texture_name );
+				}
+			}
+		);
+
+		// ChangeModel(e, model name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("ChangeModel",
+			[&entt, &engineResources](entt::entity e, std::string model_name)
+			{
+				Renderable3D* r = entt.GetEngineComponent<Renderable3D>(e);
+				if (r)
+				{
+					r->m_model_id = engineResources.Get<Asset3DManager>().get().GetID(model_name);
 				}
 			}
 		);

@@ -98,6 +98,17 @@ function S_Player(e)
                         "Special property:", playerAttackComponent.selectedAttack[3], "\n")
         UnselectAllButtons()
     end
+
+    -- press 6
+    if (CheckKeyPress(54)) then 
+        print("[Player.lua] Cryogenesis selected through hotkey!")
+        playerComponent.selectedAction = "Cryogenesis"
+        playerAttackComponent.selectedAttack = attackList[19]
+            print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+                        "Base damage:", playerAttackComponent.selectedAttack[2], 
+                        "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+        UnselectAllButtons()
+    end
 end
 
 -- this is to prevent Action Buttons from resetting due to using attacks through hotkeys

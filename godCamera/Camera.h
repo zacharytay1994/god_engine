@@ -27,6 +27,7 @@ namespace god
 		glm::mat4 GODCAMERA_API GetPerpectiveProjectionMatrix ();
 		glm::mat4 GODCAMERA_API GetOrthographicProjectionMatrix ( float width , float height );
 		glm::mat4 GODCAMERA_API GetCameraViewMatrix ();
+		glm::mat4 GODCAMERA_API GetCameraViewFaceCamera ();
 
 		// camera modes
 		// free camera
