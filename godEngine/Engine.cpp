@@ -169,7 +169,9 @@ namespace god
 			SystemTimer::EndTimeSegment ( "Populating Scene" );
 
 			//Physics Simulate update
+			SystemTimer::StartTimeSegment ( "Physics System" );
 			godPhysicsSystem.Update ( delta_timer.m_dt , enttxsol.m_pause );
+			SystemTimer::EndTimeSegment ( "Physics System" );
 
 			// render scene
 			SystemTimer::StartTimeSegment ( "Rendering" );
@@ -192,6 +194,7 @@ namespace god
 				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,
 				camera.GetCameraViewMatrix () ,
+				camera.GetCameraViewFaceCamera () ,
 				camera.m_position ,
 				ogl_textures ,
 				camera_front );
@@ -224,6 +227,7 @@ namespace god
 			ogl_editor.BeginFrame ();
 			// pass scene view the renderpass texture
 			//editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( imgui_renderpass.GetTexture () );
+			//editor_windows.GetWindow<EW_SceneView>()->SetRenderpassTexture( hdr_renderpass.GetTexture(1) );
 			editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( extra_renderpass.GetTexture () );
 			//editor_windows.GetWindow<EW_SceneView> ()->SetRenderpassTexture ( opengl.m_blur_pingpong_1.GetTexture() );
 			editor_windows.Update ( 0.02f , engine_resources );

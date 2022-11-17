@@ -45,7 +45,7 @@ namespace god
 
 
 
-		if ( rigiddynamic.updateRigidDynamic )
+		if ( rigiddynamic.initRigidDynamic)
 		{
 
 			if ( rigiddynamic.p_material == nullptr )
@@ -116,18 +116,55 @@ namespace god
 			physx::PxRigidBodyExt::updateMassAndInertia ( *rigiddynamic.p_RigidDynamic , rigiddynamic.Density );
 
 			mScene->addActor ( *rigiddynamic.p_RigidDynamic );
+			rigiddynamic.p_RigidDynamic->setContactReportThreshold(0.01f);
 
-			rigiddynamic.updateRigidDynamic = false;
 
-		}
+			for (auto const& tracked : ContactCallBack)
+			{
+				if (edata.m_id == tracked.first)
+				{
+					psys.getContactReportCallback().AddToContactTrack(rigiddynamic.p_RigidDynamic, tracked.second);
+				}
+			}
+
+			for (auto& [entt1, entt2, fp, actor1, actor2] : psys.getContactReportCallback().getContactPairTrack() )
+			{
+				if (edata.m_id == entt1)
+				{
+					actor1 = rigiddynamic.p_RigidDynamic;
+				}
+				if (edata.m_id == entt2)
+				{
+					actor2 = rigiddynamic.p_RigidDynamic;
+				}
+			}
+			rigiddynamic.p_RigidDynamic->userData = &edata;
+
+			rigiddynamic.initRigidDynamic = false;
+
+		}//init rigiddynamic
 
 		if (rigiddynamic.Simulation)
 		{
+			//rigiddynamic.Trigger = false;
+			//rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
 			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
 		}
 		else
 		{
+			//rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
+		}
+
+		if (rigiddynamic.Trigger)
+		{
+			rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+			rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+		}
+		else
+		{
+			rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+			rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
 		}
 
 		if (rigiddynamic.Gravity)
@@ -167,11 +204,6 @@ namespace god
 
 
 
-		if (edata.m_id == 41 || edata.m_id == 48 || edata.m_id == 104)
-		{
-			psys.getCRCB().AddPosCb(rigiddynamic.p_RigidDynamic, DiceCallBack);
-		}
-
 	
 
 	}
@@ -185,14 +217,24 @@ namespace god
 		//wait for simulation
 		while ( psys.GetisRunning () )
 			;
-
+		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
-
+		
 
 
 		if ( rigiddynamic.p_RigidDynamic )
 		{
+			//
+			if (edata.m_id == 0)
+			{
+				physx::PxTransform ptransform1 = rigiddynamic.p_RigidDynamic->getGlobalPose();
+
+				ptransform1.p.y -= 0.01f;
+				rigiddynamic.p_RigidDynamic->setGlobalPose(ptransform1);
+
+			}
+			//
 			physx::PxTransform ptransform = rigiddynamic.p_RigidDynamic->getGlobalPose ();
 
 			transform.m_position.x = ptransform.p.x;

@@ -24,6 +24,7 @@ namespace god
 		float Density;
 		bool Active{ true };
 		bool Simulation{ true };
+		bool Trigger{ false };
 		bool Gravity{ true };
 
 		//Non serialize data
@@ -32,14 +33,14 @@ namespace god
 		physx::PxShape* p_shape;	
 		physx::PxRigidDynamic* p_RigidDynamic;
 
-		bool updateRigidDynamic{ true };
+		bool initRigidDynamic{ true };
 		physx::PxScene* mScene;
 
 		//Ctor
 		RigidDynamic() :  
 			p_material{ nullptr }, p_RigidDynamic{ nullptr }, mScene{ nullptr }, p_trimesh{nullptr},
 			shapeid{ 0 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, p_shape{ nullptr }, 
-			locktoscale{ true }, Active{ true }, Simulation{ true },
+			locktoscale{ true }, Active{ true }, Simulation{ true }, Trigger{ false }, Gravity{ true },
 			StaticFriction{ 0.5f }, DynamicFriction{ 0.5f }, Restitution{ 0.5f }, 
 			AngularVelocity{ 0.f,0.f,0.f }, LinearVelocity{ 0.f,0.f,0.f }, Density{ 1.f }
 		{};
@@ -53,7 +54,7 @@ namespace god
 			}
 
 		};
-};
+	};
 	template <>
 	inline void NewLuaType<RigidDynamic>(sol::state& luaState, std::string const& name)
 	{
@@ -95,7 +96,7 @@ namespace god
 						{
 							selected_shape = i;
 							component.shapeid = i;
-							component.updateRigidDynamic = true;
+							component.initRigidDynamic = true;
 							ImGui::CloseCurrentPopup();
 						}
 					ImGui::EndPopup();
@@ -120,6 +121,7 @@ namespace god
 
 				ImGui::Checkbox("Simulation", &component.Simulation);
 				ImGui::Checkbox("Gravity", &component.Gravity);
+				ImGui::Checkbox("Trigger", &component.Trigger);
 				ImGui::Checkbox("Lock Extents to Scale", &component.locktoscale);
 
 
@@ -154,6 +156,7 @@ namespace god
 
 		RapidJSON::JSONifyToValue(value, document, "Simulation", component.Simulation);
 		RapidJSON::JSONifyToValue(value, document, "Gravity", component.Gravity);
+		RapidJSON::JSONifyToValue(value, document, "Trigger", component.Trigger);
 
 		RapidJSON::JSONifyToValue(value, document, "scale lock", component.locktoscale);
 		RapidJSON::JSONifyToValue(value, document, "shapeid", component.shapeid);
@@ -187,6 +190,7 @@ namespace god
 
 		AssignIfExist(jsonObj, component.Simulation, "Simulation");
 		AssignIfExist(jsonObj, component.Gravity, "Gravity");
+		AssignIfExist(jsonObj, component.Trigger, "Trigger");
 
 		AssignIfExist(jsonObj, component.locktoscale, "scale lock");
 		AssignIfExist(jsonObj, component.shapeid, "shapeid");

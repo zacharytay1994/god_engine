@@ -40,7 +40,7 @@ namespace god
 		physx::PxScene* const GetPhysicsScene() const;
 
 		
-		ContactReportCallback& getCRCB();
+		ContactReportCallback& getContactReportCallback();
 
 		bool debugdraw;
 	private:
