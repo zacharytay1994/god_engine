@@ -88,16 +88,39 @@ namespace god
 			rigidstatic.p_RigidStatic->userData = &rigidstatic;
 
 			rigidstatic.updateRigidStatic = false;
+		}//init static
+
+	
+		rigidstatic.p_RigidStatic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, !rigidstatic.Active);
+
+		if (rigidstatic.Trigger)
+		{
+			rigidstatic.Simulation = false;
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+		}
+		else
+		{
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
 		}
 
 		if (rigidstatic.Simulation)
 		{
-			rigidstatic.p_RigidStatic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
+			rigidstatic.Trigger = false;
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+
 		}
 		else
 		{
-			rigidstatic.p_RigidStatic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 		}
+
+
+
+
+
+
 
 		if (rigidstatic.locktoscale)
 		{

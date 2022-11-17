@@ -65,7 +65,33 @@ namespace god
 				ImGui::Separator();
 				ImGui::Text("RigidStatic Component");
 				ImGui::Separator();
+
 				ImGui::Checkbox("Active", &component.Active);
+
+				int selected_type = component.PhysicsTypeid;
+				const char* typenames[] = { "Default", "Dice", "Player", "Enemy", "Bullet", "Tile" };
+				char buf1[64];
+				sprintf_s(buf1, "%s###", typenames[selected_type]); // ### operator override ID ignoring the preceding label
+				ImGui::Text("Physics Type :");
+				ImGui::PushID(1);
+				if (ImGui::Button(buf1))
+				{
+					ImGui::OpenPopup("type popup");
+				}
+				//ImGui::TextUnformatted( names[selected_shape] );
+				if (ImGui::BeginPopup("type popup"))
+				{
+					for (int i = 0; i < IM_ARRAYSIZE(typenames); i++)
+						if (ImGui::Selectable(typenames[i]))
+						{
+							selected_type = i;
+							component.PhysicsTypeid = i;
+							component.updateRigidStatic = true;
+							ImGui::CloseCurrentPopup();
+						}
+					ImGui::EndPopup();
+				}
+
 				ImGui::InputFloat("StaticFriction", &component.StaticFriction);
 				ImGui::InputFloat("DynamicFriction", &component.DynamicFriction);
 				ImGui::InputFloat("Restitution", &component.Restitution);
@@ -77,8 +103,12 @@ namespace god
 				if (ImGui::Button(buf))
 				{
 					ImGui::OpenPopup("shape popup");
+					ImGui::PopID();
 				}
-				//ImGui::TextUnformatted( names[selected_shape] );
+				else
+				{
+					ImGui::PopID();
+				}
 				if (ImGui::BeginPopup("shape popup"))
 				{
 					ImGui::Text("Shape type");
@@ -88,10 +118,12 @@ namespace god
 						{
 							selected_shape = i;
 							component.Shapeid = i;
+							component.updateRigidStatic = true;
 							ImGui::CloseCurrentPopup();
 						}
 					ImGui::EndPopup();
 				}
+
 
 				switch (component.Shapeid)
 				{

@@ -47,7 +47,7 @@ namespace god
 
 
 
-		if ( rigiddynamic.initRigidDynamic)
+		if ( rigiddynamic.updateRigidDynamic)
 		{
 
 			if ( rigiddynamic.p_material == nullptr )
@@ -128,7 +128,7 @@ namespace god
 			rigiddynamic.m_id = edata.m_id;
 			rigiddynamic.p_RigidDynamic->userData = &rigiddynamic;
 
-			rigiddynamic.initRigidDynamic = false;
+			rigiddynamic.updateRigidDynamic = false;
 
 		}//init rigiddynamic
 
