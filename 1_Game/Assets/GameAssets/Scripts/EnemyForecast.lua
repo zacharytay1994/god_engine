@@ -15,6 +15,11 @@
 -- Cannot use the original attack script because it's too complicated to insert 
 -- a forecast function.
 
+-- TDLR; to make enemy forecast it's action, do the following:
+-- 1) add C_Pathfind to Forecast
+-- 2) add movement script to 
+-- 3)  
+
 --[IsComponent]
 function C_EnemyForecast()
     local var = {
@@ -32,15 +37,39 @@ end
 --[IsSystem]
 function S_EnemyForecast(e)
 
+    local forecastComponent = GetComponent(e, "C_EnemyForecast")
 
-
-    -- local enemiesList = EntitiesWithScriptComponent("C_EnemyController")
-    -- for m = 1, #enemiesList do     
+    if (forecastComponent.performForecast) then
     
-    --     local forecastObject = Child(enemiesList[m], 0)
-    --     print("Testing forecastObject name:", EntityName(forecastObject))
-    
-    -- end
+        local enemiesList = EntitiesWithScriptComponent("C_EnemyController")
 
+        for i = 1, #enemiesList do
+        
+            ForecastAction(enemiesList[i])
+        
+        end
+
+        forecastComponent.performForecast = false
+    
+    end
+end
+
+function ForecastAction(enemyEntity)
+
+    -- FORECAST MOVEMENT -------------------------------------------------------------
+    -- instantiate a ball that with floor as the parent
+    
+    -- add movement script to the ball based on enemy type
+    
+    -- add c_pathfind to the ball
+    
+    -- set the ball.moveScript.executeMove = true
+    -- END OF FORECAST MOVEMENT ------------------------------------------------------
+
+    -- FORECAST ATTACK ---------------------------------------------------------------
+
+    -- add custom attack script to the ball based on enemy type
+
+    -- END OF FORECAST ATTACK --------------------------------------------------------
 
 end
