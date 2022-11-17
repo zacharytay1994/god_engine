@@ -1156,6 +1156,11 @@ namespace god
 		return true;
 	}
 
+	bool EnttXSol::RemoveComponent ( entt::entity id , std::string const& name )
+	{
+		return m_registry.storage<sol::table> ( entt::hashed_string ( name.c_str () ) ).remove ( id );
+	}
+
 	entt::runtime_view EnttXSol::GetView ( std::vector<std::string> const& scriptComponents , std::vector<std::string> const& engineComponents )
 	{
 		entt::runtime_view view {};
