@@ -16,7 +16,7 @@
 
 namespace god
 {
-	void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources )
+	void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources , std::string& nextScene )
 	{
 		// glm::vec3
 		entt.RegisterLuaType<glm::vec3> ( "vec3" ,
@@ -29,6 +29,14 @@ namespace god
 			"x" , &glm::ivec3::x ,
 			"y" , &glm::ivec3::y ,
 			"z" , &glm::ivec3::z );
+
+		// ChangeScene(sceneName)
+		entt.RegisterLuaFunction ( "ChangeScene" ,
+			[&entt , &nextScene]( std::string const& s )->void
+			{
+				nextScene = s;
+			}
+		);
 
 		// Camera
 		entt.RegisterLuaType<Camera> ( "Camera" ,
