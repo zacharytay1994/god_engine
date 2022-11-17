@@ -14,6 +14,17 @@ function C_ButtonOnHoverPopup()
     end
 end
 
+function GenerateRandomHoverSFX()
+	local sfx = 
+	{ 
+		"SFX_Hover01", "SFX_Hover02", "SFX_Hover03", "SFX_Hover04", "SFX_Hover05",
+		"SFX_Hover06", "SFX_Hover07", "SFX_Hover08", "SFX_Hover09", "SFX_Hover10"
+	}
+	
+	local rng = GenerateRandomNumberInRange(1, 10)
+	InstancePrefab(sfx[rng],0,0,0)
+end
+
 --[IsSystem]
 function S_ButtonOnHoverPopup(e)
     local on_hover_popup = GetComponent(e, "C_ButtonOnHoverPopup")
@@ -24,7 +35,8 @@ function S_ButtonOnHoverPopup(e)
         on_hover_popup.InitialScaleY = gui_object.size.y
         gui_object.size.x = gui_object.size.x * on_hover_popup.PopUpAmount
         gui_object.size.y = gui_object.size.y * on_hover_popup.PopUpAmount
-        InstancePrefab("SFX_Bloop",0,0,0)
+		GenerateRandomHoverSFX()
+        -- InstancePrefab("SFX_Bloop",0,0,0)
     end
 
     if gui_object.exit or ~gui_object.active then
