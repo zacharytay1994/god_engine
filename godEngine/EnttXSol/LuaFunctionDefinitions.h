@@ -5,5 +5,5 @@
 namespace god
 {
 	struct EnttXSol;
-	void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources );
+	void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources , std::string& nextScene );
 }

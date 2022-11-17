@@ -73,10 +73,18 @@ function S_UIManager(e)
                     currentDiceComponent = GetComponent(diceList[j], "C_DiceScript")
                     
                     -- currently only 2 attack types, will modify this part when more attack types are implemented
-                    if (currentDiceComponent.value == 1 or currentDiceComponent.value == 2 or currentDiceComponent.value == 3) then                       
+                    if (currentDiceComponent.value == 0) then                       
                         UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "FrontJab"                       
-                    else              
-                        UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "EnergyBolt"                      
+                    elseif (currentDiceComponent.value == 1) then                       
+                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "BigSwing"                       
+                    elseif (currentDiceComponent.value == 2) then                       
+                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "GroundSmash"                       
+                    elseif (currentDiceComponent.value == 3) then
+                        UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "EnergyBolt"
+					elseif (currentDiceComponent.value == 4) then
+                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Projectile"             
+					elseif (currentDiceComponent.value == 5) then
+                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Corporikinesis"             
                     end
                 end
                 

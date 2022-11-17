@@ -119,7 +119,8 @@ namespace god
 			scene
 		);
 
-		RegisterLuaCPP ( enttxsol , engine_resources );
+		std::string scene_to_change { "nil" };
+		RegisterLuaCPP ( enttxsol , engine_resources , scene_to_change );
 
 		// imgui editor windows
 		EditorWindows<EngineResources> editor_windows;
@@ -275,6 +276,28 @@ namespace god
 
 			// update FMOD system
 			AudioAPI::Update ();
+
+			// change scene if any
+			if ( scene_to_change != "nil" )
+			{
+				std::cout << "Attempting to change scene to " << scene_to_change << std::endl;
+
+				editor_windows.GetWindow<EW_TilemapEditor> ()->ClearPreview ( engine_resources );
+				EntityGrid& grid = engine_resources.Get<EntityGrid> ().get ();
+				grid = EntityGrid ();
+				auto scene_tree = editor_windows.GetWindow<EW_SceneTree> ();
+				scene_tree->Reset ();
+				enttxsol.ClearEntt ( engine_resources );
+				enttxsol.DeserializeStateV2 ( engine_resources , scene_to_change , &grid );
+				scene_tree->m_select_hierarchy_tab = true;
+
+				SoundManager& sound_manager = engine_resources.Get<SoundManager> ().get ();
+				auto& sounds = sound_manager.GetResources ();
+				AudioAPI::StopAndResetAll ( sounds );
+
+				scene_to_change = "nil";
+				std::cout << "Change Scene attempt done." << std::endl;
+			}
 
 			delta_timer.EndFrame ();
 			SystemTimer::EndTimeSegment ( "Overall" );
