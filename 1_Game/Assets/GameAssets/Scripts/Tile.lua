@@ -11,8 +11,3 @@ function C_FloorTile()
         return var
     end
 end
-
---[IsSystem]
-function S_FloorTile(e)
-
-end
