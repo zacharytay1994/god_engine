@@ -1,9 +1,7 @@
 --[IsComponent]
 function C_SplashScreen()
-    local var = {
-        x = 0,
-        y = 0,
-        z = 0
+    local var =
+    {
     }
     print("[SplashScreen.lua] C_SplashScreen")
     return function() return var
@@ -16,6 +14,16 @@ local corals_row_max_ = 20
 local corals_column_min_ = 0
 local corals_column_max_ = 5
 
+-- random generated rocks
+function GenerateRandomRocks(x, y, z)
+    -- list of rocks
+    local rocks = { "rock01", "rock02", "rock03" }
+    -- random generated seeds
+    -- local rng = GenerateRandomNumberInRange(1, 3)
+    local rng = 1
+    InstancePrefab("SS_Coral", x, y, z)
+end
+
 -- initialization of data before play button is trigged
 function OnLoad_SplashScreen()
 
@@ -24,27 +32,10 @@ function OnLoad_SplashScreen()
     camera.position.y = 2
     camera.position.z = 10
 
-
-
-    local c_tbl =
-    {
-        [1] = print "1",
-        [2] = print "2"
-    }
-    choice = 1
-    print("choice", choice)
-    local func = c_tbl[choice]
-    if (func) then
-        func()
-    else
-        print " The program has been terminated."
-        print " Thank you!";
-    end
-
     -- create corals based on row and column
     for j = corals_column_min_, corals_column_max_, 1 do
         for i = corals_row_min_, corals_row_max_, 1 do
-            InstancePrefab("SS_Coral", i - (corals_row_max_ / 2), 0, j + 0.5)
+            GenerateRandomRocks(i - (corals_row_max_ / 2), 0, j + 0.5)
         end
     end
 
