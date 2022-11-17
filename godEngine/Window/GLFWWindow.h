@@ -8,6 +8,8 @@ namespace god
 {
 	struct GLFWWindow
 	{
+		bool m_fullscreen { false };
+
 		GLFWWindow ( uint32_t width , uint32_t height );
 		~GLFWWindow ();
 
@@ -18,7 +20,7 @@ namespace god
 
 		// getters & setters
 		HWND			GetWindowHandle ();
-		GLFWwindow* GetGLFWWindow ();
+		GLFWwindow*		GetGLFWWindow ();
 		uint32_t		GetWindowWidth ();
 		uint32_t		GetWindowHeight ();
 		bool			Resized ();
@@ -90,6 +92,7 @@ namespace god
 		friend void	GLFWJoystick_callback ( int jid , int event );
 
 		void		SetViewportMouseCoordinates ( double x , double y );
+		void		SetWindowTitle ( std::string const& title );
 
 	private:
 		GLFWwindow* m_window;
