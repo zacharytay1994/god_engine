@@ -119,8 +119,8 @@ namespace god
 			scene
 		);
 
-		std::string scene_to_change { "nil" };
-		RegisterLuaCPP ( enttxsol , engine_resources , scene_to_change );
+		MainVariables main_variables = { "nil", false };
+		RegisterLuaCPP ( enttxsol , engine_resources , main_variables );
 
 		// imgui editor windows
 		EditorWindows<EngineResources> editor_windows;
@@ -278,6 +278,7 @@ namespace god
 			AudioAPI::Update ();
 
 			// change scene if any
+			auto& [scene_to_change , play_on_change] = main_variables;
 			if ( scene_to_change != "nil" )
 			{
 				std::cout << "Attempting to change scene to " << scene_to_change << std::endl;
@@ -296,6 +297,12 @@ namespace god
 				AudioAPI::StopAndResetAll ( sounds );
 
 				scene_to_change = "nil";
+
+				if ( play_on_change )
+				{
+					enttxsol.m_pause = false;
+					play_on_change = false;
+				}
 				std::cout << "Change Scene attempt done." << std::endl;
 			}
 
