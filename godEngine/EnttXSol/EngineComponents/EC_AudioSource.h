@@ -124,7 +124,7 @@ namespace god
 				ImGui::Checkbox("Loop", &component.m_loop);
 				ImGui::Checkbox("Play On Awake", &component.m_play_on_awake);
 
-				ImGui::DragFloat("Density", &component.m_volume, 0.01f, 0.f, 1.f);
+				ImGui::DragFloat("Volume", &component.m_volume, 0.01f, 0.f, 1.f);
 				ImGui::SliderFloat("Pitch", &component.m_pitch, 0.f, 1.5f, "%.01f", 1.f);
 				ImGui::InputFloat("Min Distance", &component.m_min_distance);
 				ImGui::InputFloat("Max Distance", &component.m_max_distance);
