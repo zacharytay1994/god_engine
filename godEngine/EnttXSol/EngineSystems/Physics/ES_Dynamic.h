@@ -104,6 +104,8 @@ namespace god
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
 				break;
 
+			
+
 			}
 
 			rigiddynamic.p_RigidDynamic = mPhysics->createRigidDynamic ( physx::PxTransform ( transform.m_position.x ,

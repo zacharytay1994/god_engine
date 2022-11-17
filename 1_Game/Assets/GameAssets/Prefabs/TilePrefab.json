@@ -23,6 +23,7 @@
         "diffuse uid": 2013979416
       },
       "RigidStatic": {
+        "Active": true,
         "StaticFriction": 0.5,
         "DynamicFriction": 0.5,
         "Restitution": 0.5,

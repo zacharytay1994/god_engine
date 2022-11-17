@@ -152,6 +152,9 @@ namespace god
 	{
 		(engineResources);
 		// serialize
+		RapidJSON::JSONifyToValue(value, document, "Active", component.Active);
+
+
 		RapidJSON::JSONifyToValue(value, document, "StaticFriction", component.StaticFriction);
 		RapidJSON::JSONifyToValue(value, document, "DynamicFriction", component.DynamicFriction);
 		RapidJSON::JSONifyToValue(value, document, "Restitution", component.Restitution);
@@ -184,6 +187,7 @@ namespace god
 	{
 		(engineResources);
 		// deserialize
+		AssignIfExist(jsonObj, component.Active, "Active");
 
 		AssignIfExist(jsonObj, component.StaticFriction, "StaticFriction");
 		AssignIfExist(jsonObj, component.DynamicFriction, "DynamicFriction");

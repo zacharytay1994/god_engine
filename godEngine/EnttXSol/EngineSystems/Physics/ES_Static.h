@@ -37,10 +37,7 @@ namespace god
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
 
 
-		if (rigidstatic.Active == false)
-		{
-			mScene->removeActor(*rigidstatic.p_RigidStatic);
-		}
+
 
 
 		if (rigidstatic.updateRigidStatic)
@@ -54,7 +51,7 @@ namespace god
 				//exclusive shape (can be modified)
 
 
-				switch (rigidstatic.PhysicsTypeid)
+				switch (rigidstatic.Shapeid)
 				{
 				case PhysicsTypes::Cube:
 					rigidstatic.p_shape = mPhysics->createShape(physx::PxBoxGeometry(rigidstatic.extents.x, rigidstatic.extents.y, rigidstatic.extents.z), *rigidstatic.p_material, true);
@@ -69,6 +66,7 @@ namespace god
 					rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 					break;
 
+				
 				}
 
 
