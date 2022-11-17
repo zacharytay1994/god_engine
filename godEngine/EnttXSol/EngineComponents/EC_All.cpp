@@ -17,6 +17,7 @@ namespace god
 		"DirectionalLight" ,
 		"GridManipulate" ,
 		"GUIObject" ,
-		"GUIText"
+		"GUIText" ,
+		"Transparent"
 	};
 }

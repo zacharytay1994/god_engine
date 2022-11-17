@@ -194,6 +194,7 @@ namespace god
 				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,
 				camera.GetCameraViewMatrix () ,
+				camera.GetCameraViewFaceCamera () ,
 				camera.m_position ,
 				ogl_textures ,
 				camera_front );

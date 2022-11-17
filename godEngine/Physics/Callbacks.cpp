@@ -28,6 +28,25 @@ namespace god
 	}
 
 
+	void ContactReportCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			// ignore pairs when shapes have been deleted
+	/*		if (pairs[i].flags & (PxTriggerPairFlag::eREMOVED_SHAPE_TRIGGER |
+				PxTriggerPairFlag::eREMOVED_SHAPE_OTHER))
+				continue*/;
+
+			//std::cout << " Triggered" << std::endl;	
+			
+			//if ((&pairs[i].otherShape->getActor() == mSubmarineActor) &&
+			//	(&pairs[i].triggerShape->getActor() == gTreasureActor))
+			//{
+			//	gTreasureFound = true;
+			//}
+		}
+	}
+
 	void ContactReportCallback::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 	{
 		

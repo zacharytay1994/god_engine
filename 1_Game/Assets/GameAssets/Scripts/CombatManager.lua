@@ -58,6 +58,20 @@ function S_CombatManager(e)
         combatManagerComponent.attackListAttached = true
     end
 
+    -- no damage calculations needed to Cryogenesis
+    if (combatManagerComponent.attackType[4] == "C_Cryogenesis") then
+    
+        print("[CombatManager.lua] No damage calculation needed for Cryogenesis.")
+        
+        -- just reset and return
+        -- reset variables
+        combatManagerComponent.damage = 0
+        combatManagerComponent.attacker = -1
+        combatManagerComponent.defender = -1
+        combatManagerComponent.attackType = nil
+        return
+    end
+
     -- only calculate damage if all the required components are available
     if (combatManagerComponent.attacker ~= -1 and combatManagerComponent.defender ~= -1 and combatManagerComponent.attackType ~= nil) then
                     
