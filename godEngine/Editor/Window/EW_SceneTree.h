@@ -244,6 +244,12 @@ namespace god
 					m_selected_scene = -1;
 					m_select_hierarchy_tab = true;
 					engineResources.Get<EntityGrid> ().get () = EntityGrid ();
+
+					// stopping and resetting all the sounds 
+					SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
+					auto& sounds = sound_manager.GetResources();
+					AudioAPI::StopAndResetAll(sounds);
+
 				}
 				this->ToolTipOnHover ( "Clears the current scene, providing a fresh canvas." );
 

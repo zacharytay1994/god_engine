@@ -49,6 +49,7 @@ namespace god
 		static void SetPitch(FMOD::Channel* channel, float pitch);
 
 		static void PlaySound(Sound& sound, FMOD::Channel** channel, bool& played); 
+		static void PauseSound(FMOD::Channel* channel , bool paused);
 		static void PauseSound(Sound& sound, bool paused);
 		static void StopSound(FMOD::Channel* channel);
 
@@ -71,7 +72,6 @@ namespace god
 		static FMOD::ChannelGroup* m_master_channel_group;
 		static FMOD::SoundGroup* m_master_sound_group;
 
-		//static std::vector<FMOD::Channel*> m_channels;
 		static std::list<FMOD::Channel*> m_channels;
 		static std::unordered_map<int, FMOD::ChannelGroup*> m_channel_groups;
 		static std::unordered_map<int, const char*> m_channel_group_names;
