@@ -79,6 +79,10 @@ function S_Character(e)
         -- set character to dead
         characterComponent.isDead = true
 
+        if(characterComponent.isDead == true)
+        then
+            ChangeScene("WinloseScreen")
+        end
         -- RemoveInstance will be called by TurnOrderManager at the end of current round
     end
 
