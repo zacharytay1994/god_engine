@@ -11,7 +11,7 @@ function C_SplashScreen()
 end
 
 -- number of corals to spawn
-local corals_row_min_ = 1
+local corals_row_min_ = 0
 local corals_row_max_ = 20
 local corals_column_min_ = 0
 local corals_column_max_ = 5
@@ -24,22 +24,41 @@ function OnLoad_SplashScreen()
     camera.position.y = 2
     camera.position.z = 10
 
+
+
+    local c_tbl =
+    {
+        [1] = print "1",
+        [2] = print "2"
+    }
+    choice = 1
+    print("choice", choice)
+    local func = c_tbl[choice]
+    if (func) then
+        func()
+    else
+        print " The program has been terminated."
+        print " Thank you!";
+    end
+
     -- create corals based on row and column
     for j = corals_column_min_, corals_column_max_, 1 do
         for i = corals_row_min_, corals_row_max_, 1 do
-            InstancePrefab("SS_Coral", i - (corals_row_max_ / 2) + (j * 0.2), 0, j)
+            InstancePrefab("SS_Coral", i - (corals_row_max_ / 2), 0, j + 0.5)
         end
     end
+
+    -- create directional light at the door
+    InstancePrefab("SS_DirectionalLight", 0, 6, -6)
 
     -- create door at the end of the corals
     InstancePrefab("SS_Door", 0, 0, -corals_column_max_)
 
-    -- create rectagular plain floor / using precreated prefab
-    InstancePrefab("FloorPrefab", 0, -0.1, 0)
-
     -- create terrain floor
     InstancePrefab("SS_Terrain", 0, 0, -38)
 
+    -- create rectagular plain floor / using precreated prefab
+    InstancePrefab("FloorPrefab", 0, 0, 0)
 
     print("[SplashScreen.lua] OnLoad_SplashScreen")
 end
@@ -60,7 +79,8 @@ function S_SplashScreen(e)
         coral_transform.scale.x = math.abs(coral_transform.position.x) * 0.1
         coral_transform.scale.y = math.abs(coral_transform.position.x) * 0.1
         coral_transform.scale.z = math.abs(coral_transform.position.x) * 0.1
-        coral_transform.position.y = coral_transform.scale.y * 1.5
+        coral_transform.position.y = coral_transform.scale.y;
+
     end
 
     -- to get identity of 1 object
@@ -69,7 +89,6 @@ function S_SplashScreen(e)
 
     -- // this is how to print id of the object
     -- print(GetEntityData(door_in_scene).id)
-
 
     IsMoving = false
     local camera = FindCameraObject()
@@ -80,7 +99,6 @@ function S_SplashScreen(e)
         IsMoving = true
     end
 
-
     -- shift the door position up to stay on top of 0
     door_transform.position.y = door_transform.scale.y
 
@@ -90,8 +108,6 @@ function S_SplashScreen(e)
         door_transform.scale.y = door_transform.scale.y + speed
         door_transform.scale.z = door_transform.scale.z + speed
     end
-
-
 end
 
 --[IsComponent]
