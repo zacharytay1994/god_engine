@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <glm/glm/gtc/matrix_transform.hpp>
+#include <math.h>
 
 namespace god
 {
@@ -28,6 +29,16 @@ namespace god
 	glm::mat4 Camera::GetCameraViewMatrix ()
 	{
 		return glm::lookAt ( m_position , m_position + m_look_at , m_up );
+	}
+
+	glm::mat4 Camera::GetCameraViewFaceCamera ()
+	{
+		glm::mat4 view { GetCameraViewMatrix () };
+		// camera rotation relative to origin
+		glm::vec3 norm_position = glm::normalize ( m_position );
+		float angle = acos ( norm_position.z );
+		view = glm::rotate ( view , angle , glm::vec3 ( 0 , 1 , 0 ) );
+		return view;
 	}
 
 	void Camera::FreeCamera (

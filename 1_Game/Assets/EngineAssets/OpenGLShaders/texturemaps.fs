@@ -328,6 +328,5 @@ void main( )
 
     // output_color += vec4( uEmissive , uEmissive , uEmissive , 1 );
 
-    fFragColor = output_color;
-
+    fFragColor = vec4(output_color.rgb,texture(uMaterial.diffuse_map, vUV).a);
 }

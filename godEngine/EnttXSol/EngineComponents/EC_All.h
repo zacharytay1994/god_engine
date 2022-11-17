@@ -10,7 +10,7 @@
 
 #include "Render/EC_PointLight.h"
 #include "Render/EC_DirectionalLight.h"
-
+#include "Render/EC_Transparent.h"
 
 #include "Physics/EC_Static.h"
 #include "Physics/EC_Dynamic.h"
@@ -41,7 +41,8 @@ namespace god
 			DirectionalLight ,
 			GridManipulate ,
 			GUIObject ,
-			GUIText
+			GUIText ,
+			Transparent
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};
