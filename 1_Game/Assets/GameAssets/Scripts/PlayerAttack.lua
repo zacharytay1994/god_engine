@@ -3,7 +3,6 @@
 -- Note: when implementing a new player attack / action:
 -- 1) Write the new attack script and attach it to CombatManager.
 -- 2) Add debug shortcut to Player.lua
--- 3) 
 
 --[IsComponent]
 function C_PlayerAttack()

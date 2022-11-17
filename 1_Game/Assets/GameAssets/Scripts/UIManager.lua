@@ -18,7 +18,13 @@ function C_UIManager()
         characterIconsInit = false,
 
         -- list of all character icons
-        iconList = {}
+        iconList = {},
+		
+		-- Size of healthbar
+		healthbar_size = 0.0,
+		
+		-- Health record, used to optimize the healthbar UI
+		health_record = 0.0
     };
     return function()
         return var
@@ -28,7 +34,12 @@ end
 --[IsSystem]
 function S_UIManager(e)
     
+
     local UIManagerComponent = GetComponent(e, "C_UIManager")
+	
+	if (UIManagerComponent.healthbar_size == 0.0) then
+		UIManagerComponent.healthbar_size = GetGUIObject(GetEntity("HealthbarRed")).size.x
+	end
 
     -- checking if player entity exists
     local playerEntity = GetEntity("Player")
@@ -86,6 +97,14 @@ function S_UIManager(e)
 					elseif (currentDiceComponent.value == 5) then
                         -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Corporikinesis"             
                     end
+
+                    -- -- un-hardcoded solution 
+                    -- -- (diceValue will be a value from 0 to 8, colorModifier will be a value from 1 to 3.
+                    -- -- On the dice side, need to map 0 to FrontJab, 1 to BigSwing, 2 to GroundSmash, 3 to EnergyBolt, etc.)
+                    -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = attackList[(diceValue * 3) + colorModifier][1]     
+                    -- where attackList[(diceValue * 3) + colorModifier][1] is "frontJabBlue"
+                    -- and there will be a texture called with the exact same name "frontJabBlue"
+                    -- end of setting selected action --------------------------------------------------
                 end
                 
                 -- change button textures to show the available actions
@@ -112,8 +131,15 @@ function S_UIManager(e)
         -- clear actionButtonList
         UIManagerComponent.actionButtonList = {}
     end
-
-	GetGUIText(GetEntity("StaminaIcon")).text = tostring(GetComponent(GetEntity("Player"), "C_Character").currentStamina)
+	
+	local playerComponent = GetComponent(playerEntity, "C_Character")
+	GetGUIText(GetEntity("StaminaIcon")).text = tostring(playerComponent.currentStamina)
+	if(UIManagerComponent.health_record ~= playerComponent.currentHP) then
+		UIManagerComponent.health_record = playerComponent.currentHP
+		GetGUIText(GetEntity("HealthHeart")).text = tostring(playerComponent.currentHP)
+		GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
+	end
+	-- print(UIManagerComponent.healthbar_size)
 	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------
 

@@ -45,6 +45,7 @@ function C_Character()
     end
 end
 
+isAlive = true
 --[IsSystem]
 function S_Character(e)
     
@@ -79,6 +80,11 @@ function S_Character(e)
         -- set character to dead
         characterComponent.isDead = true
 
+        if(characterComponent.isDead == true)
+        then
+            isAlive = false
+            ChangeScene("WinloseScreen",true)
+        end
         -- RemoveInstance will be called by TurnOrderManager at the end of current round
     end
 

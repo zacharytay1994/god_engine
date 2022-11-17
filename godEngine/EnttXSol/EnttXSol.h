@@ -159,7 +159,7 @@ namespace god
 		template<typename...COMPONENTS>
 		auto GetView ();
 
-		friend void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources );
+		friend void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources , MainVariables& name );
 
 		// helper functor to attach script components
 		struct AttachEngineComponentFunctor
@@ -208,6 +208,7 @@ namespace god
 		void LoadSystem ( std::string const& name );
 		bool AttachComponent ( Entities::ID id , std::string const& name );
 		bool AttachComponent ( entt::entity id , std::string const& name );
+		bool RemoveComponent ( entt::entity id , std::string const& name );
 	public:
 		template <typename T>
 		auto&& GetStorage ( std::string const& name );

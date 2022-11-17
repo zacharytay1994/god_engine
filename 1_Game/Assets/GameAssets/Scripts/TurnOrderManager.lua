@@ -31,10 +31,10 @@ function C_TurnOrderManager()
         turnQueue = {},
 
         -- counts the number of turn cycles 
-        turnCycleCounter = 0,
+        turnCycleCounter = 0
 
         -- turn order UI will be refreshed at the start of each round
-        refreshTurnOrderUI = false
+        --refreshTurnOrderUI = false
     };
     return function()
         return var
@@ -99,25 +99,25 @@ function S_TurnOrderManager(e)
             end
 
             -- sort all characters in turnQueue by remaining stamina (Selection Sort)------------------------------------
-            if (#turnOrderManagerComponent.turnQueue > 1) then                           
-                local arrayLength = #turnOrderManagerComponent.turnQueue        
-                for i = 1, #turnOrderManagerComponent.turnQueue - 1 do                  
-                    if (i <= arrayLength) then                                         
-                        indexLargest = i
-                        for j = i + 1, #turnOrderManagerComponent.turnQueue do
-                            if (j <= arrayLength) then
-                                if (GetComponent(turnOrderManagerComponent.turnQueue[j], "C_Character").currentStamina > GetComponent(turnOrderManagerComponent.turnQueue[indexLargest], "C_Character").currentStamina) then
-                                    indexLargest = j
-                                end
-                            end
-                        end 
+            -- if (#turnOrderManagerComponent.turnQueue > 1) then                           
+            --     local arrayLength = #turnOrderManagerComponent.turnQueue        
+            --     for i = 1, #turnOrderManagerComponent.turnQueue - 1 do                  
+            --         if (i <= arrayLength) then                                         
+            --             indexLargest = i
+            --             for j = i + 1, #turnOrderManagerComponent.turnQueue do
+            --                 if (j <= arrayLength) then
+            --                     if (GetComponent(turnOrderManagerComponent.turnQueue[j], "C_Character").currentStamina > GetComponent(turnOrderManagerComponent.turnQueue[indexLargest], "C_Character").currentStamina) then
+            --                         indexLargest = j
+            --                     end
+            --                 end
+            --             end 
 
-                        temp = turnOrderManagerComponent.turnQueue[indexLargest]
-                        turnOrderManagerComponent.turnQueue[indexLargest] = turnOrderManagerComponent.turnQueue[i]
-                        turnOrderManagerComponent.turnQueue[i] = temp
-                    end
-                end
-            end 
+            --             temp = turnOrderManagerComponent.turnQueue[indexLargest]
+            --             turnOrderManagerComponent.turnQueue[indexLargest] = turnOrderManagerComponent.turnQueue[i]
+            --             turnOrderManagerComponent.turnQueue[i] = temp
+            --         end
+            --     end
+            -- end 
             -- end of selection sort ------------------------------------------------------------------------------------
 
             -- push player to the front as much as possible (e.g. if a bunch of characters have 0 stamina, the player will go first among the 0-stamina-ers) ------------------------------------------            
@@ -128,7 +128,8 @@ function S_TurnOrderManager(e)
             local playerEntity = GetEntity("Player")
             if (playerEntity ~= -1) then
                 for n = 1, #turnOrderManagerComponent.turnQueue do
-                    if (turnOrderManagerComponent.turnQueue[n] == GetEntityData(playerEntity).id) then
+                    if (turnOrderManagerComponent.turnQueue[n] == playerEntity) then
+                    -- if (turnOrderManagerComponent.turnQueue[n] == GetEntityData(playerEntity).id) then
                         playerIndex = n
                         break;
                     end
@@ -137,20 +138,26 @@ function S_TurnOrderManager(e)
                 print("[TurnOrderManager.lua] Player Entity is missing!")
             end
 
-            -- while characters in front of the player have the same stamina as the player, swap their queue positions
-            while ((playerIndex - 1) > 1) do
-                
-                if (GetComponent(turnOrderManagerComponent.turnQueue[playerIndex], "C_Character").currentStamina == GetComponent(turnOrderManagerComponent.turnQueue[playerIndex - 1], "C_Character").currentStamina) then
-                
-                    temp = turnOrderManagerComponent.turnQueue[playerIndex]
-                    turnOrderManagerComponent.turnQueue[playerIndex] = turnOrderManagerComponent.turnQueue[playerIndex - 1]
-                    turnOrderManagerComponent.turnQueue[playerIndex - 1] = temp
+            -- swap player to first in the turnQueue ----------------------------------------------------------------
+            local temp = turnOrderManagerComponent.turnQueue[playerIndex]
+            turnOrderManagerComponent.turnQueue[playerIndex] = turnOrderManagerComponent.turnQueue[1]
+            turnOrderManagerComponent.turnQueue[1] = temp
+            -- end of swapping --------------------------------------------------------------------------------------
 
-                    playerIndex = playerIndex - 1
-                else
-                    break
-                end
-            end
+            -- while characters in front of the player have the same stamina as the player, swap their queue positions
+            -- while ((playerIndex - 1) > 1) do
+                
+            --     if (GetComponent(turnOrderManagerComponent.turnQueue[playerIndex], "C_Character").currentStamina == GetComponent(turnOrderManagerComponent.turnQueue[playerIndex - 1], "C_Character").currentStamina) then
+                
+            --         temp = turnOrderManagerComponent.turnQueue[playerIndex]
+            --         turnOrderManagerComponent.turnQueue[playerIndex] = turnOrderManagerComponent.turnQueue[playerIndex - 1]
+            --         turnOrderManagerComponent.turnQueue[playerIndex - 1] = temp
+
+            --         playerIndex = playerIndex - 1
+            --     else
+            --         break
+            --     end
+            -- end
             -- end of pushing player to the front -----------------------------------------------------------------------------------------------------------------------------------------------------
 
             -- print sort queue, and also refresh characters' stamina
@@ -163,8 +170,15 @@ function S_TurnOrderManager(e)
             -- reset to false so it doesn't build the queue again for this round
             turnOrderManagerComponent.buildTurnQueue = false
 
-            -- cue UIManager to refresh the turn order icons 
-            turnOrderManagerComponent.refreshTurnOrderUI = true
+            local enemyForecastEntity = GetEntity("EnemyForecast")
+            if (enemyForecastEntity ~= -1) then
+                GetComponent(enemyForecastEntity, "C_EnemyForecast").performForecast = true
+            else
+                print("[TurnOrderManager.lua] ERROR: EnemyForecast entity not found!")
+            end
+
+            -- -- cue UIManager to refresh the turn order icons 
+            -- turnOrderManagerComponent.refreshTurnOrderUI = true
 
             print("[TurnOrderManager.lua] End of building turnQueue.\n")
 
