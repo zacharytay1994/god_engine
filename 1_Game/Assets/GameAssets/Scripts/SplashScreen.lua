@@ -11,17 +11,38 @@ end
 -- number of corals to spawn
 local corals_row_min_ = 0
 local corals_row_max_ = 20
-local corals_column_min_ = 0
-local corals_column_max_ = 5
+local corals_column_min_ = -2
+local corals_column_max_ = 8
 
 -- random generated rocks
 function GenerateRandomRocks(x, y, z)
-    -- list of rocks
-    local rocks = { "rock01", "rock02", "rock03" }
+
+    local rng_pos = GenerateRandomNumberInRange(1, 10) / 100.0
+    -- create rock
+    local rock_entity = InstancePrefabNow("SS_Rock", rng_pos + x, rng_pos + y, z)
+
     -- random generated seeds
-    -- local rng = GenerateRandomNumberInRange(1, 3)
-    local rng = 1
-    InstancePrefab("SS_Coral", x, y, z)
+    ChangeModel(rock_entity, "rock0" .. tostring(GenerateRandomNumberInRange(1, 4)))
+
+    -- get rock transformation data
+    local rock_transform = GetTransform(rock_entity)
+
+    -- set transform scale to rock
+    local rng_scale = GenerateRandomNumberInRange(1, 10) / 20.0
+    rock_transform.scale.x = rng_scale
+    rock_transform.scale.y = rng_scale
+    rock_transform.scale.z = rng_scale
+    rock_transform.position.y = rock_transform.scale.y;
+end
+
+function GenerateRandomSeaweeds(x, y, z)
+
+    local seaweed_entity = InstancePrefabNow("SS_Seaweeds", x, y, z)
+
+    ChangeModel(seaweed_entity, "Plant_Seaweed0" .. tostring(GenerateRandomNumberInRange(1, 3)))
+
+    local seaweed_transform = GetTransform(seaweed_entity)
+
 end
 
 -- initialization of data before play button is trigged
@@ -58,21 +79,6 @@ end
 function S_SplashScreen(e)
     local dt = GetDeltaTime()
     local speed = 0.1 * dt
-
-    -- get all corals in the scene
-    local corals_in_scene = EntitiesWithScriptComponent("C_CoralData")
-
-    -- for each coral in the scene
-    for i = 1, #corals_in_scene do
-        local coral_transform = GetTransform(corals_in_scene[i])
-
-        -- set transform scale to coral scale
-        coral_transform.scale.x = math.abs(coral_transform.position.x) * 0.1
-        coral_transform.scale.y = math.abs(coral_transform.position.x) * 0.1
-        coral_transform.scale.z = math.abs(coral_transform.position.x) * 0.1
-        coral_transform.position.y = coral_transform.scale.y;
-
-    end
 
     -- to get identity of 1 object
     local door_in_scene = EntitiesWithScriptComponent("C_DoorData")[1]
