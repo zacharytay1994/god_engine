@@ -97,6 +97,14 @@ function S_UIManager(e)
 					elseif (currentDiceComponent.value == 5) then
                         -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Corporikinesis"             
                     end
+
+                    -- -- un-hardcoded solution 
+                    -- -- (diceValue will be a value from 0 to 8, colorModifier will be a value from 1 to 3.
+                    -- -- On the dice side, need to map 0 to FrontJab, 1 to BigSwing, 2 to GroundSmash, 3 to EnergyBolt, etc.)
+                    -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = attackList[(diceValue * 3) + colorModifier][1]     
+                    -- where attackList[(diceValue * 3) + colorModifier][1] is "frontJabBlue"
+                    -- and there will be a texture called with the exact same name "frontJabBlue"
+                    -- end of setting selected action --------------------------------------------------
                 end
                 
                 -- change button textures to show the available actions
