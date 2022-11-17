@@ -23,12 +23,12 @@ function C_EnemyController()
         -- name of the enemy's movement script (e.g. MoveDummee)
         -- movementScriptName will be initialized by using the inspector
         --[SerializeString]
-        movementScriptName = nil,
+        movementScriptName = "",
 
         -- name of the enemy's movement script (e.g. EnemyDummee)
         -- attackScriptName will be initialized by using the inspector
         --[SerializeString]
-        attackScriptName = nil
+        attackScriptName = ""
 
     }
     return function()

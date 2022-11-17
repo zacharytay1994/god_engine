@@ -327,6 +327,24 @@ namespace god
 			}
 		);
 
+		// SetVelocity(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("SetVelocity",
+			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+			{
+				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+					;
+
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				{
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setLinearVelocity(ConvertToPhysXVector({ x, y, z }));
+					}
+				}
+			}
+		);
+
 		// AddForce(e,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "AddForce" ,
