@@ -2,12 +2,13 @@
 -- This script will be attached to CombatManager.
 -- CombatManager will run this script whenever the player uses a Ground Smash attack.
 
--- To use Ground Smash, the Player will need to click on Triton. Then, it will hit all enemies adjacent to Triton
+-- To use Ground Smash, the Player will need to click on the tile below Triton. Then, it will hit all enemies adjacent to Triton
 -- and apply push back.
 
 -- TODO:
 -- 1) Make GroundSmash affect diagonal enemies.
--- 2) Complete the pushback function
+-- 2) Retrieve the actual groundsmash damage based on dice color
+-- 3) Allow groundsmash to be used by selecting triton
 
 --[IsComponent]
 function C_GroundSmash()
@@ -60,16 +61,16 @@ function S_GroundSmash(e)
 
         else
             
-            -- check if attacker == defender because the player needs to click on itself to use ground smash
-            if (attackComponent.attacker == attackComponent.defender) then
+            -- check if the player has clicked the tile below Triton
+            if (AttackGroundSmashCheckCorrectTileClicked(attackComponent.attacker, attackComponent.defender)) then
                 
                 -- passed the check, allow the rest of the script to run
                 attackComponent.canAttack = true
-                print("[AttackGroundSmash.lua] Player clicked on Triton! Proceeding with GroundSmash.")
+                print("[AttackGroundSmash.lua] Player clicked on the tile below Triton! Proceeding with GroundSmash.")
             else
                 
                 -- failed the check, print fail message
-                print("[AttackGroundSmash.lua] Player did not click on Triton! GroundSmash failed.")
+                print("[AttackGroundSmash.lua] Player did not click on the tile below Triton! GroundSmash failed.")
             end
             
             -- this will allow PlayerAttack.lua to proceed
@@ -98,6 +99,8 @@ function S_GroundSmash(e)
         -- trigger particles (if any)
         
         -- play attack animation (if any)
+
+        print("[AttackGroundSmash.lua] End of GroundSmash!")
     end
     -- end of attack effects ---------------------------------------------------------------------------------------------
     
@@ -108,70 +111,89 @@ function S_GroundSmash(e)
     attackComponent.playerRotation = 0
 end
 
-function AttackGroundSmashApplyDamagePushback(e)
+function AttackGroundSmashCheckCorrectTileClicked(player, clickedEntity)
 
+    print("[AttackGroundSmash.lua] Checking if clickedEntity is the tile below Triton!")
+    
+    local playerGrid = GetGridCell(player)
+    local clickedEntityGrid = GetGridCell(clickedEntity)
+
+    if (playerGrid.x == clickedEntityGrid.x and playerGrid.y == clickedEntityGrid.y + 1 and playerGrid.z == clickedEntityGrid.z) then
+        return true
+    end
+
+    return false
+end
+
+function AttackGroundSmashApplyDamagePushback(player)
+
+    print("[AttackGroundSmash.lua] Applying damage to enemies hit by GroundSmash!")
+    
     local hitEnemies = { }
     
     -- find all characters in range of attack
     local characterList = EntitiesWithScriptComponent("C_Character")
     for i = 1, #characterList do
-        if (AttackGroundSmashCheckPlayerAdjacentToEnemy(e, characterList[i])) then 
+        if (AttackGroundSmashCheckPlayerAdjacentToEnemy(player, characterList[i])) then 
             hitEnemies[#hitEnemies + 1] = characterList[i]
+            print("[AttackGroundSmash.lua] GroundSmash has hit", EntityName(characterList[i]), GetEntityData(characterList[i]).id)
         end
     end
 
-    local combatManagerEntity = GetEntity("CombatManager")
-    local attackList = nil
-    if (combatManagerEntity ~= -1) then
-        attackList = GetComponent(combatManagerEntity, "C_CombatManager")
+    if (#hitEnemies < 1) then 
+        print("[AttackGroundSmash.lua] GroundSmash did not hit any enemies!")
     end
-    
-    local groundSmashDamage = combatManagerComponent.attackType[2]
+
+    -- local combatManagerEntity = GetEntity("CombatManager")
+    -- local combatManagerComponent = nil
+    -- if (combatManagerEntity ~= -1) then
+    --     combatManagerComponent = GetComponent(combatManagerEntity, "C_CombatManager")
+    -- end
+    -- local groundSmashDamage = combatManagerComponent.attackType[2]
+
+    -- NEED TO GET DICE COLOR HERE, FOR NOW JUST SET DAMAGE AS 2
+    local groundSmashDamage = 2
 
     for j = 1, #hitEnemies do
     
         -- apply damage to all characters
         local enemyCharacterComponent = GetComponent(hitEnemies[j], "C_Character")
-        enemyCharacterComponent.currentHP = enemyCharacterComponent.curerntHP - groundSmashDamage
+        enemyCharacterComponent.currentHP = enemyCharacterComponent.currentHP - groundSmashDamage
+        print("[AttackGroundSmash.lua] Applied", groundSmashDamage, "damage to", EntityName(hitEnemies[j]))
 
-        -- TODO: apply pushback to all characters while ensuring proper landing
-    
+        -- apply pushback to all characters while ensuring proper landing
+        AttackGroundSmashApplyPushback(player, hitEnemies[j])
+        print("AttackGroundSmash.lua] Applied pushback to", EntityName(hitEnemies[j]), "and character behind it.")
     end
 end
 
 function AttackGroundSmashCheckPlayerAdjacentToEnemy(player, enemy)
     
     -- init result
-    result = false
+    local result = false
 
     -- get attacker and defenders' locations
-    attackerGrid = GetGridCell(attacker)
-    defenderGrid = GetGridCell(defender)
-
-    -- get rotation variable
-    attackComponent = GetComponent(e, "C_FrontJab")
+    local attackerGrid = GetGridCell(player)
+    local defenderGrid = GetGridCell(enemy)
 
     if (attackerGrid.y == defenderGrid.y) then 
 
         -- enemy behind player
         if (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z - 1) then
             result = true 
-            attackComponent.playerRotation = 0
 
         -- enemy in front of player
         elseif (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z + 1) then
             result = true 
-            attackComponent.playerRotation = 180
 
         -- enemy to player's left
         elseif (attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x - 1) then
             result = true 
-            attackComponent.playerRotation = 90
 
         -- enemy to player's right
         elseif(attackerGrid.z == defenderGrid.z and attackerGrid.x == defenderGrid.x + 1) then
             result = true 
-            attackComponent.playerRotation = 270
+
         end
     end
 
@@ -197,8 +219,12 @@ function AttackGroundSmashApplyPushback(player, enemy)
     local affectedEntity = nil
     local affectedEntities = { }
 
+    -- add the enemy directly hit by GroundSmash to affectedEntities first
+    affectedEntities[#affectedEntities + 1] = enemy
+
     while (loopCounter <= 8) do
     
+        -- update the currentGrid to check for entities
         currentGrid[1] = currentGrid[1] + pushbackDirection[1]
         currentGrid[2] = currentGrid[2] + pushbackDirection[2]
         currentGrid[3] = currentGrid[3] + pushbackDirection[3]
@@ -244,15 +270,120 @@ function AttackGroundSmashApplyPushback(player, enemy)
     -- affectedEntities now contain all entities with a GridCell component, that form a chain behind the initial enemy
 
     -- check affectedEntities for any floortiles / destructible rocks
+    local tileList = EntitiesWithScriptComponent("C_FloorTile")
+    --local rockList = 
+
+    for k = 1, #affectedEntities do
+        for l = 1, #tileList do
+        
+            -- if there is a floortile, then don't do anything more, return. can't pushback anyone in affectedEntity because the floortile is blocking.
+            if (affectedEntities[k] == tileList[l]) then  
+                print("[AttackGroundSmash.lua] There is a floortile in the pushback chain behind", EntityName(affectedEntities[k]), ", cannot apply pushback.")
+                return
+            end
+        end
+
+        -- -- if there is a destructible rock, then remove all entities from that rock onwards (including that rock) and destroy that rock.
+        -- for m = 1, #rockList do
+        -- end
+    end
     
-    -- if there is a destructible rock, then remove all entities from that rock onwards (including that rock) and destroy that rock, 
-    -- and apply pushback to affectedEntities + ensure proper landing
+    -- code reach here means there is no rock / floortile, apply pushback to affectedEntities + ensure proper landing.
+    print("[AttackGroundSmash.lua] Nothing blocking pushback, applying pushback to all entities behind", EntityName(affectedEntities[1]))
 
-    -- if there is a floortile, then don't do anything more, return. can't pushback anyone in affectedEntity because the floortile is blocking.
+    -- for each affectedEntity, apply pushback here and then check proper landing
+    for n = 1, #affectedEntities do 
+        local affectedEntityGrid = GetGridCell(affectedEntities[n])
+        affectedEntityGrid.x = affectedEntityGrid.x + pushbackDirection[1]
+        affectedEntityGrid.y = affectedEntityGrid.y + pushbackDirection[2]
+        affectedEntityGrid.z = affectedEntityGrid.z + pushbackDirection[3]
+        AttackGroundSmashEnsureProperLanding(affectedEntities[n])
+    end
+end
 
-    -- if there is no rock / floortile, then apply pushback to affectedEntities + ensure proper landing
+-- checks if there is a tile below character after recoil
+-- if no tile below then this will deal fall damage / kill the character accordingly
+-- input entity MUST HAVE C_CHARACTER COMPONENT
+function AttackGroundSmashEnsureProperLanding(e)
+
+    local tileList = EntitiesWithScriptComponent("C_FloorTile")
+    local tilesBelow = { }
+    local entityGrid = GetGridCell(e)
+
+    for i = 1, #tileList do
+    
+        local currentTileGrid = GetGridCell(tileList[i])
+
+        if (currentTileGrid.x == entityGrid.x and currentTileGrid.y == entityGrid.y - 1 and currentTileGrid.z == entityGrid.z) then
+            print("[AttackGroundSmash.lua] Pushed character has safely landed onto a floor tile.")
+            return
+        elseif (currentTileGrid.x == entityGrid.x and currentTileGrid.y < entityGrid.y - 1 and currentTileGrid.z == entityGrid.z) then
+            tilesBelow[#tilesBelow + 1] = tileList[i]
+        end
+    end
+
+    -- Note: if code reaches here then it means pushed character is not in a safe position
+
+    local characterComponent = GetComponent(e, "C_Character")
+    local tileToFallOnto = nil
+    
+    -- if there are not tilesBelow then pushed character has fallen off the map, kill it
+    if (#tilesBelow == 0) then
+        characterComponent.currentHP = 0
+        print("[AttackGroundSmash.lua] Pushed character has fallen off the map and died.")
+        return
+    
+    -- else, find the highest tile in tilesBelow and place the pushed character there, applying fall damage
+    else
+        for j = 1, #tilesBelow do
+              
+            local currentTileBelowGrid = GetGridCell(tilesBelow[j])
+
+            -- if tileToFallOnto is nil then simply assign currentTile to tileToFallOnto
+            if (tileToFallOnto == nil) then
+                tileToFallOnto = tilesBelow[j]
+            
+            -- else if currentTileGrid is higher than tileToFallOnto, then overwrite tileToFallOnto
+            elseif (currentTileBelowGrid.y > GetGridCell(tileToFallOnto).y) then
+                tileToFallOnto = tilesBelow[j]
+            end
+        end
+
+        -- place the entity on top of the grid
+        entityGrid.y = GetGridCell(tileToFallOnto).y + 1
+        
+        local combatManagerEntity = GetEntity("CombatManager")
+        local combatManagerComponent = nil
+        if (combatManagerEntity ~= -1) then
+            combatManagerComponent = GetComponent(combatManagerEntity, "C_CombatManager")
+        else
+            print("[AttackGroundSmash.lua] ERROR: Cannot find CombatManager! Unable to deal fall damage.")
+        end
+        characterComponent.currentHP = characterComponent.currentHP - combatManagerComponent.fallDamage
+        print("[AttackGroundSmash.lua]", EntityName(e), "has fallen off a ledge and received fall damage.")
+    end
+
+    EnemyAttackDummeeCheckCharacterBelow(e)
 
 end
 
-function AttackGroundSmashEnsureProperLanding(entity)
+-- checks if there is a character below the entity being pushed back
+-- if there is then the character below will get squashed to death
+function EnemyAttackDummeeCheckCharacterBelow(e)
+
+    local characterList = EntitiesWithScriptComponent("C_Character")
+    local entityGrid = GetGridCell(e)
+
+    for i = 1, #characterList do
+        
+        if (characterList[i] ~= e) then
+            
+            local characterGrid = GetGridCell(characterList[i])
+
+            if (characterGrid.y < entityGrid.y) then
+                GetComponent(characterList[i], "C_Character").currentHP = 0
+                print("[AttackGroundSmash.lua]", EntityName(characterList[i]), "has been squashed to death by", EntityName(e), ".")
+            end
+        end     
+    end
 end
