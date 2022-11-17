@@ -36,7 +36,9 @@ namespace god
 		std::vector<std::string> m_prefabs_list;
 		std::vector<std::string> m_scene_list;
 
+	public:
 		bool m_select_hierarchy_tab { false };
+	private:
 
 		void RecursivelyDisplaySceneHierarchy ( EDITOR_RESOURCES& engineResources , EnttXSol::Entities::ID entity );
 
