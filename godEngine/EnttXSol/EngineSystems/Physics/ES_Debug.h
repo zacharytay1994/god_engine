@@ -29,9 +29,9 @@ namespace god
 		//std::cout << "DebugDynamic\n";
 
 
-		switch (rigiddynamic.shapeid)
+		switch (rigiddynamic.Shapeid)
 		{
-		case RigidDynamic::Cube:
+		case PhysicsTypes::Cube:
 			glm::vec3 scale = glm::vec3{ 1.f,1.f,1.f };
 			glm::vec3 scale2 = glm::vec3{ 2.f,2.f,2.f };
 
@@ -81,7 +81,7 @@ namespace god
 			OpenGL::DrawLine(pt[4], pt[0]);
 			OpenGL::DrawLine(min, pt[5]);
 			break;
-		case RigidDynamic::Sphere:
+		case PhysicsTypes::Sphere:
 		{
 			//float radius = rigiddynamic.extents.x;
 			//glm::vec3 start = transform.m_local_transform * glm::vec4(transform.m_position,1.0);
@@ -96,7 +96,7 @@ namespace god
 			//std::cout << "lol";
 			break;
 		}
-		case RigidDynamic::Capsule:
+		case PhysicsTypes::Capsule:
 
 
 

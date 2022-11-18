@@ -8,7 +8,7 @@
 #include "ES_AudioListener.h"
 
 #include "Physics/ES_Dynamic.h"
-#include "Physics/ES_RayCast.h"
+//#include "Physics/ES_RayCast.h"
 #include "Physics/ES_Static.h"
 #include "Physics/ES_Debug.h"
 
@@ -87,8 +87,7 @@ namespace god
 		SystemTimer::StartTimeSegment ( "Physics Frame End" );
 		enttxsol.RunEngineSystem ( engineResources , DebugDynamic );
 		enttxsol.RunEngineSystem ( engineResources , DebugStatic );
-		enttxsol.RunEngineSystem ( engineResources , RayCastDynamic );
-		enttxsol.RunEngineSystem ( engineResources , RayCastStatic );
+
 		SystemTimer::EndTimeSegment ( "Physics Frame End" );
 
 		if ( !enttxsol.m_pause )

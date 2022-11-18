@@ -4,6 +4,8 @@
 #include "../../EnttXSol.h"
 #include "../../../Physics/DiceCallBack.h"
 
+
+
 using namespace physx;
 namespace god
 {
@@ -34,8 +36,8 @@ namespace god
 		}//else if entt.m_pause
 		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1> ( component );
+		RigidDynamic& rigiddynamic = std::get<2>(component);
 		Renderable3D& renderable = std::get<3> ( component );
-		RigidDynamic& rigiddynamic = std::get<2> ( component );
 		PhysicsSystem& psys = engineResources.Get<PhysicsSystem>().get();
 
 		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem> ().get ().GetPhysics ();
@@ -45,33 +47,38 @@ namespace god
 
 
 
-		if ( rigiddynamic.initRigidDynamic)
+		if ( rigiddynamic.updateRigidDynamic)
 		{
 
 			if ( rigiddynamic.p_material == nullptr )
 			{
 				rigiddynamic.p_material = mPhysics->createMaterial ( rigiddynamic.StaticFriction , rigiddynamic.DynamicFriction , rigiddynamic.Restitution );
 			}
-
-			//exclusive shape (can be modified)
-			switch ( rigiddynamic.shapeid )
+			else
 			{
-			case RigidDynamic::Cube:
+				rigiddynamic.p_material->setStaticFriction(rigiddynamic.StaticFriction);
+				rigiddynamic.p_material->setDynamicFriction(rigiddynamic.DynamicFriction);
+				rigiddynamic.p_material->setRestitution(rigiddynamic.Restitution);
+			}
+			//exclusive shape (can be modified)
+			switch ( rigiddynamic.Shapeid )
+			{
+			case PhysicsTypes::Cube:
 				rigiddynamic.p_shape = mPhysics->createShape ( physx::PxBoxGeometry ( rigiddynamic.extents.x , rigiddynamic.extents.y , rigiddynamic.extents.z ) , *rigiddynamic.p_material , true );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
 				break;
-			case RigidDynamic::Sphere:
+			case PhysicsTypes::Sphere:
 
 				rigiddynamic.p_shape = mPhysics->createShape ( physx::PxSphereGeometry ( rigiddynamic.extents.x ) , *rigiddynamic.p_material , true );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
 				break;
-			case RigidDynamic::Capsule:
+			case PhysicsTypes::Capsule:
 
 				rigiddynamic.p_shape = mPhysics->createShape ( physx::PxCapsuleGeometry ( rigiddynamic.extents.x , rigiddynamic.extents.y ) , *rigiddynamic.p_material , true );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
 				break;
 
-			case RigidDynamic::TriangleMesh:
+			case PhysicsTypes::TriangleMesh:
 				std::vector<Vertex3D> vertexes = std::get<1> ( assetmgr.Get ( renderable.m_model_id ) ).m_model.m_meshes[ 0 ].m_vertices;
 				std::vector< uint32_t> indices = std::get<1> ( assetmgr.Get ( renderable.m_model_id ) ).m_model.m_meshes[ 0 ].m_indices;
 				std::vector<glm::vec3> points;
@@ -101,7 +108,6 @@ namespace god
 				rigiddynamic.p_shape = mPhysics->createShape ( physx::PxTriangleMeshGeometry ( rigiddynamic.p_trimesh , scale ) , *rigiddynamic.p_material , true );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
 				break;
-
 			}
 
 			rigiddynamic.p_RigidDynamic = mPhysics->createRigidDynamic ( physx::PxTransform ( transform.m_position.x ,
@@ -119,82 +125,60 @@ namespace god
 			rigiddynamic.p_RigidDynamic->setContactReportThreshold(0.01f);
 
 
-			for (auto const& tracked : ContactCallBack)
-			{
-				if (edata.m_id == tracked.first)
-				{
-					psys.getContactReportCallback().AddToContactTrack(rigiddynamic.p_RigidDynamic, tracked.second);
-				}
-			}
+			rigiddynamic.m_id = edata.m_id;
+			rigiddynamic.p_RigidDynamic->userData = &rigiddynamic;
 
-			for (auto& [entt1, entt2, fp, actor1, actor2] : psys.getContactReportCallback().getContactPairTrack() )
-			{
-				if (edata.m_id == entt1)
-				{
-					actor1 = rigiddynamic.p_RigidDynamic;
-				}
-				if (edata.m_id == entt2)
-				{
-					actor2 = rigiddynamic.p_RigidDynamic;
-				}
-			}
-			rigiddynamic.p_RigidDynamic->userData = &edata;
-
-			rigiddynamic.initRigidDynamic = false;
+			rigiddynamic.updateRigidDynamic = false;
 
 		}//init rigiddynamic
 
-		if (rigiddynamic.Simulation)
-		{
-			//rigiddynamic.Trigger = false;
-			//rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
-			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
-		}
-		else
-		{
-			//rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
-		}
+		
+		rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, !rigiddynamic.Active);
+		rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !rigiddynamic.Gravity);
 
 		if (rigiddynamic.Trigger)
 		{
+			rigiddynamic.Simulation = false;
 			rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 			rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
 		}
 		else
 		{
 			rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
-			rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
 		}
 
-		if (rigiddynamic.Gravity)
+		if (rigiddynamic.Simulation)
 		{
-			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
+			rigiddynamic.Trigger = false;
+			rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+			rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+		
 		}
 		else
 		{
-			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+			rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 		}
+
 
 		if ( rigiddynamic.locktoscale )
 		{
 			rigiddynamic.extents = transform.m_scale;
-			switch ( rigiddynamic.shapeid )
+			switch ( rigiddynamic.Shapeid )
 			{
-			case RigidDynamic::Cube:
+			case PhysicsTypes::Cube:
 				rigiddynamic.p_shape->setGeometry ( physx::PxBoxGeometry ( rigiddynamic.extents.x , rigiddynamic.extents.y , rigiddynamic.extents.z ) );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
 				break;
-			case RigidDynamic::Sphere:
+			case PhysicsTypes::Sphere:
 				rigiddynamic.p_shape->setGeometry ( physx::PxSphereGeometry ( rigiddynamic.extents.x ) );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
 				break;
-			case RigidDynamic::Capsule:
+			case PhysicsTypes::Capsule:
 				rigiddynamic.p_shape->setGeometry ( physx::PxCapsuleGeometry ( rigiddynamic.extents.x , rigiddynamic.extents.y ) );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
 				break;
 
-			case RigidDynamic::TriangleMesh:
+			case PhysicsTypes::TriangleMesh:
 				PxMeshScale scale ( PxVec3 ( rigiddynamic.extents.x , rigiddynamic.extents.y , rigiddynamic.extents.z ) , PxQuat ( PxIdentity ) );
 				rigiddynamic.p_shape->setGeometry ( physx::PxTriangleMeshGeometry ( rigiddynamic.p_trimesh , scale ) );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
