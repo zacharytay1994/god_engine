@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../EngineComponents.h"
-#include "../../Physics/godPhysics.h"
+//#include "../../Physics/godPhysics.h"
 #include "../../godEngine/Physics/Types.h"
 
 
