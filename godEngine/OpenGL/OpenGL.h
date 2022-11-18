@@ -46,7 +46,6 @@ namespace god
 		void  RenderScene ( Scene& scene ,
 			glm::mat4 const& projection ,
 			glm::mat4 const& view ,
-			glm::mat4 const& viewNoRot ,
 			glm::vec3 const& camera_position ,
 			OGLTextureManager& textures ,
 			glm::vec3 const& camera_front );

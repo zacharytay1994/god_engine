@@ -250,7 +250,6 @@ namespace god
 	void OpenGL::RenderScene ( Scene& scene ,
 		glm::mat4 const& projection ,
 		glm::mat4 const& view ,
-		glm::mat4 const& viewNoRot ,
 		glm::vec3 const& camera_position ,
 		OGLTextureManager& textures ,
 		glm::vec3 const& camera_front )
@@ -415,6 +414,37 @@ namespace god
 
 		// view matrix
 		//OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , viewNoRot );
+
+		// Draw skybox as last
+		glCullFace ( GL_CW );
+		m_cubemap.CubeMapEnableDepth ();
+		m_cubemap_shader.Use ();
+		OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "view" , view );
+		OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "projection" , projection );
+		OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "camera" , camera_position );
+		m_cubemap.Bind ();
+		m_cubemap.Draw ();
+		m_cubemap.UnBind ();
+		m_cubemap.CubeMapDisableDepth ();
+		glCullFace ( GL_CCW );
+
+		// Draw the normal model
+		m_textured_shader.Use ();
+
+		// Reset point light uniforms
+		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uNumPointLight" , 0 );
+
+		// Reset directional light uniforms
+		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uNumDirectionalLight" , 0 );
+
+		// projection matrix
+		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uProjection" , projection );
+
+		// view matrix
+		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uView" , view );
+
+		// set view position
+		OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uViewPosition" , camera_position );
 
 		//glDisable ( GL_DEPTH_TEST );
 		glEnable ( GL_BLEND );
@@ -669,18 +699,18 @@ namespace god
 
 		//[SPACE]-----------------------------------------------------------------------------------
 
-		// Draw skybox as last
-		glCullFace ( GL_CW );
-		m_cubemap.CubeMapEnableDepth ();
-		m_cubemap_shader.Use ();
-		OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "view" , view );
-		OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "projection" , projection );
-		OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "camera" , camera_position );
-		m_cubemap.Bind ();
-		m_cubemap.Draw ();
-		m_cubemap.UnBind ();
-		m_cubemap.CubeMapDisableDepth ();
-		glCullFace ( GL_CCW );
+		//// Draw skybox as last
+		//glCullFace ( GL_CW );
+		//m_cubemap.CubeMapEnableDepth ();
+		//m_cubemap_shader.Use ();
+		//OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "view" , view );
+		//OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "projection" , projection );
+		//OGLShader::SetUniform ( m_cubemap_shader.GetShaderID () , "camera" , camera_position );
+		//m_cubemap.Bind ();
+		//m_cubemap.Draw ();
+		//m_cubemap.UnBind ();
+		//m_cubemap.CubeMapDisableDepth ();
+		//glCullFace ( GL_CCW );
 
 		// Unuse the bound shader
 		OGLShader::UnUse ();

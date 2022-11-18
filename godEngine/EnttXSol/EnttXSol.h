@@ -136,9 +136,9 @@ namespace god
 
 		// S = scene, T = transform, R = renderable
 		template <typename S , typename T , typename R , typename F>
-		void PopulateScene ( S& scene , F& fonts );
+		void PopulateScene ( S& scene , F& fonts , float cameraFaceRotation = 0.0f );
 		template <typename S , typename T , typename R , typename F>
-		void RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) );
+		void RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) , float cameraFaceRotation = 0.0f );
 
 		void SerializeStateV2 ( EngineResources& engineResources , std::string const& fileName );
 		void SerializeStateV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value );
@@ -452,7 +452,7 @@ namespace god
 	}
 
 	template<typename S , typename T , typename R , typename F>
-	inline void EnttXSol::PopulateScene ( S& scene , F& fonts )
+	inline void EnttXSol::PopulateScene ( S& scene , F& fonts , float cameraFaceRotation )
 	{
 		// add objects to scene
 		scene.ClearInstancedScene ();
@@ -460,7 +460,7 @@ namespace god
 		{
 			if ( m_entities.Valid ( i ) && m_entities[ i ].m_parent_id == Entities::Null && m_registry.storage<ActiveComponent> ().contains ( m_entities[ i ].m_id ) )
 			{
-				RecursivePopulateScene<S , T , R , F> ( scene , fonts , i );
+				RecursivePopulateScene<S , T , R , F> ( scene , fonts , i , glm::mat4 ( 1.0f ) , cameraFaceRotation );
 			}
 		}
 
@@ -482,7 +482,7 @@ namespace god
 	}
 
 	template<typename S , typename T , typename R , typename F>
-	inline void EnttXSol::RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform )
+	inline void EnttXSol::RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform , float cameraFaceRotation )
 	{
 		// if parent has both transform and renderable component
 		if ( m_registry.all_of<T , R , GUIObject> ( m_entities[ e ].m_id ) )
@@ -635,7 +635,12 @@ namespace god
 		{
 			auto [transform , renderable , transparent] = m_registry.get<T , R , Transparent> ( m_entities[ e ].m_id );
 
-			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
+			glm::vec3 rotation_offset ( 0.0f );
+			if ( transparent.m_facing_horizontal )
+			{
+				rotation_offset = { 0 , cameraFaceRotation , 0 };
+			}
+			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation + rotation_offset , transform.m_scale );
 
 			transform.m_parent_transform = parentTransform;
 			transform.m_local_transform = model_transform;

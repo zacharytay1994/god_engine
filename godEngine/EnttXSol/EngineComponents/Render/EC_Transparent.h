@@ -7,13 +7,18 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct Transparent
 	{
-		bool facing_h { false };
+		bool m_facing_horizontal { true };
+
+		bool operator==( Transparent const& rhs )
+		{
+			return m_facing_horizontal == rhs.m_facing_horizontal;
+		}
 	};
 	template <>
 	inline void NewLuaType<Transparent> ( sol::state& luaState , std::string const& name )
 	{
 		RegisterLuaType<Transparent> ( luaState , name ,
-			"facing_h" , &Transparent::facing_h );
+			"facing_horizontal" , &Transparent::m_facing_horizontal );
 	}
 	template<>
 	inline void ComponentInspector::operator() < Transparent > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
@@ -26,7 +31,7 @@ namespace god
 				ImGui::Text ( "Transparent" );
 				ImGui::Separator ();
 
-
+				ImGui::Checkbox ( "Face Camera [H]" , &component.m_facing_horizontal );
 			} );
 	}
 
@@ -35,7 +40,8 @@ namespace god
 	{
 		( engineResources );
 		// serialize
-		RapidJSON::JSONifyToValue ( value , document , "facing_h" , component.facing_h );
+		//RapidJSON::JSONifyToValue ( value , document , "facing_h" , component.facing_h );
+		RapidJSON::JSONifyToValue ( value , document , "facing_horizontal" , component.m_facing_horizontal );
 	}
 
 	template<>
@@ -43,6 +49,7 @@ namespace god
 	{
 		( engineResources );
 		// deserialize
-		AssignIfExist ( jsonObj , component.facing_h , "facing_h" );
+		//AssignIfExist ( jsonObj , component.facing_h , "facing_h" );
+		AssignIfExist ( jsonObj , component.m_facing_horizontal , "facing_horizontal" );
 	}
 }
