@@ -12,7 +12,7 @@ namespace god
 		Sound();
 		Sound(std::string const& soundPath);
 
-		FMOD::Sound* m_sound_sample;
+		FMOD::Sound* m_sound_sample{ nullptr };
 		std::string m_name;
 		std::string m_file_name;
 
@@ -48,6 +48,7 @@ namespace god
 		static void SetVolume(FMOD::Channel* channel, float volume);
 		static void SetPitch(FMOD::Channel* channel, float pitch);
 
+		static void PlaySound(Sound& sound); 
 		static void PlaySound(Sound& sound, FMOD::Channel** channel, bool& played); 
 		static void PauseSound(FMOD::Channel* channel , bool paused);
 		static void PauseSound(Sound& sound, bool paused);
@@ -75,5 +76,7 @@ namespace god
 		static std::list<FMOD::Channel*> m_channels;
 		static std::unordered_map<int, FMOD::ChannelGroup*> m_channel_groups;
 		static std::unordered_map<int, const char*> m_channel_group_names;
+
+		static std::vector<Sound> m_extra_sounds;
 	};
 }

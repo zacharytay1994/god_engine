@@ -24,6 +24,8 @@ namespace god
 		{ 0, "Default" }, { 1, "Music" }, { 2, "SFX" }
 	};
 
+	std::vector<Sound> AudioAPI::m_extra_sounds;
+
 	AudioAPI::AudioAPI()
 	{
 		FMOD_RESULT result = FMOD::System_Create(&m_FMOD_system);
@@ -54,6 +56,9 @@ namespace god
 	AudioAPI::~AudioAPI()
 	{
 		m_FMOD_system->release();
+
+		for (auto& sound : m_extra_sounds)
+			UnloadSound(sound);
 	}
 
 	void AudioAPI::Update()
@@ -121,9 +126,12 @@ namespace god
 		// change the mode when creating sound
 		FMOD_MODE mode = FMOD_3D;
 
-		FMOD_RESULT result = m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
+		if (!sound.m_sound_sample)
+		{
+			FMOD_RESULT result = m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample);
+			if (result != FMOD_OK)
+				assert(FMOD_ErrorString(result));
+		}
 
 		std::string path{ filePath };
 		size_t last_slash = path.find_last_of('\\') + 1;
@@ -158,6 +166,14 @@ namespace god
 	void AudioAPI::SetPitch(FMOD::Channel* channel, float pitch)
 	{
 		channel->setPitch(pitch);
+	}
+
+	void AudioAPI::PlaySound(Sound& sound)
+	{
+		m_FMOD_system->playSound(sound.m_sound_sample, NULL, false, &sound.m_channel);
+		sound.m_played = true;
+
+		m_channels.push_back(sound.m_channel);
 	}
 
 	void AudioAPI::PlaySound(Sound& sound, FMOD::Channel** channel, bool& played)
