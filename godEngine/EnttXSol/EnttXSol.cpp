@@ -753,6 +753,15 @@ namespace god
 				++i;
 			}
 
+			// for now serialize GridCell component if has
+			GridCell* grid_cell = GetEngineComponent<GridCell> ( m_entities[ entity ].m_id );
+			if ( grid_cell != nullptr )
+			{
+				rapidjson::Value component_value { rapidjson::kObjectType };
+				JSONify ( engineResources , document , component_value , *grid_cell );
+				RapidJSON::JSONifyToValue ( value , document , "GridCell" , component_value );
+			}
+
 			// unique script components
 			for ( auto const& script : m_scripts )
 			{
@@ -878,6 +887,12 @@ namespace god
 				AttachComponent<GridCell> ( prefab_root );
 				GridCell* grid_cell = GetEngineComponent<GridCell> ( prefab_root );
 				DeJSONify ( engineResources , *grid_cell , value[ "Grid Cell" ] );
+			}
+			else if ( value.HasMember ( "GridCell" ) )
+			{
+				AttachComponent<GridCell> ( prefab_root );
+				GridCell* grid_cell = GetEngineComponent<GridCell> ( prefab_root );
+				DeJSONify ( engineResources , *grid_cell , value[ "GridCell" ] );
 			}
 
 			// load all existing engine components, assuming the prefab loaded has the component, and there is a unique property saved
@@ -1166,6 +1181,15 @@ namespace god
 					T_Manip::RunOnType ( EngineComponents::Components () , i ,
 						WriteUniqueEngineComponentsToSON () , std::ref ( *this ) , engineResources , std::ref ( document ) , std::ref ( value ) , entity , m_entities[ entity ].m_name , component_name );
 					++i;
+				}
+
+				// for now serialize GridCell component if has
+				GridCell* grid_cell = GetEngineComponent<GridCell> ( m_entities[ entity ].m_id );
+				if ( grid_cell != nullptr )
+				{
+					rapidjson::Value component_value { rapidjson::kObjectType };
+					JSONify ( engineResources , document , component_value , *grid_cell );
+					RapidJSON::JSONifyToValue ( value , document , "GridCell" , component_value );
 				}
 
 				// write all existing script components
