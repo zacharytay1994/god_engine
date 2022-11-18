@@ -21,6 +21,16 @@ namespace god
 		float m_padding_right { 0.0f };
 		float m_padding_top { 0.0f };
 		float m_size { 0.2f };
+
+		bool operator==( GUIText const& rhs )
+		{
+			return m_text == rhs.m_text &&
+				m_alignment == rhs.m_alignment &&
+				m_padding_left == rhs.m_padding_left &&
+				m_padding_right == rhs.m_padding_right &&
+				m_padding_top == rhs.m_padding_top &&
+				m_size == rhs.m_size;
+		}
 	};
 	template <>
 	inline void NewLuaType<GUIText> ( sol::state& luaState , std::string const& name )

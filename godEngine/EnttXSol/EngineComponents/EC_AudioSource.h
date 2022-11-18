@@ -28,6 +28,11 @@ namespace god
 		
 		FMOD_VECTOR m_position;
 		FMOD_VECTOR m_velocity;
+
+		bool operator==( AudioSource const& rhs )
+		{
+			return true;
+		}
  	};
 	template <>
 	inline void NewLuaType<AudioSource>(sol::state& luaState, std::string const& name)

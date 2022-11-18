@@ -13,6 +13,14 @@ namespace god
 		// not saved, used to change cell in Grid3D
 		int32_t m_cell_ox { 0 } , m_cell_oy { 0 } , m_cell_oz { 0 };
 		bool m_initialized { false };
+
+		bool operator==( GridCell const& rhs )
+		{
+			return m_cell_x == rhs.m_cell_x &&
+				m_cell_y == rhs.m_cell_y &&
+				m_cell_z == rhs.m_cell_z &&
+				m_cell_size == rhs.m_cell_size;
+		}
 	};
 	template <>
 	inline void NewLuaType<GridCell> ( sol::state& luaState , std::string const& name )

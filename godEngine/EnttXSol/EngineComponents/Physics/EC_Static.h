@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../EngineComponents.h"
-#include "../../Physics/godPhysics.h"
+#include "../../../Physics/godPhysics.h"
 
 namespace god
 {
@@ -47,6 +47,19 @@ namespace god
 			}
 
 		};
+
+		bool operator==( RigidStatic const& rhs )
+		{
+			/*return StaticFriction == rhs.StaticFriction &&
+				DynamicFriction == rhs.DynamicFriction &&
+				Restitution == rhs.Restitution &&
+				extents == rhs.extents &&
+				Simulation == rhs.Simulation &&
+				locktoscale == rhs.locktoscale &&
+				shapeid == rhs.shapeid &&
+				Offset == rhs.Offset;*/
+			return true;
+		}
 	};
 	template <>
 	inline void NewLuaType<RigidStatic>(sol::state& luaState, std::string const& name)

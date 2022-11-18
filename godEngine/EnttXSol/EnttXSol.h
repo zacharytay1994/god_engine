@@ -31,7 +31,6 @@
 #include <functional>
 #include <type_traits>
 #include <queue>
-#include <algorithm>
 
 namespace god
 {
@@ -74,6 +73,8 @@ namespace god
 		void ReloadScript ( std::string const& scriptFile );
 		void UnloadScript ( std::string const& scriptName );
 		void DeleteScript ( std::string const& scriptFile );
+
+		void SyncPrefabScriptPropertyWithFile ( Entities::ID id , std::string const& propertyName );
 
 		template<typename ENGINE_COMPONENTS>
 		void BindEngineComponents ();
@@ -147,7 +148,7 @@ namespace god
 		void DeserializeStateV2 ( EngineResources& engineResources , std::string const& fileName , EntityGrid* grid = nullptr );
 		void DeserializeStateV2Recurse ( EngineResources& engineResources , rapidjson::Value& value , std::string const& name , Entities::ID parent , EntityGrid* grid = nullptr );
 
-		void SavePrefabV2 ( EngineResources& engineResources , Entities::ID root , std::string const& fileName );
+		void SavePrefabV2 ( EngineResources& engineResources , Entities::ID root , std::string fileName );
 		void SavePrefabV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value , bool root = false );
 
 		EnttXSol::Entities::ID LoadPrefabV2 ( EngineResources& engineResources , std::string const& fileName , Entities::ID parent = Entities::Null , bool persist = true , EntityGrid* grid = nullptr );
@@ -213,6 +214,7 @@ namespace god
 	public:
 		template <typename T>
 		auto&& GetStorage ( std::string const& name );
+		void PrefabSetMaster ( EngineResources& engineResources , std::string fileName );
 	private:
 		entt::runtime_view GetView ( std::vector<std::string> const& components , std::vector<std::string> const& engineComponents );
 
@@ -222,7 +224,6 @@ namespace god
 		std::queue<std::tuple<std::string , Entities::ID , float , float , float , bool>> m_instance_queue;
 		std::queue<Entities::ID> m_delete_queue;
 		void SetEntityActive ( EnttXSol::Entities::ID entity , bool active );
-		void PrefabSetMaster ( EngineResources& engineResources , std::string fileName );
 		EnttXSol::Entities::ID InstancePrefabFromMaster ( std::string const& fileName , Entities::ID parent = Entities::Null );
 		Entities::ID MakeEntityCopy ( Entities::ID src , Entities::ID parent );
 
@@ -320,37 +321,30 @@ namespace god
 			template <typename T>
 			void operator()( EnttXSol& entt , EngineResources& engineResources , rapidjson::Document& document , rapidjson::Value& jsonObj , Entities::ID id , std::string const& prefabName , std::string const& engineComponentName )
 			{
-				// if has engine component
-				T* engine_component = entt.GetEngineComponent<T> ( id );
-				T* master_component { nullptr };
-				if ( entt.m_entity_pool.find ( prefabName ) != entt.m_entity_pool.end () )
+				if ( !std::is_same<T , EntityData> () )
 				{
-					master_component = entt.GetEngineComponent<T> ( entt.m_entity_pool[ prefabName ] );
-				}
-				if ( engine_component != nullptr && master_component != nullptr )
-				{
-					// if is unique, i.e. diff from original saved one
-					// compare with master copy
-					if ( !( *engine_component == *master_component ) )
+					// if has engine component
+					T* engine_component = entt.GetEngineComponent<T> ( id );
+					T* master_component { nullptr };
+					if ( entt.m_entity_pool.find ( prefabName ) != entt.m_entity_pool.end () )
 					{
-						rapidjson::Value component_value { rapidjson::kObjectType };
-						JSONify ( engineResources , document , component_value , *engine_component );
-						RapidJSON::JSONifyToValue ( jsonObj , document , engineComponentName , component_value );
-						std::cout << "Found and Wrote unique property of :" << engineComponentName << " of " << id << std::endl;
+						master_component = entt.GetEngineComponent<T> ( entt.m_entity_pool[ prefabName ] );
+					}
+					if ( engine_component != nullptr && master_component != nullptr )
+					{
+						// if is unique, i.e. diff from original saved one
+						// compare with master copy
+						if ( !( *engine_component == *master_component ) )
+						{
+							rapidjson::Value component_value { rapidjson::kObjectType };
+							JSONify ( engineResources , document , component_value , *engine_component );
+							RapidJSON::JSONifyToValue ( jsonObj , document , engineComponentName , component_value );
+							std::cout << "Found and Wrote unique property of :" << engineComponentName << " of " << id << std::endl;
+						}
 					}
 				}
 			}
 		};
-
-		/*struct testtmpalte
-		{
-			template<typename T>
-			bool operator()()
-			{
-				T a , b;
-				return a == b;
-			}
-		};*/
 	};
 
 	template<typename ENGINE_COMPONENTS>

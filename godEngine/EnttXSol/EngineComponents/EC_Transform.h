@@ -18,7 +18,9 @@ namespace god
 
 		bool operator==( Transform const& rhs )
 		{
-			return m_position == rhs.m_position;
+			return m_position == rhs.m_position &&
+				m_rotation == rhs.m_rotation &&
+				m_scale == rhs.m_scale;
 		}
 	};
 	template <>
