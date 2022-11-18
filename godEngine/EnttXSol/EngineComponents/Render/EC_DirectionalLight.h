@@ -10,10 +10,18 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct DirectionalLight
 	{
-		glm::vec3 m_colour		{ 1.0f };
-		glm::vec3 m_ambient		{ 0.0f };
-		glm::vec3 m_diffuse		{ 0.0f };
-		glm::vec3 m_specular	{ 0.0f };
+		glm::vec3 m_colour { 1.0f };
+		glm::vec3 m_ambient { 0.0f };
+		glm::vec3 m_diffuse { 0.0f };
+		glm::vec3 m_specular { 0.0f };
+
+		bool operator==( DirectionalLight const& rhs )
+		{
+			return m_colour == rhs.m_colour &&
+				m_ambient == rhs.m_ambient &&
+				m_diffuse == rhs.m_diffuse &&
+				m_specular == rhs.m_specular;
+		}
 	};
 
 	template <>
@@ -37,9 +45,9 @@ namespace god
 				ImGui::Separator ();
 
 				ImGui::DragFloat3 ( "Colour" , glm::value_ptr ( component.m_colour ) , 1.0f , 0.0f , 100.0f );
-				ImGui::DragFloat3 ( "Ambient" , glm::value_ptr ( component.m_ambient ) , 1.0f, 0.0f , 100.0f );
-				ImGui::DragFloat3 ( "Diffuse" , glm::value_ptr ( component.m_diffuse ) , 1.0f, 0.0f , 100.0f );
-				ImGui::DragFloat3 ( "Specular" , glm::value_ptr ( component.m_specular ) , 1.0f, 0.0f , 100.0f );
+				ImGui::DragFloat3 ( "Ambient" , glm::value_ptr ( component.m_ambient ) , 1.0f , 0.0f , 100.0f );
+				ImGui::DragFloat3 ( "Diffuse" , glm::value_ptr ( component.m_diffuse ) , 1.0f , 0.0f , 100.0f );
+				ImGui::DragFloat3 ( "Specular" , glm::value_ptr ( component.m_specular ) , 1.0f , 0.0f , 100.0f );
 			} );
 	}
 

@@ -15,19 +15,6 @@ function C_test1()
     end
 end
 
---[IsComponent]
-function Transform()
-    local var = {
-        --[SerializeInt]
-        x = 5,
-        y = 0,
-        z = 0
-    };
-    return function()
-        return var
-    end
-end
-
 --b[IsComponent]
 -- function Component2()
 --     local var = {

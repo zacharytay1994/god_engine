@@ -30,10 +30,9 @@ namespace god
 		void Update(float dt, bool pause);
 		
 		
-		physx::PxRigidActor* const GetRayCastMouse() const;
-		void SetRCMid(uint32_t id);
-		uint32_t getRCMid();
-
+		physx::PxRigidActor* const GetRayCastMouse();
+		const uint32_t getRCMid();
+		void setRCMid(uint32_t id);
 		bool GetisRunning() const;
 		physx::PxPhysics* const GetPhysics() const;
 		physx::PxCooking* const GetCooking() const;
@@ -46,7 +45,6 @@ namespace god
 	private:
 	
 
-		
 		void Raycast();
 
 		//PhysX Visual Debugger
@@ -55,7 +53,6 @@ namespace god
 
 
 		// Data members
-
 		uint32_t RayCastid;
 		ContactReportCallback gContactReportCallback;
 

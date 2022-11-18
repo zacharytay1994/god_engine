@@ -12,6 +12,11 @@ namespace god
 		FMOD_VECTOR m_position;
 		FMOD_VECTOR m_forward;
 		FMOD_VECTOR m_up;
+
+		bool operator==( AudioListener const& rhs )
+		{
+			return m_listener_id == rhs.m_listener_id;
+		}
 	};
 	template <>
 	inline void NewLuaType<AudioListener>(sol::state& luaState, std::string const& name)

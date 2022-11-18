@@ -9,6 +9,11 @@ namespace god
 	{
 		uint32_t m_id;
 		uint32_t m_parent_id;
+
+		bool operator==( EntityData const& rhs )
+		{
+			return true;
+		}
 	};
 
 	template <>

@@ -25,6 +25,16 @@ namespace god
 		bool m_enter { false };
 		bool m_exit { false };
 		bool m_active { true };
+
+		bool operator==( GUIObject const& rhs )
+		{
+			return m_position == rhs.m_position &&
+				m_layer == rhs.m_layer &&
+				m_size == rhs.m_size &&
+				m_fixed_aspect_ratio == rhs.m_fixed_aspect_ratio &&
+				m_aspect_ratio == rhs.m_aspect_ratio &&
+				m_active == rhs.m_active;
+		}
 	};
 	template <>
 	inline void NewLuaType<GUIObject> ( sol::state& luaState , std::string const& name )

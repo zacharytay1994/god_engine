@@ -29,6 +29,7 @@ namespace god
 		{
 			return;
 		}
+		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1>(component);
 		RigidStatic& rigidstatic = std::get<2>(component);
 
@@ -36,10 +37,7 @@ namespace god
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
 
 
-		if (rigidstatic.Active == false)
-		{
-			mScene->removeActor(*rigidstatic.p_RigidStatic);
-		}
+
 
 
 		if (rigidstatic.updateRigidStatic)
@@ -53,21 +51,22 @@ namespace god
 				//exclusive shape (can be modified)
 
 
-				switch (rigidstatic.shapeid)
+				switch (rigidstatic.Shapeid)
 				{
-				case RigidStatic::Cube:
+				case PhysicsTypes::Cube:
 					rigidstatic.p_shape = mPhysics->createShape(physx::PxBoxGeometry(rigidstatic.extents.x, rigidstatic.extents.y, rigidstatic.extents.z), *rigidstatic.p_material, true);
 					rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 					break;
-				case RigidStatic::Sphere:
+				case PhysicsTypes::Sphere:
 					rigidstatic.p_shape = mPhysics->createShape(physx::PxSphereGeometry(rigidstatic.extents.x), *rigidstatic.p_material, true);
 					rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 					break;
-				case RigidStatic::Capsule:
+				case PhysicsTypes::Capsule:
 					rigidstatic.p_shape = mPhysics->createShape(physx::PxCapsuleGeometry(rigidstatic.extents.x, rigidstatic.extents.y), *rigidstatic.p_material, true);
 					rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 					break;
 
+				
 				}
 
 
@@ -85,34 +84,59 @@ namespace god
 				mScene->addActor(*rigidstatic.p_RigidStatic);
 
 			}
-			
+			//rigidstatic.p_RigidStatic->setActorFlag()
+			rigidstatic.p_RigidStatic->userData = &rigidstatic;
+
 			rigidstatic.updateRigidStatic = false;
+		}//init static
+
+	
+		rigidstatic.p_RigidStatic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, !rigidstatic.Active);
+
+		if (rigidstatic.Trigger)
+		{
+			rigidstatic.Simulation = false;
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+		}
+		else
+		{
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
 		}
 
 		if (rigidstatic.Simulation)
 		{
-			rigidstatic.p_RigidStatic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, false);
+			rigidstatic.Trigger = false;
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+
 		}
 		else
 		{
-			rigidstatic.p_RigidStatic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, true);
+			rigidstatic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 		}
+
+
+
+
+
+
 
 		if (rigidstatic.locktoscale)
 		{
 			rigidstatic.extents = transform.m_scale;
 
-			switch (rigidstatic.shapeid)
+			switch (rigidstatic.Shapeid)
 			{
-			case RigidStatic::Cube:
+			case PhysicsTypes::Cube:
 				rigidstatic.p_shape->setGeometry(physx::PxBoxGeometry(rigidstatic.extents.x, rigidstatic.extents.y, rigidstatic.extents.z));
 				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 				break;
-			case RigidStatic::Sphere:
+			case PhysicsTypes::Sphere:
 				rigidstatic.p_shape->setGeometry(physx::PxSphereGeometry(rigidstatic.extents.x));
 				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 				break;
-			case RigidStatic::Capsule:
+			case PhysicsTypes::Capsule:
 				rigidstatic.p_shape->setGeometry(physx::PxCapsuleGeometry(rigidstatic.extents.x, rigidstatic.extents.y));
 				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
 				break;
