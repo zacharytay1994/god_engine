@@ -1,1 +1,106 @@
-{"MenuBackground":{"Type":"Default","Script Components":{"C_ButtonOnHoverPopup":{}},"Engine Components":{"Transform":{"position_x":960.0,"position_y":442.52001953125,"position_z":-251.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":960.0,"scale_y":9312.0,"scale_z":1.0},"Renderable3D":{"model uid":1879123389,"diffuse uid":1058838867,"emissive":0.0},"GUIObject":{"position_x":0.5,"position_y":0.46000000834465027,"z_layer":0,"size_x":1.0,"size_y":1.0,"size_z":1.0,"fixed_ar":true,"ar":9.699999809265137,"active":true}},"Children":{"DiceButton":{"Type":"Prefab","Transform":{"position_x":-0.699999988079071,"position_y":0.019999980926513672,"position_z":2.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.15000000596046448,"scale_y":0.009999999776482582,"scale_z":1.0}},"ShopButton":{"Type":"Prefab","Transform":{"position_x":-0.699999988079071,"position_y":0.0,"position_z":2.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.15000000596046448,"scale_y":0.009999999776482582,"scale_z":1.0},"GUIObject":{"position_x":0.15000000596046448,"position_y":0.5,"z_layer":1,"size_x":0.15000000596046448,"size_y":0.009999999776482582,"size_z":1.0,"fixed_ar":false,"ar":1.0,"active":true}},"StartButton":{"Type":"Prefab","Transform":{"position_x":-0.5199999809265137,"position_y":-0.019999980926513672,"position_z":2.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.3199999928474426,"scale_y":0.009999999776482582,"scale_z":1.0}},"QuitButton":{"Type":"Prefab","Transform":{"position_x":0.940000057220459,"position_y":0.039999961853027344,"position_z":2.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.07000000029802322,"scale_y":0.006000000052154064,"scale_z":1.0}},"SettingButton":{"Type":"Prefab","Transform":{"position_x":0.7999999523162842,"position_y":0.039999961853027344,"position_z":1.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":0.07000000029802322,"scale_y":0.006000000052154064,"scale_z":1.0}}}}}
+{
+    "MenuBackground": {
+        "Type": "Default",
+        "Script Components": {
+            "C_ButtonOnHoverPopup": {}
+        },
+        "Engine Components": {
+            "Transform": {
+                "position_x": 960.0,
+                "position_y": 442.52001953125,
+                "position_z": -251.0,
+                "rotation_x": 0.0,
+                "rotation_y": -0.0,
+                "rotation_z": 0.0,
+                "scale_x": 960.0,
+                "scale_y": 9312.0,
+                "scale_z": 1.0
+            },
+            "Renderable3D": {
+                "model uid": 1879123389,
+                "diffuse uid": 1058838867,
+                "emissive": 0.0
+            },
+            "GUIObject": {
+                "position_x": 0.5,
+                "position_y": 0.46000000834465027,
+                "z_layer": 0,
+                "size_x": 1.0,
+                "size_y": 1.0,
+                "size_z": 1.0,
+                "fixed_ar": true,
+                "ar": 9.699999809265137,
+                "active": true
+            }
+        },
+        "Children": {
+            "DiceButton": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": -0.699999988079071,
+                    "position_y": 0.019999980926513672,
+                    "position_z": 2.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.15000000596046448,
+                    "scale_y": 0.009999999776482582,
+                    "scale_z": 1.0
+                }
+            },
+            "ShopButton": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": -0.699999988079071,
+                    "position_y": 0.0,
+                    "position_z": 2.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.15000000596046448,
+                    "scale_y": 0.009999999776482582,
+                    "scale_z": 1.0
+                },
+                "GUIObject": {
+                    "position_x": 0.15000000596046448,
+                    "position_y": 0.5,
+                    "z_layer": 1,
+                    "size_x": 0.15000000596046448,
+                    "size_y": 0.009999999776482582,
+                    "size_z": 1.0,
+                    "fixed_ar": false,
+                    "ar": 1.0,
+                    "active": true
+                }
+            },
+            "StartButton": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": -0.5199999809265137,
+                    "position_y": -0.019999980926513672,
+                    "position_z": 2.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.3199999928474426,
+                    "scale_y": 0.009999999776482582,
+                    "scale_z": 1.0
+                }
+            },
+            "QuitButton": {
+                "Type": "Prefab",
+                "Transform": {
+                    "position_x": 0.940000057220459,
+                    "position_y": 0.039999961853027344,
+                    "position_z": 2.0,
+                    "rotation_x": 0.0,
+                    "rotation_y": -0.0,
+                    "rotation_z": 0.0,
+                    "scale_x": 0.07000000029802322,
+                    "scale_y": 0.006000000052154064,
+                    "scale_z": 1.0
+                }
+            }
+        }
+    }
+}
