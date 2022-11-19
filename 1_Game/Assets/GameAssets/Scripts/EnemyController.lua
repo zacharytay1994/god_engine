@@ -51,18 +51,16 @@ function S_EnemyController(e)
         return
     end
 
-    -- enemy shouldn't do anything if afflicted with Frozen or Immobilised status
-    if (characterComponent.statusAilment == "Frozen") then
-        print("[EnemyController.lua]", EntityName(e), GetEntityData(e).id, "is Frozen. Ending turn.")
-        characterComponent.endTurn = true
-        return
-    elseif (characterComponent.statusAilment == "Immobilised") then
-        print("[EnemyController.lua]", EntityName(e), GetEntityData(e).id, "is Immobilised. Ending turn.")
-        characterComponent.endTurn = true
-        return
-    end
-
-    
+    -- -- enemy shouldn't do anything if afflicted with Frozen or Immobilised status
+    -- if (characterComponent.statusAilment == "Frozen") then
+    --     print("[EnemyController.lua]", EntityName(e), GetEntityData(e).id, "is Frozen. Ending turn.")
+    --     characterComponent.endTurn = true
+    --     return
+    -- elseif (characterComponent.statusAilment == "Immobilised") then
+    --     print("[EnemyController.lua]", EntityName(e), GetEntityData(e).id, "is Immobilised. Ending turn.")
+    --     characterComponent.endTurn = true
+    --     return
+    -- end
 
     -- inform movementScript to start moving the enemy.
     -- once done, movementScript will set hasMoved to true.

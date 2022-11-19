@@ -62,6 +62,39 @@ namespace god
 			}
 		);
 
+		// AddScriptComponent(e,componentName)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "AttachScriptComponent" ,
+			[&entt]( entt::entity e , std::string const& component )->void
+			{
+				if ( !entt.AttachComponent ( e , component ) )
+				{
+					std::cerr << "RemoveScriptComponent:: ERROR - failed to attach " << component << "from " << static_cast< int >( e ) << "!" << std::endl;
+				}
+			}
+		);
+
+		// RemoveScriptComponent(e,componentName)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "RemoveScriptComponent" ,
+			[&entt]( entt::entity e , std::string const& component )->void
+			{
+				if ( !entt.RemoveComponent ( e , component ) )
+				{
+					std::cerr << "RemoveScriptComponent:: ERROR - failed to remove " << component << "from " << static_cast< int >( e ) << "!" << std::endl;
+				}
+			}
+		);
+
+		// AddScriptSystem(e,componentName)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "AttachScriptSystem" ,
+			[&entt]( entt::entity e , std::string const& system )->void
+			{
+				entt.AttachScriptSystem<EngineComponents> ( entt.GetEngineComponent<EntityData> ( e )->m_id , system );
+			}
+		);
+
 		// GetEntity(entityName)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "GetEntity" ,

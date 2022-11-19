@@ -189,6 +189,7 @@
     <ClInclude Include="Physics\PhysicsInterface.h" />
     <ClInclude Include="Physics\PhysicUtils.h" />
     <ClInclude Include="Physics\SnippetUtils.h" />
+    <ClInclude Include="Physics\Types.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
     <ClInclude Include="Window\DeltaTimer.h" />
     <ClInclude Include="Window\SystemTimer.h" />

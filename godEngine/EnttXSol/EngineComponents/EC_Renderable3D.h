@@ -14,6 +14,16 @@ namespace god
 		uint32_t m_specular_id { 0 };
 		float m_shininess { 32.0f };
 		float m_emissive { 0.0f };
+
+		bool operator==( Renderable3D const& rhs )
+		{
+			return
+				m_model_id == rhs.m_model_id &&
+				m_diffuse_id == rhs.m_diffuse_id &&
+				m_specular_id == rhs.m_specular_id &&
+				m_shininess == rhs.m_shininess &&
+				m_emissive == rhs.m_emissive;
+		}
 	};
 	template <>
 	inline void NewLuaType<Renderable3D> ( sol::state& luaState , std::string const& name )
@@ -107,8 +117,8 @@ namespace god
 				ImGui::Text ( "- Shininess :" );
 				ImGui::InputFloat ( "##Shininess" , &component.m_shininess );
 
-				ImGui::Text( "- Emissive :" );
-				ImGui::DragFloat( "##Emissive", &component.m_emissive );
+				ImGui::Text ( "- Emissive :" );
+				ImGui::DragFloat ( "##Emissive" , &component.m_emissive );
 			} );
 	}
 

@@ -1,0 +1,40 @@
+{
+    "TestPropertyPrefab": {
+        "Type": "Prefab",
+        "Transform": {
+            "position_x": -3.126284599304199,
+            "position_y": 0.0,
+            "position_z": 5.973031997680664,
+            "rotation_x": 0.0,
+            "rotation_y": -0.0,
+            "rotation_z": 0.0,
+            "scale_x": 1.0,
+            "scale_y": 1.0,
+            "scale_z": 1.0
+        },
+        "Renderable3D": {
+            "model uid": 197490809,
+            "diffuse uid": 2130157803,
+            "emissive": 66.0
+        }
+    },
+    "TestPropertyPrefab": {
+        "Type": "Prefab",
+        "Transform": {
+            "position_x": 5.075686454772949,
+            "position_y": -2.4409797191619873,
+            "position_z": -2.6922607421875,
+            "rotation_x": 0.0,
+            "rotation_y": -0.0,
+            "rotation_z": 0.0,
+            "scale_x": 1.0,
+            "scale_y": 1.0,
+            "scale_z": 1.0
+        },
+        "Renderable3D": {
+            "model uid": 4047594528,
+            "diffuse uid": 2130157803,
+            "emissive": 66.0
+        }
+    }
+}

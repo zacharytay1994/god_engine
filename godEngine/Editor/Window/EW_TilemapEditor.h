@@ -236,6 +236,12 @@ namespace god
 				grid_cell->m_cell_size = m_cell_size;
 
 				//grid[ m_selected ].Insert ( m_cell_size , { m_cell_x, m_cell_y, m_cell_z } , entity );
+				// recreate preview
+				m_preview_id = m_enttxsol.AddPrefabToScene ( engineResources , m_selected_prefab , m_selected ,
+					{ ( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size,
+					static_cast< float >( m_cell_y ) * m_true_cell_size,
+					( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size } ,
+					false );
 			}
 		}
 
@@ -251,18 +257,20 @@ namespace god
 				}
 				else
 				{
-					transform->m_position = {
-						( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size,
-						static_cast< float >( m_cell_y ) * m_true_cell_size,
-						( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size };
-
 					GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( m_preview_id );
 					if ( grid_cell )
 					{
-						/*grid_cell->m_cell_x = m_cell_x;
+						grid_cell->m_cell_x = m_cell_x;
 						grid_cell->m_cell_y = m_cell_y;
 						grid_cell->m_cell_z = m_cell_z;
-						grid_cell->m_cell_size = m_cell_size;*/
+						grid_cell->m_cell_size = m_cell_size;
+					}
+					else
+					{
+						transform->m_position = {
+							( static_cast< float >( m_cell_x ) + 0.5f ) * m_true_cell_size,
+							static_cast< float >( m_cell_y ) * m_true_cell_size,
+							( static_cast< float >( m_cell_z ) + 0.5f ) * m_true_cell_size };
 					}
 				}
 			}
