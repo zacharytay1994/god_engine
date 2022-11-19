@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../EngineComponents.h"
+#include "../../../Physics/godPhysics.h"
 //#include "../../Physics/godPhysics.h"
 #include "../../godEngine/Physics/Types.h"
 
@@ -55,8 +56,12 @@ namespace god
 			{
 				mScene->removeActor(*p_RigidDynamic);
 			}
-
 		};
+
+		bool operator==( RigidDynamic const& rhs )
+		{
+			return true;
+		}
 	};
 	template <>
 	inline void NewLuaType<RigidDynamic>(sol::state& luaState, std::string const& name)

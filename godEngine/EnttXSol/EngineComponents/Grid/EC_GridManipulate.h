@@ -12,6 +12,11 @@ namespace god
 		uint32_t m_highlight_id { static_cast< uint32_t >( -1 ) };
 		bool m_clicked { false };
 		glm::ivec3 m_last_clicked_cell;
+
+		bool operator==( GridManipulate const& rhs )
+		{
+			return true;
+		}
 	};
 
 	template <>

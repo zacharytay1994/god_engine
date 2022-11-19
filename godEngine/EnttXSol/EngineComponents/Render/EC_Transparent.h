@@ -8,6 +8,11 @@ namespace god
 	struct Transparent
 	{
 		bool facing_h { false };
+
+		bool operator==( Transparent const& rhs )
+		{
+			return true;
+		}
 	};
 	template <>
 	inline void NewLuaType<Transparent> ( sol::state& luaState , std::string const& name )

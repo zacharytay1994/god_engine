@@ -15,6 +15,13 @@ namespace god
 
 		glm::mat4 m_parent_transform { glm::mat4 ( 1.0f ) };
 		glm::mat4 m_local_transform { glm::mat4 ( 1.0f ) };
+
+		bool operator==( Transform const& rhs )
+		{
+			return m_position == rhs.m_position &&
+				m_rotation == rhs.m_rotation &&
+				m_scale == rhs.m_scale;
+		}
 	};
 	template <>
 	inline void NewLuaType<Transform> ( sol::state& luaState , std::string const& name )
