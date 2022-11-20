@@ -57,6 +57,10 @@ function S_Pathfind(e)
                             charComp.currentStamina = charComp.currentStamina - 1
                             print("[Pathfind.lua]", EntityName(e), "'s indicator's Stamina after moving:", charComp.currentStamina)
 
+                            -- need to do this because for some reason, using e in the following if-block 
+                            -- causes the player to not be able to move.
+                            local entity = e
+
                             if (charComp.currentStamina <= 0) then
                                 print("[Pathfind.lua] Indicator's stamina has reached 0! Ending movement.")
                                 pathfind.Path = false
@@ -65,12 +69,12 @@ function S_Pathfind(e)
                                 -- refresh the stamina for enemy after the forecast has expended it
                                 charComp.currentStamina = charComp.maxStamina
 
-                                -- reset enemy's movement script variables
-                                local moveComponent = GetComponent(e, "C_EnemyMoveDummee")
+                                -- -- reset enemy's movement script variables
+                                local moveComponent = GetComponent(entity, "C_EnemyMoveDummee")
                                 moveComponent.Time = 0.0
                                 moveComponent.startedPathfind = false
                                 moveComponent.executeMove = false
-                                GetComponent(e, "C_EnemyController").movementForecast = false
+                                GetComponent(entity, "C_EnemyController").movementForecast = false
 
                                 -- reset C_Pathfind variables
                                 local pathfindComponent = GetComponent(e, "C_Pathfind")
