@@ -9,7 +9,7 @@ function C_Pathfind()
         z = 0,
         Path = false,
         --[SerializeFloat]
-        Interval = 1.0,
+        Interval = 0.1,
         Timer = 0.0,
         --[SerializeInt]
         MaxDown = 1,
@@ -38,39 +38,87 @@ function S_Pathfind(e)
                 local path = GetPath3D(e, pathfind.x, pathfind.y, pathfind.z, pathfind.MaxDown, pathfind.MaxUp, pathfind.HeuristicMultiplier);
                 if (#path > 1) then
                            
-                    -- -- adjust character's rotation here -----------------------------------------------------------
-                    local characterTransform = GetTransform(e)
-                    
-                    if (path[2].x > current_cell.x) then
-                        -- face left
-                        characterTransform.rotation.y = 90
-                    elseif (path[2].x < current_cell.x) then
-                        -- face right
-                        characterTransform.rotation.y = 270
-                    elseif (path[2].z > current_cell.z) then
-                        -- face front
-                        characterTransform.rotation.y = 0
+                    -- if C_Pathfind is attached to an enemy whose is flagged to perform a forecast,
+                    -- then overwrite current_cell so that the indicator moves instead of the enemy.
+                    -- in the future, check from a list of enemy names instead.
+                    -- print(EntityName(e))
+                    -- print("GetComponent(e, C_EnemyController).doingForecast", GetComponent(e, "C_EnemyController").doingForecast)
+                    if (EntityName(e) ~= "Player" and GetComponent(e, "C_EnemyController").movementForecast) then
+                        if (GetComponent(e, "C_EnemyController").indicatorEntity ~= -1 and GetComponent(e, "C_EnemyController").indicatorEntity ~= nil) then
+                            
+                            current_cell = GetGridCell(GetComponent(e, "C_EnemyController").indicatorEntity)
+                            --print("indicatorEntity gridcell:", current_cell.x, current_cell.y, current_cell.z)
+
+                            current_cell.x = path[2].x
+                            current_cell.y = path[2].y
+                            current_cell.z = path[2].z
+                            -- print("found")
+                            print(current_cell.x, current_cell.y, current_cell.z)
+
+                            local charComp = GetComponent(e, "C_Character")
+                            charComp.currentStamina = charComp.currentStamina - 1
+                            print("[Pathfind.lua]", EntityName(e), "'s indicator's Stamina after moving:", charComp.currentStamina)
+
+                            if (charComp.currentStamina <= 0) then
+                                print("[Pathfind.lua] Indicator's stamina has reached 0! Ending movement.")
+                                pathfind.Path = false
+                                pathfind.Timer = 0.0
+                                
+                                -- refresh the stamina for enemy after the forecast has expended it
+                                charComp.currentStamina = charComp.maxStamina
+                                local moveComponent = GetComponent(e, "C_EnemyMoveDummee")
+                                moveComponent.Time = 0.0
+                                moveComponent.startedPathfind = false
+                                moveComponent.executeMove = false
+                                GetComponent(e, "C_EnemyController").movementForecast = false
+                                -- print("CHECKCCKECKENCIJWNCKUENKCJENK")
+                                local pathfindComponent = GetComponent(e, "C_Pathfind")
+                                pathfindComponent.x = 0
+                                pathfindComponent.y = 0
+                                pathfindComponent.z = 0
+                                print("[Pathfind.lua] ForecastIndicator done moving!")
+                            end
+                        end
                     else
-                        -- face back
-                        characterTransform.rotation.y = 180         
+                        -- -- move the character -------------------------------------------------------------------------
+                        current_cell.x = path[2].x
+                        current_cell.y = path[2].y
+                        current_cell.z = path[2].z
+                        -- print("found")
+                        print(current_cell.x, current_cell.y, current_cell.z)
+                        -- -- end of moving the character ----------------------------------------------------------------
+                        
+                        -- -- adjust character's rotation here -----------------------------------------------------------
+                        local characterTransform = GetTransform(e)
+                        
+                        if (path[2].x > current_cell.x) then
+                            -- face left
+                            characterTransform.rotation.y = 90
+                        elseif (path[2].x < current_cell.x) then
+                            -- face right
+                            characterTransform.rotation.y = 270
+                        elseif (path[2].z > current_cell.z) then
+                            -- face front
+                            characterTransform.rotation.y = 0
+                        else
+                            -- face back
+                            characterTransform.rotation.y = 180         
+                        end
+                        -- -- end of adjusting rotation ------------------------------------------------------------------
+                        
+                        -- -- reduce stamina by one for each step --------------------------------------------------------
+                        local charComp = GetComponent(e, "C_Character")
+                        charComp.currentStamina = charComp.currentStamina - 1
+                        print("[Pathfind.lua]", EntityName(e), "Stamina after moving:", charComp.currentStamina)
+
+                        if (charComp.currentStamina <= 0) then
+                            pathfind.Path = false
+                            pathfind.Timer = 0.0
+                        end
+                        -- -- end of reducing stamina --------------------------------------------------------------------
                     end
-                    -- -- end of adjusting rotation ------------------------------------------------------------------
                     
-                    current_cell.x = path[2].x
-                    current_cell.y = path[2].y
-                    current_cell.z = path[2].z
-                    -- print("found")
-                    print(current_cell.x, current_cell.y, current_cell.z)
-
-                    -- reduce stamina by one for each step
-                    charComp = GetComponent(e, "C_Character")
-                    charComp.currentStamina = charComp.currentStamina - 1
-                    print("[Pathfind.lua]", EntityName(e), "Stamina after moving:", charComp.currentStamina)
-
-                    if (charComp.currentStamina <= 0) then
-                        pathfind.Path = false
-                        pathfind.Timer = 0.0
-                    end
+                    
 
                 else
                     pathfind.Path = false

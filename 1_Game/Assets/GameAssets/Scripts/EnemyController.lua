@@ -17,6 +17,16 @@ function C_EnemyController()
         -- will be set to true by the attack script attached to this enemy
         hasAttacked = false,
 
+        doingForecast = false,
+
+        movementForecast = false,
+
+        attackForecast = false,
+
+        initializedForecast = false,
+
+        indicatorEntity = nil,
+
         -- -- can be added in the future, if needed
         -- hasPerformedSpecialBehaviour = false
 
@@ -43,6 +53,37 @@ function S_EnemyController(e)
     local enemyEntity = e
 
     local enemyController = GetComponent(e, "C_EnemyController")
+
+    if (enemyController.doingForecast == true and enemyController.initializedForecast == false) then
+
+        local movementScript = GetComponent(enemyEntity, enemyController.movementScriptName)
+        enemyController.movementForecast = true
+        movementScript.executeMove = true   
+
+        -- local attackScript = GetComponent(enemyEntity, enemyController.movementScriptName)
+        -- enemyController.attackForecast = true
+
+        local enemyGrid = GetGridCell(enemyEntity)
+        enemyController.indicatorEntity = InstancePrefabParentedOnGridNow(GetEntity("Floor"), "ForecastIndicator", enemyGrid.x, enemyGrid.y, enemyGrid.z)
+        print("[EnemyController.lua] ForecastIndicator instanced!")
+
+        -- add to indicatorsList
+        local enemyForecastEntity = GetEntity("EnemyForecast")
+        local enemyForecastComponent = nil
+        if (enemyForecastEntity ~= -1) then
+            enemyForecastComponent = GetComponent(enemyForecastEntity, "C_EnemyForecast")
+        end
+        enemyForecastComponent.indicatorsList[#enemyForecastComponent.indicatorsList + 1] = enemyController.indicatorEntity
+
+        enemyController.initializedForecast = true
+        print("[EnemyController.lua] Executing forecast!")        
+    end
+
+    if (enemyController.movementForecast == false and enemyController.attackForecast == false) then
+        -- print("[EnemyController.lua] Done with both movement and attack forecast!")
+        enemyController.doingForecast = false
+        enemyController.initializedForecast = false
+    end
     
     -- don't run the script if the enemy is not currently active
     if (characterComponent.isActive == false) then
@@ -50,6 +91,7 @@ function S_EnemyController(e)
         enemyController.hasAttacked = false
         return
     end
+
 
     -- -- enemy shouldn't do anything if afflicted with Frozen or Immobilised status
     -- if (characterComponent.statusAilment == "Frozen") then

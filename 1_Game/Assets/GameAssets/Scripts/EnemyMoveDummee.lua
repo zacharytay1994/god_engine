@@ -30,7 +30,7 @@ end
 
 --[IsSystem]
 function S_EnemyMoveDummee(e)
-            
+    
     -- get MoveDummee component
     local moveComponent = GetComponent(e, "C_EnemyMoveDummee")
     
@@ -52,7 +52,7 @@ function S_EnemyMoveDummee(e)
     end
                     
     -- allow movement after 1 second has passed
-    if (moveComponent.Time < 0.5) then
+    if (moveComponent.Time < 0.1) then
 
         -- accumulate time
         moveComponent.Time = moveComponent.Time + GetDeltaTime()
@@ -60,7 +60,11 @@ function S_EnemyMoveDummee(e)
     -- after 1 second has passed and pathfinding has not been initialized
     elseif (moveComponent.startedPathfind == false) then
         
-        print("[EnemyMoveDummee.lua] Start of movement for", EntityName(e), entityDataComponent.id)
+        if (GetComponent(e, "C_EnemyController").movementForecast) then
+            print("[EnemyMoveDummee.lua] Start of FORECAST movement for", EntityName(e), entityDataComponent.id)
+        else
+            print("[EnemyMoveDummee.lua] Start of movement for", EntityName(e), entityDataComponent.id)
+        end
 
         local targetTile = nil
 

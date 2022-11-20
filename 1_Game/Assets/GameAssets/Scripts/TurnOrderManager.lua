@@ -170,6 +170,7 @@ function S_TurnOrderManager(e)
             -- reset to false so it doesn't build the queue again for this round
             turnOrderManagerComponent.buildTurnQueue = false
 
+            -- forecast enemy actions at the start of each round
             local enemyForecastEntity = GetEntity("EnemyForecast")
             if (enemyForecastEntity ~= -1) then
                 GetComponent(enemyForecastEntity, "C_EnemyForecast").performForecast = true
