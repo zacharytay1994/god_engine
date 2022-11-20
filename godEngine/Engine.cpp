@@ -179,7 +179,7 @@ namespace god
 			enttxsol.Update ( engine_resources );
 			SystemTimer::EndTimeSegment ( "EnTT Update" );
 			SystemTimer::StartTimeSegment ( "Populating Scene" );
-			enttxsol.PopulateScene<Scene , Transform , Renderable3D , Fonts> ( scene , fonts , camera.GetCameraFaceAngle () );
+			enttxsol.PopulateScene<Scene , Transform , Renderable3D , Fonts> ( scene , fonts , camera.m_position );
 			SystemTimer::EndTimeSegment ( "Populating Scene" );
 
 			//Physics Simulate update

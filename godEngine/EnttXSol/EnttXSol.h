@@ -138,9 +138,9 @@ namespace god
 
 		// S = scene, T = transform, R = renderable
 		template <typename S , typename T , typename R , typename F>
-		void PopulateScene ( S& scene , F& fonts , float cameraFaceRotation = 0.0f );
+		void PopulateScene ( S& scene , F& fonts , glm::vec3 const& cameraPosition = { 0,0,0 } );
 		template <typename S , typename T , typename R , typename F>
-		void RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) , float cameraFaceRotation = 0.0f );
+		void RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) , glm::vec3 const& cameraPosition = { 0,0,0 } );
 
 		void SerializeStateV2 ( EngineResources& engineResources , std::string const& fileName );
 		void SerializeStateV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value );
@@ -509,7 +509,7 @@ namespace god
 	}
 
 	template<typename S , typename T , typename R , typename F>
-	inline void EnttXSol::PopulateScene ( S& scene , F& fonts , float cameraFaceRotation )
+	inline void EnttXSol::PopulateScene ( S& scene , F& fonts , glm::vec3 const& cameraPosition )
 	{
 		// add objects to scene
 		scene.ClearInstancedScene ();
@@ -517,7 +517,7 @@ namespace god
 		{
 			if ( m_entities.Valid ( i ) && m_entities[ i ].m_parent_id == Entities::Null && m_registry.storage<ActiveComponent> ().contains ( m_entities[ i ].m_id ) )
 			{
-				RecursivePopulateScene<S , T , R , F> ( scene , fonts , i , glm::mat4 ( 1.0f ) , cameraFaceRotation );
+				RecursivePopulateScene<S , T , R , F> ( scene , fonts , i , glm::mat4 ( 1.0f ) , cameraPosition );
 			}
 		}
 
@@ -539,7 +539,7 @@ namespace god
 	}
 
 	template<typename S , typename T , typename R , typename F>
-	inline void EnttXSol::RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform , float cameraFaceRotation )
+	inline void EnttXSol::RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform , glm::vec3 const& cameraPosition )
 	{
 		// if parent has both transform and renderable component
 		if ( m_registry.all_of<T , R , GUIObject> ( m_entities[ e ].m_id ) )
@@ -684,7 +684,7 @@ namespace god
 				// populate scene with children
 				for ( auto const& child : m_entities[ e ].m_children )
 				{
-					RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat );
+					RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat , cameraPosition );
 				}
 			}
 		}
@@ -692,10 +692,11 @@ namespace god
 		{
 			auto [transform , renderable , transparent] = m_registry.get<T , R , Transparent> ( m_entities[ e ].m_id );
 
+			glm::vec3 world_position = parentTransform * glm::vec4 ( transform.m_position , 1.0f );
 			glm::vec3 rotation_offset ( 0.0f );
 			if ( transparent.m_facing_horizontal )
 			{
-				rotation_offset = { 0 , cameraFaceRotation , 0 };
+				rotation_offset = { 0 , HorizontalFaceCameraDegrees ( cameraPosition , world_position ) , 0 };
 			}
 			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation + rotation_offset , transform.m_scale );
 
@@ -746,7 +747,7 @@ namespace god
 			// populate scene with children
 			for ( auto const& child : m_entities[ e ].m_children )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat );
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat , cameraPosition );
 			}
 		}
 		// if only transform component
@@ -764,7 +765,7 @@ namespace god
 			// populate scene with children
 			for ( auto const& child : m_entities[ e ].m_children )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat );
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat , cameraPosition );
 			}
 		}
 		// if neither, take the previous transform in the hierarchy, default identity matrix
@@ -773,7 +774,7 @@ namespace god
 			// populate scene with children
 			for ( auto const& child : m_entities[ e ].m_children )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , fonts , child , parentTransform );
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , parentTransform , cameraPosition );
 			}
 		}
 	}
