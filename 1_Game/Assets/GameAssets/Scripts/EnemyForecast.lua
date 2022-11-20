@@ -69,34 +69,34 @@ function S_EnemyForecast(e)
     end
 end
 
-function ForecastAction(enemyEntity, e)
+-- function ForecastAction(enemyEntity, e)
 
     
-    -- FORECAST MOVEMENT -------------------------------------------------------------
-    local enemyGrid = GetGridCell(enemyEntity)
-    local characterComponent = GetComponent(enemyEntity, "C_Character")
-    local forecastComponent = GetComponent(e, "C_EnemyForecast")
+--     -- FORECAST MOVEMENT -------------------------------------------------------------
+--     local enemyGrid = GetGridCell(enemyEntity)
+--     local characterComponent = GetComponent(enemyEntity, "C_Character")
+--     local forecastComponent = GetComponent(e, "C_EnemyForecast")
     
-    -- instantiate a ForecastIndicator with the floor as its parent
-    local indicatorInstance = InstancePrefabParentedOnGridNow(GetEntity("Floor"), "ForecastIndicator", enemyGrid.x, enemyGrid.y, enemyGrid.z)
-    forecastComponent.indicatorsList[#forecastComponent.indicatorsList + 1] = indicatorInstance
+--     -- instantiate a ForecastIndicator with the floor as its parent
+--     local indicatorInstance = InstancePrefabParentedOnGridNow(GetEntity("Floor"), "ForecastIndicator", enemyGrid.x, enemyGrid.y, enemyGrid.z)
+--     forecastComponent.indicatorsList[#forecastComponent.indicatorsList + 1] = indicatorInstance
     
-    -- add movement script to the ball based on enemy type and set the moveScript.executeMove = true
-    if (characterComponent.characterType == "Dummee") then
-        AttachScriptComponent(indicatorInstance, "C_EnemyMoveDummee")
-        GetComponent(indicatorInstance, "C_EnemyMoveDummee").executeMove = true
-        print("indicatorInstance's executeMove =", GetComponent(indicatorInstance, "C_EnemyMoveDummee").executeMove)
-    elseif (characterComponent.characterType == "Squinky") then
-        AttachScriptComponent(indicatorInstance, "C_EnemyMoveSqinky")
-        GetComponent(indicatorInstance, "C_EnemyMoveSqinky").executeMove = true
-    end
-    -- END OF FORECAST MOVEMENT ------------------------------------------------------
+--     -- add movement script to the ball based on enemy type and set the moveScript.executeMove = true
+--     if (characterComponent.characterType == "Dummee") then
+--         AttachScriptComponent(indicatorInstance, "C_EnemyMoveDummee")
+--         GetComponent(indicatorInstance, "C_EnemyMoveDummee").executeMove = true
+--         print("indicatorInstance's executeMove =", GetComponent(indicatorInstance, "C_EnemyMoveDummee").executeMove)
+--     elseif (characterComponent.characterType == "Squinky") then
+--         AttachScriptComponent(indicatorInstance, "C_EnemyMoveSqinky")
+--         GetComponent(indicatorInstance, "C_EnemyMoveSqinky").executeMove = true
+--     end
+--     -- END OF FORECAST MOVEMENT ------------------------------------------------------
 
 
-    -- FORECAST ATTACK ---------------------------------------------------------------
+--     -- FORECAST ATTACK ---------------------------------------------------------------
 
-    -- add custom attack script to the ball based on enemy type
+--     -- add custom attack script to the ball based on enemy type
 
-    -- END OF FORECAST ATTACK --------------------------------------------------------
+--     -- END OF FORECAST ATTACK --------------------------------------------------------
 
-end
+-- end

@@ -38,7 +38,12 @@ function C_EnemyController()
         -- name of the enemy's movement script (e.g. EnemyDummee)
         -- attackScriptName will be initialized by using the inspector
         --[SerializeString]
-        attackScriptName = ""
+        attackScriptName = "",
+
+        -- custom attack script purely for forecasting attack
+        -- each enemy type will have a different one
+        --[SerializeString]
+        forecastAttackScriptName = ""
 
     }
     return function()
@@ -60,8 +65,7 @@ function S_EnemyController(e)
         enemyController.movementForecast = true
         movementScript.executeMove = true   
 
-        -- local attackScript = GetComponent(enemyEntity, enemyController.movementScriptName)
-        -- enemyController.attackForecast = true
+        
 
         local enemyGrid = GetGridCell(enemyEntity)
         enemyController.indicatorEntity = InstancePrefabParentedOnGridNow(GetEntity("Floor"), "ForecastIndicator", enemyGrid.x, enemyGrid.y, enemyGrid.z)
@@ -76,9 +80,14 @@ function S_EnemyController(e)
         enemyForecastComponent.indicatorsList[#enemyForecastComponent.indicatorsList + 1] = enemyController.indicatorEntity
 
         enemyController.initializedForecast = true
-        print("[EnemyController.lua] Executing forecast!")   
-    --else
-        --print("[EnemyController.lua] ForecastIndicator not instanced! enemyController.doingForecast:", enemyController.doingForecast, "enemyController.initializedForecast:", enemyController.initializedForecast)     
+        print("[EnemyController.lua] Executing forecast!")       
+    end
+
+    -- forecast attack based on ForecastIndicator's location
+    if (enemyController.attackForecast == true) then
+    
+        local attackForecastScript = GetComponent(enemyEntity, enemyController.forecastAttackScriptName)
+        attackForecastScript.performAttackForecast = true
     end
 
     if (enemyController.movementForecast == false and enemyController.attackForecast == false) then
@@ -93,7 +102,6 @@ function S_EnemyController(e)
         enemyController.hasAttacked = false
         return
     end
-
 
     -- -- enemy shouldn't do anything if afflicted with Frozen or Immobilised status
     -- if (characterComponent.statusAilment == "Frozen") then

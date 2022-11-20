@@ -75,6 +75,7 @@ function S_Pathfind(e)
                                 moveComponent.startedPathfind = false
                                 moveComponent.executeMove = false
                                 GetComponent(entity, "C_EnemyController").movementForecast = false
+                                GetComponent(entity, "C_EnemyController").attackForecast = true
 
                                 -- reset C_Pathfind variables
                                 local pathfindComponent = GetComponent(e, "C_Pathfind")
