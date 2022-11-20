@@ -651,23 +651,6 @@ namespace god
 
 	void OpenGL::RenderTransparent ( Scene& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures , glm::vec3 const& camera_front )
 	{
-		SystemTimer::StartTimeSegment ( "Sorting Transparent Objects" );
-		using RenderDataReference = std::tuple<Scene::InstancedRenderData , std::reference_wrapper<std::vector<glm::mat4>>>;
-		std::vector<RenderDataReference> sorted_render_data;
-		sorted_render_data.reserve ( scene.m_billboard_sprites.size () );
-		for ( auto& data : scene.m_billboard_sprites )
-		{
-			if ( !data.second.empty () )
-			{
-				sorted_render_data.push_back ( { data.first, data.second } );
-			}
-		}
-		std::sort ( sorted_render_data.begin () , sorted_render_data.end () , [&view]( auto const& lhs , auto const& rhs )
-			{
-				return  ( view * std::get<1> ( lhs ).get ()[ 0 ] )[ 3 ].z < ( view* std::get<1> ( rhs ).get ()[ 0 ] )[ 3 ].z;
-			} );
-		SystemTimer::EndTimeSegment ( "Sorting Transparent Objects" );
-
 		// Draw the normal model
 		m_textured_discard_shader.Use ();
 
@@ -686,29 +669,13 @@ namespace god
 		// set view position
 		OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uViewPosition" , camera_position );
 
-		//glDisable ( GL_DEPTH_TEST );
 		glEnable ( GL_BLEND );
 		glBlendFunc ( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
 		glDisable ( GL_CULL_FACE );
 		for ( auto const& data : scene.m_billboard_sprites )
 		{
-			// Make it so the stencil test always passes
-			//glStencilFunc( GL_ALWAYS, 1, 0xFF );
-			//// Enable modifying of the stencil buffer
-			//glStencilMask( 0xFF );
-
 			// Draw the normal model
 			m_textured_discard_shader.Use ();
-
-			// projection matrix
-			//OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uProjection" , projection );
-
-			//// view matrix
-			//OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uView" , view );
-
-			//// set uniforms for fragment shader
-			//// set view position
-			//OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uViewPosition" , camera_position );
 
 			// set material
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
@@ -802,7 +769,6 @@ namespace god
 				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
 		}
-		//glEnable ( GL_DEPTH_TEST );
 		glDisable ( GL_BLEND );
 		glEnable ( GL_CULL_FACE );
 	}

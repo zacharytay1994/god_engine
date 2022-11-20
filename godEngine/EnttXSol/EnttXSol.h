@@ -692,13 +692,13 @@ namespace god
 		{
 			auto [transform , renderable , transparent] = m_registry.get<T , R , Transparent> ( m_entities[ e ].m_id );
 
-			glm::vec3 world_position = parentTransform * glm::vec4 ( transform.m_position , 1.0f );
+			/*glm::vec3 world_position = parentTransform * glm::vec4 ( transform.m_position , 1.0f );
 			glm::vec3 rotation_offset ( 0.0f );
 			if ( transparent.m_facing_horizontal )
 			{
 				rotation_offset = { 0 , HorizontalFaceCameraDegrees ( cameraPosition , world_position ) , 0 };
-			}
-			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation + rotation_offset , transform.m_scale );
+			}*/
+			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation /*+ rotation_offset*/ , transform.m_scale );
 
 			transform.m_parent_transform = parentTransform;
 			transform.m_local_transform = model_transform;

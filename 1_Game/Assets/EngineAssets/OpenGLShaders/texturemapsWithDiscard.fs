@@ -228,7 +228,7 @@ void main( )
     vec4 specular_color = texture( uMaterial.specular_map , vUV );
 
     // discard pixels with alpha <= 0.001
-    if (diffuse_color.a <= 0.001)
+    if (diffuse_color.a <= 0.8)
     {
         discard;
     }
