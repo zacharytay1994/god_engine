@@ -41,8 +41,6 @@ function S_Pathfind(e)
                     -- if C_Pathfind is attached to an enemy whose is flagged to perform a forecast,
                     -- then overwrite current_cell so that the indicator moves instead of the enemy.
                     -- in the future, check from a list of enemy names instead.
-                    -- print(EntityName(e))
-                    -- print("GetComponent(e, C_EnemyController).doingForecast", GetComponent(e, "C_EnemyController").doingForecast)
                     if (EntityName(e) ~= "Player" and GetComponent(e, "C_EnemyController").movementForecast) then
                         if (GetComponent(e, "C_EnemyController").indicatorEntity ~= -1 and GetComponent(e, "C_EnemyController").indicatorEntity ~= nil) then
                             
@@ -66,16 +64,20 @@ function S_Pathfind(e)
                                 
                                 -- refresh the stamina for enemy after the forecast has expended it
                                 charComp.currentStamina = charComp.maxStamina
+
+                                -- reset enemy's movement script variables
                                 local moveComponent = GetComponent(e, "C_EnemyMoveDummee")
                                 moveComponent.Time = 0.0
                                 moveComponent.startedPathfind = false
                                 moveComponent.executeMove = false
                                 GetComponent(e, "C_EnemyController").movementForecast = false
-                                -- print("CHECKCCKECKENCIJWNCKUENKCJENK")
+
+                                -- reset C_Pathfind variables
                                 local pathfindComponent = GetComponent(e, "C_Pathfind")
                                 pathfindComponent.x = 0
                                 pathfindComponent.y = 0
                                 pathfindComponent.z = 0
+
                                 print("[Pathfind.lua] ForecastIndicator done moving!")
                             end
                         end

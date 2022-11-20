@@ -44,6 +44,7 @@ function S_EnemyForecast(e)
         local enemiesList = EntitiesWithScriptComponent("C_EnemyController")
         for i = 1, #enemiesList do
             GetComponent(enemiesList[i], "C_EnemyController").doingForecast = true
+            print("[EnemyForecast.lua]", EntityName(enemiesList[i]), "doingForecast set to",  GetComponent(enemiesList[i], "C_EnemyController").doingForecast)
         end
 
         forecastComponent.performForecast = false

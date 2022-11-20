@@ -76,7 +76,9 @@ function S_EnemyController(e)
         enemyForecastComponent.indicatorsList[#enemyForecastComponent.indicatorsList + 1] = enemyController.indicatorEntity
 
         enemyController.initializedForecast = true
-        print("[EnemyController.lua] Executing forecast!")        
+        print("[EnemyController.lua] Executing forecast!")   
+    --else
+        --print("[EnemyController.lua] ForecastIndicator not instanced! enemyController.doingForecast:", enemyController.doingForecast, "enemyController.initializedForecast:", enemyController.initializedForecast)     
     end
 
     if (enemyController.movementForecast == false and enemyController.attackForecast == false) then

@@ -174,6 +174,7 @@ function S_TurnOrderManager(e)
             local enemyForecastEntity = GetEntity("EnemyForecast")
             if (enemyForecastEntity ~= -1) then
                 GetComponent(enemyForecastEntity, "C_EnemyForecast").performForecast = true
+                print("[TurnOrderManager.lua] Set C_EnemyForecast.performForecast to", GetComponent(enemyForecastEntity, "C_EnemyForecast").performForecast)
             else
                 print("[TurnOrderManager.lua] ERROR: EnemyForecast entity not found!")
             end

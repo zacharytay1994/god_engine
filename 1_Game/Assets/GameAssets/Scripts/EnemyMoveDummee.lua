@@ -70,17 +70,31 @@ function S_EnemyMoveDummee(e)
 
         -- if enemy is already beside player or in same lane as player, don't move 
         if (EnemyMoveDummeeAdjacentToPlayer(e, playerEntity) or EnemyMoveDummeeSameLane(e, playerEntity)) then
-            print("[EnemyMoveDummee.lua] Dummee is already adjacent to or in same lane as Player. Returning.")
-            GetComponent(e, "C_EnemyController").hasMoved = true
-            moveComponent.executeMove = false
-            return
+            if (GetComponent(e, "C_Character").isActive == true) then
+                print("[EnemyMoveDummee.lua] Dummee is already adjacent to or in same lane as Player. Returning.")
+                GetComponent(e, "C_EnemyController").hasMoved = true
+                moveComponent.executeMove = false
+                return
+            -- if character is not active, that means it's trying to forecast movement.
+            else
+                moveComponent.executeMove = false
+                GetComponent(e, "C_EnemyController").movementForecast = false
+                return
+            end
         
             -- if enemy is on different y-axis as player, don't move
         elseif (enemyGridCell.y ~= GetGridCell(playerEntity).y) then
-            print("[EnemyMoveDummee.lua] Dummee is not on the same level as player. Returning.")
-            GetComponent(e, "C_EnemyController").hasMoved = true
-            moveComponent.executeMove = false
-            return
+            if (GetComponent(e, "C_Character").isActive == true) then
+                print("[EnemyMoveDummee.lua] Dummee is not on the same level as player. Returning.")
+                GetComponent(e, "C_EnemyController").hasMoved = true
+                moveComponent.executeMove = false
+                return
+            else
+                moveComponent.executeMove = false
+                GetComponent(e, "C_EnemyController").movementForecast = false
+                return
+            end
+            
 
         else   
             targetTile = EnemyMoveDummeeSuitableTile()
