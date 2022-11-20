@@ -3,6 +3,8 @@
 #include <entt.hpp>
 #include <string>
 
+#include <glm/glm/glm.hpp>
+
 namespace god
 {
 	struct Entity_
@@ -24,6 +26,10 @@ namespace god
 		std::vector<ContainerID> m_children;
 		bool m_persist_in_scene { true };
 		bool m_active { true };
+
+		bool m_parent_changed;
+		glm::mat4 m_parent_transform;
+
 		Entity_ () = default;
 		Entity_ ( entt::registry& registry , std::string const& name , ContainerID parent , Type type = Type::Default );
 

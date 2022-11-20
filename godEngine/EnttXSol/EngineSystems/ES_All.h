@@ -12,6 +12,9 @@
 #include "Physics/ES_Static.h"
 #include "Physics/ES_Debug.h"
 
+#include "Render/ES_Transform.h"
+#include "Render/ES_FaceCamera.h"
+
 #include "Grid/ES_GridManipulate.h"
 
 #include "GUI/ES_GUIObject.h"
@@ -23,6 +26,10 @@ namespace god
 	// runs in the middle of a frame
 	void EngineSystems ( EnttXSol& enttxsol , EngineResources& engineResources , bool isPause )
 	{
+		// render
+		enttxsol.RunEngineSystem ( engineResources , TransformDirty );
+		enttxsol.RunEngineSystem ( engineResources , FaceCamera );
+
 		if ( !isPause )
 		{
 			SystemTimer::StartTimeSegment ( "ExampleSystem" );

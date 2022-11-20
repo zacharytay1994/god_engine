@@ -8,6 +8,8 @@ namespace god
 	struct Transparent
 	{
 		bool m_facing_horizontal { true };
+		float m_facing_rotation_y { 0.0f };
+		bool m_changed { false };
 
 		bool operator==( Transparent const& rhs )
 		{

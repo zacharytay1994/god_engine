@@ -140,7 +140,7 @@ namespace god
 		template <typename S , typename T , typename R , typename F>
 		void PopulateScene ( S& scene , F& fonts , glm::vec3 const& cameraPosition = { 0,0,0 } );
 		template <typename S , typename T , typename R , typename F>
-		void RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) , glm::vec3 const& cameraPosition = { 0,0,0 } );
+		void RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , bool changed , glm::mat4 parentTransform = glm::mat4 ( 1.0f ) , glm::vec3 const& cameraPosition = { 0,0,0 } );
 
 		void SerializeStateV2 ( EngineResources& engineResources , std::string const& fileName );
 		void SerializeStateV2Recurse ( EngineResources& engineResources , Entities::ID entity , rapidjson::Document& document , rapidjson::Value& value );
@@ -517,7 +517,7 @@ namespace god
 		{
 			if ( m_entities.Valid ( i ) && m_entities[ i ].m_parent_id == Entities::Null && m_registry.storage<ActiveComponent> ().contains ( m_entities[ i ].m_id ) )
 			{
-				RecursivePopulateScene<S , T , R , F> ( scene , fonts , i , glm::mat4 ( 1.0f ) , cameraPosition );
+				RecursivePopulateScene<S , T , R , F> ( scene , fonts , i , false , glm::mat4 ( 1.0f ) , cameraPosition );
 			}
 		}
 
@@ -539,25 +539,35 @@ namespace god
 	}
 
 	template<typename S , typename T , typename R , typename F>
-	inline void EnttXSol::RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , glm::mat4 parentTransform , glm::vec3 const& cameraPosition )
+	inline void EnttXSol::RecursivePopulateScene ( S& scene , F& fonts , Entities::ID e , bool changed , glm::mat4 parentTransform , glm::vec3 const& cameraPosition )
 	{
 		// if parent has both transform and renderable component
 		if ( m_registry.all_of<T , R , GUIObject> ( m_entities[ e ].m_id ) )
 		{
 			auto [transform , renderable , gui_object] = m_registry.get<T , R , GUIObject> ( m_entities[ e ].m_id );
 
-			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
-
-			transform.m_parent_transform = parentTransform;
-			transform.m_local_transform = model_transform;
-
-			auto model_xform_cat = parentTransform * model_transform;
+			bool world_changed { false };
+			if ( changed )
+			{
+				transform.m_parent_transform = parentTransform;
+				world_changed = true;
+			}
+			if ( transform.m_changed )
+			{
+				glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
+				transform.m_local_transform = model_transform;
+				world_changed = true;
+			}
+			if ( world_changed )
+			{
+				transform.m_world_transform = transform.m_parent_transform * transform.m_local_transform;
+			}
 
 			// add to scene
 			if ( renderable.m_model_id != -1 && gui_object.m_active )
 			{
 				scene.Add2DInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-					renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
+					renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , transform.m_world_transform );
 
 				if ( m_registry.storage<GUIText> ().contains ( m_entities[ e ].m_id ) )
 				{
@@ -575,7 +585,7 @@ namespace god
 					float sentence_left = -1.0f + gui_text.m_padding_left;
 					float sentence_right = -1.0f - gui_text.m_padding_right;
 
-					float scale_y { scale * ( model_xform_cat[ 0 ].x / model_xform_cat[ 1 ].y ) };
+					float scale_y { scale * ( transform.m_world_transform[ 0 ].x / transform.m_world_transform[ 1 ].y ) };
 
 					while ( ss >> word )
 					{
@@ -627,7 +637,7 @@ namespace god
 								glm::mat4 character_transform = BuildModelMatrixRotDegrees ( { xpos,ypos,1 } , { 0,0,0 } , { w,-h,1 } );
 
 								scene.AddCharacter ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-									ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat * character_transform );
+									ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , transform.m_world_transform * character_transform );
 
 								x += ch.m_advance * scale;
 							}
@@ -672,7 +682,7 @@ namespace god
 						glm::mat4 character_transform = BuildModelMatrixRotDegrees ( { xpos,ypos,1 } , { 0,0,0 } , { w,-h,1 } );
 
 						scene.AddCharacter ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-							ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat * character_transform );
+							ch.m_texture_ID , renderable.m_specular_id , renderable.m_shininess } , transform.m_world_transform * character_transform );
 
 						x += ch.m_advance * scale;
 					}
@@ -684,7 +694,7 @@ namespace god
 				// populate scene with children
 				for ( auto const& child : m_entities[ e ].m_children )
 				{
-					RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat , cameraPosition );
+					RecursivePopulateScene<S , T , R> ( scene , fonts , child , world_changed , transform.m_world_transform , cameraPosition );
 				}
 			}
 		}
@@ -692,42 +702,56 @@ namespace god
 		{
 			auto [transform , renderable , transparent] = m_registry.get<T , R , Transparent> ( m_entities[ e ].m_id );
 
-			/*glm::vec3 world_position = parentTransform * glm::vec4 ( transform.m_position , 1.0f );
-			glm::vec3 rotation_offset ( 0.0f );
-			if ( transparent.m_facing_horizontal )
+			bool world_changed { false };
+			if ( changed )
 			{
-				rotation_offset = { 0 , HorizontalFaceCameraDegrees ( cameraPosition , world_position ) , 0 };
-			}*/
-			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation /*+ rotation_offset*/ , transform.m_scale );
-
-			transform.m_parent_transform = parentTransform;
-			transform.m_local_transform = model_transform;
-
-			auto model_xform_cat = parentTransform * model_transform;
+				transform.m_parent_transform = parentTransform;
+				world_changed = true;
+			}
+			if ( transform.m_changed || transparent.m_changed )
+			{
+				glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , { transform.m_rotation.z, transparent.m_facing_rotation_y, transform.m_rotation.z } , transform.m_scale );
+				transform.m_local_transform = model_transform;
+				world_changed = true;
+			}
+			if ( world_changed )
+			{
+				transform.m_world_transform = transform.m_parent_transform * transform.m_local_transform;
+			}
 
 			// add to scene
 			if ( renderable.m_model_id != -1 )
 			{
 				scene.AddBillboard ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive } , model_xform_cat );
+						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive } , transform.m_world_transform );
 			}
 
 			// populate scene with children
 			for ( auto const& child : m_entities[ e ].m_children )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat );
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , world_changed , transform.m_world_transform );
 			}
 		}
 		else if ( m_registry.all_of<T , R> ( m_entities[ e ].m_id ) )
 		{
 			auto [transform , renderable] = m_registry.get<T , R> ( m_entities[ e ].m_id );
 
-			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
-
-			transform.m_parent_transform = parentTransform;
-			transform.m_local_transform = model_transform;
-
-			auto model_xform_cat = parentTransform * model_transform;
+			bool world_changed { false };
+			if ( changed )
+			{
+				transform.m_parent_transform = parentTransform;
+				world_changed = true;
+			}
+			if ( transform.m_changed )
+			{
+				glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
+				transform.m_local_transform = model_transform;
+				world_changed = true;
+			}
+			if ( world_changed )
+			{
+				transform.m_world_transform = transform.m_parent_transform * transform.m_local_transform;
+			}
 
 			// add to scene
 			if ( renderable.m_model_id != -1 )
@@ -735,19 +759,19 @@ namespace god
 				if ( m_registry.storage<GUIObject> ().contains ( m_entities[ e ].m_id ) )
 				{
 					scene.Add2DInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , model_xform_cat );
+						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , transform.m_world_transform );
 				}
 				else
 				{
 					scene.AddInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive } , model_xform_cat );
+						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive } , transform.m_world_transform );
 				}
 			}
 
 			// populate scene with children
 			for ( auto const& child : m_entities[ e ].m_children )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat , cameraPosition );
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , world_changed , transform.m_world_transform , cameraPosition );
 			}
 		}
 		// if only transform component
@@ -755,17 +779,27 @@ namespace god
 		{
 			auto& transform = m_registry.get<T> ( m_entities[ e ].m_id );
 
-			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
-
-			transform.m_parent_transform = parentTransform;
-			transform.m_local_transform = model_transform;
-
-			auto model_xform_cat = parentTransform * model_transform;
+			bool world_changed { false };
+			if ( changed )
+			{
+				transform.m_parent_transform = parentTransform;
+				world_changed = true;
+			}
+			if ( transform.m_changed )
+			{
+				glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
+				transform.m_local_transform = model_transform;
+				world_changed = true;
+			}
+			if ( world_changed )
+			{
+				transform.m_world_transform = transform.m_parent_transform * transform.m_local_transform;
+			}
 
 			// populate scene with children
 			for ( auto const& child : m_entities[ e ].m_children )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , fonts , child , model_xform_cat , cameraPosition );
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , world_changed , transform.m_world_transform , cameraPosition );
 			}
 		}
 		// if neither, take the previous transform in the hierarchy, default identity matrix
@@ -774,7 +808,7 @@ namespace god
 			// populate scene with children
 			for ( auto const& child : m_entities[ e ].m_children )
 			{
-				RecursivePopulateScene<S , T , R> ( scene , fonts , child , parentTransform , cameraPosition );
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , changed , parentTransform , cameraPosition );
 			}
 		}
 	}
