@@ -738,7 +738,9 @@ function EnemyAttackDummeeApplyPushback(dummee, victim)
     end
 
     -- TODO: Check for any floor tiles or destructible rocks in the affectedEntities list, 
-    -- and remove all entities behind the first found floor tile or destructible rock entity.
+    -- and remove all entities behind the first found floor tile or destructible rock entity,
+    -- including that first found floor tile or destructible rock entity.
+    -- and if it's a destructible object, destroy it
     print("[EnemyAttackDummee.lua] TODO: remove non-character entities from affectedEntities. Game will crash if pushback is applied to non-character entities.")
 
     -- for each entity in affectedEntities, push back 1 tile

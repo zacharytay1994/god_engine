@@ -87,6 +87,27 @@ function S_Pathfind(e)
                             end
                         end
                     else
+                        
+                        -- -- adjust character's rotation here -----------------------------------------------------------
+                        local characterTransform = GetTransform(e)
+                        
+                        if (path[2].x > current_cell.x) then
+                            -- face left
+                            print("FACE LEFT")
+                            characterTransform.rotation.y = 90
+                        elseif (path[2].x < current_cell.x) then
+                            -- face right
+                            characterTransform.rotation.y = 270
+                        elseif (path[2].z > current_cell.z) then
+                            -- face front
+                            print("FACE FRONT")
+                            characterTransform.rotation.y = 0
+                        else
+                            -- face back
+                            characterTransform.rotation.y = 180         
+                        end
+                        -- -- end of adjusting rotation ------------------------------------------------------------------
+                        
                         -- -- move the character -------------------------------------------------------------------------
                         -- set camera to track movement
                         local world_position = WorldPosition(e)
@@ -116,24 +137,6 @@ function S_Pathfind(e)
                         -- print("found")
                         print(current_cell.x, current_cell.y, current_cell.z)
                         -- -- end of moving the character ----------------------------------------------------------------
-                        
-                        -- -- adjust character's rotation here -----------------------------------------------------------
-                        local characterTransform = GetTransform(e)
-                        
-                        if (path[2].x > current_cell.x) then
-                            -- face left
-                            characterTransform.rotation.y = 90
-                        elseif (path[2].x < current_cell.x) then
-                            -- face right
-                            characterTransform.rotation.y = 270
-                        elseif (path[2].z > current_cell.z) then
-                            -- face front
-                            characterTransform.rotation.y = 0
-                        else
-                            -- face back
-                            characterTransform.rotation.y = 180         
-                        end
-                        -- -- end of adjusting rotation ------------------------------------------------------------------
                         
                         -- -- reduce stamina by one for each step --------------------------------------------------------
                         local charComp = GetComponent(e, "C_Character")
