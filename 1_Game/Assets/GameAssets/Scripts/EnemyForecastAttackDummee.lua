@@ -98,13 +98,34 @@ end
 -- draw a line connecting the forecast indicator and the player
 function EnemyForecastAttackDummeeDrawArrow(e, forecastIndicator, player)
 
+    -- calculate attackIndicator's position and scale
+    local forecastIndicatorPosition = GetTransform(forecastIndicator).position
+    local playerPosition = GetTransform(player).position
+    local attackIndicatorPosition = { }
+    attackIndicatorPosition[1] = (forecastIndicatorPosition.x + playerPosition.x) / 2
+    attackIndicatorPosition[2] = (forecastIndicatorPosition.y + playerPosition.y) / 2
+    attackIndicatorPosition[3] = (forecastIndicatorPosition.z + playerPosition.z) / 2
+    -- print("[EnemyForecastAttackDummee.lua] Check attackIndicatorPosition:", attackIndicatorPosition[1], attackIndicatorPosition[2], attackIndicatorPosition[3])
+    
     -- create an instance of an attackIndicator
-    -- local attackIndicator = InstancePrefabParentedOnGridNow(GetEntity("Floor"), "ForecastIndicator", enemyGrid.x, enemyGrid.y, enemyGrid.z)
+    local attackIndicator = InstancePrefabNow("AttackIndicator", attackIndicatorPosition[1], attackIndicatorPosition[2], attackIndicatorPosition[3])
 
     -- add the instance to EnemyForecast's indicatorsList
-
-    -- position will be halfway between forecastIndicator and the player
+    local enemyForecastEntity = GetEntity("EnemyForecast")
+    if (enemyForecastEntity ~= -1) then
+        local enemyForecastComponent = GetComponent(enemyForecastEntity, "C_EnemyForecast")
+        enemyForecastComponent.indicatorsList[#enemyForecastComponent.indicatorsList + 1] = attackIndicator
+    else
+        print("[EnemyForecastAttackDummee.lua] ERROR: EnemyForecast entity cannot be found!")
+    end
 
     -- scale the attackIndicator (a scale.x or scale.z of 1.0 is exactly the length of one tile)
+    if (forecastIndicatorPosition.x - playerPosition.x ~= 0) then
+        -- if forecastIndicator and player are on different x-axis then scale according to x-axis distance between each other
+        GetTransform(attackIndicator).scale.x = (forecastIndicatorPosition.x - playerPosition.x) / 2
+    else
+        -- if forecastIndicator and player are on different z-axis then scale according to z-axis distance between each other
+        GetTransform(attackIndicator).scale.z = (forecastIndicatorPosition.z - playerPosition.z) / 2
+    end
 
 end
