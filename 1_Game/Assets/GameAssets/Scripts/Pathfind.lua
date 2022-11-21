@@ -88,6 +88,28 @@ function S_Pathfind(e)
                         end
                     else
                         -- -- move the character -------------------------------------------------------------------------
+                        -- set camera to track movement
+                        local world_position = WorldPosition(e)
+                        local dir_x = path[2].x - current_cell.x
+                        local dir_y = path[2].y - current_cell.y
+                        local dir_z = path[2].z - current_cell.z
+                        local dist_behind = 3
+                        local dist_above = 4
+                        if dir_x ~= 0 then
+                            if dir_x > 0 then
+                                SetCameraNextPosition(world_position.x-dist_behind, world_position.y + dir_y + dist_above, world_position.z)
+                            else 
+                                SetCameraNextPosition(world_position.x+dist_behind, world_position.y + dir_y + dist_above, world_position.z)
+                            end
+                        else
+                            if dir_z > 0 then
+                                SetCameraNextPosition(world_position.x, world_position.y + dir_y + dist_above, world_position.z-dist_behind)
+                            else 
+                                SetCameraNextPosition(world_position.x, world_position.y + dir_y + dist_above, world_position.z+dist_behind)
+                            end
+                        end
+                        SetCameraNextLookAt(world_position.x+dir_x, world_position.y + dir_y, world_position.z+dir_z)
+
                         current_cell.x = path[2].x
                         current_cell.y = path[2].y
                         current_cell.z = path[2].z
