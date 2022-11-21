@@ -437,6 +437,15 @@ namespace god
 		entt.RegisterLuaFunction ( "SetCameraMoveSpeed" ,
 			[&engineResources]( float speed )->void
 			{
+				engineResources.Get<Camera> ().get ().m_camera_move_speed = speed;
+			}
+		);
+
+		// SetCameraPanSpeed(speed)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "SetCameraPanSpeed" ,
+			[&engineResources]( float speed )->void
+			{
 				engineResources.Get<Camera> ().get ().m_camera_pan_speed = speed;
 			}
 		);
