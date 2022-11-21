@@ -179,7 +179,7 @@ namespace god
 			enttxsol.Update ( engine_resources );
 			SystemTimer::EndTimeSegment ( "EnTT Update" );
 			SystemTimer::StartTimeSegment ( "Populating Scene" );
-			enttxsol.PopulateScene<Scene , Transform , Renderable3D , Fonts> ( scene , fonts );
+			enttxsol.PopulateScene<Scene , Transform , Renderable3D , Fonts> ( scene , fonts , camera.m_position );
 			SystemTimer::EndTimeSegment ( "Populating Scene" );
 
 			//Physics Simulate update
@@ -211,7 +211,6 @@ namespace god
 				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,
 				camera.GetCameraViewMatrix () ,
-				camera.GetCameraViewFaceCamera () ,
 				camera.m_position ,
 				ogl_textures ,
 				camera_front );
@@ -346,7 +345,7 @@ namespace god
 				window.m_fullscreen = !window.m_fullscreen;
 			}
 
-
+			scene.ClearInstancedScene ();
 			delta_timer.EndFrame ();
 			SystemTimer::EndTimeSegment ( "Overall" );
 

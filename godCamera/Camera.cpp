@@ -31,14 +31,16 @@ namespace god
 		return glm::lookAt ( m_position , m_position + m_look_at , m_up );
 	}
 
-	glm::mat4 Camera::GetCameraViewFaceCamera ()
+	float Camera::GetCameraFaceAngle ()
 	{
 		glm::mat4 view { GetCameraViewMatrix () };
 		// camera rotation relative to origin
-		glm::vec3 norm_position = glm::normalize ( m_position );
-		float angle = acos ( norm_position.z );
-		view = glm::rotate ( view , angle , glm::vec3 ( 0 , 1 , 0 ) );
-		return view;
+		glm::vec3 norm_position = glm::normalize ( glm::vec3 ( m_position.x , 0.0f , m_position.z ) );
+		if ( m_position.x < 0.0f )
+		{
+			return 180.0f + glm::degrees ( acos ( -norm_position.z ) );
+		}
+		return glm::degrees ( acos ( norm_position.z ) );
 	}
 
 	void Camera::FreeCamera (
