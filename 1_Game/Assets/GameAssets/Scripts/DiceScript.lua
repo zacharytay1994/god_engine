@@ -97,18 +97,18 @@ function S_DiceScript(e)
 		
 		if (transform.position.x > 10) then
 			SetTransformPosition(e, 9.9, transform.position.y, transform.position.z)
-			SetVelocity(e, 0, 0, 0)
+			SetVelocity(e, -1, 0, 0)
 		elseif (transform.position.x < -5) then
 			SetTransformPosition(e, -4.9, transform.position.y, transform.position.z)
-			SetVelocity(e, 0, 0, 0)
+			SetVelocity(e, 1, 0, 0)
 		end
 		
 		if (transform.position.z > 3) then
 			SetTransformPosition(e, transform.position.x, transform.position.y, 2.9)
-			SetVelocity(e, 0, 0, 0)
+			SetVelocity(e, 0, 0, -1)
 		elseif (transform.position.z < -11) then
 			SetTransformPosition(e, transform.position.x, transform.position.y, -10.9)
-			SetVelocity(e, 0, 0, 0)
+			SetVelocity(e, 0, 0, 1)
 		end
 
 		c_dice.position_x = transform.position.x
@@ -141,7 +141,6 @@ function DiceScript_RollDice(e, c_dice)
 	transform.rotation.x = GenerateRandomNumberInRange(0,360)
 	transform.rotation.y = GenerateRandomNumberInRange(0,360)
 	transform.rotation.z = GenerateRandomNumberInRange(0,360)
-	--AddForce(e, 100.0, 100.0, 100.0)
 	c_dice.current_timer = GenerateRandomNumberInRange(0, c_dice.blue_chance)
 	if (c_dice.current_timer < c_dice.gold_chance) then
 		c_dice.color = 3
