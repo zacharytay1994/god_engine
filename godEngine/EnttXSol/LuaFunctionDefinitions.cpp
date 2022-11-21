@@ -396,6 +396,51 @@ namespace god
 			}
 		);
 
+		// SetCameraPosition(x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "SetCameraPosition" ,
+			[&engineResources]( float x , float y , float z )->void
+			{
+				engineResources.Get<Camera> ().get ().SetPosition ( { x, y, z } );
+			}
+		);
+
+		// SetCameraLookAt(x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "SetCameraLookAt" ,
+			[&engineResources]( float x , float y , float z )->void
+			{
+				engineResources.Get<Camera> ().get ().SetLookAt ( { x, y, z } );
+			}
+		);
+
+		// SetCameraNextPosition(x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "SetCameraNextPosition" ,
+			[&engineResources]( float x , float y , float z )->void
+			{
+				engineResources.Get<Camera> ().get ().SetNextPosition ( { x, y, z } );
+			}
+		);
+
+		// SetCameraNextLookAt(x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "SetCameraNextLookAt" ,
+			[&engineResources]( float x , float y , float z )->void
+			{
+				engineResources.Get<Camera> ().get ().SetNextLookAt ( { x, y, z } );
+			}
+		);
+
+		// SetCameraMoveSpeed(speed)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "SetCameraMoveSpeed" ,
+			[&engineResources]( float speed )->void
+			{
+				engineResources.Get<Camera> ().get ().m_camera_pan_speed = speed;
+			}
+		);
+
 		// Sin(value)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "Sin" ,
