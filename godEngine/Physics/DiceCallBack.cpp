@@ -9,18 +9,18 @@ namespace god
 
 	void DiceCallBack(glm::vec3 const& pos)
 	{
-		AudioAPI::LoadSound("C:\\Users\\Tingl\\Desktop\\CSD3400\\god_engine\\1_Game\\Assets\\GameAssets\\Sounds\\Dice Hit.wav", diceSFX);
-		std::cout << "Dice contacts: " << pos << std::endl;
-		
-		if (prevPos != pos)
-		{
-			AudioAPI::PlaySound(diceSFX);
-			prevPos = pos;
-		}
-		else
-		{
-			AudioAPI::StopSound(diceSFX.m_channel);
-		}
+		//AudioAPI::LoadSound("C:\\Users\\Tingl\\Desktop\\CSD3400\\god_engine\\1_Game\\Assets\\GameAssets\\Sounds\\Dice Hit.wav", diceSFX);
+		//std::cout << "Dice contacts: " << pos << std::endl;
+		//
+		//if (prevPos != pos)
+		//{
+		//	AudioAPI::PlaySound(diceSFX);
+		//	prevPos = pos;
+		//}
+		//else
+		//{
+		//	AudioAPI::StopSound(diceSFX.m_channel);
+		//}
 
 	}
 

@@ -21,7 +21,7 @@ namespace god
 
 	std::unordered_map<int, const char*> AudioAPI::m_channel_group_names =
 	{
-		{ 0, "Default" }, { 1, "Music" }, { 2, "SFX" }
+		{ 1, "Default" }, { 2, "Music" }, { 3, "SFX" }
 	};
 
 	std::vector<Sound> AudioAPI::m_extra_sounds;
