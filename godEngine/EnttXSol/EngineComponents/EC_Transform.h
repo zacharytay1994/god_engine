@@ -15,6 +15,13 @@ namespace god
 
 		glm::mat4 m_parent_transform { glm::mat4 ( 1.0f ) };
 		glm::mat4 m_local_transform { glm::mat4 ( 1.0f ) };
+		glm::mat4 m_world_transform { glm::mat4 ( 1.0f ) };
+
+		// dirty flag
+		bool m_changed { true };
+		glm::vec3 m_prev_position;
+		glm::vec3 m_prev_rotation;
+		glm::vec3 m_prev_scale { 1.0f, 1.0f,1.0f };
 
 		bool operator==( Transform const& rhs )
 		{

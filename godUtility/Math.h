@@ -16,4 +16,6 @@ namespace god
 	GODUTILITY_API bool IntersectLineSegmentPlane ( glm::vec3 const& a , glm::vec3 const& b , glm::vec3 const& n , float d , glm::vec3& p );
 
 	GODUTILITY_API float LengthSq ( glm::vec3 const& v );
+
+	GODUTILITY_API float HorizontalFaceCameraDegrees ( glm::vec3 const& cameraPosition , glm::vec3 const& targetPosition );
 }
