@@ -80,7 +80,7 @@ function S_Character(e)
         -- set character to dead
         characterComponent.isDead = true
 
-        if(characterComponent.isDead == true)
+        if (characterComponent.characterType == "Player" and characterComponent.isDead == true) 
         then
             isAlive = false
             ChangeScene("WinloseScreen",true)
