@@ -344,7 +344,7 @@ namespace god
 				window.m_fullscreen = !window.m_fullscreen;
 			}
 
-
+			scene.ClearInstancedScene ();
 			delta_timer.EndFrame ();
 			SystemTimer::EndTimeSegment ( "Overall" );
 

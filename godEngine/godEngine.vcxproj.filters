@@ -153,6 +153,10 @@
     <ClInclude Include="Physics\Types.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_Transform.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_FaceCamera.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateGUI.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateTransparent.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateDefault.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateOnlyTransform.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

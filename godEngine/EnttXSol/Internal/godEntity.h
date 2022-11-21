@@ -27,8 +27,8 @@ namespace god
 		bool m_persist_in_scene { true };
 		bool m_active { true };
 
-		bool m_parent_changed;
-		glm::mat4 m_parent_transform;
+		bool m_parent_changed { true };
+		glm::mat4 m_parent_transform { 1.0f };
 
 		Entity_ () = default;
 		Entity_ ( entt::registry& registry , std::string const& name , ContainerID parent , Type type = Type::Default );

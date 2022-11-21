@@ -14,6 +14,10 @@
 
 #include "Render/ES_Transform.h"
 #include "Render/ES_FaceCamera.h"
+#include "Render/ES_PopulateOnlyTransform.h"
+#include "Render/ES_PopulateDefault.h"
+#include "Render/ES_PopulateTransparent.h"
+#include "Render/ES_PopulateGUI.h"
 
 #include "Grid/ES_GridManipulate.h"
 
@@ -29,6 +33,10 @@ namespace god
 		// render
 		enttxsol.RunEngineSystem ( engineResources , TransformDirty );
 		enttxsol.RunEngineSystem ( engineResources , FaceCamera );
+		enttxsol.RunEngineSystem ( engineResources , PopulateTransformOnly , std::tuple<Renderable3D , GUIObject , Transparent> () );
+		enttxsol.RunEngineSystem ( engineResources , PopulateDefault , std::tuple<GUIObject , Transparent> () );
+		enttxsol.RunEngineSystem ( engineResources , PopulateTransparent );
+		enttxsol.RunEngineSystem ( engineResources , PopulateGUI );
 
 		if ( !isPause )
 		{
@@ -104,9 +112,9 @@ namespace god
 			enttxsol.RunEngineSystem ( engineResources , RigidDynamicFrameEnd );
 			SystemTimer::EndTimeSegment ( "RigidDynamicFrameEnd" );
 
-			SystemTimer::StartTimeSegment("AudioListenerSystem");
-			enttxsol.RunEngineSystem(engineResources, AudioListenerSystem);
-			SystemTimer::EndTimeSegment("AudioListenerSystem");
+			SystemTimer::StartTimeSegment ( "AudioListenerSystem" );
+			enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
+			SystemTimer::EndTimeSegment ( "AudioListenerSystem" );
 		}
 
 	}

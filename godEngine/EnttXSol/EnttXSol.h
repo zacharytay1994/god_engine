@@ -82,8 +82,8 @@ namespace god
 		void RegisterLuaType ( std::string const& name , ARGS...args );
 		template<typename FUNCTION>
 		void RegisterLuaFunction ( std::string const& name , FUNCTION fn );
-		template<typename ...T>
-		void RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) );
+		template<typename ...T , typename ...E>
+		void RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) , std::tuple<E...> const& exclude = std::tuple<> () );
 		void BindEngineSystemUpdate (
 			void( *update )( EnttXSol& , EngineResources& , bool ) ,
 			void( *init )( EnttXSol& , EngineResources& ) ,
@@ -369,10 +369,10 @@ namespace god
 		m_lua[ name ] = fn;
 	}
 
-	template<typename ...T>
-	inline void EnttXSol::RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) )
+	template<typename ...T , typename ...E>
+	inline void EnttXSol::RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) , std::tuple<E...> const& exclude )
 	{
-		auto view = m_registry.view<std::remove_reference<T>::type...> ();
+		auto view = m_registry.view<std::remove_reference<T>::type...> ( entt::exclude<E...> );
 		//view.each ( system );
 
 		for ( auto entity : view )
@@ -512,14 +512,14 @@ namespace god
 	inline void EnttXSol::PopulateScene ( S& scene , F& fonts , glm::vec3 const& cameraPosition )
 	{
 		// add objects to scene
-		scene.ClearInstancedScene ();
+		/*scene.ClearInstancedScene ();
 		for ( uint32_t i = 0; i < m_entities.Size (); ++i )
 		{
 			if ( m_entities.Valid ( i ) && m_entities[ i ].m_parent_id == Entities::Null && m_registry.storage<ActiveComponent> ().contains ( m_entities[ i ].m_id ) )
 			{
 				RecursivePopulateScene<S , T , R , F> ( scene , fonts , i , false , glm::mat4 ( 1.0f ) , cameraPosition );
 			}
-		}
+		}*/
 
 		// add point light to scene
 		scene.m_point_light_data.clear ();

@@ -14,7 +14,7 @@ function OnLoad_EnvironmentManager()
     local tiles = EntitiesWithScriptComponent("C_FloorTile")
     for i = 1, #tiles do
         -- random amount number
-        local rng_amount = GenerateRandomNumberInRange(5, 10)
+        local rng_amount = GenerateRandomNumberInRange(10, 20)
         for n = 1, rng_amount do
             -- get tile transform half vertical extent
             local tile_transform = GetTransform(tiles[i])
@@ -38,6 +38,10 @@ function OnLoad_EnvironmentManager()
             env_transform.position.x = rng_position_x
             env_transform.position.z = rng_position_z
         end
+
+        -- local tile_transform = GetTransform(tiles[i])
+        -- InstancePrefabParentedNow(tiles[i], "Env_Flora_1", 0, tile_transform.scale.y, 0)
+
     end
 
     print("Finsihed setting up environment.")
