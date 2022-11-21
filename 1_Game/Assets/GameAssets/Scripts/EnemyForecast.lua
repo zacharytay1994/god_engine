@@ -23,6 +23,9 @@
 function C_EnemyForecast()
     local var = {
 
+        --[SerializeBool]
+        seeForecast = true,
+        
         -- will be set to true by TurnOrderManager, at the start of each round.
         -- reset once to false once done
         performForecast = false,
@@ -40,6 +43,10 @@ function S_EnemyForecast(e)
 
     local forecastComponent = GetComponent(e, "C_EnemyForecast")
 
+    if (forecastComponent.seeForecast == false) then
+        return
+    end
+    
     if (forecastComponent.performForecast) then
         local enemiesList = EntitiesWithScriptComponent("C_EnemyController")
         for i = 1, #enemiesList do

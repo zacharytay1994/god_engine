@@ -98,6 +98,13 @@ end
 -- draw a line connecting the forecast indicator and the player
 function EnemyForecastAttackDummeeDrawArrow(e, forecastIndicator, player)
 
-    
+    -- create an instance of an attackIndicator
+    -- local attackIndicator = InstancePrefabParentedOnGridNow(GetEntity("Floor"), "ForecastIndicator", enemyGrid.x, enemyGrid.y, enemyGrid.z)
+
+    -- add the instance to EnemyForecast's indicatorsList
+
+    -- position will be halfway between forecastIndicator and the player
+
+    -- scale the attackIndicator (a scale.x or scale.z of 1.0 is exactly the length of one tile)
 
 end
