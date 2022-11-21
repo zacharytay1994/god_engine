@@ -14,7 +14,7 @@ function OnLoad_EnvironmentManager()
     local tiles = EntitiesWithScriptComponent("C_FloorTile")
     for i = 1, #tiles do
         -- random amount number
-        local rng_amount = GenerateRandomNumberInRange(10, 20)
+        local rng_amount = GenerateRandomNumberInRange(5, 10)
         for n = 1, rng_amount do
             -- get tile transform half vertical extent
             local tile_transform = GetTransform(tiles[i])
