@@ -77,8 +77,10 @@ function S_EnemyMoveDummee(e)
                 return
             -- if character is not active, that means it's trying to forecast movement.
             else
+                print("[EnemyMoveDummee.lua] ForecastIndicator is already adjacent to or in same lane as Player. Returning.")
                 moveComponent.executeMove = false
                 GetComponent(e, "C_EnemyController").movementForecast = false
+                GetComponent(e, "C_EnemyController").attackForecast = true
                 return
             end
         
@@ -90,8 +92,10 @@ function S_EnemyMoveDummee(e)
                 moveComponent.executeMove = false
                 return
             else
+                print("[EnemyMoveDummee.lua] ForecastIndicator is not on the same level as player. Returning.")
                 moveComponent.executeMove = false
                 GetComponent(e, "C_EnemyController").movementForecast = false
+                GetComponent(e, "C_EnemyController").attackForecast = true
                 return
             end
             
