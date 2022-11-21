@@ -34,6 +34,7 @@ function ResetHighlightTiles()
 end
 
 function HighlightTiles(e, range)
+	-- Not using pathfinding yet
 	print("[GridHighlightScript] Highlighting tiles...")
 	local c_gridmanager = GetComponent(GetEntity("TileHighlighter"), "C_GridHighlightScript")
 	local origin_cell = GetGridCell(e)
