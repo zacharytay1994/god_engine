@@ -65,8 +65,6 @@ function S_EnemyController(e)
         enemyController.movementForecast = true
         movementScript.executeMove = true   
 
-        
-
         local enemyGrid = GetGridCell(enemyEntity)
         enemyController.indicatorEntity = InstancePrefabParentedOnGridNow(GetEntity("Floor"), "ForecastIndicator", enemyGrid.x, enemyGrid.y, enemyGrid.z)
         print("[EnemyController.lua] ForecastIndicator instanced!")
