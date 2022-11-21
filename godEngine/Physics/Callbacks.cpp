@@ -13,23 +13,36 @@ namespace god
 	{
 		for (int i = 0; i < count; i++)
 		{
-			// ignore pairs when shapes have been deleted
-	/*		if (pairs[i].flags & (PxTriggerPairFlag::eREMOVED_SHAPE_TRIGGER |
-				PxTriggerPairFlag::eREMOVED_SHAPE_OTHER))
-				continue*/;
+			for (auto const& [ptypeid, fp] : TriggerCallBack)
+			{
+				int type1 = reinterpret_cast<RigidDynamic*>(pairs[i].triggerShape->getActor()->userData)->PhysicsTypeid;
 
-			std::cout << " Triggered" << std::endl;	
-			
-			//if ((&pairs[i].otherShape->getActor() == mSubmarineActor) &&
-			//	(&pairs[i].triggerShape->getActor() == gTreasureActor))
-			//{
-			//	gTreasureFound = true;
-			//}
+				if (type1 == ptypeid)
+				{
+					fp(ConvertToGlmVector( pairs[i].triggerShape->getActor()->getGlobalPose().p ) );
+				}
+
+			}
+
+
+			for (auto const& [ptypeid0, ptypeid1,fp] : TriggerCallBackPair)
+			{
+				int type0 = reinterpret_cast<RigidDynamic*>(pairs[i].triggerShape->getActor()->userData)->PhysicsTypeid;
+				int type1 = reinterpret_cast<RigidDynamic*>(pairs[i].otherShape->getActor()->userData)->PhysicsTypeid;
+				if (type0 == ptypeid0 && type1== ptypeid1)
+				{
+					fp( ConvertToGlmVector(pairs[i].triggerShape->getActor()->getGlobalPose().p) 
+						, ConvertToGlmVector(pairs[i].otherShape->getActor()->getGlobalPose().p) );
+				}
+
+
+			}
 		}
 	}
 
 	void ContactReportCallback::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 	{
+		
 		for (auto const& [ptypeid,fp] : ContactCallBack)
 		{
 			int type0 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[0]->userData)->PhysicsTypeid;
@@ -44,6 +57,22 @@ namespace god
 			}
 
 		}
+
+		for (auto const& [ptypeid0, ptypeid1, fp] : ContactCallBackPair)
+		{
+			int type0 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[0]->userData)->PhysicsTypeid;
+			int type1 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[1]->userData)->PhysicsTypeid;
+			if (type0 == ptypeid0 && type1== ptypeid1)
+			{
+				fp( ConvertToGlmVector( pairHeader.actors[0]->getGlobalPose().p ), ConvertToGlmVector(pairHeader.actors[1]->getGlobalPose().p ) );
+			}
+			if (type0 == ptypeid1 && type1 == ptypeid0)
+			{
+				fp(ConvertToGlmVector(pairHeader.actors[1]->getGlobalPose().p), ConvertToGlmVector(pairHeader.actors[0]->getGlobalPose().p));
+			}
+
+		}
+
 
 
 #if CONTACTPOINTS 
