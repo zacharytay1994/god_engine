@@ -17,6 +17,7 @@ namespace god
 		void Reset ();
 		EnttXSol::Entities::ID GetSelectedEntity ();
 		void ResetScene ( EDITOR_RESOURCES& engineResources );
+		void SetSelectedScene(std::string const& name);
 	private:
 		std::string m_input_string { "NIL" };
 		EnttXSol::Entities::ID m_selected_entity { EnttXSol::Entities::Null };
@@ -519,6 +520,17 @@ namespace god
 				// reload scene
 				m_enttxsol.DeserializeStateV2 ( engineResources , name );
 			}
+		}
+	}
+
+	template<typename EDITOR_RESOURCES>
+	inline void EW_SceneTree<EDITOR_RESOURCES>::SetSelectedScene(std::string const& name)
+	{
+		auto it = std::find_if(m_scene_list.begin(), m_scene_list.end(), [&name](auto const& s) {
+			return (s.find(name) != std::string::npos);
+		});
+		if (it != m_scene_list.end()) {
+			m_selected_scene = it - m_scene_list.begin();
 		}
 	}
 }
