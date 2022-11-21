@@ -136,6 +136,7 @@ end
 function DiceScript_RollDice(e, c_dice)
 	print("[DiceScript] Roll Dice")
 	c_dice.is_rolling = true
+	c_dice.value = -1
 	FreezeObject(e, false)
 	local transform = GetTransform(e)
 	transform.rotation.x = GenerateRandomNumberInRange(0,360)
