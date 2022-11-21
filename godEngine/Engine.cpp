@@ -317,6 +317,7 @@ namespace god
 				auto scene_tree = editor_windows.GetWindow<EW_SceneTree> ();
 				scene_tree->Reset ();
 				scene_tree->m_select_hierarchy_tab = true;
+				scene_tree->SetSelectedScene(scene_to_change);
 #endif
 
 				EntityGrid& grid = engine_resources.Get<EntityGrid> ().get ();

@@ -127,8 +127,11 @@ namespace god
 
 			rigiddynamic.m_id = edata.m_id;
 			rigiddynamic.p_RigidDynamic->userData = &rigiddynamic;
+			rigiddynamic.p_RigidDynamic->setName("Dynamic");
 
 			rigiddynamic.updateRigidDynamic = false;
+
+
 
 		}//init rigiddynamic
 
