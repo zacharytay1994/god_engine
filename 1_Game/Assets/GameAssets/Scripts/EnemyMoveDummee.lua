@@ -30,7 +30,7 @@ end
 
 --[IsSystem]
 function S_EnemyMoveDummee(e)
-            
+    
     -- get MoveDummee component
     local moveComponent = GetComponent(e, "C_EnemyMoveDummee")
     
@@ -52,7 +52,7 @@ function S_EnemyMoveDummee(e)
     end
                     
     -- allow movement after 1 second has passed
-    if (moveComponent.Time < 0.5) then
+    if (moveComponent.Time < 0.1) then
 
         -- accumulate time
         moveComponent.Time = moveComponent.Time + GetDeltaTime()
@@ -60,23 +60,45 @@ function S_EnemyMoveDummee(e)
     -- after 1 second has passed and pathfinding has not been initialized
     elseif (moveComponent.startedPathfind == false) then
         
-        print("[EnemyMoveDummee.lua] Start of movement for", EntityName(e), entityDataComponent.id)
+        if (GetComponent(e, "C_EnemyController").movementForecast) then
+            print("[EnemyMoveDummee.lua] Start of FORECAST movement for", EntityName(e), entityDataComponent.id)
+        else
+            print("[EnemyMoveDummee.lua] Start of movement for", EntityName(e), entityDataComponent.id)
+        end
 
         local targetTile = nil
 
         -- if enemy is already beside player or in same lane as player, don't move 
         if (EnemyMoveDummeeAdjacentToPlayer(e, playerEntity) or EnemyMoveDummeeSameLane(e, playerEntity)) then
-            print("[EnemyMoveDummee.lua] Dummee is already adjacent to or in same lane as Player. Returning.")
-            GetComponent(e, "C_EnemyController").hasMoved = true
-            moveComponent.executeMove = false
-            return
+            if (GetComponent(e, "C_Character").isActive == true) then
+                print("[EnemyMoveDummee.lua] Dummee is already adjacent to or in same lane as Player. Returning.")
+                GetComponent(e, "C_EnemyController").hasMoved = true
+                moveComponent.executeMove = false
+                return
+            -- if character is not active, that means it's trying to forecast movement.
+            else
+                print("[EnemyMoveDummee.lua] ForecastIndicator is already adjacent to or in same lane as Player. Returning.")
+                moveComponent.executeMove = false
+                GetComponent(e, "C_EnemyController").movementForecast = false
+                GetComponent(e, "C_EnemyController").attackForecast = true
+                return
+            end
         
             -- if enemy is on different y-axis as player, don't move
         elseif (enemyGridCell.y ~= GetGridCell(playerEntity).y) then
-            print("[EnemyMoveDummee.lua] Dummee is not on the same level as player. Returning.")
-            GetComponent(e, "C_EnemyController").hasMoved = true
-            moveComponent.executeMove = false
-            return
+            if (GetComponent(e, "C_Character").isActive == true) then
+                print("[EnemyMoveDummee.lua] Dummee is not on the same level as player. Returning.")
+                GetComponent(e, "C_EnemyController").hasMoved = true
+                moveComponent.executeMove = false
+                return
+            else
+                print("[EnemyMoveDummee.lua] ForecastIndicator is not on the same level as player. Returning.")
+                moveComponent.executeMove = false
+                GetComponent(e, "C_EnemyController").movementForecast = false
+                GetComponent(e, "C_EnemyController").attackForecast = true
+                return
+            end
+            
 
         else   
             targetTile = EnemyMoveDummeeSuitableTile()

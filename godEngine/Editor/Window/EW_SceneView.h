@@ -32,6 +32,7 @@ namespace god
 		unsigned int m_renderpass_texture { NO_TEXTURE };
 		float m_margin_buffer_x { 20.0f };
 		float m_margin_buffer_y { 100.0f };
+		bool m_disable_guizmo { false };
 		EnttXSol& m_enttxsol;
 
 		std::array<std::tuple<std::string , ImGuizmo::OPERATION> , 3> m_guizmo_operation = {
@@ -94,49 +95,52 @@ namespace god
 			EnttXSol::Entities::ID selected_entity = this->Get<EW_SceneTree> ()->GetSelectedEntity ();
 			if ( selected_entity != EnttXSol::Entities::Null )
 			{
-				Transform* transform = m_enttxsol.GetEngineComponent<Transform> ( selected_entity );
-				GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( selected_entity );
-				if ( transform )
+				if ( !m_disable_guizmo )
 				{
-					ImGuizmo::SetOrthographic ( false );
-					ImGuizmo::SetDrawlist ();
-					ImGuizmo::SetRect ( viewport_pos.x , viewport_pos.y , viewport_size.x , viewport_size.y );
-
-					// camera
-					glm::mat4 view = camera.GetCameraViewMatrix ();
-					glm::mat4 projection = camera.GetPerpectiveProjectionMatrix ();
-
-					// entity transform
-					glm::mat4 world_transform = transform->m_parent_transform * transform->m_local_transform;
-
-					ImGuizmo::Manipulate (
-						glm::value_ptr ( view ) ,
-						glm::value_ptr ( projection ) ,
-						std::get<1> ( m_guizmo_operation[ m_guizmo_operation_id ] ) ,
-						ImGuizmo::LOCAL ,
-						glm::value_ptr ( world_transform ) );
-
-					glm::mat4 local_transform = glm::inverse ( transform->m_parent_transform ) * world_transform;
-
-					// decompose
-					glm::vec3 position , rotation , scale;
-					ImGuizmo::DecomposeMatrixToComponents (
-						glm::value_ptr ( local_transform ) ,
-						glm::value_ptr ( position ) , glm::value_ptr ( rotation ) , glm::value_ptr ( scale ) );
-
-					if ( grid_cell )
+					Transform* transform = m_enttxsol.GetEngineComponent<Transform> ( selected_entity );
+					GridCell* grid_cell = m_enttxsol.GetEngineComponent<GridCell> ( selected_entity );
+					if ( transform )
 					{
-						grid_cell->m_cell_x = static_cast< int32_t >( std::floor ( position.x / ( grid_cell->m_cell_size * 2.0f ) ) );
-						grid_cell->m_cell_y = static_cast< int32_t >( std::floor ( position.y / ( grid_cell->m_cell_size * 2.0f ) ) );
-						grid_cell->m_cell_z = static_cast< int32_t >( std::floor ( position.z / ( grid_cell->m_cell_size * 2.0f ) ) );
-						transform->m_rotation = rotation;
-						transform->m_scale = scale;
-					}
-					else
-					{
-						transform->m_position = position;
-						transform->m_rotation = rotation;
-						transform->m_scale = scale;
+						ImGuizmo::SetOrthographic ( false );
+						ImGuizmo::SetDrawlist ();
+						ImGuizmo::SetRect ( viewport_pos.x , viewport_pos.y , viewport_size.x , viewport_size.y );
+
+						// camera
+						glm::mat4 view = camera.GetCameraViewMatrix ();
+						glm::mat4 projection = camera.GetPerpectiveProjectionMatrix ();
+
+						// entity transform
+						glm::mat4 world_transform = transform->m_parent_transform * transform->m_local_transform;
+
+						ImGuizmo::Manipulate (
+							glm::value_ptr ( view ) ,
+							glm::value_ptr ( projection ) ,
+							std::get<1> ( m_guizmo_operation[ m_guizmo_operation_id ] ) ,
+							ImGuizmo::LOCAL ,
+							glm::value_ptr ( world_transform ) );
+
+						glm::mat4 local_transform = glm::inverse ( transform->m_parent_transform ) * world_transform;
+
+						// decompose
+						glm::vec3 position , rotation , scale;
+						ImGuizmo::DecomposeMatrixToComponents (
+							glm::value_ptr ( local_transform ) ,
+							glm::value_ptr ( position ) , glm::value_ptr ( rotation ) , glm::value_ptr ( scale ) );
+
+						if ( grid_cell )
+						{
+							grid_cell->m_cell_x = static_cast< int32_t >( std::floor ( position.x / ( grid_cell->m_cell_size * 2.0f ) ) );
+							grid_cell->m_cell_y = static_cast< int32_t >( std::floor ( position.y / ( grid_cell->m_cell_size * 2.0f ) ) );
+							grid_cell->m_cell_z = static_cast< int32_t >( std::floor ( position.z / ( grid_cell->m_cell_size * 2.0f ) ) );
+							transform->m_rotation = rotation;
+							transform->m_scale = scale;
+						}
+						else
+						{
+							transform->m_position = position;
+							transform->m_rotation = rotation;
+							transform->m_scale = scale;
+						}
 					}
 				}
 			}
@@ -192,6 +196,9 @@ namespace god
 			ImGui::OpenPopup ( "Guizmo Operation" );
 		}
 		this->ToolTipOnHover ( "Changes the guizmo used to edit and object." );
+
+		ImGui::SameLine ();
+		ImGui::Checkbox ( "Disable Guizmo" , &m_disable_guizmo );
 
 		ImGui::SameLine ();
 		ImGui::Text ( "FPS: %d" , DeltaTimer::m_fps );

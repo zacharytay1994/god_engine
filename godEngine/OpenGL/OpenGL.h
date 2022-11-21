@@ -46,13 +46,18 @@ namespace god
 		void  RenderScene ( Scene& scene ,
 			glm::mat4 const& projection ,
 			glm::mat4 const& view ,
-			glm::mat4 const& viewNoRot ,
 			glm::vec3 const& camera_position ,
 			OGLTextureManager& textures ,
 			glm::vec3 const& camera_front );
 		void RenderGUI ( Scene& scene ,
 			glm::mat4 const& projection ,
 			OGLTextureManager& textures );
+		void RenderTransparent ( Scene& scene ,
+			glm::mat4 const& projection ,
+			glm::mat4 const& view ,
+			glm::vec3 const& camera_position ,
+			OGLTextureManager& textures ,
+			glm::vec3 const& camera_front );
 
 		void  ResizeViewport ( int width , int height );
 
@@ -92,6 +97,7 @@ namespace god
 		// shaders
 		OGLShader m_flat_shader;
 		OGLShader m_textured_shader;
+		OGLShader m_textured_discard_shader;
 		OGLShader m_single_colour_outline_shader;
 		OGLShader m_cubemap_shader;
 		OGLShader m_depthmap_shader;

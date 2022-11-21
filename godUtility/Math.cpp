@@ -56,4 +56,16 @@ namespace god
 	{
 		return v.x * v.x + v.y * v.y + v.z * v.z;
 	}
+
+	float HorizontalFaceCameraDegrees ( glm::vec3 const& cameraPosition , glm::vec3 const& targetPosition )
+	{
+		glm::vec3 targetToCamera = cameraPosition - targetPosition;
+		targetToCamera.y = 0;
+		glm::vec3 norm_position = glm::normalize ( targetToCamera );
+		if ( targetToCamera.x < 0.0f )
+		{
+			return 180.0f + glm::degrees ( acos ( -norm_position.z ) );
+		}
+		return glm::degrees ( acos ( norm_position.z ) );
+	}
 }
