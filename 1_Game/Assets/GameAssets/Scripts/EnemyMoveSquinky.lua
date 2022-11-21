@@ -76,7 +76,7 @@ function S_EnemyMoveSquinky(e)
             print("[EnemyMoveSquinky.lua] Start of movement for", EntityName(e), entityDataComponent.id)
         end
         
-        -- if enemy is already beside player or in same lane as player, don't move 
+        -- if enemy is already beside player, don't move 
         if (EnemyMoveSquinkyAdjacentToPlayer(e, playerEntity)) then
             if (GetComponent(e, "C_Character").isActive == true) then
                 print("[EnemyMoveSquinky.lua] Squinky is already adjacent to Player, don't move. Returning.")
@@ -221,13 +221,31 @@ function EnemyMoveSquinkySuitablePath(Squinky, targetEntity)
 
     local shortestDistance = 1000
     for j = 1, #allCandidates do
-        if (EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget) < shortestDistance) then
+        if (EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget) < shortestDistance and EnemyMoveSquinkyCandidateUnoccupied(allCandidates[j])) then
             shortestDistance = EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget)
             tileToMoveTo = allCandidates[j]
         end
     end
 
     return tileToMoveTo
+end
+
+function EnemyMoveSquinkyCandidateUnoccupied(candidateTile)
+    
+    local candidateGrid = GetGridCell(candidateTile)
+
+    local entitiesWithGridCell = EntitiesWithEngineComponent("GridCell")
+
+    for i = 1, #entitiesWithGridCell do
+    
+        local currentEntityGrid = GetGridCell(entitiesWithGridCell[i])
+
+        if (candidateGrid.x == currentEntityGrid.x and candidateGrid.y == currentEntityGrid.y - 1 and candidateGrid.z == currentEntityGrid.z) then
+            return false
+        end
+    end
+
+    return true
 end
 
 function EnemyMoveSquinkyAdjacentToPlayer(enemy, player)
