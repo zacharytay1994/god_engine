@@ -30,8 +30,8 @@ namespace god
 		void Update(float dt, bool pause);
 		
 		
-		physx::PxRigidActor* const GetRayCastMouse();
-		const uint32_t getRCMid();
+		physx::PxRigidActor* const GetRayCastMouse() const;
+		const uint32_t getRCMid() const;
 		void setRCMid(uint32_t id);
 		bool GetisRunning() const;
 		physx::PxPhysics* const GetPhysics() const;
