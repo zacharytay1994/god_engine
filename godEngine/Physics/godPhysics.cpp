@@ -136,6 +136,8 @@ namespace god
 
 	void PhysicsSystem::Update(float dt , bool pause)
 	{
+		if (!mWindow->WindowsMinimized())
+			Raycast();
 		if (pause)
 			return;
 		//mStepSize is 1/60 Physics at 60fps by default
@@ -231,19 +233,15 @@ namespace god
 		}
 	}
 
-	physx::PxRigidActor* const PhysicsSystem::GetRayCastMouse()
+	physx::PxRigidActor* const PhysicsSystem::GetRayCastMouse() const
 	{
-
-		if (!mWindow->WindowsMinimized())
-			Raycast();
 		return mRayCastMouse;
 	}
 
-	const uint32_t PhysicsSystem::getRCMid()
+	const uint32_t PhysicsSystem::getRCMid() const
 	{
-		physx::PxRigidActor* rcm = GetRayCastMouse();
-		
-		if (!rcm)
+
+		if (!mRayCastMouse)
 			return Null;
 		else
 			return RayCastid;
