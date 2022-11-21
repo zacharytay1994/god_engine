@@ -121,8 +121,9 @@ namespace god
 				ImGui::PushID(1);
 				if (ImGui::Button(buf))
 				{
-					ImGui::OpenPopup("shape popup");
 					ImGui::PopID();
+					ImGui::OpenPopup("shape popup");
+			
 				}
 				else
 				{
