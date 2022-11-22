@@ -271,6 +271,15 @@ namespace god
 			}
 		);
 
+		// DrawLine(x0,y0,z0,x1,y1,z1,r,g,b,a,lineWidth)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "DrawLine" ,
+			[&engineResources]( float x0 , float y0 , float z0 , float x1 , float y1 , float z1 , float r , float g , float b , float a , float lineWidth )->void
+			{
+				engineResources.Get<OpenGL> ().get ().DrawLine ( { x0,y0,z0 } , { x1,y1,z1 } , { r,g,b,a } , lineWidth );
+			}
+		);
+
 		// InstancePrefabNow(name,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "InstancePrefabNow" ,
