@@ -547,6 +547,7 @@ namespace god
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_SIMULATION , freeze );
+						entt.GetEngineComponent<RigidDynamic>(e)->Active = !freeze;
 					}
 				}
 			}

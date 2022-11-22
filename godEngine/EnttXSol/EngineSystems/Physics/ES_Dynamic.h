@@ -49,6 +49,11 @@ namespace god
 
 		if ( rigiddynamic.updateRigidDynamic)
 		{
+			if (rigiddynamic.locktoscale)
+			{
+				rigiddynamic.extents = transform.m_scale;
+			}
+
 
 			if ( rigiddynamic.p_material == nullptr )
 			{
@@ -171,31 +176,7 @@ namespace god
 		}
 
 
-		if ( rigiddynamic.locktoscale )
-		{
-			rigiddynamic.extents = transform.m_scale;
-			switch ( rigiddynamic.Shapeid )
-			{
-			case PhysicsTypes::Cube:
-				rigiddynamic.p_shape->setGeometry ( physx::PxBoxGeometry ( rigiddynamic.extents.x , rigiddynamic.extents.y , rigiddynamic.extents.z ) );
-				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
-				break;
-			case PhysicsTypes::Sphere:
-				rigiddynamic.p_shape->setGeometry ( physx::PxSphereGeometry ( rigiddynamic.extents.x ) );
-				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
-				break;
-			case PhysicsTypes::Capsule:
-				rigiddynamic.p_shape->setGeometry ( physx::PxCapsuleGeometry ( rigiddynamic.extents.x , rigiddynamic.extents.y ) );
-				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
-				break;
 
-			case PhysicsTypes::TriangleMesh:
-				PxMeshScale scale ( PxVec3 ( rigiddynamic.extents.x , rigiddynamic.extents.y , rigiddynamic.extents.z ) , PxQuat ( PxIdentity ) );
-				rigiddynamic.p_shape->setGeometry ( physx::PxTriangleMeshGeometry ( rigiddynamic.p_trimesh , scale ) );
-				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
-			}
-			rigiddynamic.updateRigidDynamic = true;
-		}
 
 
 
@@ -220,16 +201,6 @@ namespace god
 
 		if ( rigiddynamic.p_RigidDynamic )
 		{
-			//
-			if (edata.m_id == 0)
-			{
-				physx::PxTransform ptransform1 = rigiddynamic.p_RigidDynamic->getGlobalPose();
-
-				ptransform1.p.y -= 0.01f;
-				rigiddynamic.p_RigidDynamic->setGlobalPose(ptransform1);
-
-			}
-			//
 			physx::PxTransform ptransform = rigiddynamic.p_RigidDynamic->getGlobalPose ();
 
 			transform.m_position.x = ptransform.p.x;

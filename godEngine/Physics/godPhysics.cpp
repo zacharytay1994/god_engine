@@ -43,6 +43,8 @@ namespace god
 	PhysicsSystem::PhysicsSystem() 
 
 	{
+		mStepSize = 1.f / 30.f;
+
 		RayCastid = Null;
 		mRunning = false;
 		mCamera = nullptr;
@@ -134,29 +136,55 @@ namespace god
 		}
 	}
 
+	void PhysicsSystem::SimpleMovingAverageDeltaTime(float dt)
+	{
+		sma_dt[sma_index++] = dt;
+		if (sma_index == sma_dt.size())
+			sma_index = 0;
+
+		mStepSize = (sma_dt[0] + sma_dt[1] + sma_dt[2] + sma_dt[3] + sma_dt[4]) / 5.f;
+
+	}
+
+	void PhysicsSystem::CalculateNumSteps()
+	{
+
+		if (mAccumulator < 1.0f)
+		{
+			numSteps = 1;
+		}
+		
+		if (mAccumulator > 2.0f)
+		{
+			numSteps = 2;
+		}
+		if (mAccumulator > 3.0f)
+		{
+			numSteps = 3;
+		}
+		
+
+		if(mAccumulator>5.0f)
+		{
+			mStepSize = 15.f;
+		}
+	}
 	void PhysicsSystem::Update(float dt , bool pause)
 	{
 		if (!mWindow->WindowsMinimized())
 			Raycast();
 		if (pause)
 			return;
-		//mStepSize is 1/60 Physics at 60fps by default
+	
 		mAccumulator += dt;
 		if (mAccumulator < mStepSize)
 			return;
 
-		mStepSize = 1.0f / (numSteps * 60.0f);
-		if (mAccumulator > 1.0f)
-		{
-			numSteps = 2;
-		}
-		else if (mAccumulator < 0.1f)
-		{
-			numSteps = 1;
-		}
+
+		CalculateNumSteps();
 		for (uint16_t i = 0; i < numSteps; ++i)
 		{
-			mAccumulator -= mStepSize;
+			//mAccumulator -= dt;
 			mRunning = true;
 			mScene->simulate(mStepSize);
 
