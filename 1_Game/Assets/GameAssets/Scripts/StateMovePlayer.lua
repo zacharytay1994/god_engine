@@ -64,7 +64,7 @@ function S_StateMovePlayer(e)
                         pathfind.Path = true
 
                         stateMovePlayerComponent.callEnemyForecast = true
-                        ClearIndicatorsList()
+                        --ClearIndicatorsList()
                     end
 
                     local playerGridCell = GetGridCell(e)
