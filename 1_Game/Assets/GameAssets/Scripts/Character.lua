@@ -80,6 +80,14 @@ function S_Character(e)
         -- set character to dead
         characterComponent.isDead = true
 
+         -- remove forecast indicator ---------------------------------------------------------------------
+        --  if (enemyController.indicatorEntity ~= nil) then
+        --     print("[EnemyController.lua] Removing indicatorEntity for character who just died!")
+        --     RemoveInstance(enemyController.indicatorEntity)
+        --     enemyController.indicatorEntity = nil
+        -- end
+        --------------------------------------------------------------------------------------------------
+
         if (characterComponent.characterType == "Player" and characterComponent.isDead == true) 
         then
             isAlive = false
