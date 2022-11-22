@@ -18,7 +18,6 @@ namespace god
 		{
 			//std::cout << "raycast: " << edata.m_id << std::endl;
 			psystem.setRCMid(edata.m_id);
-
 		}
 	}
 

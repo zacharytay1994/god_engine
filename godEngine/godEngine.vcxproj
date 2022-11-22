@@ -140,6 +140,12 @@
     <ClInclude Include="EnttXSol\EngineSystems\ES_AudioListener.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_FaceCamera.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateDefault.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateGUI.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateOnlyTransform.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateTransparent.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_Transform.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_AudioSource.h" />
     <ClInclude Include="EnttXSol\EngineSystems\GUI\ES_GUIObject.h" />

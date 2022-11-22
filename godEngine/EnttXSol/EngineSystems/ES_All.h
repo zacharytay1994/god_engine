@@ -8,9 +8,16 @@
 #include "ES_AudioListener.h"
 
 #include "Physics/ES_Dynamic.h"
-//#include "Physics/ES_RayCast.h"
+#include "Physics/ES_RayCast.h"
 #include "Physics/ES_Static.h"
 #include "Physics/ES_Debug.h"
+
+#include "Render/ES_Transform.h"
+#include "Render/ES_FaceCamera.h"
+#include "Render/ES_PopulateOnlyTransform.h"
+#include "Render/ES_PopulateDefault.h"
+#include "Render/ES_PopulateTransparent.h"
+#include "Render/ES_PopulateGUI.h"
 
 #include "Grid/ES_GridManipulate.h"
 
@@ -23,6 +30,14 @@ namespace god
 	// runs in the middle of a frame
 	void EngineSystems ( EnttXSol& enttxsol , EngineResources& engineResources , bool isPause )
 	{
+		// render
+		enttxsol.RunEngineSystem ( engineResources , TransformDirty );
+		enttxsol.RunEngineSystem ( engineResources , FaceCamera );
+		enttxsol.RunEngineSystem ( engineResources , PopulateTransformOnly , std::tuple<Renderable3D , GUIObject , Transparent> () );
+		enttxsol.RunEngineSystem ( engineResources , PopulateDefault , std::tuple<GUIObject , Transparent> () );
+		enttxsol.RunEngineSystem ( engineResources , PopulateTransparent );
+		enttxsol.RunEngineSystem ( engineResources , PopulateGUI );
+
 		if ( !isPause )
 		{
 			SystemTimer::StartTimeSegment ( "ExampleSystem" );
@@ -87,7 +102,10 @@ namespace god
 		SystemTimer::StartTimeSegment ( "Physics Frame End" );
 		enttxsol.RunEngineSystem ( engineResources , DebugDynamic );
 		enttxsol.RunEngineSystem ( engineResources , DebugStatic );
-
+		enttxsol.RunEngineSystem(engineResources, RayCastDynamic);
+		enttxsol.RunEngineSystem(engineResources, RayCastStatic);
+		
+			
 		SystemTimer::EndTimeSegment ( "Physics Frame End" );
 
 		if ( !enttxsol.m_pause )
@@ -97,10 +115,12 @@ namespace god
 			enttxsol.RunEngineSystem ( engineResources , RigidDynamicFrameEnd );
 			SystemTimer::EndTimeSegment ( "RigidDynamicFrameEnd" );
 
-			SystemTimer::StartTimeSegment("AudioListenerSystem");
-			enttxsol.RunEngineSystem(engineResources, AudioListenerSystem);
-			SystemTimer::EndTimeSegment("AudioListenerSystem");
+			SystemTimer::StartTimeSegment ( "AudioListenerSystem" );
+			enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
+			SystemTimer::EndTimeSegment ( "AudioListenerSystem" );
 		}
+
+
 
 	}
 

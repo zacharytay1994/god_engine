@@ -27,10 +27,24 @@ namespace god
 		glm::mat4 GODCAMERA_API GetPerpectiveProjectionMatrix ();
 		glm::mat4 GODCAMERA_API GetOrthographicProjectionMatrix ( float width , float height );
 		glm::mat4 GODCAMERA_API GetCameraViewMatrix ();
-		glm::mat4 GODCAMERA_API GetCameraViewFaceCamera ();
+		float GODCAMERA_API GetCameraFaceAngle ();
+
+		// interpolate movement stuff
+		glm::vec3 m_next_position { m_position };
+		glm::vec3 m_next_look_at { m_look_at };
+		float m_camera_move_speed { 5.0f };
+		float m_camera_pan_speed { 5.0f };
+		const float m_epsilon { 0.001f };
+
+		void GODCAMERA_API SetPosition ( glm::vec3 const& position );
+		void GODCAMERA_API SetLookAt ( glm::vec3 const& lookAt );
+		void GODCAMERA_API SetNextPosition ( glm::vec3 const& position );
+		void GODCAMERA_API SetNextLookAt ( glm::vec3 const& lookat );
+		void GODCAMERA_API InterpolateCameraState ( float dt );
 
 		// camera modes
 		// free camera
+		bool m_free_camera_active { false };
 		float m_free_camera_speed { 1.0f };
 		float m_free_camera_sensitivity { 0.3f };
 		float m_free_camera_scroll_sensitivity { 1000.0f };

@@ -73,10 +73,10 @@ namespace god
 		// setup camera
 		Camera camera;
 		camera.UpdateAspectRatio ( window.GetWindowWidth () , window.GetWindowHeight () );
-		camera.m_pitch = -25.0f;
-		camera.m_yaw = 155.0f;
-		//camera.m_look_at = { 0,0,0 };
-		camera.m_position = { -2,7,-10 };
+		//camera.m_pitch = -25.0f;
+		//camera.m_yaw = 155.0f;
+		camera.SetLookAt ( { 1,0,-2 } );
+		camera.SetPosition ( { 8,10,2 } );
 		//float scene_camera_zoom_distance { 20.0f };
 		glm::vec3 scene_camera_position_offset { 0.0f };
 
@@ -179,7 +179,7 @@ namespace god
 			enttxsol.Update ( engine_resources );
 			SystemTimer::EndTimeSegment ( "EnTT Update" );
 			SystemTimer::StartTimeSegment ( "Populating Scene" );
-			enttxsol.PopulateScene<Scene , Transform , Renderable3D , Fonts> ( scene , fonts );
+			enttxsol.PopulateScene<Scene , Transform , Renderable3D , Fonts> ( scene , fonts , camera.m_position );
 			SystemTimer::EndTimeSegment ( "Populating Scene" );
 
 			//Physics Simulate update
@@ -211,7 +211,6 @@ namespace god
 				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,
 				camera.GetCameraViewMatrix () ,
-				camera.GetCameraViewFaceCamera () ,
 				camera.m_position ,
 				ogl_textures ,
 				camera_front );
@@ -301,6 +300,14 @@ namespace god
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );
 
+			if ( window.KeyPressed ( GLFW_KEY_M ) )
+			{
+				camera.SetNextPosition ( { 5,5,5 } );
+				camera.SetNextLookAt ( { 1,0,0 } );
+			}
+
+			camera.InterpolateCameraState ( DeltaTimer::m_dt );
+
 			EngineSystemsFrameEnd ( enttxsol , engine_resources );
 
 			// update FMOD system
@@ -318,6 +325,7 @@ namespace god
 				auto scene_tree = editor_windows.GetWindow<EW_SceneTree> ();
 				scene_tree->Reset ();
 				scene_tree->m_select_hierarchy_tab = true;
+				scene_tree->SetSelectedScene ( scene_to_change );
 #endif
 
 				EntityGrid& grid = engine_resources.Get<EntityGrid> ().get ();
@@ -345,7 +353,7 @@ namespace god
 				window.m_fullscreen = !window.m_fullscreen;
 			}
 
-
+			scene.ClearInstancedScene ();
 			delta_timer.EndFrame ();
 			SystemTimer::EndTimeSegment ( "Overall" );
 

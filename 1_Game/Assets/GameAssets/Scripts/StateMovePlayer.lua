@@ -10,7 +10,8 @@ function C_StateMovePlayer()
         --[SerializeString]
         GlobalStatemachine = "GlobalStatemachine",
         State = "MovePlayer",
-        Time = 0.0
+        Time = 0.0,
+        callEnemyForecast = false
     }
     return function()
         return var
@@ -39,6 +40,10 @@ function S_StateMovePlayer(e)
 
             -- do not allow movement if no more stamina
             if (GetComponent(e, "C_Character").currentStamina <= 0) then
+                print("[StateMovePlayer.lua] Player stamina has reached zero! Refreshing enemy forecasts and returning.")
+                -- GetComponent(e, "C_Player").selectedAction = nil
+                
+                RefreshEnemyForecast()
                 return
             end
 
@@ -57,11 +62,20 @@ function S_StateMovePlayer(e)
                         pathfind.y = gm.last_clicked_cell.y
                         pathfind.z = gm.last_clicked_cell.z
                         pathfind.Path = true
+
+                        stateMovePlayerComponent.callEnemyForecast = true
                     end
 
                     local playerGridCell = GetGridCell(e)
                     if (playerGridCell.x == gm.last_clicked_cell.x and playerGridCell.y == gm.last_clicked_cell.y and playerGridCell.z == gm.last_clicked_cell.z) then
                         pathfind.Path = false
+                        -- GetComponent(e, "C_Player").selectedAction = nil
+
+                        if (stateMovePlayerComponent.callEnemyForecast) then
+                            print("[StateMovePlayer.lua] Player has reached destination! Refreshing enemy forecasts.")
+                            RefreshEnemyForecast()
+                            stateMovePlayerComponent.callEnemyForecast = false
+                        end
                     end
                 end             
             end            

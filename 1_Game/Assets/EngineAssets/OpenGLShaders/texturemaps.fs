@@ -164,7 +164,7 @@ float ShadowCalculation( vec4 fragPosLightSpace , vec3 lightPosition )
     return shadow;
 }
 
-vec3 PointLight( int i )
+vec3 PointLight( int i , vec4 diffuseColor , vec4 specularColor )
 {
     vec3 normal = normalize( vNormal );
     vec3 light_to_frag = uPointLight[i].position - vWorldPos;
@@ -177,14 +177,13 @@ vec3 PointLight( int i )
     vec3 reflect_direction = reflect( -light_direction , normal );
 
     // ambient
-    vec4 ambient = vec4( ( uPointLight[i].colour * uPointLight[i].ambient ) , 1.0 ) * texture( uMaterial.diffuse_map , vUV ) * distance_clamp;
+    vec4 ambient = vec4( ( uPointLight[i].colour * uPointLight[i].ambient ) , 1.0 ) * diffuseColor * distance_clamp;
 
     // diffuse
     float diffuse_scalar = max( dot( normal , light_direction ) , 0.0 );
     diffuse_scalar *= attenuation * distance_clamp;
 
-    // vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * vec4(pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma)),1.0));
-    vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * vec4(texture(uMaterial.diffuse_map, vUV).rgb,1.0));
+    vec4 diffuse = vec4((uPointLight[i].colour * uPointLight[i].diffuse), 1.0) * (diffuse_scalar * vec4(diffuseColor.rgb,1.0));
 
     // cubemap reflection
     vec3 I = normalize( vWorldPos - uViewPosition ); //--
@@ -195,73 +194,39 @@ vec3 PointLight( int i )
     // specular
     float specular_scalar = pow( max( dot( view_direction , reflect_direction ) , 0.0 ) , uMaterial.shininess );
     specular_scalar *= attenuation;
-    vec4 specular = cubemap_colour * ( specular_scalar * texture( uMaterial.specular_map , vUV ) );
+    vec4 specular = cubemap_colour * ( specular_scalar * specularColor );
 
     // calculate shadow
-    // float shadow = ShadowCalculation(vFragPosLightSpace);
-    return vec3( ( ambient + ( ( light_max_distance - light_distance ) / light_max_distance ) * ( diffuse + specular ) ) * texture( uMaterial.diffuse_map , vUV ) );
-    // return vec3((ambient + (1.0 - shadow) * (diffuse + specular)) * texture(uMaterial.diffuse_map, vUV));
+    return vec3( ( ambient + ( ( light_max_distance - light_distance ) / light_max_distance ) * ( diffuse + specular ) ) * diffuseColor );
 }
 
-vec3 DirectLight( int i , float shadow )
+vec3 DirectLight( int i , float shadow , vec4 diffuseColor , vec4 specularColor )
 {
     // ambient
-    vec3 ambient = uDirectionalLight[i].ambient * texture( uMaterial.diffuse_map , vUV ).rgb;
+    vec3 ambient = uDirectionalLight[i].ambient * diffuseColor.rgb;
 
     // diffuse
 	vec3 normal = normalize(vNormal);
     vec3 light_direction = normalize(-uDirectionalLight[i].direction);
     float diffuse_scalar = max(dot(normal, light_direction), 0.0);
-    // vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * pow(texture(uMaterial.diffuse_map, vUV).rgb,vec3(gamma));
-    vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * texture(uMaterial.diffuse_map, vUV).rgb;
+    vec3 diffuse = uDirectionalLight[i].diffuse * diffuse_scalar * diffuseColor.rgb;
 
     // specular
     vec3 view_direction = normalize( uViewPosition - vWorldPos );
     vec3 reflect_direction = reflect( -light_direction , normal );
     float specular_scalar = pow( max( dot( view_direction , reflect_direction ) , 0.0 ) , uMaterial.shininess );
-    vec3 specular = uDirectionalLight[i].specular * specular_scalar * texture( uMaterial.specular_map , vUV ).rgb;
+    vec3 specular = uDirectionalLight[i].specular * specular_scalar * specularColor.rgb;
 
     return vec3( ambient + ( 1.0 - shadow ) * ( diffuse + specular ) );
 }
 
-vec3 SpotLight( )
-{
-    // ambient
-    vec3 ambient = uSpotLight.ambient * texture( uMaterial.diffuse_map , vUV ).rgb;
-
-    // diffuse
-    vec3 normal = normalize( vNormal );
-    vec3 light_direction = normalize( uSpotLight.position - vWorldPos );
-    float diffuse_scalar = max( dot( normal , light_direction ) , 0.0 );
-    vec3 diffuse = uSpotLight.diffuse * diffuse_scalar * texture( uMaterial.diffuse_map , vUV ).rgb;
-
-    // specular
-    vec3 view_direction = normalize( uSpotLight.viewPos - vWorldPos );
-    vec3 reflect_direction = reflect( -light_direction , normal );
-    float specular_scalar = pow( max( dot( view_direction , reflect_direction ) , 0.0 ) , uMaterial.shininess );
-    vec3 specular = uSpotLight.specular * specular_scalar * texture( uMaterial.specular_map , vUV ).rgb;
-
-    // spotlight (soft edges)
-    float theta = dot( light_direction , normalize( -uSpotLight.direction ) );
-    float epsilon = ( uSpotLight.cutOff - uSpotLight.outerCutOff );
-    float intensity = clamp( ( theta - uSpotLight.outerCutOff ) / epsilon , 0.0 , 1.0 );
-    diffuse *= intensity;
-    specular *= intensity;
-
-    // attenuation
-    float distance = length( uSpotLight.position - vWorldPos );
-    float attenuation = 1.0 / ( uSpotLight.constant + uSpotLight.linear * distance + uSpotLight.quadratic * ( distance * distance ) );
-
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
-
-    return vec3( ambient + diffuse + specular );
-}
-
 void main( )
 {
+    // pre-read variables
     vec4 output_color = vec4( 0 );
+    vec4 diffuse_color = texture( uMaterial.diffuse_map , vUV );
+    vec4 specular_color = texture( uMaterial.specular_map , vUV );
+
     // calculate shadow
     vec3 light_position = normalize( vec3( 0 , 0 , 0 ) );
     if ( uNumDirectionalLight > 0 )
@@ -274,42 +239,34 @@ void main( )
     vec3 point_lights_value = vec3( 0 , 0 , 0 );
     for ( int i = 0; i < uNumPointLight; ++i )
     {
-        point_lights_value += PointLight( i );
+        point_lights_value += PointLight( i , diffuse_color , specular_color );
     }
 
     // calculate directional lights
     vec3 directional_lights_value = vec3( 0 , 0 , 0 );
     for ( int i = 0; i < 1; ++i )
     {
-        directional_lights_value += DirectLight( i , shadow );
+        directional_lights_value += DirectLight( i , shadow , diffuse_color , specular_color );
     }
 
     output_color = vec4( ( point_lights_value + directional_lights_value ) , 1.0 );
 
     // emissive
-    // output_color *= uEmissive;
-    output_color += uEmissive * texture( uMaterial.diffuse_map , vUV );
+    output_color += uEmissive * diffuse_color;
 
+    // render to hdr texture if pass certain threshold
     float brightness = dot( output_color.rgb , vec3( 0.2126 , 0.7152 , 0.0722 ) );
-    // float brightness = dot(output_color.rgb, vec3(50.2126, 50.7152, 50.0722));
     if ( brightness > 10.0 )
         fBrightColor = vec4( output_color.rgb , 1.0 );
     else
         fBrightColor = vec4( 0.0 , 0.0 , 0.0 , 1.0 );
 
-    //apply fog calculation only if fog is enabled
+    // apply fog calculation only if fog is enabled
     if ( uFogParams.isEnabled )
     {
         float fogCoordinate = abs( vEyeSpacePosition.z / vEyeSpacePosition.w );
         output_color = mix( output_color , vec4( uFogParams.color , 1.0 ) , getFogFactor( uFogParams , fogCoordinate ) );
     }
-
-    // apply toon shading
-    // float toon_shading_intensity = dot(output_color.xyz,normalize(vNormal));
-    // if (toon_shading_intensity > 0.25) 
-    //     output_color = vec4((output_color - mod( output_color , 0.1 )).xyz,1.0);
-    // else 
-    //     output_color = vec4(0.1,0.1,0.1,1.0);
 
     // bind caustic 
     float c_x = ( vWorldPos.x + 10.0 ) / 20.0;
@@ -321,12 +278,5 @@ void main( )
 
     output_color += vec4( caustic_color , 1.0 );
 
-    if ( uIsTint )
-    {
-        output_color = vec4( output_color.x + ( ( 1 - output_color.x ) * uTint.x ) , output_color.y + ( ( 1 - output_color.y ) * uTint.y ) , output_color.z + ( ( 1 - output_color.z ) * uTint.z ) , output_color.w + ( ( 1 - output_color.w ) * uTint.w ) );
-    }
-
-    // output_color += vec4( uEmissive , uEmissive , uEmissive , 1 );
-
-    fFragColor = vec4(output_color.rgb,texture(uMaterial.diffuse_map, vUV).a);
+    fFragColor = vec4(output_color.rgb,diffuse_color.a);
 }
