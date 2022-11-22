@@ -184,7 +184,7 @@ namespace god
 
 			//Physics Simulate update
 			SystemTimer::StartTimeSegment ( "Physics System" );
-			//godPhysicsSystem.Update ( delta_timer.m_dt , enttxsol.m_pause );
+			godPhysicsSystem.Update ( delta_timer.m_dt , enttxsol.m_pause );
 			SystemTimer::EndTimeSegment ( "Physics System" );
 
 			// render scene
