@@ -16,6 +16,7 @@ function S_MainmenuToGame(e)
 
     if(gui_object.pressed and screen.isSelected == false) then
         ChangeScene("Level_1",true)
+        SceneName = "Level_1"
         screen.isSelected = true
     end
 end
