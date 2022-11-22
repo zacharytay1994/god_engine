@@ -762,6 +762,10 @@ function EnemyAttackDummeeApplyPushback(dummee, victim)
     -- and if it's a destructible object, destroy it
     print("[EnemyAttackDummee.lua] TODO: remove non-character entities from affectedEntities. Game will crash if pushback is applied to non-character entities.")
     -- EnemyAttackDummeeRemoveNonCharacters(affectedEntities)
+    if (EnemyAttackDummeeListContainsUnmovable(affectedEntities)) then
+        print("[EnemyAttackDummee.lua] affectedEntities contain a floor tile or ice tile, cannot push characters back.")
+        return
+    end
 
     -- for each entity in affectedEntities, push back 1 tile
     for k = 1, #affectedEntities do
@@ -864,6 +868,62 @@ function EnemyAttackDummeeApplyPushback(dummee, victim)
         end
     end
 end
+
+function EnemyAttackDummeeListContainsUnmovable(affectedEntities)
+
+    local allTiles = EntitiesWithScriptComponent("C_FloorTile")
+    local destructibleObjects = EntitiesWithScriptComponent("C_DestructibleObject")
+
+    for i = 1, #affectedEntities do
+    
+        for j = 1, #allTiles do    
+            if (allTiles[j] == affectedEntities[i]) then
+                --this affectedEntity is a floortile, return true
+                return true
+            end
+        end
+
+        for k = 1, #destructibleObjects do
+            if (destructibleObjects[k] == affectedEntities[i]) then
+                -- this affectedEntity is a destructible object, return true
+                return true
+            end
+        end    
+    end
+end
+
+-- -- affectedEntities is a list of entities continously behind the victim (including the victim)
+-- function EnemyAttackDummeeRemoveNonCharacters(affectedEntities)
+
+--     local allTiles = EntitiesWithScriptComponent("C_FloorTile")
+--     local destructibleObjects = EntitiesWithScriptComponent("C_DestructibleObject")
+--     local removeFromList = false
+
+--     for i = 1, #affectedEntities do
+    
+--         for j = 1, #allTiles do    
+--             if (allTiles[j] == affectedEntities[i]) then
+--                 --this affectedEntity is a floortile, remove it from affectedEntities
+--                 removeFromList = true
+--             end
+--         end
+
+--         for k = 1, #destructibleObjects do
+--             if (destructibleObjects[k] == affectedEntities[i]) then
+--                 -- this affectedEntity is a destructible object, remove it from affectedEntities
+--                 removeFromList = true
+--             end
+--         end
+
+--         if (removeFromList) then
+--             affectedEntities[i] = nil
+--         end
+    
+--     end
+
+--     -- may need to re-sort the list
+
+-- end
 
 -- checks if there is a character below the entity being pushed back
 -- if there is then the character below will get squashed to death
