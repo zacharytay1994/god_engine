@@ -7,6 +7,8 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct AudioSource
 	{
+		UINTLL m_dsp_clock;
+
 		FMOD::Channel* m_channel{ nullptr };
 		const char* m_channel_group_name{ "" };
 		int m_channel_group_id{ 0 }; // to seperate sounds into different categories

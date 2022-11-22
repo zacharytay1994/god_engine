@@ -12,6 +12,7 @@ namespace god
 		AudioAPI::LoadSound(soundPath.c_str(), *this);
 	}
 
+	// AudioAPI members
 	FMOD::System* AudioAPI::m_FMOD_system;
 	FMOD::ChannelGroup* AudioAPI::m_master_channel_group;
 	FMOD::SoundGroup* AudioAPI::m_master_sound_group;
@@ -27,23 +28,23 @@ namespace god
 	std::vector<Sound> AudioAPI::m_extra_sounds;
 
 	// DSP Effects
+	int AudioAPI::m_sample_rate;
+
 	FMOD::DSP* AudioAPI::dsp_echo;
+	std::unordered_map <int, FMOD::DSP* > m_dsp_effects;
+
+	std::unordered_map<int, const char*> AudioAPI::m_dsp_effects_names =
+	{
+		{ 1, "Echo" }, { 2, "Fade" }
+	};
 
 	AudioAPI::AudioAPI()
 	{
-		FMOD_RESULT result = FMOD::System_Create(&m_FMOD_system);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
-
+		ErrorCheck(FMOD::System_Create(&m_FMOD_system));
 		m_FMOD_system->init(FMOD_MAX_CHANNEL_WIDTH, FMOD_INIT_NORMAL, NULL);
 
-		result = m_FMOD_system->getMasterChannelGroup(&m_master_channel_group);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
-
-		result = m_FMOD_system->getMasterSoundGroup(&m_master_sound_group);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
+		ErrorCheck(m_FMOD_system->getMasterChannelGroup(&m_master_channel_group));
+		ErrorCheck(m_FMOD_system->getMasterSoundGroup(&m_master_sound_group));
 
 		for (const auto& name : m_channel_group_names)
 		{
@@ -53,7 +54,12 @@ namespace god
 			m_channel_groups.insert({ name.first, CreateChannelGroup(name.second) });
 		}
 
-		result = m_FMOD_system->createDSPByType(FMOD_DSP_TYPE_HIGHPASS, &dsp_echo);
+		// DSP Effects
+		{
+			ErrorCheck(m_FMOD_system->getSoftwareFormat(&m_sample_rate, nullptr, nullptr));
+
+			ErrorCheck(m_FMOD_system->createDSPByType(FMOD_DSP_TYPE_HIGHPASS, &dsp_echo));
+		}
 
 		std::cerr << "AudioAPI created\n";
 	}
@@ -89,10 +95,7 @@ namespace god
 	FMOD::ChannelGroup* AudioAPI::CreateChannelGroup(const char* name)
 	{
 		FMOD::ChannelGroup* channel_group = nullptr;
-
-		FMOD_RESULT result = m_FMOD_system->createChannelGroup(name, &channel_group);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
+		ErrorCheck(m_FMOD_system->createChannelGroup(name, &channel_group));
 
 		return channel_group;
 	}
@@ -121,9 +124,7 @@ namespace god
 
 	void AudioAPI::LoadSound(const char* filePath, FMOD::Sound** sound)
 	{
-		FMOD_RESULT result = m_FMOD_system->createSound(filePath, FMOD_DEFAULT, 0, sound);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
+		ErrorCheck(m_FMOD_system->createSound(filePath, FMOD_DEFAULT, 0, sound));
 	}
 
 	void AudioAPI::LoadSound(const char* filePath, Sound& sound)
@@ -133,9 +134,7 @@ namespace god
 
 		if (!sound.m_sound_sample)
 		{
-			FMOD_RESULT result = m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample);
-			if (result != FMOD_OK)
-				assert(FMOD_ErrorString(result));
+			ErrorCheck(m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample));
 		}
 
 		std::string path{ filePath };
@@ -231,7 +230,40 @@ namespace god
 
 	void AudioAPI::AddEchoEffect(FMOD::Channel* channel)
 	{
-		channel->addDSP(0, dsp_echo);
+		ErrorCheck(channel->addDSP(0, dsp_echo));
+	}
+
+	void AudioAPI::AddFadeInEffect(FMOD::Channel* channel, UINTLL dspClock, float fadeInPoint)
+	{
+		channel->setPaused(true);
+
+		ErrorCheck(channel->addFadePoint(dspClock, 0.f));
+		ErrorCheck(channel->addFadePoint(dspClock + static_cast<UINTLL>((m_sample_rate * fadeInPoint)), 1.f));
+
+		channel->setPaused(false);
+	}
+
+	void AudioAPI::AddFadeOutEffect(FMOD::Channel* channel, UINTLL dspClock, float fadeOutPoint)
+	{
+		channel->setPaused(true);
+
+		ErrorCheck(channel->addFadePoint(dspClock, 1.f));
+		ErrorCheck(channel->addFadePoint(dspClock + static_cast<UINTLL>((m_sample_rate * fadeOutPoint)), 0.f));
+		ErrorCheck(channel->setDelay(0, dspClock + static_cast<UINTLL>((m_sample_rate * fadeOutPoint)), true)); // delay to stop sound
+
+		channel->setPaused(false);
+	}
+
+
+
+	int AudioAPI::GetSampleRate()
+	{
+		return m_sample_rate;
+	}
+
+	void AudioAPI::GetDSPClock(FMOD::Channel* channel, UINTLL& dspClock)
+	{
+		ErrorCheck(channel->getDSPClock(0, &dspClock));
 	}
 
 
