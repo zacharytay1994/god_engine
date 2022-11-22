@@ -25,9 +25,8 @@ function S_StairsToNextLevel(e)
     --     print (EntityName(e), "GridCell location:", cell.x, cell.y, cell.z)
     -- end
 
-    if(player.isDead == false and stairs.trigger == false)
+    if(stairs.trigger == false)
     then
-        print ("Player is alive")
         if(player_grid_cell.x == cell.x and player_grid_cell.y == cell.y + 1 and player_grid_cell.z == cell.z)
         then
             ChangeScene("Level_2",true)
