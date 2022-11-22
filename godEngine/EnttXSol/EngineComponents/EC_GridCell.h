@@ -14,6 +14,13 @@ namespace god
 		int32_t m_cell_ox { 0 } , m_cell_oy { 0 } , m_cell_oz { 0 };
 		bool m_initialized { false };
 
+		// extra parameters for cells
+		bool m_passable { false };
+		bool m_steppable { true };
+
+		// flag this to true if wish for the cell to update
+		bool m_changed { false };
+
 		bool operator==( GridCell const& rhs )
 		{
 			return m_cell_x == rhs.m_cell_x &&
@@ -29,7 +36,9 @@ namespace god
 			"x" , &GridCell::m_cell_x ,
 			"y" , &GridCell::m_cell_y ,
 			"z" , &GridCell::m_cell_z ,
-			"cell_size" , &GridCell::m_cell_size );
+			"cell_size" , &GridCell::m_cell_size ,
+			"passable", &GridCell::m_passable,
+			"steppable", &GridCell::m_steppable);
 	}
 	template<>
 	inline void ComponentInspector::operator() < GridCell > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
@@ -52,6 +61,10 @@ namespace god
 				ImGui::SetNextItemWidth ( width / 4 );
 				ImGui::DragInt ( "Z" , &component.m_cell_z );
 
+				ImGui::Checkbox ( "Passable" , &component.m_passable );
+				ImGui::Checkbox ( "Steppable" , &component.m_steppable );
+				ImGui::Checkbox ( "Changed" , &component.m_changed );
+
 				ImGui::Text ( "Cell Size: %.3f" , component.m_cell_size );
 			} );
 	}
@@ -65,6 +78,8 @@ namespace god
 		RapidJSON::JSONifyToValue ( value , document , "cell_y" , component.m_cell_y );
 		RapidJSON::JSONifyToValue ( value , document , "cell_z" , component.m_cell_z );
 		RapidJSON::JSONifyToValue ( value , document , "cell_size" , component.m_cell_size );
+		RapidJSON::JSONifyToValue ( value , document , "passable" , component.m_passable );
+		RapidJSON::JSONifyToValue ( value , document , "steppable" , component.m_steppable );
 	}
 
 	template<>
@@ -76,5 +91,7 @@ namespace god
 		AssignIfExist ( jsonObj , component.m_cell_y , "cell_y" );
 		AssignIfExist ( jsonObj , component.m_cell_z , "cell_z" );
 		AssignIfExist ( jsonObj , component.m_cell_size , "cell_size" );
+		AssignIfExist ( jsonObj , component.m_passable , "passable" );
+		AssignIfExist ( jsonObj , component.m_steppable , "steppable" );
 	}
 }
