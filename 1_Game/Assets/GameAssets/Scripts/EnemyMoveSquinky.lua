@@ -140,8 +140,6 @@ function S_EnemyMoveSquinky(e)
                 moveComponent.executeMove = false
                 GetComponent(e, "C_EnemyController").hasMoved = true
                 print("[EnemyMoveSquinky.lua] Destination reached!")
-                
-            
             end
             
 
@@ -153,10 +151,10 @@ function S_EnemyMoveSquinky(e)
                 moveComponent.Time = 0
                 moveComponent.startedPathfind = false
 
-                GetComponent(entity, "C_EnemyController").movementForecast = false
-                GetComponent(entity, "C_EnemyController").attackForecast = true
-
                 moveComponent.executeMove = false
+                GetComponent(e, "C_EnemyController").movementForecast = false
+                GetComponent(e, "C_EnemyController").attackForecast = true
+
                 print("[EnemyMoveSquinky.lua] Forecast Indicator has suitable tiles to move to, staying still.")
                 return
             
@@ -219,12 +217,44 @@ function EnemyMoveSquinkySuitablePath(Squinky, targetEntity)
        end  
     end
 
-    local shortestDistance = 1000
-    for j = 1, #allCandidates do
-        if (EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget) < shortestDistance and EnemyMoveSquinkyCandidateUnoccupied(allCandidates[j])) then
-            shortestDistance = EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget)
-            tileToMoveTo = allCandidates[j]
-        end
+    -- checking if player is standing on an iceTile instead of a floor tile
+    if (tileBelowTarget == nil) then
+    
+        local iceTileList = EntitiesWithScriptComponent("C_IceTile")
+
+        for j = 1, #iceTileList do
+
+            -- location of the current tile
+            local currentGridCell = GetGridCell(iceTileList[j])
+
+            -- if the current tile is the one that the target is standing on, store it in tileBelowTarget
+            if (currentGridCell.x == destinationGridCell.x and currentGridCell.y == destinationGridCell.y - 1 and currentGridCell.z == destinationGridCell.z) then
+                tileBelowTarget = iceTileList[j]
+
+            -- elseif the current tile is directly adjacent or diagonal to Squinky
+            elseif (currentGridCell.x == squinkyGridCell.x and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1 or -- behind player
+            currentGridCell.x == squinkyGridCell.x and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z + 1 or -- in front of player
+            currentGridCell.z == squinkyGridCell.z and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.x == squinkyGridCell.x - 1 or -- to the right
+            currentGridCell.z == squinkyGridCell.z and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.x == squinkyGridCell.x + 1 or
+            currentGridCell.x == squinkyGridCell.x + 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z + 1 or -- forward right
+            currentGridCell.x == squinkyGridCell.x + 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1 or -- backward right
+            currentGridCell.x == squinkyGridCell.x - 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z + 1 or -- forward left
+            currentGridCell.x == squinkyGridCell.x - 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1) then -- to the left
+                
+                -- add current tile to adjacentCandidates
+                allCandidates[#allCandidates + 1] = iceTileList[j]       
+            end  
+        end   
+    end
+
+    if (tileBelowTarget ~= nil) then
+        local shortestDistance = 1000
+        for j = 1, #allCandidates do
+            if (EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget) < shortestDistance and EnemyMoveSquinkyCandidateUnoccupied(allCandidates[j])) then
+                shortestDistance = EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget)
+                tileToMoveTo = allCandidates[j]
+            end
+        end 
     end
 
     return tileToMoveTo

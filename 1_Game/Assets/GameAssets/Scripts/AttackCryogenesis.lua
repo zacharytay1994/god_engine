@@ -92,7 +92,7 @@ function S_AttackCryogenesis(e)
         transformComponent.rotation.y = attackComponent.playerRotation
 
         -- create an instance of a blue tile
-        InstancePrefabParentedOnGrid(GetEntity("Floor"), "IceTile", attackComponent.iceLocation[1], attackComponent.iceLocation[2], attackComponent.iceLocation[3])
+        local iceTile = InstancePrefabParentedOnGridNow(GetEntity("Floor"), "IceTile", attackComponent.iceLocation[1], attackComponent.iceLocation[2], attackComponent.iceLocation[3])
 
         -- no screenshake for cryo
         
