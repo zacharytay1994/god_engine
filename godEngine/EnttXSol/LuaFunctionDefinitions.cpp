@@ -517,6 +517,7 @@ namespace god
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setLinearVelocity ( ConvertToPhysXVector ( { x, y, z } ) );
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->clearForce();
 					}
 				}
 			}
@@ -535,9 +536,7 @@ namespace god
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_SIMULATION , false );
-						std::cout << "---ADDING FORCE1...." << std::endl;
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->addForce ( ConvertToPhysXVector ( { x, y, z } ) );
-						std::cout << "---ADDING FORCE2...." << std::endl;
 					}
 				}
 			}
@@ -556,6 +555,7 @@ namespace god
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_SIMULATION , freeze );
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_GRAVITY ,    freeze );
 						entt.GetEngineComponent<RigidDynamic>(e)->Active = !freeze;
 					}
 				}

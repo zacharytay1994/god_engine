@@ -12,14 +12,14 @@ end
 
 --[IsSystem]
 function S_StairsToNextLevel(e)
-    print("Hi")
+
     local player = GetEntity("Player")
     --local player = GetComponent(e, "C_Character")
     local player_grid_cell = GetGridCell(player)
     local stairs = GetComponent(e, "C_StairsToNextLevel")
     
     local cell = GetGridCell(e)
-    print (cell.x , cell.y , cell.z)
+    -- print (cell.x , cell.y , cell.z)
     -- if(player.characterType == "Player" and player.isDead == false)
     -- then
     --     print (EntityName(e), "GridCell location:", cell.x, cell.y, cell.z)
