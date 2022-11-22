@@ -14,6 +14,7 @@ namespace god
 		uint32_t m_specular_id { 0 };
 		float m_shininess { 32.0f };
 		float m_emissive { 0.0f };
+		bool m_visible { true };
 
 		bool operator==( Renderable3D const& rhs )
 		{
@@ -29,7 +30,8 @@ namespace god
 	inline void NewLuaType<Renderable3D> ( sol::state& luaState , std::string const& name )
 	{
 		RegisterLuaType<Renderable3D> ( luaState , name ,
-			"model_id" , &Renderable3D::m_model_id );
+			"model_id" , &Renderable3D::m_model_id ,
+			"visible" , &Renderable3D::m_visible );
 	}
 	template<>
 	inline void ComponentInspector::operator() < Renderable3D > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& engineResources )
@@ -167,6 +169,7 @@ namespace god
 
 		// serialize emissive
 		RapidJSON::JSONifyToValue ( value , document , "emissive" , component.m_emissive );
+		RapidJSON::JSONifyToValue ( value , document , "visible" , component.m_visible );
 	}
 
 	template<>
@@ -207,5 +210,6 @@ namespace god
 		}
 
 		AssignIfExist ( jsonObj , component.m_emissive , "emissive" );
+		AssignIfExist ( jsonObj , component.m_visible , "visible" );
 	}
 }
