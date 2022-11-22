@@ -37,11 +37,14 @@ namespace god
 		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
 
 
-
-
-
 		if (rigidstatic.updateRigidStatic)
 		{
+
+
+			if (rigidstatic.locktoscale)
+			{
+				rigidstatic.extents = transform.m_scale;
+			}
 			if (rigidstatic.p_material == nullptr)
 			{
 				rigidstatic.p_material = mPhysics->createMaterial(rigidstatic.StaticFriction, rigidstatic.DynamicFriction, rigidstatic.Restitution);
@@ -114,37 +117,6 @@ namespace god
 		else
 		{
 			rigidstatic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-		}
-
-
-
-
-
-
-
-		if (rigidstatic.locktoscale)
-		{
-			rigidstatic.extents = transform.m_scale;
-
-			switch (rigidstatic.Shapeid)
-			{
-			case PhysicsTypes::Cube:
-				rigidstatic.p_shape->setGeometry(physx::PxBoxGeometry(rigidstatic.extents.x, rigidstatic.extents.y, rigidstatic.extents.z));
-				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
-				break;
-			case PhysicsTypes::Sphere:
-				rigidstatic.p_shape->setGeometry(physx::PxSphereGeometry(rigidstatic.extents.x));
-				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
-				break;
-			case PhysicsTypes::Capsule:
-				rigidstatic.p_shape->setGeometry(physx::PxCapsuleGeometry(rigidstatic.extents.x, rigidstatic.extents.y));
-				rigidstatic.p_shape->setMaterials(&rigidstatic.p_material, 1);
-				break;
-
-			}
-
-
-			
 		}
 
 		rigidstatic.p_RigidStatic->setGlobalPose(physx::PxTransform(transform.m_position.x + rigidstatic.Offset.x,
