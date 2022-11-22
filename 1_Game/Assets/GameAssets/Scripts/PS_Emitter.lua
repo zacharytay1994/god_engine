@@ -19,8 +19,8 @@ function S_PS_Emitter(e)
     if (ps.Timer < ps.EmissionRate) then
         ps.Timer = ps.Timer + dt
     else
-        ps.Timer = 0.0
-        
+        ps.Timer = GenerateRandomNumberInRange(0, 10) / 10.0
+
         local x = GenerateRandomNumberInRange(0, 100) / 100 - 0.5
         local y = GenerateRandomNumberInRange(0, 100) / 100
         local z = GenerateRandomNumberInRange(0, 100) / 100 - 0.5

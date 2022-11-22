@@ -18,7 +18,7 @@ local centerX = 10
 -- random generated seaweeds
 function GenerateRandomSeaweeds(arr)
 
-    for i = 0, 100, 1 do
+    for i = 0, 150, 1 do
         local rng_pos_x = GenerateRandomNumberInRange(minColumns, maxColumns)
         local rng_pos_z = GenerateRandomNumberInRange(minRows, maxRows)
 
@@ -27,11 +27,11 @@ function GenerateRandomSeaweeds(arr)
             -- set seaweed position
             local seaweed_entity = InstancePrefabNow("SS_Seaweed", rng_pos_x, 0, rng_pos_z)
 
-            ChangeModel(seaweed_entity, "Plant_Seaweed0" .. tostring(GenerateRandomNumberInRange(1, 3)))
+            ChangeModel(seaweed_entity, "Plant_Seaweed0" .. tostring(GenerateRandomNumberInRange(1, 4)))
             local seaweed_transform = GetTransform(seaweed_entity)
 
             --set seaweed scale
-            local rng_scale = GenerateRandomNumberInRange(1, 10) / 10.0
+            local rng_scale = GenerateRandomNumberInRange(2, 8) / 10.0
             seaweed_transform.scale.x = rng_scale
             seaweed_transform.scale.y = rng_scale
             seaweed_transform.scale.z = rng_scale
@@ -63,9 +63,64 @@ function GenerateRandomRocks(arr)
             rock_transform.scale.x = rng_scale
             rock_transform.scale.y = rng_scale
             rock_transform.scale.z = rng_scale
-            rock_transform.position.y = rock_transform.position.y + (rock_transform.scale.y / 2.0);
+            rock_transform.position.y = 1.0 * (rock_transform.scale.y / 2.0);
 
             arr[rng_pos_z * maxColumns + rng_pos_x] = true
+        end
+    end
+end
+
+function GenerateRandomCorals(arr)
+    -- lua array starts from 1
+    corals = { "plant02_CoralSticks", "Plant_Coral01", "Plant_Coral02" }
+
+    -- generate random position data
+    for i = 0, 100, 1 do
+        local rng_pos_x = GenerateRandomNumberInRange(minColumns, maxColumns)
+        local rng_pos_z = GenerateRandomNumberInRange(minRows, maxRows)
+        -- create corals
+        if (arr[rng_pos_z * maxColumns + rng_pos_x] == false) then
+            local coral_entity = InstancePrefabNow("SS_Coral", rng_pos_x, 1.01, rng_pos_z)
+
+            ChangeModel(coral_entity, corals[(GenerateRandomNumberInRange(1, 3))])
+
+            -- get corals transformation data
+            local coral_transform = GetTransform(coral_entity)
+
+            -- set transform scale to corals
+            local rng_scale = GenerateRandomNumberInRange(2, 10) / 10.0
+
+            coral_transform.scale.x = rng_scale
+            coral_transform.scale.y = rng_scale
+            coral_transform.scale.z = rng_scale
+            coral_transform.position.y = coral_transform.scale.y
+            coral_transform.rotation.y = (GenerateRandomNumberInRange(1, 18) * 10)
+
+            arr[rng_pos_z * maxColumns + rng_pos_x] = true
+        end
+    end
+end
+
+function PlantBubbleEmitter(arr)
+    for row = minRows, maxRows, 1 do
+        for col = minColumns, maxColumns, 1 do
+            if (arr[row * maxColumns + col] == false) then
+                local plant_bubble_entity = InstancePrefabNow("SS_FloraBubbleEmitter", col, 1, row)
+
+                ChangeTexture(plant_bubble_entity, "2D_Flora_0" .. tostring(GenerateRandomNumberInRange(2, 5)))
+
+
+                local plant_bubble_transform = GetTransform(plant_bubble_entity)
+
+                local rng_scale = GenerateRandomNumberInRange(4, 8) / 10.0
+
+                plant_bubble_transform.scale.x = rng_scale
+                plant_bubble_transform.scale.y = rng_scale
+                plant_bubble_transform.scale.z = rng_scale
+
+                plant_bubble_transform.position.y = plant_bubble_transform.scale.y
+                arr[row * maxColumns + col] = true
+            end
         end
     end
 end
@@ -77,6 +132,7 @@ function GenerateStonePathway()
     end
 end
 
+-- create few seahorses in scene
 function GenerateSeahorse(vel_x, vel_y, vel_z, pos_x, pos_y, pos_z, index)
 
     for i = 0, index, 1 do
@@ -119,13 +175,20 @@ function OnLoad_SplashScreen()
         end
     end
 
+    -- create random rocks in the scene
     GenerateRandomRocks(objs_placement)
+
+    -- create random seaweeds in the scene
     GenerateRandomSeaweeds(objs_placement)
 
+    GenerateRandomCorals(objs_placement)
+
+    PlantBubbleEmitter(objs_placement)
 
     -- create directional light at the door
     InstancePrefab("SS_DirectionalLight", centerX, 10, -10)
 
+    -- create rock below the door
     InstancePrefab("SS_RockFlat", centerX, 0, -7)
 
     -- create door at the end of the corals
@@ -137,6 +200,7 @@ function OnLoad_SplashScreen()
     -- create rectagular plain floor / using precreated prefab
     InstancePrefab("FloorPrefab", centerX, 0, 0)
 
+    -- create large kelp
     InstancePrefab("SS_Kelp", 13, 0.5, -2.8)
 
     InstancePrefab("SS_TreeBranch", 7.5, 1.5, 5.0)
