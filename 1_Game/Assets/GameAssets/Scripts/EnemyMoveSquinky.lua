@@ -62,7 +62,7 @@ function S_EnemyMoveSquinky(e)
     end
                     
     -- allow movement after 1 second has passed
-    if (moveComponent.Time < 0.5) then
+    if (moveComponent.Time < 0.1) then
 
         -- accumulate time
         moveComponent.Time = moveComponent.Time + GetDeltaTime()
@@ -70,16 +70,29 @@ function S_EnemyMoveSquinky(e)
     -- after 1 second has passed and pathfinding has not been initialized
     elseif (moveComponent.startedPathfind == false) then
         
+        if (GetComponent(e, "C_EnemyController").movementForecast) then
+            print("[EnemyMoveSquinky.lua] Start of FORECAST movement for", EntityName(e), entityDataComponent.id)
+        else
+            print("[EnemyMoveSquinky.lua] Start of movement for", EntityName(e), entityDataComponent.id)
+        end
         
-        print("[EnemyMoveSquinky.lua] Start of movement for", EntityName(e), entityDataComponent.id)
-
-        -- if enemy is already beside player or in same lane as player, don't move 
+        -- if enemy is already beside player, don't move 
         if (EnemyMoveSquinkyAdjacentToPlayer(e, playerEntity)) then
-            print("[EnemyMoveSquinky.lua] Squinky is already adjacent to Player, don't move. Returning.")
-            moveComponent.Time = 0
-            moveComponent.executeMove = false
-            GetComponent(e, "C_EnemyController").hasMoved = true
-            return
+            if (GetComponent(e, "C_Character").isActive == true) then
+                print("[EnemyMoveSquinky.lua] Squinky is already adjacent to Player, don't move. Returning.")
+                moveComponent.Time = 0
+                moveComponent.executeMove = false
+                GetComponent(e, "C_EnemyController").hasMoved = true
+                return
+            -- if character is not active, that means it's trying to forecast movement
+            else
+                print("[EnemyMoveSquinky.lua] Squinky is already adjacent to Player, don't move. Returning.")
+                moveComponent.Time = 0
+                moveComponent.executeMove = false
+                GetComponent(e, "C_EnemyController").movementForecast = false
+                GetComponent(e, "C_EnemyController").attackForecast = true
+                return
+            end
 
         -- else, find a suitable tile for Squinky to move to
         else   
@@ -89,34 +102,73 @@ function S_EnemyMoveSquinky(e)
         -- if a suitable tile is found, then set it as target and move towards it
         if (moveComponent.targetTile ~= nil) then 
 
-            -- Cannot use C_Pathfind here because then Squinky will never walk diagonally
+            if (GetComponent(e, "C_EnemyController").movementForecast) then
+                
+                local indicatorEntity = GetComponent(e, "C_EnemyController").indicatorEntity
+                if (indicatorEntity ~= -1 and indicatorEntity ~= nil) then
+
+                    print("[EnemyMoveSquinky.lua] ForecastIndicator starting to move.")
+                    local targetTileGrid = GetGridCell(moveComponent.targetTile)
+                    local indicatorGrid = GetGridCell(indicatorEntity)
+                    indicatorGrid.x = targetTileGrid.x
+                    indicatorGrid.y = targetTileGrid.y + 1
+                    indicatorGrid.z = targetTileGrid.z
+                    
+                    --print("CHECK HERE")
+                    moveComponent.Time = 0
+                    moveComponent.startedPathfind = false
+                    moveComponent.executeMove = false
+                    GetComponent(e, "C_EnemyController").movementForecast = false
+                    GetComponent(e, "C_EnemyController").attackForecast = true
+                    print("[EnemyMoveSquinky.lua] ForecastIndicator done moving!")
+                end
             
-            -- TODO: just teleport squinky here
-            local targetTileGrid = GetGridCell(moveComponent.targetTile)
-            enemyGridCell.x = targetTileGrid.x
-            enemyGridCell.y = targetTileGrid.y + 1
-            enemyGridCell.z = targetTileGrid.z
+            else
+                -- Cannot use C_Pathfind here because then Squinky will never walk diagonally
+            
+                -- TODO: just teleport squinky here
+                local targetTileGrid = GetGridCell(moveComponent.targetTile)
+                enemyGridCell.x = targetTileGrid.x
+                enemyGridCell.y = targetTileGrid.y + 1
+                enemyGridCell.z = targetTileGrid.z
 
+                -- reset variables
+                moveComponent.Time = 0.0
+                moveComponent.startedPathfind = false
+                moveComponent.targetTile = nil
 
-            -- reset variables
-            moveComponent.Time = 0.0
-            moveComponent.startedPathfind = false
-            moveComponent.targetTile = nil
-
-            moveComponent.executeMove = false
-            GetComponent(e, "C_EnemyController").hasMoved = true
-            print("[EnemyMoveSquinky.lua] Destination reached!")
+                moveComponent.executeMove = false
+                GetComponent(e, "C_EnemyController").hasMoved = true
+                print("[EnemyMoveSquinky.lua] Destination reached!")
+            end
+            
 
         -- else if no suitable target tile is found, don't move and end turn
         else
-            -- reset variables
-            moveComponent.Time = 0
-            moveComponent.startedPathfind = false
+            if (GetComponent(e, "C_EnemyController").movementForecast) then
 
-            moveComponent.executeMove = false
-            GetComponent(e, "C_EnemyController").hasMoved = true
-            print("[EnemyMoveSquinky.lua] No suitable tiles to move to, staying still and ending turn.")
-            return
+                -- reset variables
+                moveComponent.Time = 0
+                moveComponent.startedPathfind = false
+
+                moveComponent.executeMove = false
+                GetComponent(e, "C_EnemyController").movementForecast = false
+                GetComponent(e, "C_EnemyController").attackForecast = true
+
+                print("[EnemyMoveSquinky.lua] Forecast Indicator has suitable tiles to move to, staying still.")
+                return
+            
+            else
+
+                -- reset variables
+                moveComponent.Time = 0
+                moveComponent.startedPathfind = false
+
+                moveComponent.executeMove = false
+                GetComponent(e, "C_EnemyController").hasMoved = true
+                print("[EnemyMoveSquinky.lua] No suitable tiles to move to, staying still and ending turn.")
+                return
+            end
         end
     end
 end
@@ -165,15 +217,65 @@ function EnemyMoveSquinkySuitablePath(Squinky, targetEntity)
        end  
     end
 
-    local shortestDistance = 1000
-    for j = 1, #allCandidates do
-        if (EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget) < shortestDistance) then
-            shortestDistance = EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget)
-            tileToMoveTo = allCandidates[j]
-        end
+    -- checking if player is standing on an iceTile instead of a floor tile
+    if (tileBelowTarget == nil) then
+    
+        local iceTileList = EntitiesWithScriptComponent("C_IceTile")
+
+        for j = 1, #iceTileList do
+
+            -- location of the current tile
+            local currentGridCell = GetGridCell(iceTileList[j])
+
+            -- if the current tile is the one that the target is standing on, store it in tileBelowTarget
+            if (currentGridCell.x == destinationGridCell.x and currentGridCell.y == destinationGridCell.y - 1 and currentGridCell.z == destinationGridCell.z) then
+                tileBelowTarget = iceTileList[j]
+
+            -- elseif the current tile is directly adjacent or diagonal to Squinky
+            elseif (currentGridCell.x == squinkyGridCell.x and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1 or -- behind player
+            currentGridCell.x == squinkyGridCell.x and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z + 1 or -- in front of player
+            currentGridCell.z == squinkyGridCell.z and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.x == squinkyGridCell.x - 1 or -- to the right
+            currentGridCell.z == squinkyGridCell.z and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.x == squinkyGridCell.x + 1 or
+            currentGridCell.x == squinkyGridCell.x + 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z + 1 or -- forward right
+            currentGridCell.x == squinkyGridCell.x + 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1 or -- backward right
+            currentGridCell.x == squinkyGridCell.x - 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z + 1 or -- forward left
+            currentGridCell.x == squinkyGridCell.x - 1 and currentGridCell.y == squinkyGridCell.y -1 and currentGridCell.z == squinkyGridCell.z - 1) then -- to the left
+                
+                -- add current tile to adjacentCandidates
+                allCandidates[#allCandidates + 1] = iceTileList[j]       
+            end  
+        end   
+    end
+
+    if (tileBelowTarget ~= nil) then
+        local shortestDistance = 1000
+        for j = 1, #allCandidates do
+            if (EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget) < shortestDistance and EnemyMoveSquinkyCandidateUnoccupied(allCandidates[j])) then
+                shortestDistance = EnemyMoveSquinkyCalculateDistance(allCandidates[j], tileBelowTarget)
+                tileToMoveTo = allCandidates[j]
+            end
+        end 
     end
 
     return tileToMoveTo
+end
+
+function EnemyMoveSquinkyCandidateUnoccupied(candidateTile)
+    
+    local candidateGrid = GetGridCell(candidateTile)
+
+    local entitiesWithGridCell = EntitiesWithEngineComponent("GridCell")
+
+    for i = 1, #entitiesWithGridCell do
+    
+        local currentEntityGrid = GetGridCell(entitiesWithGridCell[i])
+
+        if (candidateGrid.x == currentEntityGrid.x and candidateGrid.y == currentEntityGrid.y - 1 and candidateGrid.z == currentEntityGrid.z) then
+            return false
+        end
+    end
+
+    return true
 end
 
 function EnemyMoveSquinkyAdjacentToPlayer(enemy, player)
