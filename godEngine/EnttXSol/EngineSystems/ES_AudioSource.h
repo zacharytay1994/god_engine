@@ -19,6 +19,8 @@ namespace god
 				// check for playback state
 				AudioAPI::CheckSoundPlayback(audio_source.m_channel, &audio_source.m_finish_playing);
 
+				AudioAPI::AddEchoEffect(audio_source.m_channel);
+
 				AudioAPI::SetMute(audio_source.m_channel, audio_source.m_mute);
 				AudioAPI::SetVolume(audio_source.m_channel, audio_source.m_volume);
 				AudioAPI::SetPitch(audio_source.m_channel, audio_source.m_pitch);

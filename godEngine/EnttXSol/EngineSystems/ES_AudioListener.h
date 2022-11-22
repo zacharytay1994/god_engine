@@ -33,8 +33,11 @@ namespace god
 					if (!audio_source.m_played)
 						AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
 				}
+
 			}
 		}
+
+		AudioAPI::ToggleDSPEffects(audio_listener.dsp_effects_on);
 
 		// 3d sound
 		AudioAPI::GLMVectorToFMODVector(al_transform.m_position, audio_listener.m_position);

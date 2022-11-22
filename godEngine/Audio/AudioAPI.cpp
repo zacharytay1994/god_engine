@@ -26,6 +26,9 @@ namespace god
 
 	std::vector<Sound> AudioAPI::m_extra_sounds;
 
+	// DSP Effects
+	FMOD::DSP* AudioAPI::dsp_echo;
+
 	AudioAPI::AudioAPI()
 	{
 		FMOD_RESULT result = FMOD::System_Create(&m_FMOD_system);
@@ -49,6 +52,8 @@ namespace god
 
 			m_channel_groups.insert({ name.first, CreateChannelGroup(name.second) });
 		}
+
+		result = m_FMOD_system->createDSPByType(FMOD_DSP_TYPE_HIGHPASS, &dsp_echo);
 
 		std::cerr << "AudioAPI created\n";
 	}
@@ -217,6 +222,16 @@ namespace god
 		}
 
 		m_channels.clear();
+	}
+
+	void AudioAPI::ToggleDSPEffects(bool toggle)
+	{
+		dsp_echo->setBypass(!toggle);
+	}
+
+	void AudioAPI::AddEchoEffect(FMOD::Channel* channel)
+	{
+		channel->addDSP(0, dsp_echo);
 	}
 
 

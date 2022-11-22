@@ -13,6 +13,8 @@ namespace god
 		FMOD_VECTOR m_forward;
 		FMOD_VECTOR m_up;
 
+		bool dsp_effects_on = true;
+
 		bool operator==( AudioListener const& rhs )
 		{
 			return m_listener_id == rhs.m_listener_id;
@@ -34,6 +36,8 @@ namespace god
 				ImGui::Separator();
 				ImGui::Text("Audio Listener");
 				ImGui::Separator();
+
+				ImGui::Checkbox("Enable Effects", &component.dsp_effects_on);
 			});
 	}
 

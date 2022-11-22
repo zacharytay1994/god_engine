@@ -61,6 +61,10 @@ namespace god
 		static void StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets);
 
 	public:
+		static void ToggleDSPEffects(bool toggle);
+		static void AddEchoEffect(FMOD::Channel* channel);
+
+	public:
 		static void SetListenerAttributes(const FMOD_VECTOR* position, const FMOD_VECTOR* velocity, const FMOD_VECTOR* forward, const FMOD_VECTOR* up);
 		static void SetSourceAttributes(FMOD::Channel* channel, const FMOD_VECTOR* position, const FMOD_VECTOR* velocity);
 		static void SetMinMaxDistance(FMOD::Channel* channel , float min, float max);
@@ -78,5 +82,8 @@ namespace god
 		static std::unordered_map<int, const char*> m_channel_group_names;
 
 		static std::vector<Sound> m_extra_sounds;
+
+		// DSP Effects
+		static FMOD::DSP* dsp_echo;
 	};
 }
