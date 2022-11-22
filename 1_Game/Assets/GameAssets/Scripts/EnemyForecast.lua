@@ -109,6 +109,31 @@ function RefreshEnemyForecast()
     print("[EnemyForecast.lua] Finished refreshing enemy forecasts!")
 end
 
+function ClearIndicatorsList()
+    
+    print("[EnemyForecast.lua] Clearing indicatorsList!")
+
+    local enemyForecastEntity = GetEntity("EnemyForecast")
+    if (enemyForecastEntity == -1 ) then
+        print("[EnemyForecast.lua] ERROR: EnemyForecast entity cannot be found! Returning.")
+        return
+    end
+
+    local enemyForecastComponent = GetComponent(enemyForecastEntity, "C_EnemyForecast")
+
+    if (#enemyForecastComponent.indicatorsList > 0) then
+        print("[EnemyForecast.lua] Clearing all forecast indicators!")
+        for i = 1, #enemyForecastComponent.indicatorsList do
+            RemoveInstance(enemyForecastComponent.indicatorsList[i])
+            enemyForecastComponent.indicatorsList[i] = nil
+        end
+        print("[EnemyForecast.lua] #indicatorsList:", #enemyForecastComponent.indicatorsList)
+    end
+
+    print("[EnemyForecast.lua] Done clearing indicatorsList!")
+
+end
+
 -- function ForecastAction(enemyEntity, e)
 
     
