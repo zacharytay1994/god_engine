@@ -24,6 +24,30 @@ namespace god
 		struct Cell
 		{
 			std::vector<T> m_values;
+
+			bool Passable ()
+			{
+				for ( auto const& v : m_values )
+				{
+					if ( !v.m_passable )
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+
+			bool Steppable ()
+			{
+				for ( auto const& v : m_values )
+				{
+					if ( v.m_steppable )
+					{
+						return true;
+					}
+				}
+				return false;
+			}
 		};
 
 		// size, x, y, z
@@ -260,7 +284,7 @@ namespace god
 					}
 
 					// case 2: if occupied
-					if ( grid.find ( neighbour_coordinate ) != grid.end () && grid[ neighbour_coordinate ].m_values.size () > 0 )
+					if ( grid.find ( neighbour_coordinate ) != grid.end () && !grid[ neighbour_coordinate ].Passable () )
 					{
 						continue;
 					}
@@ -268,7 +292,7 @@ namespace god
 					// case 3: if cell below nothing
 					Coordinate floor = neighbour_coordinate;
 					std::get<1> ( floor ) -= 1;
-					if ( !( grid.find ( floor ) != grid.end () && grid[ floor ].m_values.size () > 0 ) )
+					if ( !( grid.find ( floor ) != grid.end () && grid[ floor ].m_values.size () > 0 && grid[ floor ].Steppable () ) )
 					{
 						continue;
 					}
@@ -350,12 +374,14 @@ namespace god
 	struct Grid3DCell
 	{
 		uint32_t m_entity_id;
-		bool m_solid;
+		bool m_passable;
+		bool m_steppable;
 
-		Grid3DCell ( uint32_t entityID , bool solid = true )
+		Grid3DCell ( uint32_t entityID , bool passable = false , bool steppable = false )
 			:
 			m_entity_id ( entityID ) ,
-			m_solid ( solid )
+			m_passable ( passable ) ,
+			m_steppable ( steppable )
 		{
 
 		}
