@@ -7,6 +7,7 @@
 -- TODO:
 -- 1) Currently dice color is not checked, cryo is allowed to freeze everything
 -- 2) IceTileScript (for melting the ice and dealing DoT to any character inside)
+-- 3) Un-hardcode ice tile duration
 
 --[IsComponent]
 function C_Cryogenesis()
@@ -93,6 +94,17 @@ function S_AttackCryogenesis(e)
 
         -- create an instance of a blue tile
         local iceTile = InstancePrefabParentedOnGridNow(GetEntity("Floor"), "IceTile", attackComponent.iceLocation[1], attackComponent.iceLocation[2], attackComponent.iceLocation[3])
+
+        --set iceTile's duration (no. of turns before melting)
+        local iceTileComponent = GetComponent(iceTile, "C_IceTile")
+        iceTileComponent.duration = 3 --hardcoded
+        
+        local turnOrderManagerEntity = GetEntity("TurnOrderManager")
+        local turnOrderManagerComponent = nil
+        if (turnOrderManagerEntity ~= -1) then
+            turnOrderManagerComponent = GetComponent(turnOrderManagerEntity, "C_TurnOrderManager")
+        end
+        iceTileComponent.turnCreated = turnOrderManagerComponent.turnCycleCounter
 
         -- no screenshake for cryo
         
