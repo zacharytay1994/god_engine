@@ -69,7 +69,7 @@ function S_StateMovePlayer(e)
                         pathfind.Path = true
 
                         stateMovePlayerComponent.callEnemyForecast = true
-                        -- ClearIndicatorsList()
+                        ClearIndicatorsList()
 
                         -- allow forecast to refresh when player stamina reaches zero
                         stateMovePlayerComponent.refreshEnemyForecastOnce = false
