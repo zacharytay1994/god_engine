@@ -61,21 +61,29 @@ namespace god
 				rigiddynamic.p_material->setRestitution(rigiddynamic.Restitution);
 			}
 			//exclusive shape (can be modified)
+
+			physx::PxReal mass = 0.f;
+
 			switch ( rigiddynamic.Shapeid )
 			{
 			case PhysicsTypes::Cube:
 				rigiddynamic.p_shape = mPhysics->createShape ( physx::PxBoxGeometry ( rigiddynamic.extents.x , rigiddynamic.extents.y , rigiddynamic.extents.z ) , *rigiddynamic.p_material , true );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
+				
+				mass =2.f*rigiddynamic.extents.x * 2.f*rigiddynamic.extents.y *2.f* rigiddynamic.extents.z * rigiddynamic.Density;// L^3
 				break;
 			case PhysicsTypes::Sphere:
 
 				rigiddynamic.p_shape = mPhysics->createShape ( physx::PxSphereGeometry ( rigiddynamic.extents.x ) , *rigiddynamic.p_material , true );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
+				mass = (4.f/3.f)* physx::PxPi * rigiddynamic.extents.x* rigiddynamic.extents.x* rigiddynamic.extents.x;//4/3 * pi * r^3
 				break;
 			case PhysicsTypes::Capsule:
 
 				rigiddynamic.p_shape = mPhysics->createShape ( physx::PxCapsuleGeometry ( rigiddynamic.extents.x , rigiddynamic.extents.y ) , *rigiddynamic.p_material , true );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
+				mass = (  (4.f / 3.f) * physx::PxPi * rigiddynamic.extents.x * rigiddynamic.extents.x * rigiddynamic.extents.x )
+					+ ( physx::PxPi * rigiddynamic.extents.x * rigiddynamic.extents.x * rigiddynamic.extents.y );//4/3 * pi * r^3 + pi * r^2 * h 
 				break;
 
 			case PhysicsTypes::TriangleMesh:
@@ -117,7 +125,7 @@ namespace god
 
 			rigiddynamic.p_RigidDynamic->attachShape ( *rigiddynamic.p_shape );
 			rigiddynamic.p_RigidDynamic->setAngularVelocity ( physx::PxVec3 ( rigiddynamic.AngularVelocity.x , rigiddynamic.AngularVelocity.y , rigiddynamic.AngularVelocity.z ) , true );
-			physx::PxReal mass = 10.f;
+		
 			physx::PxRigidBodyExt::setMassAndUpdateInertia ( *rigiddynamic.p_RigidDynamic , mass );
 			physx::PxRigidBodyExt::updateMassAndInertia ( *rigiddynamic.p_RigidDynamic , rigiddynamic.Density );
 
@@ -186,7 +194,7 @@ namespace god
 				rigiddynamic.p_shape->setGeometry ( physx::PxTriangleMeshGeometry ( rigiddynamic.p_trimesh , scale ) );
 				rigiddynamic.p_shape->setMaterials ( &rigiddynamic.p_material , 1 );
 			}
-
+			rigiddynamic.updateRigidDynamic = true;
 		}
 
 

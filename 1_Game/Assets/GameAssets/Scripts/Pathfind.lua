@@ -93,14 +93,12 @@ function S_Pathfind(e)
                         
                         if (path[2].x > current_cell.x) then
                             -- face left
-                            print("FACE LEFT")
                             characterTransform.rotation.y = 90
                         elseif (path[2].x < current_cell.x) then
                             -- face right
                             characterTransform.rotation.y = 270
                         elseif (path[2].z > current_cell.z) then
                             -- face front
-                            print("FACE FRONT")
                             characterTransform.rotation.y = 0
                         else
                             -- face back
