@@ -87,31 +87,56 @@ function S_Pathfind(e)
                             end
                         end
                     else
-                        -- -- move the character -------------------------------------------------------------------------
-                        current_cell.x = path[2].x
-                        current_cell.y = path[2].y
-                        current_cell.z = path[2].z
-                        -- print("found")
-                        print(current_cell.x, current_cell.y, current_cell.z)
-                        -- -- end of moving the character ----------------------------------------------------------------
                         
                         -- -- adjust character's rotation here -----------------------------------------------------------
                         local characterTransform = GetTransform(e)
                         
                         if (path[2].x > current_cell.x) then
                             -- face left
+                            print("FACE LEFT")
                             characterTransform.rotation.y = 90
                         elseif (path[2].x < current_cell.x) then
                             -- face right
                             characterTransform.rotation.y = 270
                         elseif (path[2].z > current_cell.z) then
                             -- face front
+                            print("FACE FRONT")
                             characterTransform.rotation.y = 0
                         else
                             -- face back
                             characterTransform.rotation.y = 180         
                         end
                         -- -- end of adjusting rotation ------------------------------------------------------------------
+                        
+                        -- -- move the character -------------------------------------------------------------------------
+                        -- set camera to track movement
+                        local world_position = WorldPosition(e)
+                        local dir_x = path[2].x - current_cell.x
+                        local dir_y = path[2].y - current_cell.y
+                        local dir_z = path[2].z - current_cell.z
+                        local dist_behind = 3
+                        local dist_above = 4
+                        if dir_x ~= 0 then
+                            if dir_x > 0 then
+                                SetCameraNextPosition(world_position.x-dist_behind, world_position.y + dir_y + dist_above, world_position.z)
+                            else 
+                                SetCameraNextPosition(world_position.x+dist_behind, world_position.y + dir_y + dist_above, world_position.z)
+                            end
+                        else
+                            if dir_z > 0 then
+                                SetCameraNextPosition(world_position.x, world_position.y + dir_y + dist_above, world_position.z-dist_behind)
+                            else 
+                                SetCameraNextPosition(world_position.x, world_position.y + dir_y + dist_above, world_position.z+dist_behind)
+                            end
+                        end
+                        SetCameraNextLookAt(world_position.x+dir_x, world_position.y + dir_y, world_position.z+dir_z)
+
+                        current_cell.x = path[2].x
+                        current_cell.y = path[2].y
+                        current_cell.z = path[2].z
+                        -- print("found")
+                        print(current_cell.x, current_cell.y, current_cell.z)
+                        -- -- end of moving the character ----------------------------------------------------------------
                         
                         -- -- reduce stamina by one for each step --------------------------------------------------------
                         local charComp = GetComponent(e, "C_Character")

@@ -28,7 +28,11 @@ namespace god
 
 	glm::mat4 Camera::GetCameraViewMatrix ()
 	{
-		return glm::lookAt ( m_position , m_position + m_look_at , m_up );
+		if ( m_free_camera_active )
+		{
+			return glm::lookAt ( m_position , m_position + m_look_at , m_up );
+		}
+		return glm::lookAt ( m_position , m_look_at , m_up );
 	}
 
 	float Camera::GetCameraFaceAngle ()
@@ -41,6 +45,56 @@ namespace god
 			return 180.0f + glm::degrees ( acos ( -norm_position.z ) );
 		}
 		return glm::degrees ( acos ( norm_position.z ) );
+	}
+
+	void Camera::SetPosition ( glm::vec3 const& position )
+	{
+		m_position = position;
+		SetNextPosition ( position );
+	}
+
+	void Camera::SetLookAt ( glm::vec3 const& lookAt )
+	{
+		m_look_at = lookAt;
+		SetNextLookAt ( lookAt );
+	}
+
+	void Camera::SetNextPosition ( glm::vec3 const& position )
+	{
+		m_next_position = position;
+	}
+
+	void Camera::SetNextLookAt ( glm::vec3 const& lookat )
+	{
+		m_next_look_at = lookat;
+	}
+
+	void Camera::InterpolateCameraState ( float dt )
+	{
+		if ( m_free_camera_active )
+		{
+			return;
+		}
+
+		// interpolate distance
+		glm::vec3 curr_to_next_position = m_next_position - m_position;
+		float distance = glm::length ( curr_to_next_position );
+		if ( distance > m_epsilon )
+		{
+			m_position.x = std::lerp ( m_position.x , m_next_position.x , dt * m_camera_move_speed );
+			m_position.y = std::lerp ( m_position.y , m_next_position.y , dt * m_camera_move_speed );
+			m_position.z = std::lerp ( m_position.z , m_next_position.z , dt * m_camera_move_speed );
+		}
+
+		// interpolate look at
+		glm::vec3 curr_to_next_lookat = m_next_look_at - m_look_at;
+		float pan_distance = glm::length ( curr_to_next_lookat );
+		if ( distance > m_epsilon )
+		{
+			m_look_at.x = std::lerp ( m_look_at.x , m_next_look_at.x , dt * m_camera_pan_speed );
+			m_look_at.y = std::lerp ( m_look_at.y , m_next_look_at.y , dt * m_camera_pan_speed );
+			m_look_at.z = std::lerp ( m_look_at.z , m_next_look_at.z , dt * m_camera_pan_speed );
+		}
 	}
 
 	void Camera::FreeCamera (
@@ -62,6 +116,11 @@ namespace god
 		bool zoomIn ,
 		bool zoomOut )
 	{
+		if ( !m_free_camera_active )
+		{
+			return;
+		}
+
 		glm::vec3 right_direction = glm::normalize ( glm::cross ( m_look_at , m_up ) );
 		glm::vec3 forward_direction = glm::normalize ( glm::cross ( m_up , right_direction ) );
 

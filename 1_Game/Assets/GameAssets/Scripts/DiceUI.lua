@@ -28,6 +28,12 @@ function S_DiceUI(e)
 		
 		local diceList = EntitiesWithScriptComponent("C_DiceScript")
 		local diceSettled = true
+		
+		if (#diceList < 3) then
+			print("[DuceUI] ERROR! There should be 3 dice!")
+			diceSettled = false
+		end
+		
 		for i = 1, #diceList do
             if (GetComponent(diceList[i], "C_DiceScript").value == -1) then
                 diceSettled = false

@@ -201,6 +201,16 @@ namespace god
 		ImGui::Checkbox ( "Disable Guizmo" , &m_disable_guizmo );
 
 		ImGui::SameLine ();
+		ImGui::Checkbox ( "Scene Camera" , &camera.m_free_camera_active );
+
+		ImGui::SameLine ();
+		if ( ImGui::Button ( "Reset Camera" ) )
+		{
+			camera.SetNextLookAt ( { 1,0,-2 } );
+			camera.SetNextPosition ( { 8,10,2 } );
+		}
+
+		ImGui::SameLine ();
 		ImGui::Text ( "FPS: %d" , DeltaTimer::m_fps );
 
 		ImGui::SameLine ();
