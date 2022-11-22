@@ -25,7 +25,15 @@ function C_RandomEventEarthquake()
         tileDirectionRate = 0.5,
         
         -- max number of affected tiles
+        --[SerializeInt]
         maxAffectedTiles = 3,
+
+        -- max number of earthquake occurences
+        --[SerializeInt]
+        maxOccurences = 3,
+
+        -- number of occurences so far
+        occurenceCount = 0,
 
         -- counts the number of affected tiles for this earthquake
         affectedTilesCounter = 0,
@@ -65,6 +73,10 @@ function S_RandomEventEarthquake(e)
 
     -- getting C_RandomEventEarthquake component
     local randomEventEarthquakeComponent = GetComponent(randomEventManagerEntity, "C_RandomEventEarthquake")
+
+    if (randomEventEarthquakeComponent.occurenceCount >= randomEventEarthquakeComponent.maxOccurences) then
+        return
+    end
 
     -- cheat to activate earthquake in 3 turns
     if (CheckKeyPress(90)) then
@@ -120,6 +132,8 @@ function S_RandomEventEarthquake(e)
         if (turnOrderManagerComponent.turnCycleCounter == randomEventEarthquakeComponent.earthquakeExecuteTurn) then 
             
             print("[RandomEventEarthquake.lua] START OF EARTHQUAKE]")
+
+            randomEventEarthquakeComponent.occurenceCount = randomEventEarthquakeComponent.occurenceCount + 1
 
             -- get a list of all tiles
             local tileList = EntitiesWithScriptComponent("C_FloorTile")
