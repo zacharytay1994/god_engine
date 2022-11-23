@@ -9,6 +9,7 @@ end
 
 function OnLoad_EnvironmentManager(e)
     print("Setting up environment.")
+
     -- find all TilePrefab (recognized by C_FloorTile) and instance Env_Flora_1 on it
     local grass = "2D_Flora_Grass"
     local corals = "2D_Flora_0"
@@ -98,23 +99,23 @@ function OnLoad_EnvironmentManager(e)
         -- random x & z
         local board_side = GenerateRandomNumberInRange(1, 4)
         if board_side == 1 then
-            local rng_position_x = GenerateRandomNumberInRange(1,300)/100.0 + 12
-            local rng_position_z = GenerateRandomNumberInRange(1,1600)/100 - 12
+            local rng_position_x = GenerateRandomNumberInRange(1, 300) / 100.0 + 12
+            local rng_position_z = GenerateRandomNumberInRange(1, 1600) / 100 - 12
             env_transform.position.x = rng_position_x
             env_transform.position.z = rng_position_z
         elseif board_side == 2 then
-            local rng_position_x = -8 - GenerateRandomNumberInRange(1,300)/100.0
-            local rng_position_z = GenerateRandomNumberInRange(1,1600)/100 - 12
+            local rng_position_x = -8 - GenerateRandomNumberInRange(1, 300) / 100.0
+            local rng_position_z = GenerateRandomNumberInRange(1, 1600) / 100 - 12
             env_transform.position.x = rng_position_x
             env_transform.position.z = rng_position_z
         elseif board_side == 3 then
-            local rng_position_x = GenerateRandomNumberInRange(1,1600)/100.0 - 7
-            local rng_position_z = -14 - GenerateRandomNumberInRange(1,300)/100
+            local rng_position_x = GenerateRandomNumberInRange(1, 1600) / 100.0 - 7
+            local rng_position_z = -14 - GenerateRandomNumberInRange(1, 300) / 100
             env_transform.position.x = rng_position_x
             env_transform.position.z = rng_position_z
         elseif board_side == 4 then
-            local rng_position_x = GenerateRandomNumberInRange(1,1600)/100.0 - 7
-            local rng_position_z = GenerateRandomNumberInRange(1,300)/100 + 5
+            local rng_position_x = GenerateRandomNumberInRange(1, 1600) / 100.0 - 7
+            local rng_position_z = GenerateRandomNumberInRange(1, 300) / 100 + 5
             env_transform.position.x = rng_position_x
             env_transform.position.z = rng_position_z
         end
@@ -133,4 +134,9 @@ end
 
 --[IsSystem]
 function S_EnvironmentManager(e)
+    -- shortcut to switch to main menu
+    if CheckKeyPress(77) then
+        print("test")
+        ChangeScene("MainmenuScreen", true)
+    end
 end

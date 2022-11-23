@@ -49,7 +49,7 @@ namespace god
 		if ( renderable.m_model_id != -1 && gui_object.m_active && renderable.m_visible )
 		{
 			scene.Add2DInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-				renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess } , transform.m_world_transform );
+				renderable.m_diffuse_id , renderable.m_specular_id , gui_object.m_alpha } , transform.m_world_transform );
 
 			if ( GUIText* p_gui_text = entt.GetEngineComponent<GUIText>( entity_data.m_id ) /*m_registry.storage<GUIText> ().contains ( m_entities[ e ].m_id )*/ )
 			{
