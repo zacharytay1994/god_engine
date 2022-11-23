@@ -73,6 +73,9 @@ function S_Character(e)
         
         print("[Character.lua]", EntityName(e), entityDataComponent.id, "has died, hiding body.")
 
+        -- RefreshEnemyForecast()
+        -- print("[Character.lua] Refreshing EnemyForecast because an enemy died.")
+
         -- hide the character below the map for now
         GetTransform(e).position.y = -100
         GetGridCell(e).y = -100
