@@ -133,5 +133,21 @@ function SetDiceIcon(e, dicenumber)
 		elseif (dice.color == 3) then
 			ChangeTexture(e, "dice_bolt_gold")
 		end
+	elseif (dice.value == 4) then
+		if (dice.color == 1) then
+			ChangeTexture(e, "dice_projectile")
+		elseif (dice.color == 2) then
+			ChangeTexture(e, "dice_projectile_pink")
+		elseif (dice.color == 3) then
+			ChangeTexture(e, "dice_projectile_gold")
+		end
+	elseif (dice.value == 6) then
+		if (dice.color == 1) then
+			ChangeTexture(e, "dice_cryogenesis")
+		elseif (dice.color == 2) then
+			ChangeTexture(e, "dice_cryogenesis_pink")
+		elseif (dice.color == 3) then
+			ChangeTexture(e, "dice_cryogenesis_gold")
+		end
 	end
 end 
