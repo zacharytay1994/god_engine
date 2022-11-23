@@ -18,7 +18,7 @@ function S_GridHighlightScript(e)
 	if (c_gridmanager.is_init == false) then
 		RefreshTileArray()
 		
-		HighlightTiles(GetEntity("Player"), 4)
+		--HighlightTiles(GetEntity("Player"), GetComponent(GetEntity("Player"), "C_Character").currentStamina)
 		--ResetHighlightTiles()
 	end
 end
@@ -38,29 +38,24 @@ function HighlightTiles(e, range)
 	print("[GridHighlightScript] Highlighting tiles...")
 	local c_gridmanager = GetComponent(GetEntity("TileHighlighter"), "C_GridHighlightScript")
 	local origin_cell = GetGridCell(e)
+	local origin_cell_y = origin_cell.y
 	if(EntityName(e) == "Player") then
-		origin_cell.y = origin_cell.y - 1
+		origin_cell_y = origin_cell_y - 1
 	end
 	for i=-range,range do
 		for j=-range,range do
 			local cell_x = origin_cell.x + i
 			local cell_z = origin_cell.z + j
 			if (cell_x >= -3 and cell_x <= 4 and cell_z >= -6 and cell_z <= 1) then
-				local height_diff = GetGridCell(c_gridmanager.tiles_array[cell_x + 4][cell_z + 7]).y - origin_cell.y
+				local height_diff = GetGridCell(c_gridmanager.tiles_array[cell_x + 4][cell_z + 7]).y - origin_cell_y
 				if (height_diff < 0) then
 					height_diff = 0
 				end
 				if (math.abs(i) + math.abs(j) + height_diff <= range) then
-					if(height_diff ~= 0) then
-						print(math.abs(i) + " " + math.abs(j) + " " + height_diff)
-					end
 					ChangeTexture(c_gridmanager.tiles_array[cell_x + 4][cell_z + 7], "DarkGreen")
 				end
 			end
 		end
-	end
-	if(EntityName(e) == "Player") then
-		origin_cell.y = origin_cell.y + 1
 	end
 end
 

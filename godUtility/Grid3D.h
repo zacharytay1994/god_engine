@@ -25,7 +25,7 @@ namespace god
 		{
 			std::vector<T> m_values;
 
-			bool Passable ()
+			bool Passable () const
 			{
 				for ( auto const& v : m_values )
 				{
@@ -37,7 +37,7 @@ namespace god
 				return true;
 			}
 
-			bool Steppable ()
+			bool Steppable () const
 			{
 				for ( auto const& v : m_values )
 				{
@@ -61,6 +61,7 @@ namespace god
 		std::vector<T> const& Get ( float granularity , Coordinate const& coord ) const;
 		std::vector<T>& Get ( float granularity , Coordinate const& coord );
 		bool Has ( float granularity , Coordinate const& coord ) const;
+		bool HasSteppable ( float granularity , Coordinate const& coord ) const;
 		void ChangeCell ( T const& value , float granularity , Coordinate const& from , Coordinate const& to );
 
 		template <typename FN , typename...ARGS>
@@ -70,6 +71,7 @@ namespace god
 		std::vector<Coordinate> GetPathAStar ( float granularity , Coordinate const& c1 , Coordinate const& c2 , int maxDown = 0 , int maxUp = 0 , int verticalHeuristic = 1 );
 
 		bool RayCastToGrid ( Coordinate& coordinate , glm::vec3 const& origin , glm::vec3 const& scale , float granularity , glm::vec3 const& start , glm::vec3 const& end , int depth = 100 );
+		bool RayCastToGridSteppable ( Coordinate& coordinate , glm::vec3 const& origin , glm::vec3 const& scale , float granularity , glm::vec3 const& start , glm::vec3 const& end , int depth = 100 );
 
 	private:
 		Grid m_grid;
@@ -132,6 +134,22 @@ namespace god
 		{
 			auto const& gran_grid = m_grid.at ( gran );
 			if ( gran_grid.find ( coord ) != gran_grid.end () && !gran_grid.at ( coord ).m_values.empty () )
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	template<typename T>
+	inline bool Grid3D<T>::HasSteppable ( float granularity , Coordinate const& coord ) const
+	{
+		uint32_t gran = NormGran ( granularity );
+		if ( m_grid.find ( gran ) != m_grid.end () )
+		{
+			auto const& gran_grid = m_grid.at ( gran );
+
+			if ( gran_grid.find ( coord ) != gran_grid.end () && !gran_grid.at ( coord ).m_values.empty () && gran_grid.at ( coord ).Steppable () )
 			{
 				return true;
 			}
@@ -343,6 +361,37 @@ namespace god
 				cell_z = static_cast< int >( std::floor ( intersect.z / stride.z ) );
 
 				if ( Has ( granularity , { cell_x, cell_y, cell_z } ) )
+				{
+					coordinate = { cell_x, cell_y, cell_z };
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
+	template<typename T>
+	inline bool Grid3D<T>::RayCastToGridSteppable ( Coordinate& coordinate , glm::vec3 const& origin , glm::vec3 const& scale , float granularity , glm::vec3 const& start , glm::vec3 const& end , int depth )
+	{
+		// start plane
+		auto difference = start - origin;
+		glm::vec3 stride = scale * 2.0f * granularity;
+		int num_layers = static_cast< int >( difference.y / stride.y );
+		float start_layer = origin.y + num_layers * stride.y;
+		glm::vec3 intersect;
+		int cell_x , cell_y , cell_z;
+		bool found { false };
+		for ( auto i = 0; i < depth && !found; ++i , start_layer -= stride.y )
+		{
+			if ( IntersectLineSegmentPlane ( start , end , { 0,1,0 } , start_layer + ( stride.y / 2.0f ) , intersect ) )
+			{
+				intersect -= origin;
+				cell_x = static_cast< int >( std::floor ( intersect.x / stride.x ) );
+				cell_y = num_layers - i;
+				cell_z = static_cast< int >( std::floor ( intersect.z / stride.z ) );
+
+				if ( HasSteppable ( granularity , { cell_x, cell_y, cell_z } ) )
 				{
 					coordinate = { cell_x, cell_y, cell_z };
 					return true;

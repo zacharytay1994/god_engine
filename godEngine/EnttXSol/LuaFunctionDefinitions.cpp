@@ -504,6 +504,24 @@ namespace god
 			}
 		);
 
+		// SetTransformRotation(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("SetTransformRotation",
+			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+			{
+				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+					;
+
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				{
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setGlobalPose ( ConvertToPhysXTransform ( entt.GetEngineComponent<Transform> ( e )->m_position, { x, y, z } ) );
+					}
+				}
+			}
+		);
+
 		// SetVelocity(e,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "SetVelocity" ,
@@ -516,6 +534,7 @@ namespace god
 				{
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->clearForce();
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setLinearVelocity ( ConvertToPhysXVector ( { x, y, z } ) );
 					}
 				}
@@ -535,9 +554,7 @@ namespace god
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_SIMULATION , false );
-						std::cout << "---ADDING FORCE1...." << std::endl;
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->addForce ( ConvertToPhysXVector ( { x, y, z } ) );
-						std::cout << "---ADDING FORCE2...." << std::endl;
 					}
 				}
 			}
@@ -556,6 +573,8 @@ namespace god
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_SIMULATION , freeze );
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_GRAVITY ,    freeze );
+						entt.GetEngineComponent<RigidDynamic>(e)->Active = !freeze;
 					}
 				}
 			}

@@ -95,13 +95,38 @@ end
 
 function SetDiceIcon(e, dicenumber)
 	local diceList = EntitiesWithScriptComponent("C_DiceScript")
-	if (GetComponent(diceList[dicenumber], "C_DiceScript").value == 0) then
-		ChangeTexture(e, "dice_jab")
-	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 1) then
-		ChangeTexture(e, "dice_swing")
-	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 2) then
-		ChangeTexture(e, "dice_smash")
-	elseif (GetComponent(diceList[dicenumber], "C_DiceScript").value == 3) then
-		ChangeTexture(e, "dice_bolt")
+	local dice = GetComponent(diceList[dicenumber], "C_DiceScript")
+	if (dice.value == 0) then
+		if (dice.color == 1) then
+			ChangeTexture(e, "dice_jab")
+		elseif (dice.color == 2) then
+			ChangeTexture(e, "dice_jab_pink")
+		elseif (dice.color == 3) then
+			ChangeTexture(e, "dice_jab_gold")
+		end
+	elseif (dice.value == 1) then
+		if (dice.color == 1) then
+			ChangeTexture(e, "dice_swing")
+		elseif (dice.color == 2) then
+			ChangeTexture(e, "dice_swing_pink")
+		elseif (dice.color == 3) then
+			ChangeTexture(e, "dice_swing_gold")
+		end
+	elseif (dice.value == 2) then
+		if (dice.color == 1) then
+			ChangeTexture(e, "dice_smash")
+		elseif (dice.color == 2) then
+			ChangeTexture(e, "dice_smash_pink")
+		elseif (dice.color == 3) then
+			ChangeTexture(e, "dice_smash_gold")
+		end
+	elseif (dice.value == 3) then
+		if (dice.color == 1) then
+			ChangeTexture(e, "dice_bolt")
+		elseif (dice.color == 2) then
+			ChangeTexture(e, "dice_bolt_pink")
+		elseif (dice.color == 3) then
+			ChangeTexture(e, "dice_bolt_gold")
+		end
 	end
 end 

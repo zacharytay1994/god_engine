@@ -184,7 +184,7 @@ namespace god
 
 			//Physics Simulate update
 			SystemTimer::StartTimeSegment ( "Physics System" );
-			//godPhysicsSystem.Update ( delta_timer.m_dt , enttxsol.m_pause );
+			godPhysicsSystem.Update ( delta_timer.m_dt , enttxsol.m_pause );
 			SystemTimer::EndTimeSegment ( "Physics System" );
 
 			// render scene
@@ -299,12 +299,6 @@ namespace god
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );
-
-			if ( window.KeyPressed ( GLFW_KEY_M ) )
-			{
-				camera.SetNextPosition ( { 5,5,5 } );
-				camera.SetNextLookAt ( { 1,0,0 } );
-			}
 
 			camera.InterpolateCameraState ( DeltaTimer::m_dt );
 

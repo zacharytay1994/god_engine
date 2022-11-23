@@ -29,7 +29,7 @@ namespace god
 		void Init(GLFWWindow* window, Camera* cam);
 		void Update(float dt, bool pause);
 		
-		
+
 		physx::PxRigidActor* const GetRayCastMouse() const;
 		const uint32_t getRCMid() const;
 		void setRCMid(uint32_t id);
@@ -44,7 +44,8 @@ namespace god
 		bool debugdraw;
 	private:
 	
-
+		void SimpleMovingAverageDeltaTime(float dt);
+		void CalculateNumSteps();
 		void Raycast();
 
 		//PhysX Visual Debugger
@@ -83,9 +84,10 @@ namespace god
 		bool mRunning;
 		float mAccumulator = 0.0f;
 		uint16_t numSteps = 1;
-		float mStepSize = 1.0f / 60.0f;
+		float mStepSize = 1.0f / 30.f;
 		
-
+		std::array < float, 5> sma_dt;
+		int sma_index = 0;
 	};
 
 

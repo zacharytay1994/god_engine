@@ -67,9 +67,11 @@ function S_StateMovePlayer(e)
                         pathfind.y = gm.last_clicked_cell.y
                         pathfind.z = gm.last_clicked_cell.z
                         pathfind.Path = true
-
+						
+						ResetHighlightTiles()
+						
                         stateMovePlayerComponent.callEnemyForecast = true
-                        -- ClearIndicatorsList()
+                        ClearIndicatorsList()
 
                         -- allow forecast to refresh when player stamina reaches zero
                         stateMovePlayerComponent.refreshEnemyForecastOnce = false
@@ -84,6 +86,8 @@ function S_StateMovePlayer(e)
                             print("[StateMovePlayer.lua] Player has reached destination! Refreshing enemy forecasts.")
                             RefreshEnemyForecast()
                             stateMovePlayerComponent.callEnemyForecast = false
+							
+							HighlightTiles(GetEntity("Player"), GetComponent(GetEntity("Player"), "C_Character").currentStamina)
                         end
                     end
                 end             

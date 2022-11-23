@@ -39,7 +39,7 @@ namespace god
 		}
 		if ( transform.m_changed || transparent.m_changed )
 		{
-			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , { transform.m_rotation.z, transparent.m_facing_rotation_y, transform.m_rotation.z } , transform.m_scale );
+			glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , { transform.m_rotation.x, transparent.m_facing_rotation_y, transform.m_rotation.z } , transform.m_scale );
 			transform.m_local_transform = model_transform;
 			world_changed = true;
 		}
@@ -49,7 +49,7 @@ namespace god
 		}
 
 		// add to scene
-		if ( renderable.m_model_id != -1 )
+		if ( renderable.m_model_id != -1 && renderable.m_visible )
 		{
 			scene.AddBillboard ( { static_cast< uint32_t >( renderable.m_model_id ) ,
 					renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive } , transform.m_world_transform );
