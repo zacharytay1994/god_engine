@@ -42,6 +42,18 @@ namespace god
 				//	audio_source.m_stop = false;
 				//}
 
+				if (audio_source.update_playtime)
+				{
+					AudioAPI::SetCurrentPlayTime(audio_source.m_channel, audio_source.m_new_playtime);
+					audio_source.update_playtime = false;
+				}
+				else
+				{
+					// Get current playtime
+					AudioAPI::GetCurrentPlayTime(audio_source.m_channel, &audio_source.m_current_playtime);
+					//std::cout << audio_source.m_current_playtime << "\n";
+				}
+
 				// Fading Control --------------------------------------------------------------------
 				if (audio_source.enable_fade_in)
 				{

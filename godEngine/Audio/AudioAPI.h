@@ -68,7 +68,7 @@ namespace god
 
 		static FMOD_RESULT CheckSoundPlayback(FMOD::Channel* channel, bool* isPlaying);
 
-		static unsigned int GetCurrentPlayTime(FMOD::Channel* channel);
+		static void GetCurrentPlayTime(FMOD::Channel* channel, unsigned int* timeStamp);
 		static void SetCurrentPlayTime(FMOD::Channel* channel, unsigned int timeStamp);
 
 		static void PlaySoundFromTime(FMOD::Channel* channel, float startPoint);
@@ -86,7 +86,7 @@ namespace god
 		static void AddFadeOut(FMOD::Channel* channel, float fadeOutTime, bool& fade);
 
 		static void RemoveFadeIn(FMOD::Channel* channel, float fadeInTime);
-		static void RemoveFadeOut(FMOD::Channel* channel, float fadeOutPoint);
+		static void RemoveFadeOut(FMOD::Channel* channel, float fadeOutTime);
 
 		static void GetFadePoints(FMOD::Channel* channel, unsigned int* points);
 		static int GetSampleRate();

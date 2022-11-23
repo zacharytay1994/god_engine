@@ -19,8 +19,9 @@ namespace god
 				// check for playback state
 				AudioAPI::CheckSoundPlayback(audio_source.m_channel, &audio_source.m_finish_playing);
 
-				// Get current playtime
-				audio_source.m_current_playtime = AudioAPI::GetCurrentPlayTime(audio_source.m_channel);
+				//// Get current playtime
+				//AudioAPI::GetCurrentPlayTime(audio_source.m_channel, &audio_source.m_current_playtime);
+				////std::cout << audio_source.m_current_playtime << "\n";
 
 				// Set Audio Source attributes
 				AudioAPI::SetMute(audio_source.m_channel, audio_source.m_mute);

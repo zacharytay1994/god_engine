@@ -17,8 +17,10 @@ namespace god
 
 		bool m_mute{ false };
 		bool m_loop{ false };
-
+		
+		bool update_playtime{ false };
 		unsigned int m_current_playtime{ 0 };
+		unsigned int m_new_playtime{ 0 };
 
 		bool m_play_on_awake{ true };
 		bool m_awake_played{ false };
@@ -53,12 +55,16 @@ namespace god
 		RegisterLuaType<AudioSource>(luaState, name,
 			"sound_id", &AudioSource::m_sound_id,
 			"finish_playing", &AudioSource::m_played, // why is this m_played?
+			"channel", &AudioSource::m_channel, // why is this m_played?
 			"played", &AudioSource::m_played,
 			"mute", &AudioSource::m_mute,
 			"loop", &AudioSource::m_loop,
 			"play_on_awake", &AudioSource::m_play_on_awake,
 			"volume", &AudioSource::m_volume,
 			"pitch", &AudioSource::m_pitch,
+			"current_playtime", &AudioSource::m_current_playtime,
+			"new_playtime", &AudioSource::m_new_playtime,
+			"update_playtime", &AudioSource::update_playtime,
 			"min_distance", &AudioSource::m_min_distance,
 			"max_distance", &AudioSource::m_max_distance,
 			"fade_in", &AudioSource::enable_fade_in,

@@ -242,12 +242,9 @@ namespace god
 		return FMOD_OK;
 	}
 
-	unsigned int AudioAPI::GetCurrentPlayTime(FMOD::Channel* channel)
+	void AudioAPI::GetCurrentPlayTime(FMOD::Channel* channel, unsigned int* timeStamp)
 	{
-		unsigned int time_stamp;
-		channel->getPosition(&time_stamp, FMOD_TIMEUNIT_PCM);
-
-		return time_stamp;
+		channel->getPosition(timeStamp, FMOD_TIMEUNIT_PCM);
 	}
 
 	void AudioAPI::SetCurrentPlayTime(FMOD::Channel* channel, unsigned int timeStamp)
