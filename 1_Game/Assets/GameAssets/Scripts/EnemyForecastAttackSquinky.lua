@@ -27,6 +27,11 @@ function S_EnemyForecastAttackSquinky(e)
     local forecastComponent = GetComponent(e, "C_EnemyForecastAttackSquinky")
     local enemyController = GetComponent(e, "C_EnemyController")
 
+    -- check if enemy is dead or alive
+    if (GetComponent(e, "C_Character").isDead) then
+        return
+    end
+
     -- if told to perform attack forecast by EnemyController, then set drawLine to true
     if (forecastComponent.performAttackForecast == true) then
             
