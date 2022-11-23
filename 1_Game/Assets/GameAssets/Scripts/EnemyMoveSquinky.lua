@@ -128,6 +128,7 @@ function S_EnemyMoveSquinky(e)
             
                 -- TODO: just teleport squinky here
                 local targetTileGrid = GetGridCell(moveComponent.targetTile)
+                EnemyMoveSquinkyUpdateSquinkyDirection(enemyGridCell, targetTileGrid, e)
                 enemyGridCell.x = targetTileGrid.x
                 enemyGridCell.y = targetTileGrid.y + 1
                 enemyGridCell.z = targetTileGrid.z
@@ -170,6 +171,25 @@ function S_EnemyMoveSquinky(e)
                 return
             end
         end
+    end
+end
+
+function EnemyMoveSquinkyUpdateSquinkyDirection(squinkyGrid, targetGrid, e)
+
+    print("[EnemyMoveSquinky.lua] Updating Squinky direction.")
+    if (squinkyGrid.z > targetGrid.z) then
+        -- turn to the back
+        GetTransform(e).rotation.y = 180
+    elseif (squinkyGrid.z < targetGrid.z) then
+        --turn to the front
+        GetTransform(e).rotation.y = 0
+    elseif (squinkyGrid.x > targetGrid.x) then
+        -- turn to the left
+        GetTransform(e).rotation.y = 90
+
+    elseif (squinkyGrid.x < targetGrid.x) then
+        -- turn to the right
+        GetTransform(e).rotation.y = 270
     end
 end
 
