@@ -129,6 +129,13 @@ namespace god
 	{
 		enttxsol.RunEngineSystem ( engineResources , ExampleSystemInit );
 		enttxsol.RunEngineSystem ( engineResources , GridManipulateInit );
+
+		SystemTimer::StartTimeSegment ( "RigidStaticUpdate" );
+		enttxsol.RunEngineSystem ( engineResources , RigidStaticUpdate );
+		SystemTimer::EndTimeSegment ( "RigidStaticUpdate" );
+		SystemTimer::StartTimeSegment ( "RigidDynamicUpdate" );
+		enttxsol.RunEngineSystem ( engineResources , RigidDynamicUpdate );
+		SystemTimer::EndTimeSegment ( "RigidDynamicUpdate" );
 	}
 
 	// runs at the end before unloading the scene 
