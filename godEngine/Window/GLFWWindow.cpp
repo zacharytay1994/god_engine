@@ -115,7 +115,7 @@ namespace god
 		glfwWindowHint ( GLFW_CONTEXT_VERSION_MINOR , 5 );
 		glfwWindowHint ( GLFW_OPENGL_PROFILE , GLFW_OPENGL_CORE_PROFILE );
 
-		m_window = glfwCreateWindow ( m_width , m_height , "God Engine" , NULL , NULL );
+		m_window = glfwCreateWindow ( m_width , m_height , "Heart Of The Trident" , NULL , NULL );
 		if ( m_window == NULL )
 		{
 			std::cerr << "Failed to create GLFW window" << std::endl;
