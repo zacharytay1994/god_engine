@@ -55,6 +55,11 @@ namespace god
 		static void SetVolume(FMOD::Channel* channel, float volume);
 		static void SetPitch(FMOD::Channel* channel, float pitch);
 
+		static bool GetLoop(Sound& sound);
+		static bool GetMute(FMOD::Channel* channel);
+		static float GetVolume(FMOD::Channel* channel);
+		static float GetPitch(FMOD::Channel* channel);
+
 		static void PlaySound(Sound& sound); 
 		static void PlaySound(Sound& sound, FMOD::Channel** channel, bool& played); 
 		static void PauseSound(FMOD::Channel* channel , bool paused);
@@ -69,15 +74,15 @@ namespace god
 
 	public:
 		static void ToggleDSPEffects(bool toggle);
-		static void AddEchoEffect(FMOD::Channel* channel);
-		static void AddFadeInEffect(FMOD::Channel* channel, UINTLL dspClock, float fadeInPoint);
-		static void AddFadeOutEffect(FMOD::Channel* channel, UINTLL dspClock, float fadeOutPoint);
+		static void AddEcho(FMOD::Channel* channel);
+		static void AddFadeIn(FMOD::Channel* channel, float fadeInTime, bool& fade);
+		static void AddFadeOut(FMOD::Channel* channel, float fadeOutTime, bool& fade);
 
-		static void RemoveFadeInEffect(FMOD::Channel* channel, UINTLL dspClock, float fadeInPoint);
+		static void RemoveFadeIn(FMOD::Channel* channel, UINTLL dspClock, float fadeInTime);
 
 		static void GetFadePoints(FMOD::Channel* channel, unsigned int* points);
 		static int GetSampleRate();
-		static void GetDSPClock(FMOD::Channel* channel, UINTLL& dspClock);
+		static UINTLL GetDSPClock(FMOD::Channel* channel);
 
 	public:
 		static void SetListenerAttributes(const FMOD_VECTOR* position, const FMOD_VECTOR* velocity, const FMOD_VECTOR* forward, const FMOD_VECTOR* up);

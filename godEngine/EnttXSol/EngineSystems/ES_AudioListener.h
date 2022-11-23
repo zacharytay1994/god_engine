@@ -34,25 +34,41 @@ namespace god
 						AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
 				}
 
-				if (audio_source.enable_fade)
+				if (audio_source.enable_fade_in)
 				{
 					unsigned int points; // move this to audioapi
 					AudioAPI::GetFadePoints(audio_source.m_channel, &points);
-					if (points == 0 && !audio_source.m_faded)
+					if (points == 0 && !audio_source.m_fadedin)
 					{
-						// DSP Effects
-						AudioAPI::GetDSPClock(audio_source.m_channel, audio_source.m_dsp_clock);
-						//AudioAPI::AddEchoEffect(audio_source.m_channel);
-
-						//AudioAPI::AddFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 10.f);
-						AudioAPI::AddFadeOutEffect(audio_source.m_channel, audio_source.m_dsp_clock, 3.f);
-						audio_source.m_faded = true;
+						AudioAPI::AddFadeIn(audio_source.m_channel, 10.f, audio_source.m_fadedin);
+						//AudioAPI::AddFadeOutEffect(audio_source.m_channel, audio_source.m_dsp_clock, 3.f);
+						audio_source.m_fadedin = true;
 					}
 					//else
 					//{
 					//	AudioAPI::RemoveFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 10.f);
 					//}
 				}
+				if (audio_source.enable_fade_out)
+				{
+					unsigned int points; // move this to audioapi
+					AudioAPI::GetFadePoints(audio_source.m_channel, &points);
+					if (points == 0 && !audio_source.m_fadedout)
+					{
+						// DSP Effects
+						//AudioAPI::GetDSPClock(audio_source.m_channel, audio_source.m_dsp_clock);
+						//AudioAPI::AddEchoEffect(audio_source.m_channel);
+
+						//AudioAPI::AddFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 10.f);
+						AudioAPI::AddFadeOut(audio_source.m_channel, 5.f, audio_source.m_fadedout);
+						audio_source.m_fadedout = true;
+					}
+					//else
+					//{
+					//	AudioAPI::RemoveFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 10.f);
+					//}
+				}
+
 
 			}
 		}

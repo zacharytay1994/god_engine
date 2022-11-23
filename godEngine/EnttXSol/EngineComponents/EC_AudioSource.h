@@ -7,10 +7,6 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct AudioSource
 	{
-		bool enable_fade{ false };
-		UINTLL m_dsp_clock;
-		bool m_faded{ false };
-
 		FMOD::Channel* m_channel{ nullptr };
 		const char* m_channel_group_name{ "" };
 		int m_channel_group_id{ 0 }; // to seperate sounds into different categories
@@ -37,6 +33,15 @@ namespace god
 		{
 			return true;
 		}
+
+		bool enable_fade_in{ false };
+		bool enable_fade_out{ false };
+		UINTLL m_dsp_clock;
+		bool m_fadedin{ false };
+		bool m_fadedout{ false };
+
+		float m_fade_in_time;
+		float m_fade_out_time;
  	};
 	template <>
 	inline void NewLuaType<AudioSource>(sol::state& luaState, std::string const& name)
@@ -132,7 +137,8 @@ namespace god
 				ImGui::Checkbox("Mute", &component.m_mute);
 				ImGui::Checkbox("Loop", &component.m_loop);
 				ImGui::Checkbox("Play On Awake", &component.m_play_on_awake);
-				ImGui::Checkbox("Fade", &component.enable_fade);
+				ImGui::Checkbox("Fade In", &component.enable_fade_in);
+				ImGui::Checkbox("Fade Out", &component.enable_fade_out);
 
 				ImGui::DragFloat("Volume", &component.m_volume, 0.01f, 0.f, 1.f);
 				ImGui::SliderFloat("Pitch", &component.m_pitch, 0.f, 1.5f, "%.01f", 1.f);
