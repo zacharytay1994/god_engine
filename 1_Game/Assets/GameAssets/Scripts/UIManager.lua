@@ -150,6 +150,32 @@ function S_UIManager(e)
         GetGUIText(GetEntity("HealthHeart")).text = tostring(playerComponent.currentHP)
         GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
     end
+	
+	-- enable roll dice button
+	local rollDiceBtn = GetGUIObject(GetEntity("RollDiceButton"))
+	if (GetEntityData(playerEntity).id == turnOrderManagerComponent.currentTurn and UIManagerComponent.diceRolled == false) then
+		rollDiceBtn.active = true
+		
+		local diceList = EntitiesWithScriptComponent("C_DiceScript")
+		for i = 1, #diceList do
+			if (GetComponent(diceList[i], "C_DiceScript").is_rolling == true) then
+				rollDiceBtn.active = false
+				break
+			end
+		end
+		
+		if (rollDiceBtn.active == true) then
+			if (rollDiceBtn.pressed) then
+				for i = 1, #diceList do
+					DiceScript_RollDice(diceList[i], GetComponent(diceList[i], "C_DiceScript"))
+				end
+				rollDiceBtn.active = false
+			end
+		end
+	else
+		rollDiceBtn.active = false
+	end
+	
 	-- print(UIManagerComponent.healthbar_size)
 	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------

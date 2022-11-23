@@ -52,7 +52,10 @@ function S_EndTurnButton(e)
                 
                 -- only end the turn if it is actually the player's turn
                 if (turnOrderManagerComponent.currentTurn == GetEntityData(playerEntity).id) then
-                    
+				
+					-- Reset all the movement highlights for player
+                    ResetHighlightTiles()
+					
                     -- trigger sound effect
                     InstancePrefab("SFX_EndTurn",0,0,0)
                     
