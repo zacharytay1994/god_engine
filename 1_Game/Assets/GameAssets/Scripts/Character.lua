@@ -48,7 +48,6 @@ end
 isAlive = true
 --[IsSystem]
 function S_Character(e)
-    
     -- getting TurnOrderManager component
     local turnOrderManagerEntity = GetEntity("TurnOrderManager") 
     local turnOrderManagerComponent = nil
@@ -103,6 +102,7 @@ function S_Character(e)
             isAlive = false
             ChangeScene("WinloseScreen",true)
         end
+       
         -- RemoveInstance will be called by TurnOrderManager at the end of current round
     end
 
