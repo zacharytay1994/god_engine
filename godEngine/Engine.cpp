@@ -122,7 +122,8 @@ namespace god
 			grid ,
 			sound_assets ,
 			godPhysicsSystem ,
-			scene
+			scene ,
+			fonts
 		);
 
 #ifdef ENABLE_EDITOR
