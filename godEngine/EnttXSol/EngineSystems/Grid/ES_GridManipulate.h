@@ -108,10 +108,12 @@ namespace god
 
 					}
 
+					grid_manipulate.m_hovered_steppable = { std::get<0> ( cell ), std::get<1> ( cell ) + 1 , std::get<2> ( cell ) };
+
 					if ( window.MouseLPressed () )
 					{
 						grid_manipulate.m_clicked = true;
-						grid_manipulate.m_last_clicked_non_steppable = { std::get<0> ( cell ), std::get<1> ( cell ) + 1 , std::get<2> ( cell ) };
+						grid_manipulate.m_last_clicked_steppable = { std::get<0> ( cell ), std::get<1> ( cell ) + 1 , std::get<2> ( cell ) };
 					}
 				}
 			}

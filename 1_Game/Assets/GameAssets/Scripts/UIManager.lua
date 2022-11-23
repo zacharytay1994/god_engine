@@ -21,7 +21,7 @@ function C_UIManager()
         iconList = {},
 		
 		-- Size of healthbar
-		healthbar_size = 0.0,
+		healthbar_size = 0.7,
 		
 		-- Health record, used to optimize the healthbar UI
 		health_record = 0.0
@@ -136,13 +136,14 @@ function S_UIManager(e)
         UIManagerComponent.actionButtonList = {}
     end
 	
-	local playerComponent = GetComponent(playerEntity, "C_Character")
-	GetGUIText(GetEntity("StaminaIcon")).text = tostring(playerComponent.currentStamina)
-	if(UIManagerComponent.health_record ~= playerComponent.currentHP) then
-		UIManagerComponent.health_record = playerComponent.currentHP
-		GetGUIText(GetEntity("HealthHeart")).text = tostring(playerComponent.currentHP)
-		GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
-	end
+    local playerComponent = GetComponent(playerEntity, "C_Character")
+
+    GetGUIText(GetEntity("StaminaIcon")).text = tostring(playerComponent.currentStamina)
+    if(UIManagerComponent.health_record ~= playerComponent.currentHP) then
+        UIManagerComponent.health_record = playerComponent.currentHP
+        GetGUIText(GetEntity("HealthHeart")).text = tostring(playerComponent.currentHP)
+        GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
+    end
 	-- print(UIManagerComponent.healthbar_size)
 	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------
