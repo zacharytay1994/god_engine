@@ -244,6 +244,9 @@ function OnLoad_SplashScreen()
     -- Heart of the trident logo
     InstancePrefab("SS_Logo", 0, 0, 0)
 
+    -- instance background music
+    InstancePrefab("BGM1", 0, 0, 0)
+
     print("[SplashScreen.lua] OnLoad_SplashScreen")
 end
 

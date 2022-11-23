@@ -35,7 +35,7 @@ namespace god
 
 		bool operator==( AudioSource const& rhs )
 		{
-			return true;
+			return m_sound_id == rhs.m_sound_id;
 		}
 
 		// Fading Parameters
