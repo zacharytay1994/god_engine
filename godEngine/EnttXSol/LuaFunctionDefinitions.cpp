@@ -535,6 +535,7 @@ namespace god
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
 						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->clearForce();
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->clearTorque();
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setLinearVelocity ( ConvertToPhysXVector ( { x, y, z } ) );
 					}
 				}

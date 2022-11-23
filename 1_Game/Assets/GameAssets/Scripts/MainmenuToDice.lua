@@ -1,5 +1,5 @@
 --[IsComponent]
-function C_MainmenuToGame()
+function C_MainmenuToDice()
     local var = {
         isSelected = false
     }
@@ -8,18 +8,14 @@ function C_MainmenuToGame()
     end
 end
 
-dice_1_faces = { 0, 0, 0, 0, 0, 0 }
-dice_2_faces = { 0, 0, 0, 3, 3, 3 }
-dice_3_faces = { 0, 0, 0, 3, 3, 3 }
-
 --[IsSystem]
-function S_MainmenuToGame(e)
+function S_MainmenuToDice(e)
 
-    local screen = GetComponent(e, "C_MainmenuToGame")
+    local screen = GetComponent(e, "C_MainmenuToDice")
     local gui_object = GetGUIObject(e)
 
     if(gui_object.pressed and screen.isSelected == false) then
-        ChangeScene("Level_1",true)
+        ChangeScene("DiceCustomization",true)
         screen.isSelected = true
     end
 end
