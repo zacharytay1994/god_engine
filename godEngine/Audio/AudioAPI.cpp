@@ -290,10 +290,20 @@ namespace god
 		ErrorCheck(channel->setDelay(0, dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), false)); // delay to stop sound
 	}
 
-	void AudioAPI::RemoveFadeIn(FMOD::Channel* channel, UINTLL dspClock, float fadeInPoint)
+	void AudioAPI::RemoveFadeIn(FMOD::Channel* channel, float fadeInPoint)
 	{
-		channel->removeFadePoints(dspClock, static_cast<UINTLL>(dspClock + fadeInPoint));
+		UINTLL dsp_clock = GetDSPClock(channel);
+
+		channel->removeFadePoints(dsp_clock, static_cast<UINTLL>(dsp_clock + fadeInPoint));
 	}
+
+	void AudioAPI::RemoveFadeOut(FMOD::Channel* channel, float fadeOutPoint)
+	{
+		UINTLL dsp_clock = GetDSPClock(channel);
+
+		channel->removeFadePoints(dsp_clock, static_cast<UINTLL>(dsp_clock + fadeOutPoint));
+	}
+
 
 
 	void AudioAPI::GetFadePoints(FMOD::Channel* channel, unsigned int* points)

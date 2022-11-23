@@ -43,11 +43,13 @@ namespace god
 						AudioAPI::AddFadeIn(audio_source.m_channel, 10.f, audio_source.m_fadedin);
 						//AudioAPI::AddFadeOutEffect(audio_source.m_channel, audio_source.m_dsp_clock, 3.f);
 						audio_source.m_fadedin = true;
+						audio_source.enable_fade_in = false;
 					}
-					//else
-					//{
-					//	AudioAPI::RemoveFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 10.f);
-					//}
+					else
+					{
+						AudioAPI::RemoveFadeIn(audio_source.m_channel, 10.f);
+						audio_source.m_fadedin = false;
+					}
 				}
 				if (audio_source.enable_fade_out)
 				{
@@ -62,11 +64,13 @@ namespace god
 						//AudioAPI::AddFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 10.f);
 						AudioAPI::AddFadeOut(audio_source.m_channel, 5.f, audio_source.m_fadedout);
 						audio_source.m_fadedout = true;
+						audio_source.enable_fade_out = false;
 					}
-					//else
-					//{
-					//	AudioAPI::RemoveFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 10.f);
-					//}
+					else
+					{
+						AudioAPI::RemoveFadeIn(audio_source.m_channel, 5.f);
+						audio_source.m_fadedout = false;
+					}
 				}
 
 

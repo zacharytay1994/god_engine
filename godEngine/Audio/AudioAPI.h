@@ -78,7 +78,8 @@ namespace god
 		static void AddFadeIn(FMOD::Channel* channel, float fadeInTime, bool& fade);
 		static void AddFadeOut(FMOD::Channel* channel, float fadeOutTime, bool& fade);
 
-		static void RemoveFadeIn(FMOD::Channel* channel, UINTLL dspClock, float fadeInTime);
+		static void RemoveFadeIn(FMOD::Channel* channel, float fadeInTime);
+		static void RemoveFadeOut(FMOD::Channel* channel, float fadeOutPoint);
 
 		static void GetFadePoints(FMOD::Channel* channel, unsigned int* points);
 		static int GetSampleRate();
