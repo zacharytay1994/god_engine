@@ -90,22 +90,22 @@ function S_Pathfind(e)
                         
                         -- -- adjust character's rotation here -----------------------------------------------------------
                         -- local characterTransform = GetTransform(e)
-                        local child_model = Child(e,0)
-                        local child_model_transform = GetTransform(child_model)
+                        -- local child_model = Child(e,0)
+                        -- local child_model_transform = GetTransform(child_model)
                         
-                        if (path[2].x > current_cell.x) then
-                            -- face left
-                            child_model_transform.rotation.y = 90
-                        elseif (path[2].x < current_cell.x) then
-                            -- face right
-                            child_model_transform.rotation.y = 270
-                        elseif (path[2].z > current_cell.z) then
-                            -- face front
-                            child_model_transform.rotation.y = 0
-                        else
-                            -- face back
-                            child_model_transform.rotation.y = 180         
-                        end
+                        -- if (path[2].x > current_cell.x) then
+                        --     -- face left
+                        --     child_model_transform.rotation.y = 90
+                        -- elseif (path[2].x < current_cell.x) then
+                        --     -- face right
+                        --     child_model_transform.rotation.y = 270
+                        -- elseif (path[2].z > current_cell.z) then
+                        --     -- face front
+                        --     child_model_transform.rotation.y = 0
+                        -- else
+                        --     -- face back
+                        --     child_model_transform.rotation.y = 180         
+                        -- end
                         -- -- end of adjusting rotation ------------------------------------------------------------------
                         
                         -- -- move the character -------------------------------------------------------------------------
@@ -135,9 +135,9 @@ function S_Pathfind(e)
                         
                         print("SETTING OFFSET")
                         -- Set child i.e. model position offset to start movement animation
-                        child_model_transform.position.x = (current_cell.x - path[2].x)*2.0
-                        child_model_transform.position.y = (current_cell.y - path[2].y)*2.0
-                        child_model_transform.position.z = (current_cell.z - path[2].z)*2.0
+                        -- child_model_transform.position.x = (current_cell.x - path[2].x)*2.0
+                        -- child_model_transform.position.y = (current_cell.y - path[2].y)*2.0
+                        -- child_model_transform.position.z = (current_cell.z - path[2].z)*2.0
 
                         print("OFFSET SET")
 
