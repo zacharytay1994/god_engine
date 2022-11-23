@@ -1,5 +1,5 @@
 --[IsComponent]
-function C_QuitToMainMenu()
+function C_MainmenuToDice()
     local var = {
         isSelected = false
     }
@@ -9,13 +9,13 @@ function C_QuitToMainMenu()
 end
 
 --[IsSystem]
-function S_QuitToMainMenu(e)
-    local screen = GetComponent(e, "C_QuitToMainMenu")
+function S_MainmenuToDice(e)
+
+    local screen = GetComponent(e, "C_MainmenuToDice")
     local gui_object = GetGUIObject(e)
 
     if(gui_object.pressed and screen.isSelected == false) then
-        ChangeScene("MainmenuScreen",true)
-        SceneName = "Mainmenu"
+        ChangeScene("DiceCustomization",true)
         screen.isSelected = true
     end
 end

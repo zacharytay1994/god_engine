@@ -24,7 +24,8 @@ function C_DiceScript()
 		rotation_y = 0.0,
 		rotation_z = 0.0,
 		
-		dice_faces = { 0, 0, 0, 3, 3, 3 }
+		dice_faces = { 0, 0, 0, 3, 3, 3 },
+		dice_id = 0
     }
     return function()
         return var
@@ -34,25 +35,40 @@ end
 --[IsSystem]
 function S_DiceScript(e)
 	local c_dice = GetComponent(e, "C_DiceScript")
+
 	if (c_dice.is_init == false) then
-		c_dice.fodder_text = "---DiceScript is running!"
+		c_dice.fodder_text = "DiceScript is running!"
+		local diceList = EntitiesWithScriptComponent("C_DiceScript")
+		for i = 1, #diceList do
+			if (diceList[i] == e) then
+				c_dice.dice_id = i
+				if (i == 1) then
+					c_dice.dice_faces = dice_1_faces
+				elseif (i == 2) then
+					c_dice.dice_faces = dice_2_faces
+				elseif (i == 3) then
+					c_dice.dice_faces = dice_3_faces
+				end
+				break
+			end
+		end
 		local transform = GetTransform(e)
 		c_dice.start_position_x = transform.position.x
 		c_dice.start_position_y = transform.position.y
 		c_dice.start_position_z = transform.position.z
 		ChangeTexture(e, "Pixel_Blue")
 		for i = 0,5 do
-			if (c_dice.dice_faces[i] == 0) then
+			if (c_dice.dice_faces[i+1] == 0) then
 				ChangeModel(Child(e, i), "dice_jab3D")
-			elseif (c_dice.dice_faces[i] == 1) then
+			elseif (c_dice.dice_faces[i+1] == 1) then
 				ChangeModel(Child(e, i), "dice_swing3D")
-			elseif (c_dice.dice_faces[i] == 2) then
+			elseif (c_dice.dice_faces[i+1] == 2) then
 				ChangeModel(Child(e, i), "dice_smash3D")
-			elseif (c_dice.dice_faces[i] == 3) then
+			elseif (c_dice.dice_faces[i+1] == 3) then
 				ChangeModel(Child(e, i), "dice_bolt3D")
-			elseif (c_dice.dice_faces[i] == 4) then
+			elseif (c_dice.dice_faces[i+1] == 4) then
 				-- ChangeModel(Child(e, i), "dice_projectile3D")
-			elseif (c_dice.dice_faces[i] == 5) then
+			elseif (c_dice.dice_faces[i+1] == 5) then
 				-- ChangeModel(Child(e, i), "dice_corporikinesis3D")
 			end
 		end
@@ -84,7 +100,7 @@ function S_DiceScript(e)
 									if (top_index_position_y < WorldPosition(Child(e, i)).y) then
 										top_index_position_y = WorldPosition(Child(e, i)).y
 										-- c_dice.value = i + 1
-										c_dice.value = c_dice.dice_faces[i]
+										c_dice.value = c_dice.dice_faces[i+1]
 									end
 								end
 								print("[DiceScript] Dice value:", c_dice.value)
@@ -138,7 +154,6 @@ function DiceScript_RollDice(e, c_dice)
 	c_dice.is_rolling = true
 	c_dice.value = -1
 	FreezeObject(e, false)
-	SetVelocity(e, 0, 0, 0)
 	local transform = GetTransform(e)
 	transform.rotation.x = GenerateRandomNumberInRange(0,360)
 	transform.rotation.y = GenerateRandomNumberInRange(0,360)
@@ -161,5 +176,5 @@ function DiceScript_DisableDice(e, c_dice)
 	c_dice.color = 0
 	FreezeObject(e, true)
 	SetTransformPosition(e, 999, 999, 999)
-	SetVelocity(e, 0, 0, 0)
+
 end

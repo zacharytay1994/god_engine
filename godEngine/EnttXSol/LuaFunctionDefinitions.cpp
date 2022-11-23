@@ -112,6 +112,18 @@ namespace god
 			}
 		);
 
+		// SetActive(e,bool)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "SetActive" ,
+			[&entt]( entt::entity e , bool active )
+			{
+				if ( EntityData* ed = entt.GetEngineComponent<EntityData> ( e ) )
+				{
+					entt.SetEntityActive ( ed->m_id , active );
+				}
+			}
+		);
+
 		// GetDeltaTime()
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "GetDeltaTime" ,
@@ -172,6 +184,29 @@ namespace god
 					return out;
 				}
 				return std::vector<glm::ivec3> ();
+			}
+		);
+
+		// ForceCellUpdate(e,name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "ForceCellUpdate" ,
+			[&entt , &engineResources]( entt::entity e )->bool
+			{
+				// get parent of entity
+				EntityData* entity_data = entt.GetEngineComponent<EntityData> ( e );
+				GridCell* grid_cell = entt.GetEngineComponent<GridCell> ( e );
+				if ( entity_data && grid_cell )
+				{
+					// get parent grid
+					auto& grid = engineResources.Get<EntityGrid> ().get ()[ entity_data->m_parent_id ];
+					grid.ChangeCell ( { entity_data->m_id, grid_cell->m_passable, grid_cell->m_steppable } , grid_cell->m_cell_size , { grid_cell->m_cell_ox, grid_cell->m_cell_oy, grid_cell->m_cell_oz } , { grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } );
+					grid_cell->m_cell_ox = grid_cell->m_cell_x;
+					grid_cell->m_cell_oy = grid_cell->m_cell_y;
+					grid_cell->m_cell_oz = grid_cell->m_cell_z;
+					grid_cell->m_changed = false;
+					return true;
+				}
+				return false;
 			}
 		);
 
@@ -479,6 +514,19 @@ namespace god
 			}
 		);
 
+		// LerpVec3(x0,y0,z0,x1,y1,z1)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "LerpVec3" ,
+			[]( float x0 , float y0 , float z0 , float x1 , float y1 , float z1 , float lerpVal )->glm::vec3
+			{
+				glm::vec3 out;
+				out.x = std::lerp ( x0 , x1 , lerpVal );
+				out.y = std::lerp ( y0 , y1 , lerpVal );
+				out.z = std::lerp ( z0 , z1 , lerpVal );
+				return out;
+			}
+		);
+
 		// EntityName(e)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "EntityName" ,
@@ -508,17 +556,17 @@ namespace god
 
 		// SetTransformRotation(e,x,y,z)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("SetTransformRotation",
-			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+		entt.RegisterLuaFunction ( "SetTransformRotation" ,
+			[&entt , &engineResources]( entt::entity e , float x , float y , float z )
 			{
-				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+				while ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () )
 					;
 
-				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				if ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () == false )
 				{
-					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setGlobalPose ( ConvertToPhysXTransform ( entt.GetEngineComponent<Transform> ( e )->m_position, { x, y, z } ) );
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setGlobalPose ( ConvertToPhysXTransform ( entt.GetEngineComponent<Transform> ( e )->m_position , { x, y, z } ) );
 					}
 				}
 			}
@@ -537,6 +585,7 @@ namespace god
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
 						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->clearForce();
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->clearTorque();
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setLinearVelocity ( ConvertToPhysXVector ( { x, y, z } ) );
 					}
 				}
@@ -574,8 +623,7 @@ namespace god
 				{
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
-						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_SIMULATION , freeze );
-						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_GRAVITY ,    freeze );
+
 						entt.GetEngineComponent<RigidDynamic>(e)->Active = !freeze;
 					}
 				}
