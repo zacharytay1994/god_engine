@@ -62,21 +62,33 @@ function S_ActionButton(e)
 		if (playerComponent.selectedAction == "Move") then
 			HighlightTiles(playerEntity, GetComponent(playerEntity, "C_Character").currentStamina)
 			
-        elseif (playerComponent.selectedAction == "FrontJab") then
-            playerAttackComponent.selectedAttack = attackList[1]
-			ResetHighlightTiles()
+        else
+
+            playerAttackComponent.selectedAttack = ConvertActionToAttack(playerComponent.selectedAction, attackList)
+            ResetHighlightTiles()
             print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
-                        "Base damage:", playerAttackComponent.selectedAttack[2], 
-                        "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+                    "Base damage:", playerAttackComponent.selectedAttack[2], 
+                    "Special property:", playerAttackComponent.selectedAttack[3], "\n")
         
-        elseif (playerComponent.selectedAction == "EnergyBolt") then
-            playerAttackComponent.selectedAttack = attackList[10]
-			ResetHighlightTiles()
-            print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
-                        "Base damage:", playerAttackComponent.selectedAttack[2], 
-                        "Special property:", playerAttackComponent.selectedAttack[3], "\n")
-            
         end
+        
+        
+            -- old code, leave here for reference
+        -- elseif (playerComponent.selectedAction == "FrontJab") then
+        --     playerAttackComponent.selectedAttack = attackList[1]
+		-- 	ResetHighlightTiles()
+        --     print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+        --                 "Base damage:", playerAttackComponent.selectedAttack[2], 
+        --                 "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+        
+        -- elseif (playerComponent.selectedAction == "EnergyBolt") then
+        --     playerAttackComponent.selectedAttack = attackList[10]
+		-- 	ResetHighlightTiles()
+        --     print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
+        --                 "Base damage:", playerAttackComponent.selectedAttack[2], 
+        --                 "Special property:", playerAttackComponent.selectedAttack[3], "\n")
+            
+        -- end
 
         -- -- un-hardcoded solution 
         -- -- (diceValue will be a value from 0 to 8, colorModifier will be a value from 1 to 3.
@@ -108,4 +120,19 @@ function S_ActionButton(e)
         playerComponent.selectedAction = nil
         actionButtonComponent.buttonSelected = false
     end
+end
+
+-- selectedAction is a string ("Move", "frontJabBlue", "bigSwingGold", etc)
+function ConvertActionToAttack(selectedAction, attackList)
+
+    for i = 1, #attackList do
+    
+        if (attackList[i][1] == selectedAction) then
+            print("[UIActionButton.lua] Matched attack:", attackList[i][1])
+            return attackList[i]
+        end
+    end
+
+    print("[UIActionButton.lua] No matching attack in attackList!")
+    return nil
 end
