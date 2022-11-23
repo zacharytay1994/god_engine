@@ -67,9 +67,9 @@ function S_DiceScript(e)
 			elseif (c_dice.dice_faces[i+1] == 3) then
 				ChangeModel(Child(e, i), "dice_bolt3D")
 			elseif (c_dice.dice_faces[i+1] == 4) then
-				-- ChangeModel(Child(e, i), "dice_projectile3D")
+				ChangeModel(Child(e, i), "dice_projectile3D")
 			elseif (c_dice.dice_faces[i+1] == 5) then
-				-- ChangeModel(Child(e, i), "dice_corporikinesis3D")
+				ChangeModel(Child(e, i), "dice_cryogenesis3D")
 			end
 		end
 		c_dice.current_timer = GenerateRandomNumberInRange(0, c_dice.blue_chance)
