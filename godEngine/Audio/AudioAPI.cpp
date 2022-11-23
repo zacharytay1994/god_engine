@@ -245,16 +245,21 @@ namespace god
 
 	void AudioAPI::AddFadeOutEffect(FMOD::Channel* channel, UINTLL dspClock, float fadeOutPoint)
 	{
-		channel->setPaused(true);
-
 		ErrorCheck(channel->addFadePoint(dspClock, 1.f));
 		ErrorCheck(channel->addFadePoint(dspClock + static_cast<UINTLL>((m_sample_rate * fadeOutPoint)), 0.f));
 		ErrorCheck(channel->setDelay(0, dspClock + static_cast<UINTLL>((m_sample_rate * fadeOutPoint)), true)); // delay to stop sound
+	}
 
-		channel->setPaused(false);
+	void AudioAPI::RemoveFadeInEffect(FMOD::Channel* channel, UINTLL dspClock, float fadeInPoint)
+	{
+		channel->removeFadePoints(dspClock, static_cast<UINTLL>(dspClock + fadeInPoint));
 	}
 
 
+	void AudioAPI::GetFadePoints(FMOD::Channel* channel, unsigned int* points)
+	{
+		channel->getFadePoints(points, 0, 0);
+	}
 
 	int AudioAPI::GetSampleRate()
 	{

@@ -19,12 +19,6 @@ namespace god
 				// check for playback state
 				AudioAPI::CheckSoundPlayback(audio_source.m_channel, &audio_source.m_finish_playing);
 
-				// DSP Effects
-				AudioAPI::GetDSPClock(audio_source.m_channel, audio_source.m_dsp_clock);
-				//AudioAPI::AddEchoEffect(audio_source.m_channel);
-
-				AudioAPI::AddFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 5.f);
-				//AudioAPI::AddFadeOutEffect(audio_source.m_channel, audio_source.m_dsp_clock, 5.f);
 
 				// Set Audio Source attributes
 				AudioAPI::SetMute(audio_source.m_channel, audio_source.m_mute);

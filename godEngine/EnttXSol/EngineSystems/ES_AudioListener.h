@@ -34,6 +34,26 @@ namespace god
 						AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
 				}
 
+				if (audio_source.enable_fade)
+				{
+					unsigned int points; // move this to audioapi
+					AudioAPI::GetFadePoints(audio_source.m_channel, &points);
+					if (points == 0 && !audio_source.m_faded)
+					{
+						// DSP Effects
+						AudioAPI::GetDSPClock(audio_source.m_channel, audio_source.m_dsp_clock);
+						//AudioAPI::AddEchoEffect(audio_source.m_channel);
+
+						//AudioAPI::AddFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 10.f);
+						AudioAPI::AddFadeOutEffect(audio_source.m_channel, audio_source.m_dsp_clock, 3.f);
+						audio_source.m_faded = true;
+					}
+					//else
+					//{
+					//	AudioAPI::RemoveFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 10.f);
+					//}
+				}
+
 			}
 		}
 

@@ -7,7 +7,9 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct AudioSource
 	{
+		bool enable_fade{ false };
 		UINTLL m_dsp_clock;
+		bool m_faded{ false };
 
 		FMOD::Channel* m_channel{ nullptr };
 		const char* m_channel_group_name{ "" };
@@ -130,6 +132,7 @@ namespace god
 				ImGui::Checkbox("Mute", &component.m_mute);
 				ImGui::Checkbox("Loop", &component.m_loop);
 				ImGui::Checkbox("Play On Awake", &component.m_play_on_awake);
+				ImGui::Checkbox("Fade", &component.enable_fade);
 
 				ImGui::DragFloat("Volume", &component.m_volume, 0.01f, 0.f, 1.f);
 				ImGui::SliderFloat("Pitch", &component.m_pitch, 0.f, 1.5f, "%.01f", 1.f);
