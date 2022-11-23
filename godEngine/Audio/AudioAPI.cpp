@@ -242,6 +242,27 @@ namespace god
 		return FMOD_OK;
 	}
 
+	void AudioAPI::PlaySoundFromTime(FMOD::Channel* channel, float startPoint)
+	{
+		UINTLL dsp_clock = GetDSPClock(channel);
+		FMOD::Sound* sound; channel->getCurrentSound(&sound);
+
+		unsigned int length; sound->getLength(&length, FMOD_TIMEUNIT_MS);
+
+		channel->setDelay(dsp_clock + static_cast<UINTLL>(m_sample_rate * startPoint), length, false);
+	}
+
+	void AudioAPI::PlaySoundUntilTime(FMOD::Channel* channel, float endPoint)
+	{
+		UINTLL dsp_clock = GetDSPClock(channel);
+
+		channel->setDelay(dsp_clock, dsp_clock + static_cast<UINTLL>(m_sample_rate * endPoint), false);
+	}
+
+	void AudioAPI::PlaySoundBetweenTimes(FMOD::Channel* channel, float startPoint, float endPoint)
+	{
+	}
+
 	void AudioAPI::StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
 	{
 		m_master_channel_group->stop();
@@ -287,7 +308,7 @@ namespace god
 
 		ErrorCheck(channel->addFadePoint(dsp_clock, volume));
 		ErrorCheck(channel->addFadePoint(dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), 0.f));
-		ErrorCheck(channel->setDelay(0, dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), false)); // delay to stop sound
+		ErrorCheck(channel->setDelay(0, dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), true)); // delay to stop sound
 	}
 
 	void AudioAPI::RemoveFadeIn(FMOD::Channel* channel, float fadeInPoint)

@@ -68,6 +68,10 @@ namespace god
 
 		static FMOD_RESULT CheckSoundPlayback(FMOD::Channel* channel, bool* isPlaying);
 
+		static void PlaySoundFromTime(FMOD::Channel* channel, float startPoint);
+		static void PlaySoundUntilTime(FMOD::Channel* channel, float endPoint);
+		static void PlaySoundBetweenTimes(FMOD::Channel* channel, float startPoint, float endPoint);
+
 		static void PauseAll();
 		static void ResumeAll();
 		static void StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets);

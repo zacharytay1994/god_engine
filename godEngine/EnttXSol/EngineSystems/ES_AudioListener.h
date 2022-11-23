@@ -34,6 +34,14 @@ namespace god
 						AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
 				}
 
+				if (audio_source.m_stop)
+				{
+					AudioAPI::StopSound(audio_source.m_channel);
+					audio_source.m_played = false;
+					audio_source.enable_fade_in = true;
+					audio_source.m_stop = false;
+				}
+
 				// Fading Control --------------------------------------------------------------------
 				if (audio_source.enable_fade_in)
 				{

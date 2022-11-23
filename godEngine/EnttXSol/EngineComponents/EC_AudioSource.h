@@ -18,6 +18,8 @@ namespace god
 		bool m_mute{ false };
 		bool m_loop{ false };
 
+		bool m_stop{ false };
+
 		bool m_play_on_awake{ true };
 		bool m_awake_played{ false };
 
@@ -42,8 +44,8 @@ namespace god
 		bool m_faded_in{ false };
 		bool m_faded_out{ false };
 
-		float m_fade_in_time{ 5.f };
-		float m_fade_out_time{ 5.f };
+		float m_fade_in_time{ 3.f };
+		float m_fade_out_time{ 3.f };
  	};
 	template <>
 	inline void NewLuaType<AudioSource>(sol::state& luaState, std::string const& name)
@@ -51,6 +53,8 @@ namespace god
 		RegisterLuaType<AudioSource>(luaState, name,
 			"sound_id", &AudioSource::m_sound_id,
 			"finish_playing", &AudioSource::m_played,
+			"played", &AudioSource::m_played,
+			"stop", &AudioSource::m_stop,
 			"mute", &AudioSource::m_mute,
 			"loop", &AudioSource::m_loop,
 			"play_on_awake", &AudioSource::m_play_on_awake,
@@ -60,6 +64,8 @@ namespace god
 			"max_distance", &AudioSource::m_max_distance,
 			"fade_in", &AudioSource::enable_fade_in,
 			"fade_out", &AudioSource::enable_fade_out,
+			"faded_in", &AudioSource::enable_fade_in,
+			"faded_out", &AudioSource::enable_fade_out,
 			"fade_in_time", &AudioSource::m_fade_in_time,
 			"fade_out_time", &AudioSource::m_fade_out_time
 			);
