@@ -156,6 +156,7 @@ function GenerateSeahorse(vel_x, vel_y, vel_z, pos_x, pos_y, pos_z, index)
     end
 end
 
+-- create point light in scene
 function GeneratePointLight()
     for i = 0, 2, 1 do
         -- random Y position ( out of screen )
@@ -164,8 +165,6 @@ function GeneratePointLight()
         pointlight_data.timer_ = 1 * i
         pointlight_data.active_ = false
     end
-
-
 end
 
 -- initialization of data before play button is trigged
@@ -237,6 +236,14 @@ function OnLoad_SplashScreen()
     SetCameraMoveSpeed(0.0)
     SetCameraNextPosition(10, 2, 4.5)
 
+    InstancePrefab("SS_TreeBranch", 7.5, 1.5, 5.0)
+
+    -- "ENTER + LEFT CLICK to SKIP" text on screen
+    InstancePrefab("SS_Text", 0, 0, 0)
+
+    -- Heart of the trident logo
+    InstancePrefab("SS_Logo", 0, 0, 0)
+
     print("[SplashScreen.lua] OnLoad_SplashScreen")
 end
 
@@ -304,12 +311,14 @@ function S_SplashScreen(e)
     local camera = FindCameraObject()
 
     -- move back camera
-    if camera.position.z < 5 then
+    if camera.position.z <= 5.0 then
         IsMoving = false
+        local pngtext = EntitiesWithScriptComponent("C_PngTextData")[1]
+        ChangeTexture(pngtext, "SplashScreenText_2")
     end
 
     -- change scene
-    if ((camera.position.z < -6) and CheckKeyDown(257)) then
+    if ((camera.position.z < -6)) then
         ChangeScene("MainmenuScreen", true)
     end
 
@@ -367,4 +376,17 @@ end
 
 --[IsSystem]
 function S_PointLightData(e)
+end
+
+--[IsComponent]
+function C_PngTextData()
+    local var = {
+    }
+    return function()
+        return var
+    end
+end
+
+--[IsSystem]
+function S_PngTextData(e)
 end
