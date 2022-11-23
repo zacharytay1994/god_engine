@@ -112,6 +112,18 @@ namespace god
 			}
 		);
 
+		// SetActive(e,bool)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "SetActive" ,
+			[&entt]( entt::entity e , bool active )
+			{
+				if ( EntityData* ed = entt.GetEngineComponent<EntityData> ( e ) )
+				{
+					entt.SetEntityActive ( ed->m_id , active );
+				}
+			}
+		);
+
 		// GetDeltaTime()
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "GetDeltaTime" ,
