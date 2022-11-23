@@ -24,7 +24,8 @@ function C_DiceScript()
 		rotation_y = 0.0,
 		rotation_z = 0.0,
 		
-		dice_faces = { 0, 0, 0, 3, 3, 3 }
+		dice_faces = { 0, 0, 0, 3, 3, 3 },
+		dice_id = 0
     }
     return function()
         return var
@@ -34,8 +35,23 @@ end
 --[IsSystem]
 function S_DiceScript(e)
 	local c_dice = GetComponent(e, "C_DiceScript")
+
 	if (c_dice.is_init == false) then
-		c_dice.fodder_text = "---DiceScript is running!"
+		c_dice.fodder_text = "DiceScript is running!"
+		local diceList = EntitiesWithScriptComponent("C_DiceScript")
+		for i = 1, #diceList do
+			if (diceList[i] == e) then
+				c_dice.dice_id = i
+				if (i == 1) then
+					c_dice.dice_faces = dice_1_faces
+				elseif (i == 2) then
+					c_dice.dice_faces = dice_2_faces
+				elseif (i == 3) then
+					c_dice.dice_faces = dice_3_faces
+				end
+				break
+			end
+		end
 		local transform = GetTransform(e)
 		c_dice.start_position_x = transform.position.x
 		c_dice.start_position_y = transform.position.y
