@@ -137,11 +137,17 @@ function DiceScript_RollDice(e, c_dice)
 	print("[DiceScript] Roll Dice")
 	c_dice.is_rolling = true
 	c_dice.value = -1
-	FreezeObject(e, false)
+
 	local transform = GetTransform(e)
 	transform.rotation.x = GenerateRandomNumberInRange(0,360)
 	transform.rotation.y = GenerateRandomNumberInRange(0,360)
 	transform.rotation.z = GenerateRandomNumberInRange(0,360)
+
+	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
+
+	DebugPrintPos(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
+	FreezeObject(e, false)
+
 	c_dice.current_timer = GenerateRandomNumberInRange(0, c_dice.blue_chance)
 	if (c_dice.current_timer < c_dice.gold_chance) then
 		c_dice.color = 3
@@ -150,7 +156,8 @@ function DiceScript_RollDice(e, c_dice)
 	else
 		c_dice.color = 1
 	end
-	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
+
+	
 end
 
 function DiceScript_DisableDice(e, c_dice)
@@ -159,5 +166,5 @@ function DiceScript_DisableDice(e, c_dice)
 	c_dice.value = -1
 	c_dice.color = 0
 	FreezeObject(e, true)
-	SetTransformPosition(e, 999, 999, 999)
+
 end

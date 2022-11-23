@@ -29,7 +29,7 @@ namespace god
 		void Init(GLFWWindow* window, Camera* cam);
 		void Update(float dt, bool pause);
 		
-
+		float Getdt() const;
 		physx::PxRigidActor* const GetRayCastMouse() const;
 		const uint32_t getRCMid() const;
 		void setRCMid(uint32_t id);
@@ -88,6 +88,7 @@ namespace god
 		
 		std::array < float, 5> sma_dt;
 		int sma_index = 0;
+		float m_dt;
 	};
 
 

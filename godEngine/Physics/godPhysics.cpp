@@ -171,6 +171,7 @@ namespace god
 	}
 	void PhysicsSystem::Update(float dt , bool pause)
 	{
+		m_dt = dt;
 		if (!mWindow->WindowsMinimized())
 			Raycast();
 		if (pause)
@@ -259,6 +260,11 @@ namespace god
 			mRayCastMouse = nullptr;
 			//SetRCMid(Null);
 		}
+	}
+
+	float PhysicsSystem::Getdt() const
+	{
+		return m_dt;
 	}
 
 	physx::PxRigidActor* const PhysicsSystem::GetRayCastMouse() const

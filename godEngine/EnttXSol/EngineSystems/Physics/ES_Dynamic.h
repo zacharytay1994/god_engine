@@ -34,6 +34,9 @@ namespace god
 		{
 			return;
 		}//else if entt.m_pause
+
+
+
 		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1> ( component );
 		RigidDynamic& rigiddynamic = std::get<2>(component);
@@ -46,6 +49,9 @@ namespace god
 		Asset3DManager& assetmgr = engineResources.Get<Asset3DManager> ().get ();
 
 
+
+
+		
 
 		if ( rigiddynamic.updateRigidDynamic)
 		{
@@ -129,8 +135,11 @@ namespace god
 			rigiddynamic.mScene = mScene;
 
 			rigiddynamic.p_RigidDynamic->attachShape ( *rigiddynamic.p_shape );
+
+			rigiddynamic.p_RigidDynamic->clearForce();
 			rigiddynamic.p_RigidDynamic->setAngularVelocity ( physx::PxVec3 ( rigiddynamic.AngularVelocity.x , rigiddynamic.AngularVelocity.y , rigiddynamic.AngularVelocity.z ) , true );
-		
+			rigiddynamic.p_RigidDynamic->setLinearVelocity(physx::PxVec3(rigiddynamic.LinearVelocity.x, rigiddynamic.LinearVelocity.y, rigiddynamic.LinearVelocity.z), true);
+
 			physx::PxRigidBodyExt::setMassAndUpdateInertia ( *rigiddynamic.p_RigidDynamic , mass );
 			physx::PxRigidBodyExt::updateMassAndInertia ( *rigiddynamic.p_RigidDynamic , rigiddynamic.Density );
 
@@ -142,15 +151,18 @@ namespace god
 			rigiddynamic.p_RigidDynamic->userData = &rigiddynamic;
 			rigiddynamic.p_RigidDynamic->setName("Dynamic");
 
+
+
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, !rigiddynamic.Active);
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+
+
 			rigiddynamic.updateRigidDynamic = false;
 
 
 
 		}//init rigiddynamic
 
-		
-		rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, !rigiddynamic.Active);
-		rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !rigiddynamic.Gravity);
 
 		if (rigiddynamic.Trigger)
 		{
@@ -196,9 +208,21 @@ namespace god
 		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
+
 		
+		rigiddynamic.p_RigidDynamic->clearForce();
 
+		if (rigiddynamic.Gravity)
+		{
+			if()
+			rigiddynamic.p_RigidDynamic->addForce(physx::PxVec3(0.f, rigiddynamic.p_RigidDynamic->getMass() * -98.11f * psys.Getdt(), 0.f));
+		}
 
+		if (rigiddynamic.PhysicsTypeid == PhysicsTypes::Dice)
+		{
+			std::cout << "pos: " << rigiddynamic.p_RigidDynamic->getGlobalPose().p << std::endl;
+			std::cout << "linear velo: "<<rigiddynamic.p_RigidDynamic->getLinearVelocity() << std::endl;
+		}
 		if ( rigiddynamic.p_RigidDynamic )
 		{
 			physx::PxTransform ptransform = rigiddynamic.p_RigidDynamic->getGlobalPose ();

@@ -504,6 +504,15 @@ namespace god
 			}
 		);
 
+		// DebugPrintPos(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("DebugPrintPos",
+			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+			{
+				std::cout << "DebugPrintPos "<<x<<", " << y << ", " << z << "\n";
+			}
+		);
+		
 		// SetVelocity(e,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "SetVelocity" ,
@@ -545,18 +554,21 @@ namespace god
 
 		// FreezeObject(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction ( "FreezeObject" ,
-			[&entt , &engineResources]( entt::entity e , bool freeze )
+		entt.RegisterLuaFunction("FreezeObject",
+			[&entt, &engineResources](entt::entity e, bool freeze)
 			{
-				while ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () )
+				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
 					;
 
-				if ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () == false )
+				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
 				{
-					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
+					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
 					{
-						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_SIMULATION , freeze );
-						entt.GetEngineComponent<RigidDynamic>(e)->Active = !freeze;
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setAngularVelocity(physx::PxVec3(0.f, 0.f, 0.f));
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setAngularVelocity(physx::PxVec3(0.f, 0.f, 0.f));
+						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setLinearVelocity(physx::PxVec3(0.f, 0.f, 0.f));
+
+						entt.GetEngineComponent<RigidDynamic>(e)->Gravity = !freeze;
 					}
 				}
 			}
