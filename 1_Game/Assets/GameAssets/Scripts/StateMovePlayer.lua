@@ -11,7 +11,8 @@ function C_StateMovePlayer()
         GlobalStatemachine = "GlobalStatemachine",
         State = "MovePlayer",
         Time = 0.0,
-        callEnemyForecast = false
+        callEnemyForecast = false,
+        refreshEnemyForecastOnce = false
     }
     return function()
         return var
@@ -40,10 +41,14 @@ function S_StateMovePlayer(e)
 
             -- do not allow movement if no more stamina
             if (GetComponent(e, "C_Character").currentStamina <= 0) then
-                print("[StateMovePlayer.lua] Player stamina has reached zero! Refreshing enemy forecasts and returning.")
+                -- print("[StateMovePlayer.lua] Player stamina has reached zero! Refreshing enemy forecasts and returning.")
                 -- GetComponent(e, "C_Player").selectedAction = nil
-                
-                RefreshEnemyForecast()
+
+                if (stateMovePlayerComponent.refreshEnemyForecastOnce == false) then
+                    RefreshEnemyForecast()
+                    stateMovePlayerComponent.refreshEnemyForecastOnce = true
+                end
+
                 return
             end
 
@@ -62,8 +67,14 @@ function S_StateMovePlayer(e)
                         pathfind.y = gm.last_clicked_cell.y
                         pathfind.z = gm.last_clicked_cell.z
                         pathfind.Path = true
-
+						
+						ResetHighlightTiles()
+						
                         stateMovePlayerComponent.callEnemyForecast = true
+                        ClearIndicatorsList()
+
+                        -- allow forecast to refresh when player stamina reaches zero
+                        stateMovePlayerComponent.refreshEnemyForecastOnce = false
                     end
 
                     local playerGridCell = GetGridCell(e)
@@ -75,6 +86,8 @@ function S_StateMovePlayer(e)
                             print("[StateMovePlayer.lua] Player has reached destination! Refreshing enemy forecasts.")
                             RefreshEnemyForecast()
                             stateMovePlayerComponent.callEnemyForecast = false
+							
+							HighlightTiles(GetEntity("Player"), GetComponent(GetEntity("Player"), "C_Character").currentStamina)
                         end
                     end
                 end             

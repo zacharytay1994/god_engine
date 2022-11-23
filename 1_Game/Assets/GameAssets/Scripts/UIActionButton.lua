@@ -59,14 +59,19 @@ function S_ActionButton(e)
         print("[ActionButton.lua] playerComponent.selectedAction:", playerComponent.selectedAction)
         
         -- hardcoded (will update soon)
-        if (playerComponent.selectedAction == "FrontJab") then
+		if (playerComponent.selectedAction == "Move") then
+			HighlightTiles(playerEntity, GetComponent(playerEntity, "C_Character").currentStamina)
+			
+        elseif (playerComponent.selectedAction == "FrontJab") then
             playerAttackComponent.selectedAttack = attackList[1]
+			ResetHighlightTiles()
             print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
                         "Base damage:", playerAttackComponent.selectedAttack[2], 
                         "Special property:", playerAttackComponent.selectedAttack[3], "\n")
         
         elseif (playerComponent.selectedAction == "EnergyBolt") then
             playerAttackComponent.selectedAttack = attackList[10]
+			ResetHighlightTiles()
             print("[ActionButton.lua] Selected Player attack:", playerAttackComponent.selectedAttack[1], 
                         "Base damage:", playerAttackComponent.selectedAttack[2], 
                         "Special property:", playerAttackComponent.selectedAttack[3], "\n")

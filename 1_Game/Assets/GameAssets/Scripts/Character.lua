@@ -73,6 +73,9 @@ function S_Character(e)
         
         print("[Character.lua]", EntityName(e), entityDataComponent.id, "has died, hiding body.")
 
+        -- RefreshEnemyForecast()
+        -- print("[Character.lua] Refreshing EnemyForecast because an enemy died.")
+
         -- hide the character below the map for now
         GetTransform(e).position.y = -100
         GetGridCell(e).y = -100
@@ -80,6 +83,21 @@ function S_Character(e)
         -- set character to dead
         characterComponent.isDead = true
 
+        -- Note: this causes the game to crash when EnemyForecast tries to clear indicatorsList.
+        -- remove forecast indicator ---------------------------------------------------------------------
+        -- if (characterComponent.characterType == "Dummee" or characterComponent.characterType == "Squinky") then   
+        --     local entity = e   --- need this line if not the script will stop running for the player entity
+        --     local enemyControllerComponent = GetComponent(entity, "C_EnemyController")
+        --     if (enemyControllerComponent.indicatorEntity ~= nil) then
+        --         print("[Character.lua] Removing indicatorEntity for character who just died!")
+        --         RemoveInstance(enemyControllerComponent.indicatorEntity)
+        --         enemyControllerComponent.indicatorEntity = nil
+        --     else
+        --         print("enemyController.indicatorEntity is nil")
+        --     end
+        -- end
+        --------------------------------------------------------------------------------------------------
+         
         if (characterComponent.characterType == "Player" and characterComponent.isDead == true) 
         then
             isAlive = false
