@@ -3,7 +3,7 @@ function C_P_GlowFlies()
     local var = {
         --[SerializeFloat]
         Speed = 1.0,
-        Lifetime = 3.0,
+        Lifetime = 5.0,
         Timer = 0.0,
         VelX = 0.0,
         VelY = 1.0,

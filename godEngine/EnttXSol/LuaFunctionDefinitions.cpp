@@ -43,7 +43,9 @@ namespace god
 
 		// Camera
 		entt.RegisterLuaType<Camera> ( "Camera" ,
-			"position" , &Camera::m_position );
+			"position"	, &Camera::m_position	, 
+			"lookat"	, &Camera::m_look_at	);
+
 
 		// GetComponent(e,componentName)
 		// ==============================================================================================
@@ -477,6 +479,19 @@ namespace god
 			}
 		);
 
+		// LerpVec3(x0,y0,z0,x1,y1,z1)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "LerpVec3" ,
+			[]( float x0 , float y0 , float z0 , float x1 , float y1 , float z1 , float lerpVal )->glm::vec3
+			{
+				glm::vec3 out;
+				out.x = std::lerp ( x0 , x1 , lerpVal );
+				out.y = std::lerp ( y0 , y1 , lerpVal );
+				out.z = std::lerp ( z0 , z1 , lerpVal );
+				return out;
+			}
+		);
+
 		// EntityName(e)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "EntityName" ,
@@ -506,17 +521,17 @@ namespace god
 
 		// SetTransformRotation(e,x,y,z)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("SetTransformRotation",
-			[&entt, &engineResources](entt::entity e, float x, float y, float z)
+		entt.RegisterLuaFunction ( "SetTransformRotation" ,
+			[&entt , &engineResources]( entt::entity e , float x , float y , float z )
 			{
-				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+				while ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () )
 					;
 
-				if (engineResources.Get<PhysicsSystem>().get().GetisRunning() == false)
+				if ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () == false )
 				{
-					if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->setGlobalPose ( ConvertToPhysXTransform ( entt.GetEngineComponent<Transform> ( e )->m_position, { x, y, z } ) );
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setGlobalPose ( ConvertToPhysXTransform ( entt.GetEngineComponent<Transform> ( e )->m_position , { x, y, z } ) );
 					}
 				}
 			}
@@ -573,8 +588,7 @@ namespace god
 				{
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
-						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_SIMULATION , freeze );
-						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setActorFlag ( PxActorFlag::eDISABLE_GRAVITY ,    freeze );
+
 						entt.GetEngineComponent<RigidDynamic>(e)->Active = !freeze;
 					}
 				}

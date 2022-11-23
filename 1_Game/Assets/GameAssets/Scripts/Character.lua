@@ -48,7 +48,6 @@ end
 isAlive = true
 --[IsSystem]
 function S_Character(e)
-    
     -- getting TurnOrderManager component
     local turnOrderManagerEntity = GetEntity("TurnOrderManager") 
     local turnOrderManagerComponent = nil
@@ -72,6 +71,9 @@ function S_Character(e)
     if (characterComponent.currentHP <= 0) then 
         
         print("[Character.lua]", EntityName(e), entityDataComponent.id, "has died, hiding body.")
+
+        -- RefreshEnemyForecast()
+        -- print("[Character.lua] Refreshing EnemyForecast because an enemy died.")
 
         -- hide the character below the map for now
         GetTransform(e).position.y = -100
@@ -100,6 +102,7 @@ function S_Character(e)
             isAlive = false
             ChangeScene("WinloseScreen",true)
         end
+       
         -- RemoveInstance will be called by TurnOrderManager at the end of current round
     end
 

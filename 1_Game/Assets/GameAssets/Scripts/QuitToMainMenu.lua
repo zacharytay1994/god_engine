@@ -15,6 +15,7 @@ function S_QuitToMainMenu(e)
 
     if(gui_object.pressed and screen.isSelected == false) then
         ChangeScene("MainmenuScreen",true)
+        SceneName = "Mainmenu"
         screen.isSelected = true
     end
 end

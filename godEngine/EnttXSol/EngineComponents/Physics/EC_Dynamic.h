@@ -32,6 +32,8 @@ namespace god
 		bool Trigger{ false };
 		
 		//Non serialize data
+		bool Activeflag{ true };
+		bool Gravityflag{ false };
 		uint32_t m_id;
 		physx::PxTriangleMesh* p_trimesh;
 		physx::PxMaterial* p_material;
@@ -60,7 +62,10 @@ namespace god
 
 		bool operator==( RigidDynamic const& rhs )
 		{
-			return true;
+			if (this->p_RigidDynamic == rhs.p_RigidDynamic)
+				return true;
+			else
+				return false;
 		}
 	};
 	template <>
@@ -81,6 +86,7 @@ namespace god
 				ImGui::Separator();
 
 				ImGui::Checkbox("Active", &component.Active);
+				ImGui::Checkbox("Gravity", &component.Gravity);
 
 				int selected_type = component.PhysicsTypeid;
 				const char* typenames[] = { "Default", "Dice", "Player", "Enemy", "Bullet", "Tile" };
@@ -163,7 +169,7 @@ namespace god
 				ImGui::Separator();
 				ImGui::Text("Shape Flags");
 	
-				ImGui::Checkbox("Gravity", &component.Gravity);
+		
 				ImGui::Checkbox("Trigger", &component.Trigger);
 				ImGui::Checkbox("Simulation", &component.Simulation);
 				ImGui::Checkbox("Lock Extents to Scale", &component.locktoscale);
