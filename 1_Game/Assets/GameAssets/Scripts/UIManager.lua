@@ -77,26 +77,30 @@ function S_UIManager(e)
 
                 -- don't allow player to roll anymore for this turn
                 UIManagerComponent.diceRolled = true
+
+                local attackList = GetComponent(GetEntity("CombatManager"), "C_AttackList").attackList
                             
                 -- change the button textures
                 for j = 1, #diceList do
                     
                     currentDiceComponent = GetComponent(diceList[j], "C_DiceScript")
+
+                    UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = attackList[(currentDiceComponent.diceValue * 3) + currentDiceComponent.color][1]
                     
-                    -- currently only 2 attack types, will modify this part when more attack types are implemented
-                    if (currentDiceComponent.value == 0) then                       
-                        UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "FrontJab"                       
-                    elseif (currentDiceComponent.value == 1) then                       
-                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "BigSwing"                       
-                    elseif (currentDiceComponent.value == 2) then                       
-                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "GroundSmash"                       
-                    elseif (currentDiceComponent.value == 3) then
-                        UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "EnergyBolt"
-					elseif (currentDiceComponent.value == 4) then
-                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Projectile"             
-					elseif (currentDiceComponent.value == 5) then
-                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Corporikinesis"             
-                    end
+                    -- -- currently only 2 attack types, will modify this part when more attack types are implemented
+                    -- if (currentDiceComponent.value == 0) then                       
+                    --     UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = attackList[(currentDiceComponent.diceValue * 3) + currentDiceComponent.color][1]                            
+                    -- elseif (currentDiceComponent.value == 1) then                       
+                    --     UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "BigSwing"                       
+                    -- elseif (currentDiceComponent.value == 2) then                       
+                    --     UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "GroundSmash"                       
+                    -- elseif (currentDiceComponent.value == 3) then
+                    --     UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "EnergyBolt"
+					-- elseif (currentDiceComponent.value == 4) then
+                    --     UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Projectile"             
+					-- elseif (currentDiceComponent.value == 5) then
+                    --     UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Cryogenesis"             
+                    -- end
 
                     -- -- un-hardcoded solution 
                     -- -- (diceValue will be a value from 0 to 8, colorModifier will be a value from 1 to 3.
