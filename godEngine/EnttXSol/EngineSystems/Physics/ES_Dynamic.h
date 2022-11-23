@@ -49,6 +49,7 @@ namespace god
 
 		if ( rigiddynamic.updateRigidDynamic)
 		{
+			std::cout << "init phy obj\n";
 			if (rigiddynamic.locktoscale)
 			{
 				rigiddynamic.extents = transform.m_scale;
@@ -128,52 +129,61 @@ namespace god
 
 			rigiddynamic.mScene = mScene;
 
+	
 			rigiddynamic.p_RigidDynamic->attachShape ( *rigiddynamic.p_shape );
-			rigiddynamic.p_RigidDynamic->setAngularVelocity ( physx::PxVec3 ( rigiddynamic.AngularVelocity.x , rigiddynamic.AngularVelocity.y , rigiddynamic.AngularVelocity.z ) , true );
-		
-			physx::PxRigidBodyExt::setMassAndUpdateInertia ( *rigiddynamic.p_RigidDynamic , mass );
-			physx::PxRigidBodyExt::updateMassAndInertia ( *rigiddynamic.p_RigidDynamic , rigiddynamic.Density );
+
+
 
 			mScene->addActor ( *rigiddynamic.p_RigidDynamic );
 			rigiddynamic.p_RigidDynamic->setContactReportThreshold(0.01f);
 
+			physx::PxRigidBodyExt::setMassAndUpdateInertia(*rigiddynamic.p_RigidDynamic, mass);
+			physx::PxRigidBodyExt::updateMassAndInertia(*rigiddynamic.p_RigidDynamic, rigiddynamic.Density);
+
+			rigiddynamic.p_RigidDynamic->putToSleep();
+			rigiddynamic.p_RigidDynamic->clearForce();
+			//rigiddynamic.p_RigidDynamic->setSleepThreshold()
+			rigiddynamic.p_RigidDynamic->setAngularVelocity(physx::PxVec3(rigiddynamic.AngularVelocity.x, rigiddynamic.AngularVelocity.y, rigiddynamic.AngularVelocity.z), true);
+			rigiddynamic.p_RigidDynamic->setLinearVelocity(physx::PxVec3(rigiddynamic.LinearVelocity.x, rigiddynamic.LinearVelocity.y, rigiddynamic.LinearVelocity.z), true);
+			rigiddynamic.p_RigidDynamic->setGlobalPose(ConvertToPhysXTransform(transform.m_position, transform.m_rotation));
+			rigiddynamic.p_RigidDynamic->setMaxLinearVelocity(20.f);
 
 			rigiddynamic.m_id = edata.m_id;
 			rigiddynamic.p_RigidDynamic->userData = &rigiddynamic;
 			rigiddynamic.p_RigidDynamic->setName("Dynamic");
 
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, !rigiddynamic.Active);
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !rigiddynamic.Gravity);
+			rigiddynamic.Activeflag = rigiddynamic.Active;
+			rigiddynamic.Gravityflag = rigiddynamic.Gravity;
 			rigiddynamic.updateRigidDynamic = false;
 
 
+			if (rigiddynamic.Trigger)
+			{
+				rigiddynamic.Simulation = false;
+				rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+				rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+			}
+			else
+			{
+				rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+			}
 
+			if (rigiddynamic.Simulation)
+			{
+				rigiddynamic.Trigger = false;
+				rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
+				rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+
+			}
+			else
+			{
+				rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+			}
 		}//init rigiddynamic
 
-		
-		rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, !rigiddynamic.Active);
-		rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !rigiddynamic.Gravity);
 
-		if (rigiddynamic.Trigger)
-		{
-			rigiddynamic.Simulation = false;
-			rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-			rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
-		}
-		else
-		{
-			rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
-		}
-
-		if (rigiddynamic.Simulation)
-		{
-			rigiddynamic.Trigger = false;
-			rigiddynamic.p_shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, false);
-			rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
-		
-		}
-		else
-		{
-			rigiddynamic.p_shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-		}
 
 
 
@@ -196,8 +206,38 @@ namespace god
 		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
-		
 
+		
+		if ( rigiddynamic.Active != rigiddynamic.Activeflag)
+		{
+			if (!rigiddynamic.Active)// Not active
+			{
+				rigiddynamic.p_RigidDynamic->putToSleep();
+				rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, !rigiddynamic.Active);
+				rigiddynamic.Activeflag = rigiddynamic.Active;
+				std::cout << "put to sleep\n";
+			}
+			if ( rigiddynamic.Active)//  active
+			{
+	
+				rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_SIMULATION, !rigiddynamic.Active);
+				rigiddynamic.p_RigidDynamic->wakeUp();
+			
+				rigiddynamic.Activeflag = rigiddynamic.Active;
+				std::cout << "wakeUp\n";
+			}
+		}
+
+		if (rigiddynamic.Gravity != rigiddynamic.Gravityflag)
+		{
+
+			//rigiddynamic.p_RigidDynamic->putToSleep();
+			rigiddynamic.p_RigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, !rigiddynamic.Gravity);
+			rigiddynamic.Gravityflag = rigiddynamic.Gravity;
+			std::cout << "toggle gravity\n";
+
+
+		}
 
 		if ( rigiddynamic.p_RigidDynamic )
 		{

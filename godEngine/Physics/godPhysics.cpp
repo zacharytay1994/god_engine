@@ -100,7 +100,7 @@ namespace god
 		CreatePVD();
 	
 		mToleranceScale.length = 1;        // typical length of an object
-		mToleranceScale.speed = static_cast<physx::PxReal>(98.1);         // typical speed of an object, gravity*1s is a reasonable choice
+		mToleranceScale.speed = static_cast<physx::PxReal>(9.81);         // typical speed of an object, gravity*1s is a reasonable choice
 		mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, mToleranceScale, true, mPvd);
 
 
@@ -113,7 +113,7 @@ namespace god
 				std::cerr << "PxCreateCooking failed!" << std::endl;
 			
 			physx::PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-			sceneDesc.gravity = physx::PxVec3(0.0f, -98.11f, 0.0f);
+			sceneDesc.gravity = physx::PxVec3(0.0f, -9.81, 0.0f);
 			mDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
 			if (!mDispatcher)
 				std::cerr << "PxDefaultCpuDispatcherCreate failed!" << std::endl;
@@ -166,7 +166,7 @@ namespace god
 
 		if(mAccumulator>5.0f)
 		{
-			mStepSize = 15.f;
+			mStepSize = 1.f/15.f;
 		}
 	}
 	void PhysicsSystem::Update(float dt , bool pause)
