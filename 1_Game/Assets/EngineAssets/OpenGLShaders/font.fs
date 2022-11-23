@@ -15,7 +15,7 @@ void main()
    // fFragColor.rgb = pow(fFragColor.rgb, vec3(1.0/2.2));
 
    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(diffuse_map, vUV).r);
-   fFragColor.rgba = vec4(1.0,0.0,1.0,1.0) * sampled;
+   fFragColor.rgba = vec4(1.0,1.0,1.0,1.0) * sampled;
    // fFragColor.rgb = pow(fFragColor.rgb, vec3(1.0/2.2));
    // fFragColor = vec4(1,1,0,1);
 }
