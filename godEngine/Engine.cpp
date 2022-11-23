@@ -300,12 +300,6 @@ namespace god
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );
 
-			if ( window.KeyPressed ( GLFW_KEY_M ) )
-			{
-				camera.SetNextPosition ( { 5,5,5 } );
-				camera.SetNextLookAt ( { 1,0,0 } );
-			}
-
 			camera.InterpolateCameraState ( DeltaTimer::m_dt );
 
 			EngineSystemsFrameEnd ( enttxsol , engine_resources );

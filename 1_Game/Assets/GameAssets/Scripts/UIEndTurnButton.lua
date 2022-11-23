@@ -5,7 +5,11 @@
 function C_EndTurnButton()
     local var = {
         --[SerializeString]
-        EndTurnButton = "EndTurnButton"
+        EndTurnButton = "EndTurnButton",
+
+        pressDelay = 2,
+
+        timer = 0
     }
     return function()
         return var
@@ -34,21 +38,31 @@ function S_EndTurnButton(e)
         return
     end
 
-    if endTurnButton.pressed then
+    local endTurnButtonComponent = GetComponent(e, "C_EndTurnButton")
+    if (endTurnButtonComponent.timer < endTurnButtonComponent.pressDelay) then
         
-        -- to make sure this script isn't accidentally added other buttons
-        if (EntityName(e) == "EndTurnButton") then
-            
-            -- only end the turn if it is actually the player's turn
-            if (turnOrderManagerComponent.currentTurn == GetEntityData(playerEntity).id) then
+        endTurnButtonComponent.timer = endTurnButtonComponent.timer + GetDeltaTime()
+    
+    else
+
+        if endTurnButton.pressed then
+        
+            -- to make sure this script isn't accidentally added other buttons
+            if (EntityName(e) == "EndTurnButton") then
                 
-				-- trigger sound effect
-				InstancePrefab("SFX_EndTurn",0,0,0)
-				
-                -- signal turnOrderManager to move on to the next character's turn
-                turnOrderManagerComponent.nextTurn = true
-                print("[EndTurnButton.lua] EndTurnButton clicked! Ending player turn.")
+                -- only end the turn if it is actually the player's turn
+                if (turnOrderManagerComponent.currentTurn == GetEntityData(playerEntity).id) then
+                    
+                    -- trigger sound effect
+                    InstancePrefab("SFX_EndTurn",0,0,0)
+                    
+                    -- signal turnOrderManager to move on to the next character's turn
+                    turnOrderManagerComponent.nextTurn = true
+                    print("[EndTurnButton.lua] EndTurnButton clicked! Ending player turn.")
+                end
             end
+
+            endTurnButtonComponent.timer = 0
         end
     end
 end

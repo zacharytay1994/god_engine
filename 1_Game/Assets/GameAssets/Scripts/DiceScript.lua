@@ -138,6 +138,7 @@ function DiceScript_RollDice(e, c_dice)
 	c_dice.is_rolling = true
 	c_dice.value = -1
 	FreezeObject(e, false)
+	SetVelocity(e, 0, 0, 0)
 	local transform = GetTransform(e)
 	transform.rotation.x = GenerateRandomNumberInRange(0,360)
 	transform.rotation.y = GenerateRandomNumberInRange(0,360)
@@ -160,4 +161,5 @@ function DiceScript_DisableDice(e, c_dice)
 	c_dice.color = 0
 	FreezeObject(e, true)
 	SetTransformPosition(e, 999, 999, 999)
+	SetVelocity(e, 0, 0, 0)
 end

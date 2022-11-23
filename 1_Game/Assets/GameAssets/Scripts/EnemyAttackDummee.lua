@@ -125,11 +125,14 @@ function S_EnemyAttackDummee(e)
             -- trigger sound effect
             InstancePrefab("SFX_Jab",0,0,0)
 
-            -- set recoil destination (doesn't do anything if victim is a floor tile)
-            EnemyAttackDummeeSetRecoilDestination(e, attackComponent.victim)
+            if (attackComponent.victim ~= nil) then
 
-            -- apply push to victim (doesn't do anything if victim is a floor tile)
-            EnemyAttackDummeeApplyPushback(e, attackComponent.victim)
+                -- set recoil destination (doesn't do anything if victim is a floor tile or destructible object)
+                EnemyAttackDummeeSetRecoilDestination(e, attackComponent.victim)
+
+                -- apply push to victim (doesn't do anything if victim is a floor tile)
+                EnemyAttackDummeeApplyPushback(e, attackComponent.victim)
+            end
 
         end 
            
@@ -362,6 +365,22 @@ function EnemyAttackDummeeApplyDamage(dummee, victim)
     end
 
     -- break rocks here 
+    local destructibleList = EntitiesWithScriptComponent("C_DestructibleObject")
+
+    for j = 1, #destructibleList do
+    
+        if (destructibleList[j] == victim) then
+        
+            -- TODO: drop any characters above
+            
+            print("[EnemyAttackDummee.lua] Destroyed a", EntityName(victim))
+            RemoveInstance(victim)
+            GetComponent(dummee, "C_EnemyAttackDummee").damageApplied = true
+            GetComponent(dummee, "C_EnemyAttackDummee").victim = nil
+            return
+        end
+    
+    end
 
 end
 
@@ -742,6 +761,11 @@ function EnemyAttackDummeeApplyPushback(dummee, victim)
     -- including that first found floor tile or destructible rock entity.
     -- and if it's a destructible object, destroy it
     print("[EnemyAttackDummee.lua] TODO: remove non-character entities from affectedEntities. Game will crash if pushback is applied to non-character entities.")
+    -- EnemyAttackDummeeRemoveNonCharacters(affectedEntities)
+    if (EnemyAttackDummeeListContainsUnmovable(affectedEntities)) then
+        print("[EnemyAttackDummee.lua] affectedEntities contain a floor tile or ice tile, cannot push characters back.")
+        return
+    end
 
     -- for each entity in affectedEntities, push back 1 tile
     for k = 1, #affectedEntities do
@@ -844,6 +868,62 @@ function EnemyAttackDummeeApplyPushback(dummee, victim)
         end
     end
 end
+
+function EnemyAttackDummeeListContainsUnmovable(affectedEntities)
+
+    local allTiles = EntitiesWithScriptComponent("C_FloorTile")
+    local destructibleObjects = EntitiesWithScriptComponent("C_DestructibleObject")
+
+    for i = 1, #affectedEntities do
+    
+        for j = 1, #allTiles do    
+            if (allTiles[j] == affectedEntities[i]) then
+                --this affectedEntity is a floortile, return true
+                return true
+            end
+        end
+
+        for k = 1, #destructibleObjects do
+            if (destructibleObjects[k] == affectedEntities[i]) then
+                -- this affectedEntity is a destructible object, return true
+                return true
+            end
+        end    
+    end
+end
+
+-- -- affectedEntities is a list of entities continously behind the victim (including the victim)
+-- function EnemyAttackDummeeRemoveNonCharacters(affectedEntities)
+
+--     local allTiles = EntitiesWithScriptComponent("C_FloorTile")
+--     local destructibleObjects = EntitiesWithScriptComponent("C_DestructibleObject")
+--     local removeFromList = false
+
+--     for i = 1, #affectedEntities do
+    
+--         for j = 1, #allTiles do    
+--             if (allTiles[j] == affectedEntities[i]) then
+--                 --this affectedEntity is a floortile, remove it from affectedEntities
+--                 removeFromList = true
+--             end
+--         end
+
+--         for k = 1, #destructibleObjects do
+--             if (destructibleObjects[k] == affectedEntities[i]) then
+--                 -- this affectedEntity is a destructible object, remove it from affectedEntities
+--                 removeFromList = true
+--             end
+--         end
+
+--         if (removeFromList) then
+--             affectedEntities[i] = nil
+--         end
+    
+--     end
+
+--     -- may need to re-sort the list
+
+-- end
 
 -- checks if there is a character below the entity being pushed back
 -- if there is then the character below will get squashed to death
