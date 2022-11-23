@@ -152,12 +152,6 @@ function DiceScript_RollDice(e, c_dice)
 		c_dice.color = 1
 	end
 	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
-	print("[DiceScript] Printing start_position x:")
-	print(c_dice.start_position_x)
-	print("[DiceScript] Printing start_position y:")
-	print(c_dice.start_position_y)
-	print("[DiceScript] Printing start_position z:")
-	print(c_dice.start_position_z)
 end
 
 function DiceScript_DisableDice(e, c_dice)
