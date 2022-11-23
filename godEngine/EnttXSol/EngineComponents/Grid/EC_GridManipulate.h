@@ -14,7 +14,8 @@ namespace god
 		uint32_t m_reticle_id { static_cast< uint32_t >( -1 ) };
 		bool m_clicked { false };
 		glm::ivec3 m_last_clicked_cell;
-		glm::ivec3 m_last_clicked_non_steppable;
+		glm::ivec3 m_last_clicked_steppable;
+		glm::ivec3 m_hovered_steppable;
 
 		bool operator==( GridManipulate const& rhs )
 		{
@@ -28,7 +29,8 @@ namespace god
 		RegisterLuaType<GridManipulate> ( luaState , name ,
 			"clicked" , &GridManipulate::m_clicked ,
 			"last_clicked_cell" , &GridManipulate::m_last_clicked_cell ,
-			"last_clicked_non_steppable" , &GridManipulate::m_last_clicked_non_steppable );
+			"last_clicked_steppable" , &GridManipulate::m_last_clicked_steppable,
+			"hovered_steppable", &GridManipulate::m_hovered_steppable );
 	}
 
 	template<>
