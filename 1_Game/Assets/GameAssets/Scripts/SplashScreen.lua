@@ -155,16 +155,25 @@ function GenerateSeahorse(vel_x, vel_y, vel_z, pos_x, pos_y, pos_z, index)
     end
 end
 
+function GeneratePointLight()
+
+    for i = 0, 3, 1 do
+        InstancePrefabNow("SS_PointLight", 10.0, 3.0, 8 - (6 * i))
+    end
+end
+
 -- initialization of data before play button is trigged
 function OnLoad_SplashScreen()
+
+
 
     local camera      = FindCameraObject()
     camera.position.x = centerX
     camera.position.y = 2.5
     camera.position.z = 10
 
-    objs_placement = {} -- new array
-
+    -- new array
+    objs_placement = {}
     for row = minRows, maxRows, 1 do
         for col = minColumns, maxColumns, 1 do
             if (col > 8 and col < 12) then
@@ -181,12 +190,14 @@ function OnLoad_SplashScreen()
     -- create random seaweeds in the scene
     GenerateRandomSeaweeds(objs_placement)
 
+    -- create random corals in the scene
     GenerateRandomCorals(objs_placement)
+
 
     PlantBubbleEmitter(objs_placement)
 
     -- create directional light at the door
-    InstancePrefab("SS_DirectionalLight", centerX, 10, -10)
+    -- InstancePrefab("SS_DirectionalLight", centerX, 10, -10)
 
     -- create rock below the door
     InstancePrefab("SS_RockFlat", centerX, 0, -7)
@@ -205,13 +216,19 @@ function OnLoad_SplashScreen()
 
     InstancePrefab("SS_TreeBranch", 7.5, 1.5, 5.0)
 
+    -- create stone pathway to the door
     GenerateStonePathway()
 
+    -- create seahorse batch #1
     GenerateSeahorse(1, 0, 0, 4, 2, -2, 3)
 
+    -- create seahorse batch #2
     GenerateSeahorse(-1, 0, 0, 14, 2, -2, 3)
 
+    -- create seahorse on top of the pathway
     InstancePrefab("SS_Starfish", centerX, 0.2, 4.0)
+
+    GeneratePointLight()
 
     print("[SplashScreen.lua] OnLoad_SplashScreen")
 end
@@ -249,21 +266,21 @@ function S_SplashScreen(e)
     local camera = FindCameraObject()
 
     -- move back camera
-    if camera.position.z > 5 then
-        camera.position.z = camera.position.z - 0.4 * dt
-    else
-        IsMoving = true
-    end
+    -- if camera.position.z > 5 then
+    --     camera.position.z = camera.position.z - 0.4 * dt
+    -- else
+    --     IsMoving = true
+    -- end
 
-    -- shift the door position up to stay on top of 0
-    door_transform.position.y = door_transform.scale.y
+    -- -- shift the door position up to stay on top of 0
+    -- door_transform.position.y = door_transform.scale.y
 
-    -- scale the door
-    if door_transform.scale.x < 5 and not IsMoving then
-        door_transform.scale.x = door_transform.scale.x + speed
-        door_transform.scale.y = door_transform.scale.y + speed
-        door_transform.scale.z = door_transform.scale.z + speed
-    end
+    -- -- scale the door
+    -- if door_transform.scale.x < 5 and not IsMoving then
+    --     door_transform.scale.x = door_transform.scale.x + speed
+    --     door_transform.scale.y = door_transform.scale.y + speed
+    --     door_transform.scale.z = door_transform.scale.z + speed
+    -- end
 end
 
 --[IsComponent]

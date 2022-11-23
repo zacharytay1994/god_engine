@@ -14,6 +14,7 @@ end
 function S_PS_Emitter(e)
     local dt = GetDeltaTime()
     local ps = GetComponent(e, "C_PS_Emitter")
+    -- local ps_position = GetTransform(e).position.x
     local ps_position = GetTransform(e).position.x
 
     if (ps.Timer < ps.EmissionRate) then
@@ -30,7 +31,7 @@ function S_PS_Emitter(e)
         transform.scale.x = 0.0
         transform.scale.y = 0.0
         local glow_flies = GetComponent(particle, "C_P_GlowFlies")
-        glow_flies.Scale = 0.2 * s;
+        glow_flies.Scale = 0.1 * s;
         glow_flies.Speed = s
     end
 end
