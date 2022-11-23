@@ -408,7 +408,12 @@ namespace god
 							// update last edited date and time
 							GetTextureDocumentValue ( "Last Edited" ).SetString ( GetDateTimeString ().c_str () , m_document_textures.GetAllocator () );
 
-							god::FolderHelper::CopyFileToFolder ( m_edit_src , AssetPath::Folder_RawTextures );
+							// copy only if new src
+							if ( m_edit_new_src )
+							{
+								god::FolderHelper::CopyFileToFolder ( m_edit_src , AssetPath::Folder_RawTextures );
+							}
+							//god::FolderHelper::CopyFileToFolder ( m_edit_src , AssetPath::Folder_RawTextures );
 
 							// update json
 							god::WriteJSON ( m_document_textures , AssetPath::File_TexturesConfig );
