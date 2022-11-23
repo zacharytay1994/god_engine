@@ -96,6 +96,11 @@ end
 function SetDiceIcon(e, dicenumber)
 	local diceList = EntitiesWithScriptComponent("C_DiceScript")
 	local dice = GetComponent(diceList[dicenumber], "C_DiceScript")
+
+	if (dice.color == 0) then
+		print("[DiceUI] Error! Color should not be 0!")
+	end
+
 	if (dice.value == 0) then
 		if (dice.color == 1) then
 			ChangeTexture(e, "dice_jab")

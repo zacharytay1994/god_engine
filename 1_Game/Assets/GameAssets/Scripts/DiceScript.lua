@@ -104,6 +104,7 @@ function S_DiceScript(e)
 									end
 								end
 								print("[DiceScript] Dice value:", c_dice.value)
+								print("[DiceScript] Dice color:", c_dice.color)
 							end
 						end
 					end
@@ -134,7 +135,7 @@ function S_DiceScript(e)
 		c_dice.rotation_y = transform.rotation.y
 		c_dice.rotation_z = transform.rotation.z
 		
-		c_dice.current_timer = c_dice.current_timer - (10 * GetDeltaTime())
+		c_dice.current_timer = c_dice.current_timer - (5 * GetDeltaTime())
 		if (c_dice.current_timer < 0) then
 			c_dice.current_timer = c_dice.current_timer + c_dice.blue_chance
 			c_dice.color = 1
@@ -161,10 +162,13 @@ function DiceScript_RollDice(e, c_dice)
 	c_dice.current_timer = GenerateRandomNumberInRange(0, c_dice.blue_chance)
 	if (c_dice.current_timer < c_dice.gold_chance) then
 		c_dice.color = 3
+		ChangeTexture(e, "Pixel_Gold")
 	elseif (c_dice.current_timer < c_dice.pink_chance) then
 		c_dice.color = 2
+		ChangeTexture(e, "Pixel_Pink")
 	else
 		c_dice.color = 1
+		ChangeTexture(e, "Pixel_Blue")
 	end
 	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
 end
