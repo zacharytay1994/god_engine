@@ -163,6 +163,15 @@ function S_UIManager(e)
 				break
 			end
 		end
+		
+		if (rollDiceBtn.active == true) then
+			if (rollDiceBtn.pressed) then
+				for i = 1, #diceList do
+					DiceScript_RollDice(diceList[i], GetComponent(diceList[i], "C_DiceScript"))
+				end
+				rollDiceBtn.active = false
+			end
+		end
 	else
 		rollDiceBtn.active = false
 	end
