@@ -150,6 +150,11 @@ function S_UIManager(e)
         GetGUIText(GetEntity("HealthHeart")).text = tostring(playerComponent.currentHP)
         GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
     end
+	
+	local rollDiceBtn = GetGUIObject(GetEntity("RollDiceButton"))
+	rollDiceBtn.active = false
+	
+	
 	-- print(UIManagerComponent.healthbar_size)
 	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------
