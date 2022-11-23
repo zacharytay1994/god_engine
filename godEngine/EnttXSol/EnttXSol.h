@@ -223,7 +223,9 @@ namespace god
 
 		std::queue<std::tuple<std::string , Entities::ID , float , float , float , bool>> m_instance_queue;
 		std::queue<Entities::ID> m_delete_queue;
+	public:
 		void SetEntityActive ( EnttXSol::Entities::ID entity , bool active );
+	private:
 		EnttXSol::Entities::ID InstancePrefabFromMaster ( std::string const& fileName , Entities::ID parent = Entities::Null );
 		Entities::ID MakeEntityCopy ( Entities::ID src , Entities::ID parent );
 
