@@ -2,7 +2,8 @@
 function C_SplashScreen()
     local var =
     {
-        Zoom = false
+        Zoom = false,
+        PointLightActive = true
     }
     print("[SplashScreen.lua] C_SplashScreen")
     return function() return var
@@ -110,7 +111,6 @@ function PlantBubbleEmitter(arr)
 
                 ChangeTexture(plant_bubble_entity, "2D_Flora_0" .. tostring(GenerateRandomNumberInRange(2, 5)))
 
-
                 local plant_bubble_transform = GetTransform(plant_bubble_entity)
 
                 local rng_scale = GenerateRandomNumberInRange(4, 8) / 10.0
@@ -157,22 +157,22 @@ function GenerateSeahorse(vel_x, vel_y, vel_z, pos_x, pos_y, pos_z, index)
 end
 
 function GeneratePointLight()
-
-    for i = 0, 3, 1 do
-        InstancePrefabNow("SS_PointLight", 10.0, 3.0, 8 - (6 * i))
+    for i = 0, 2, 1 do
+        -- random Y position ( out of screen )
+        local pointlight = InstancePrefabNow("SS_PointLight", 10.0, 100.0, 8 - (6 * i))
+        local pointlight_data = GetComponent(pointlight, "C_PointLightData")
+        pointlight_data.timer_ = 1 * i
+        pointlight_data.active_ = false
     end
+
+
 end
 
 -- initialization of data before play button is trigged
 function OnLoad_SplashScreen()
 
-    -- local camera      = FindCameraObject()
-    -- camera.position.x = centerX
-    -- camera.position.y = 2.5
-    -- camera.position.z = 10
-
     -- new array
-    objs_placement = {}
+    local objs_placement = {}
     for row = minRows, maxRows, 1 do
         for col = minColumns, maxColumns, 1 do
             if (col > 8 and col < 12) then
@@ -192,17 +192,19 @@ function OnLoad_SplashScreen()
     -- create random corals in the scene
     GenerateRandomCorals(objs_placement)
 
-
+    -- create yellow bubbles around the scene
     PlantBubbleEmitter(objs_placement)
 
     -- create directional light at the door
-    -- InstancePrefab("SS_DirectionalLight", centerX, 10, -10)
+    InstancePrefab("SS_DirectionalLight", centerX, 10, -10)
 
     -- create rock below the door
     InstancePrefab("SS_RockFlat", centerX, 0, -7)
 
     -- create door at the end of the corals
     local door = InstancePrefabNow("SS_Door", centerX, 1.8, -7)
+    local door_transform = GetTransform(door)
+    door_transform.position.y = door_transform.scale.y
 
     -- create terrain floor
     InstancePrefab("SS_Terrain", centerX, 0, -38)
@@ -219,41 +221,44 @@ function OnLoad_SplashScreen()
     GenerateStonePathway()
 
     -- create seahorse batch #1
-    GenerateSeahorse(1, 0, 0, 4, 2, -2, 3)
+    GenerateSeahorse(1, 0, 0, 2, 2, -2, 3)
 
     -- create seahorse batch #2
-    GenerateSeahorse(-1, 0, 0, 14, 2, -2, 3)
+    GenerateSeahorse(-1, 0, 0, 16, 2, -2, 3)
+
+    GeneratePointLight()
 
     -- create seahorse on top of the pathway
     InstancePrefab("SS_Starfish", centerX, 0.2, 4.0)
 
-
-    -- SetCamera 
+    -- SetCamera
     SetCameraPosition(10, 2, 10)
     SetCameraLookAt(10, 0, -40)
     SetCameraMoveSpeed(0.0)
     SetCameraNextPosition(10, 2, 4.5)
-
-    local door_transform = GetTransform(door)
-    door_transform.position.y = door_transform.scale.y
 
     print("[SplashScreen.lua] OnLoad_SplashScreen")
 end
 
 --[IsSystem]
 function S_SplashScreen(e)
+
     local dt = GetDeltaTime()
-    local speed = 0.1 * dt
 
-
+    -- set seahorse movement speed here
+    local seahorse_movement_speed = 0.90 * dt
+    -- update the seahorse movement in scene
     local seahorse_in_scene = EntitiesWithScriptComponent("C_SeahorseData")
     for i = 1, #seahorse_in_scene do
         local seahorse_transform = GetTransform(seahorse_in_scene[i])
         local seahorse_data = GetComponent(seahorse_in_scene[i], "C_SeahorseData")
 
-        seahorse_transform.position.x = seahorse_transform.position.x + seahorse_data.velocity_x_ * speed
-        seahorse_transform.position.y = seahorse_transform.position.y + seahorse_data.velocity_y_ * speed
-        seahorse_transform.position.z = seahorse_transform.position.z + seahorse_data.velocity_z_ * speed
+        seahorse_transform.position.x = seahorse_transform.position.x +
+            seahorse_data.velocity_x_ * seahorse_movement_speed
+        seahorse_transform.position.y = seahorse_transform.position.y +
+            seahorse_data.velocity_y_ * seahorse_movement_speed
+        seahorse_transform.position.z = seahorse_transform.position.z +
+            seahorse_data.velocity_z_ * seahorse_movement_speed
 
         seahorse_data.timer_ = seahorse_data.timer_ + dt
 
@@ -264,7 +269,6 @@ function S_SplashScreen(e)
         end
     end
 
-    -- to get identity of 1 object
     local door_in_scene = EntitiesWithScriptComponent("C_DoorData")[1]
     local door_transform = GetTransform(door_in_scene)
 
@@ -272,9 +276,23 @@ function S_SplashScreen(e)
 
     -- click detect zoom into door
     local splashscreen = GetComponent(e, "C_SplashScreen")
-    if CheckLeftMousePress() then
+
+    -- true once / deactivate point light
+    local pointlight_in_scene = EntitiesWithScriptComponent("C_PointLightData")
+    for i = 1, #pointlight_in_scene do
+        local pointlight_data = GetComponent(pointlight_in_scene[i], "C_PointLightData")
+        local pointlight_transform = GetTransform(pointlight_in_scene[i])
+        if pointlight_data.timer_ < 0.0 then
+            pointlight_transform.position.y = 3.0
+        else
+            pointlight_data.timer_ = pointlight_data.timer_ - dt
+        end
+    end
+
+    if CheckLeftMousePress() and CheckKeyDown(257) then
         splashscreen.Zoom = true
     end
+
     if splashscreen.Zoom then
         SetCameraMoveSpeed(4.0)
         SetCameraNextPosition(10, 2, -8)
@@ -282,6 +300,7 @@ function S_SplashScreen(e)
         SetCameraMoveSpeed(0.2)
     end
 
+    -- get camera object
     local camera = FindCameraObject()
 
     -- move back camera
@@ -290,33 +309,18 @@ function S_SplashScreen(e)
     end
 
     -- change scene
-    if camera.position.z < -6 then
+    if ((camera.position.z < -6) and CheckKeyDown(257)) then
         ChangeScene("MainmenuScreen", true)
     end
 
-    -- -- shift the door position up to stay on top of 0
-    -- door_transform.position.y = door_transform.scale.y
-
     -- scale the door
-    if door_transform.scale.x < 5 and IsMoving then
-        door_transform.scale.x = door_transform.scale.x + speed
-        door_transform.scale.y = door_transform.scale.y + speed
-        door_transform.scale.z = door_transform.scale.z + speed
+    local door_scale_speed = 0.15 * dt
+    if (door_transform.scale.x < 5 and IsMoving) then
+        door_transform.scale.x = door_transform.scale.x + door_scale_speed
+        door_transform.scale.y = door_transform.scale.y + door_scale_speed
+        door_transform.scale.z = door_transform.scale.z + door_scale_speed
+        door_transform.position.y = door_transform.scale.y
     end
-
-end
-
---[IsComponent]
-function C_CoralData()
-    local var = {
-    }
-    return function()
-        return var
-    end
-end
-
---[IsSystem]
-function S_CoralData(e)
 end
 
 --[IsComponent]
@@ -348,4 +352,19 @@ end
 
 --[IsSystem]
 function S_SeahorseData(e)
+end
+
+--[IsComponent]
+function C_PointLightData()
+    local var = {
+        timer_ = 0,
+        active_ = false
+    }
+    return function()
+        return var
+    end
+end
+
+--[IsSystem]
+function S_PointLightData(e)
 end
