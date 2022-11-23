@@ -71,7 +71,12 @@ function S_PlayerAttack(e)
 
             -- select a target -----------------------------------------------------------------------------------------           
             -- special case for BigSwing / Cryogenesis because it can also target tiles, not just characters
-            if (playerComponent.selectedAction == "BigSwing" or playerComponent.selectedAction == "Cryogenesis") then
+            if (playerComponent.selectedAction == "bigSwingBlue" or
+                playerComponent.selectedAction == "bigSwingPink" or 
+                playerComponent.selectedAction == "bigSwingGold" or  
+                playerComponent.selectedAction == "cryogenesisBlue" or
+                playerComponent.selectedAction == "cryogenesisPink" or
+                playerComponent.selectedAction == "cryogenesisGold") then
 
                 local gridManipulateEntity = GetEntity("GridManipulate")
                     
