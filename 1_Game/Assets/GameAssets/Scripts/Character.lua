@@ -146,6 +146,13 @@ function S_Character(e)
     --     print("Releasing MoveButton. Player's selectedAction is:", GetComponent(e, "C_Player").selectedAction)
     -- end
 
+    -- press Y to refresh enemy forecasts
+    if (CheckKeyPress(89)) then
+        RefreshEnemyForecast()
+    end
+
+    
+
     if (characterComponent.isActive) then
         -- press X to check character's coordinates on the grid
         if (CheckKeyPress(88) == true) then
