@@ -41,6 +41,7 @@
 #include <godUtility/Math.h>
 #include <godUtility/Grid3D.h>
 
+// comment out this for no editor
 #define ENABLE_EDITOR
 
 namespace god

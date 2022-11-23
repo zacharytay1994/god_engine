@@ -43,6 +43,13 @@ function OnLoad_EnvironmentManager()
         -- InstancePrefabParentedNow(tiles[i], "Env_Flora_1", 0, tile_transform.scale.y, 0)
 
     end
+    
+    SetCameraPosition(0,10,50)
+    SetCameraLookAt(0,20,50)
+    SetCameraMoveSpeed(1.0)
+    SetCameraPanSpeed(0.5)
+    SetCameraNextLookAt(1,0,-4)
+    SetCameraNextPosition(-3,12,-15)
 
     print("Finsihed setting up environment.")
 end
