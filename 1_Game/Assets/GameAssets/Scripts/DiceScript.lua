@@ -24,7 +24,7 @@ function C_DiceScript()
 		rotation_y = 0.0,
 		rotation_z = 0.0,
 		
-		dice_faces = { 0, 0, 0, 3, 3, 3 },
+		dice_faces = { 0, 1, 2, 3, 4, 5 },
 		dice_id = 0
     }
     return function()
@@ -67,9 +67,9 @@ function S_DiceScript(e)
 			elseif (c_dice.dice_faces[i+1] == 3) then
 				ChangeModel(Child(e, i), "dice_bolt3D")
 			elseif (c_dice.dice_faces[i+1] == 4) then
-				-- ChangeModel(Child(e, i), "dice_projectile3D")
-			elseif (c_dice.dice_faces[i+1] == 5) then
-				-- ChangeModel(Child(e, i), "dice_corporikinesis3D")
+				ChangeModel(Child(e, i), "dice_projectile3D")
+			elseif (c_dice.dice_faces[i+1] == 6) then
+				ChangeModel(Child(e, i), "dice_cryogenesis3D")
 			end
 		end
 		c_dice.current_timer = GenerateRandomNumberInRange(0, c_dice.blue_chance)
@@ -104,6 +104,7 @@ function S_DiceScript(e)
 									end
 								end
 								print("[DiceScript] Dice value:", c_dice.value)
+								print("[DiceScript] Dice color:", c_dice.color)
 							end
 						end
 					end
@@ -134,7 +135,7 @@ function S_DiceScript(e)
 		c_dice.rotation_y = transform.rotation.y
 		c_dice.rotation_z = transform.rotation.z
 		
-		c_dice.current_timer = c_dice.current_timer - (10 * GetDeltaTime())
+		c_dice.current_timer = c_dice.current_timer - (5 * GetDeltaTime())
 		if (c_dice.current_timer < 0) then
 			c_dice.current_timer = c_dice.current_timer + c_dice.blue_chance
 			c_dice.color = 1
@@ -161,10 +162,13 @@ function DiceScript_RollDice(e, c_dice)
 	c_dice.current_timer = GenerateRandomNumberInRange(0, c_dice.blue_chance)
 	if (c_dice.current_timer < c_dice.gold_chance) then
 		c_dice.color = 3
+		ChangeTexture(e, "Pixel_Gold")
 	elseif (c_dice.current_timer < c_dice.pink_chance) then
 		c_dice.color = 2
+		ChangeTexture(e, "Pixel_Pink")
 	else
 		c_dice.color = 1
+		ChangeTexture(e, "Pixel_Blue")
 	end
 	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
 end

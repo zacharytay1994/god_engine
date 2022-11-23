@@ -9,9 +9,12 @@ namespace god
 	{
 		int m_listener_id{ 0 }; // output
 
+		// 3D Sound Paramaters
 		FMOD_VECTOR m_position;
 		FMOD_VECTOR m_forward;
 		FMOD_VECTOR m_up;
+
+		bool dsp_effects_on = true;
 
 		bool operator==( AudioListener const& rhs )
 		{
@@ -34,6 +37,8 @@ namespace god
 				ImGui::Separator();
 				ImGui::Text("Audio Listener");
 				ImGui::Separator();
+
+				ImGui::Checkbox("Enable Effects", &component.dsp_effects_on);
 			});
 	}
 

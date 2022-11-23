@@ -73,9 +73,16 @@ function S_EnemyForecast(e)
             playerCharacterComponent = GetComponent(playerEntity, "C_Character")
         end
         
-        -- if it's no longer the player's turn, then stop showing the indicators.
-        if (playerCharacterComponent.isActive == false) then        
-            ClearIndicatorsList()
+        -- -- if it's no longer the player's turn, then stop showing the indicators.
+        -- if (playerCharacterComponent.isActive == false) then        
+        --     ClearIndicatorsList()
+        -- end
+
+        -- if end turn button has been clicked then clear indicators list
+        local endTurnButton = GetGUIObject(GetEntity("EndTurnButton"))
+        if (endTurnButton.pressed) then
+            print("[EnemyForecast.lua] End turn button clicked!")
+            ClearIndicatorsList()  
         end
     end    
 end

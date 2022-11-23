@@ -2,6 +2,7 @@
 function C_SplashScreen()
     local var =
     {
+        Zoom = false
     }
     print("[SplashScreen.lua] C_SplashScreen")
     return function() return var
@@ -165,12 +166,10 @@ end
 -- initialization of data before play button is trigged
 function OnLoad_SplashScreen()
 
-
-
-    local camera      = FindCameraObject()
-    camera.position.x = centerX
-    camera.position.y = 2.5
-    camera.position.z = 10
+    -- local camera      = FindCameraObject()
+    -- camera.position.x = centerX
+    -- camera.position.y = 2.5
+    -- camera.position.z = 10
 
     -- new array
     objs_placement = {}
@@ -203,7 +202,7 @@ function OnLoad_SplashScreen()
     InstancePrefab("SS_RockFlat", centerX, 0, -7)
 
     -- create door at the end of the corals
-    InstancePrefab("SS_Door", centerX, 1.8, -7)
+    local door = InstancePrefabNow("SS_Door", centerX, 1.8, -7)
 
     -- create terrain floor
     InstancePrefab("SS_Terrain", centerX, 0, -38)
@@ -228,7 +227,15 @@ function OnLoad_SplashScreen()
     -- create seahorse on top of the pathway
     InstancePrefab("SS_Starfish", centerX, 0.2, 4.0)
 
-    GeneratePointLight()
+
+    -- SetCamera 
+    SetCameraPosition(10, 2, 10)
+    SetCameraLookAt(10, 0, -40)
+    SetCameraMoveSpeed(0.0)
+    SetCameraNextPosition(10, 2, 4.5)
+
+    local door_transform = GetTransform(door)
+    door_transform.position.y = door_transform.scale.y
 
     print("[SplashScreen.lua] OnLoad_SplashScreen")
 end
@@ -261,26 +268,42 @@ function S_SplashScreen(e)
     local door_in_scene = EntitiesWithScriptComponent("C_DoorData")[1]
     local door_transform = GetTransform(door_in_scene)
 
-    IsMoving = false
+    local IsMoving = true
+
+    -- click detect zoom into door
+    local splashscreen = GetComponent(e, "C_SplashScreen")
+    if CheckLeftMousePress() then
+        splashscreen.Zoom = true
+    end
+    if splashscreen.Zoom then
+        SetCameraMoveSpeed(4.0)
+        SetCameraNextPosition(10, 2, -8)
+    else
+        SetCameraMoveSpeed(0.2)
+    end
 
     local camera = FindCameraObject()
 
     -- move back camera
-    -- if camera.position.z > 5 then
-    --     camera.position.z = camera.position.z - 0.4 * dt
-    -- else
-    --     IsMoving = true
-    -- end
+    if camera.position.z < 5 then
+        IsMoving = false
+    end
+
+    -- change scene
+    if camera.position.z < -6 then
+        ChangeScene("MainmenuScreen", true)
+    end
 
     -- -- shift the door position up to stay on top of 0
     -- door_transform.position.y = door_transform.scale.y
 
-    -- -- scale the door
-    -- if door_transform.scale.x < 5 and not IsMoving then
-    --     door_transform.scale.x = door_transform.scale.x + speed
-    --     door_transform.scale.y = door_transform.scale.y + speed
-    --     door_transform.scale.z = door_transform.scale.z + speed
-    -- end
+    -- scale the door
+    if door_transform.scale.x < 5 and IsMoving then
+        door_transform.scale.x = door_transform.scale.x + speed
+        door_transform.scale.y = door_transform.scale.y + speed
+        door_transform.scale.z = door_transform.scale.z + speed
+    end
+
 end
 
 --[IsComponent]
