@@ -12,6 +12,7 @@ namespace god
 		AudioAPI::LoadSound(soundPath.c_str(), *this);
 	}
 
+	// AudioAPI members
 	FMOD::System* AudioAPI::m_FMOD_system;
 	FMOD::ChannelGroup* AudioAPI::m_master_channel_group;
 	FMOD::SoundGroup* AudioAPI::m_master_sound_group;
@@ -26,21 +27,24 @@ namespace god
 
 	std::vector<Sound> AudioAPI::m_extra_sounds;
 
+	// DSP Effects
+	int AudioAPI::m_sample_rate;
+
+	FMOD::DSP* AudioAPI::dsp_echo;
+	std::unordered_map <int, FMOD::DSP* > m_dsp_effects;
+
+	std::unordered_map<int, const char*> AudioAPI::m_dsp_effects_names =
+	{
+		{ 1, "Echo" }, { 2, "Fade" }
+	};
+
 	AudioAPI::AudioAPI()
 	{
-		FMOD_RESULT result = FMOD::System_Create(&m_FMOD_system);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
-
+		ErrorCheck(FMOD::System_Create(&m_FMOD_system));
 		m_FMOD_system->init(FMOD_MAX_CHANNEL_WIDTH, FMOD_INIT_NORMAL, NULL);
 
-		result = m_FMOD_system->getMasterChannelGroup(&m_master_channel_group);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
-
-		result = m_FMOD_system->getMasterSoundGroup(&m_master_sound_group);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
+		ErrorCheck(m_FMOD_system->getMasterChannelGroup(&m_master_channel_group));
+		ErrorCheck(m_FMOD_system->getMasterSoundGroup(&m_master_sound_group));
 
 		for (const auto& name : m_channel_group_names)
 		{
@@ -48,6 +52,13 @@ namespace god
 				continue;
 
 			m_channel_groups.insert({ name.first, CreateChannelGroup(name.second) });
+		}
+
+		// DSP Effects
+		{
+			ErrorCheck(m_FMOD_system->getSoftwareFormat(&m_sample_rate, nullptr, nullptr));
+
+			ErrorCheck(m_FMOD_system->createDSPByType(FMOD_DSP_TYPE_HIGHPASS, &dsp_echo));
 		}
 
 		std::cerr << "AudioAPI created\n";
@@ -84,10 +95,7 @@ namespace god
 	FMOD::ChannelGroup* AudioAPI::CreateChannelGroup(const char* name)
 	{
 		FMOD::ChannelGroup* channel_group = nullptr;
-
-		FMOD_RESULT result = m_FMOD_system->createChannelGroup(name, &channel_group);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
+		ErrorCheck(m_FMOD_system->createChannelGroup(name, &channel_group));
 
 		return channel_group;
 	}
@@ -116,9 +124,7 @@ namespace god
 
 	void AudioAPI::LoadSound(const char* filePath, FMOD::Sound** sound)
 	{
-		FMOD_RESULT result = m_FMOD_system->createSound(filePath, FMOD_DEFAULT, 0, sound);
-		if (result != FMOD_OK)
-			assert(FMOD_ErrorString(result));
+		ErrorCheck(m_FMOD_system->createSound(filePath, FMOD_DEFAULT, 0, sound));
 	}
 
 	void AudioAPI::LoadSound(const char* filePath, Sound& sound)
@@ -128,9 +134,7 @@ namespace god
 
 		if (!sound.m_sound_sample)
 		{
-			FMOD_RESULT result = m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample);
-			if (result != FMOD_OK)
-				assert(FMOD_ErrorString(result));
+			ErrorCheck(m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample));
 		}
 
 		std::string path{ filePath };
@@ -149,23 +153,55 @@ namespace god
 
 	void AudioAPI::SetLoop(Sound& sound, bool loop)
 	{
-		sound.m_sound_sample->setMode(loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
-		sound.m_sound_sample->setLoopCount(loop ? -1 : 0);
+		ErrorCheck(sound.m_sound_sample->setMode(loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF));
+		ErrorCheck(sound.m_sound_sample->setLoopCount(loop ? -1 : 0));
 	}
 
 	void AudioAPI::SetMute(FMOD::Channel* channel, bool mute)
 	{
-		channel->setMute(mute);
+		ErrorCheck(channel->setMute(mute));
 	}
 
 	void AudioAPI::SetVolume(FMOD::Channel* channel, float volume)
 	{
-		channel->setVolume(volume);
+		ErrorCheck(channel->setVolume(volume));
 	}
 
 	void AudioAPI::SetPitch(FMOD::Channel* channel, float pitch)
 	{
-		channel->setPitch(pitch);
+		ErrorCheck(channel->setPitch(pitch));
+	}
+
+	bool AudioAPI::GetLoop(Sound& sound)
+	{
+		int loop_count;
+		ErrorCheck(sound.m_sound_sample->getLoopCount(&loop_count));
+
+		return loop_count == -1 ? true : false;
+	}
+
+	bool AudioAPI::GetMute(FMOD::Channel* channel)
+	{
+		bool mute;
+		ErrorCheck(channel->getMute(&mute));
+
+		return mute;
+	}
+
+	float AudioAPI::GetVolume(FMOD::Channel* channel)
+	{
+		float volume;
+		ErrorCheck(channel->getVolume(&volume));
+
+		return volume;
+	}
+
+	float AudioAPI::GetPitch(FMOD::Channel* channel)
+	{
+		float pitch;
+		ErrorCheck(channel->getPitch(&pitch));
+
+		return pitch;
 	}
 
 	void AudioAPI::PlaySound(Sound& sound)
@@ -206,6 +242,41 @@ namespace god
 		return FMOD_OK;
 	}
 
+	unsigned int AudioAPI::GetCurrentPlayTime(FMOD::Channel* channel)
+	{
+		unsigned int time_stamp;
+		channel->getPosition(&time_stamp, FMOD_TIMEUNIT_PCM);
+
+		return time_stamp;
+	}
+
+	void AudioAPI::SetCurrentPlayTime(FMOD::Channel* channel, unsigned int timeStamp)
+	{
+		channel->setPosition(timeStamp, FMOD_TIMEUNIT_PCM);
+	}
+
+
+	void AudioAPI::PlaySoundFromTime(FMOD::Channel* channel, float startPoint)
+	{
+		UINTLL dsp_clock = GetDSPClock(channel);
+		FMOD::Sound* sound; channel->getCurrentSound(&sound);
+
+		unsigned int length; sound->getLength(&length, FMOD_TIMEUNIT_MS);
+
+		channel->setDelay(dsp_clock + static_cast<UINTLL>(m_sample_rate * startPoint), length, false);
+	}
+
+	void AudioAPI::PlaySoundUntilTime(FMOD::Channel* channel, float endPoint)
+	{
+		UINTLL dsp_clock = GetDSPClock(channel);
+
+		channel->setDelay(dsp_clock, dsp_clock + static_cast<UINTLL>(m_sample_rate * endPoint), false);
+	}
+
+	void AudioAPI::PlaySoundBetweenTimes(FMOD::Channel* channel, float startPoint, float endPoint)
+	{
+	}
+
 	void AudioAPI::StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
 	{
 		m_master_channel_group->stop();
@@ -217,6 +288,75 @@ namespace god
 		}
 
 		m_channels.clear();
+	}
+
+	void AudioAPI::ToggleDSPEffects(bool toggle)
+	{
+		dsp_echo->setBypass(!toggle);
+	}
+
+	void AudioAPI::AddEcho(FMOD::Channel* channel)
+	{
+		ErrorCheck(channel->addDSP(0, dsp_echo));
+	}
+
+	void AudioAPI::AddFadeIn(FMOD::Channel* channel, float fadeInTime, bool& fade)
+	{
+		UINTLL dsp_clock = GetDSPClock(channel);
+
+		channel->setPaused(true);
+
+		SetVolume(channel, 0.f);
+		ErrorCheck(channel->setDelay(0, 0, false)); // delay to resume sound
+		ErrorCheck(channel->addFadePoint(dsp_clock, 0.f));
+		ErrorCheck(channel->addFadePoint(dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeInTime)), 1.f));
+
+		channel->setPaused(false);
+	}
+
+	void AudioAPI::AddFadeOut(FMOD::Channel* channel, float fadeOutTime, bool& fade)
+	{
+		UINTLL dsp_clock = GetDSPClock(channel);
+
+		float volume = GetVolume(channel);
+
+		ErrorCheck(channel->addFadePoint(dsp_clock, volume));
+		ErrorCheck(channel->addFadePoint(dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), 0.f));
+		ErrorCheck(channel->setDelay(0, dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), false)); // delay to stop sound
+	}
+
+	void AudioAPI::RemoveFadeIn(FMOD::Channel* channel, float fadeInPoint)
+	{
+		UINTLL dsp_clock = GetDSPClock(channel);
+
+		channel->removeFadePoints(dsp_clock, static_cast<UINTLL>(dsp_clock + fadeInPoint));
+	}
+
+	void AudioAPI::RemoveFadeOut(FMOD::Channel* channel, float fadeOutPoint)
+	{
+		UINTLL dsp_clock = GetDSPClock(channel);
+
+		channel->removeFadePoints(dsp_clock, static_cast<UINTLL>(dsp_clock + fadeOutPoint));
+	}
+
+
+
+	void AudioAPI::GetFadePoints(FMOD::Channel* channel, unsigned int* points)
+	{
+		channel->getFadePoints(points, 0, 0);
+	}
+
+	int AudioAPI::GetSampleRate()
+	{
+		return m_sample_rate;
+	}
+
+	UINTLL AudioAPI::GetDSPClock(FMOD::Channel* channel)
+	{
+		UINTLL dsp_clock;
+		ErrorCheck(channel->getDSPClock(0, &dsp_clock));
+
+		return dsp_clock;
 	}
 
 
