@@ -35,7 +35,7 @@ end
 --[IsSystem]
 function S_DiceScript(e)
 	local c_dice = GetComponent(e, "C_DiceScript")
-	print(global_string_test)
+
 	if (c_dice.is_init == false) then
 		c_dice.fodder_text = "DiceScript is running!"
 		local diceList = EntitiesWithScriptComponent("C_DiceScript")
