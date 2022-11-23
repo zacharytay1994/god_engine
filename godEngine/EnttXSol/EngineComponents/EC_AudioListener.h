@@ -9,6 +9,7 @@ namespace god
 	{
 		int m_listener_id{ 0 }; // output
 
+		// 3D Sound Paramaters
 		FMOD_VECTOR m_position;
 		FMOD_VECTOR m_forward;
 		FMOD_VECTOR m_up;

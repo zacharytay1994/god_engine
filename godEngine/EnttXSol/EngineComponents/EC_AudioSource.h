@@ -23,6 +23,8 @@ namespace god
 
 		float m_volume{ 1.f };
 		float m_pitch{ 1.f };
+
+		// 3D Sound Paramaters
 		float m_min_distance{ 1.f };
 		float m_max_distance{ 10.f };
 		
@@ -34,14 +36,14 @@ namespace god
 			return true;
 		}
 
+		// Fading Parameters
 		bool enable_fade_in{ false };
 		bool enable_fade_out{ false };
-		UINTLL m_dsp_clock;
-		bool m_fadedin{ false };
-		bool m_fadedout{ false };
+		bool m_faded_in{ false };
+		bool m_faded_out{ false };
 
-		float m_fade_in_time;
-		float m_fade_out_time;
+		float m_fade_in_time{ 5.f };
+		float m_fade_out_time{ 5.f };
  	};
 	template <>
 	inline void NewLuaType<AudioSource>(sol::state& luaState, std::string const& name)
@@ -55,7 +57,11 @@ namespace god
 			"volume", &AudioSource::m_volume,
 			"pitch", &AudioSource::m_pitch,
 			"min_distance", &AudioSource::m_min_distance,
-			"max_distance", &AudioSource::m_max_distance
+			"max_distance", &AudioSource::m_max_distance,
+			"fade_in", &AudioSource::enable_fade_in,
+			"fade_out", &AudioSource::enable_fade_out,
+			"fade_in_time", &AudioSource::m_fade_in_time,
+			"fade_out_time", &AudioSource::m_fade_out_time
 			);
 	}
 	template<>

@@ -34,45 +34,40 @@ namespace god
 						AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
 				}
 
+				// Fading Control --------------------------------------------------------------------
 				if (audio_source.enable_fade_in)
 				{
-					unsigned int points; // move this to audioapi
+					unsigned int points;
 					AudioAPI::GetFadePoints(audio_source.m_channel, &points);
-					if (points == 0 && !audio_source.m_fadedin)
+					if (points == 0 && !audio_source.m_faded_in)
 					{
-						AudioAPI::AddFadeIn(audio_source.m_channel, 10.f, audio_source.m_fadedin);
-						//AudioAPI::AddFadeOutEffect(audio_source.m_channel, audio_source.m_dsp_clock, 3.f);
-						audio_source.m_fadedin = true;
+						AudioAPI::AddFadeIn(audio_source.m_channel, audio_source.m_fade_in_time, audio_source.m_faded_in);
+						audio_source.m_faded_in = true;
 						audio_source.enable_fade_in = false;
 					}
 					else
 					{
-						AudioAPI::RemoveFadeIn(audio_source.m_channel, 10.f);
-						audio_source.m_fadedin = false;
+						AudioAPI::RemoveFadeIn(audio_source.m_channel, audio_source.m_fade_in_time);
+						audio_source.m_faded_in = false;
 					}
 				}
 				if (audio_source.enable_fade_out)
 				{
-					unsigned int points; // move this to audioapi
+					unsigned int points;
 					AudioAPI::GetFadePoints(audio_source.m_channel, &points);
-					if (points == 0 && !audio_source.m_fadedout)
+					if (points == 0 && !audio_source.m_faded_out)
 					{
-						// DSP Effects
-						//AudioAPI::GetDSPClock(audio_source.m_channel, audio_source.m_dsp_clock);
-						//AudioAPI::AddEchoEffect(audio_source.m_channel);
-
-						//AudioAPI::AddFadeInEffect(audio_source.m_channel, audio_source.m_dsp_clock, 10.f);
-						AudioAPI::AddFadeOut(audio_source.m_channel, 5.f, audio_source.m_fadedout);
-						audio_source.m_fadedout = true;
+						AudioAPI::AddFadeOut(audio_source.m_channel, audio_source.m_fade_out_time, audio_source.m_faded_out);
+						audio_source.m_faded_out = true;
 						audio_source.enable_fade_out = false;
 					}
 					else
 					{
-						AudioAPI::RemoveFadeIn(audio_source.m_channel, 5.f);
-						audio_source.m_fadedout = false;
+						AudioAPI::RemoveFadeIn(audio_source.m_channel, audio_source.m_fade_out_time);
+						audio_source.m_faded_out = false;
 					}
 				}
-
+				// ------------------------------------------------------------------------------------
 
 			}
 		}
