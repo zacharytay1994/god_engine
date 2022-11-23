@@ -11,7 +11,7 @@ end
 unlocked = false
 --[IsSystem]
 function S_LevelProgress(e)
-    print(SceneName)
+
     local progress = GetComponent(e, "C_LevelProgress")
     local gui_object = GetGUIObject(e)
 
