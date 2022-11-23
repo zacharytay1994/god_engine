@@ -62,10 +62,7 @@ namespace god
 
 		bool operator==( RigidDynamic const& rhs )
 		{
-			if (this->p_RigidDynamic == rhs.p_RigidDynamic)
-				return true;
-			else
-				return false;
+			return true;
 		}
 	};
 	template <>
