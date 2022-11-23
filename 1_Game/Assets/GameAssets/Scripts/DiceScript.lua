@@ -58,17 +58,17 @@ function S_DiceScript(e)
 		c_dice.start_position_z = transform.position.z
 		ChangeTexture(e, "Pixel_Blue")
 		for i = 0,5 do
-			if (c_dice.dice_faces[i] == 0) then
+			if (c_dice.dice_faces[i+1] == 0) then
 				ChangeModel(Child(e, i), "dice_jab3D")
-			elseif (c_dice.dice_faces[i] == 1) then
+			elseif (c_dice.dice_faces[i+1] == 1) then
 				ChangeModel(Child(e, i), "dice_swing3D")
-			elseif (c_dice.dice_faces[i] == 2) then
+			elseif (c_dice.dice_faces[i+1] == 2) then
 				ChangeModel(Child(e, i), "dice_smash3D")
-			elseif (c_dice.dice_faces[i] == 3) then
+			elseif (c_dice.dice_faces[i+1] == 3) then
 				ChangeModel(Child(e, i), "dice_bolt3D")
-			elseif (c_dice.dice_faces[i] == 4) then
+			elseif (c_dice.dice_faces[i+1] == 4) then
 				-- ChangeModel(Child(e, i), "dice_projectile3D")
-			elseif (c_dice.dice_faces[i] == 5) then
+			elseif (c_dice.dice_faces[i+1] == 5) then
 				-- ChangeModel(Child(e, i), "dice_corporikinesis3D")
 			end
 		end
@@ -100,7 +100,7 @@ function S_DiceScript(e)
 									if (top_index_position_y < WorldPosition(Child(e, i)).y) then
 										top_index_position_y = WorldPosition(Child(e, i)).y
 										-- c_dice.value = i + 1
-										c_dice.value = c_dice.dice_faces[i]
+										c_dice.value = c_dice.dice_faces[i+1]
 									end
 								end
 								print("[DiceScript] Dice value:", c_dice.value)

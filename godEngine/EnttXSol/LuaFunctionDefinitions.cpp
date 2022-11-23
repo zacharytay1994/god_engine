@@ -175,6 +175,29 @@ namespace god
 			}
 		);
 
+		// ForceCellUpdate(e,name)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "ForceCellUpdate" ,
+			[&entt , &engineResources]( entt::entity e )->bool
+			{
+				// get parent of entity
+				EntityData* entity_data = entt.GetEngineComponent<EntityData> ( e );
+				GridCell* grid_cell = entt.GetEngineComponent<GridCell> ( e );
+				if ( entity_data && grid_cell )
+				{
+					// get parent grid
+					auto& grid = engineResources.Get<EntityGrid> ().get ()[ entity_data->m_parent_id ];
+					grid.ChangeCell ( { entity_data->m_id, grid_cell->m_passable, grid_cell->m_steppable } , grid_cell->m_cell_size , { grid_cell->m_cell_ox, grid_cell->m_cell_oy, grid_cell->m_cell_oz } , { grid_cell->m_cell_x, grid_cell->m_cell_y, grid_cell->m_cell_z } );
+					grid_cell->m_cell_ox = grid_cell->m_cell_x;
+					grid_cell->m_cell_oy = grid_cell->m_cell_y;
+					grid_cell->m_cell_oz = grid_cell->m_cell_z;
+					grid_cell->m_changed = false;
+					return true;
+				}
+				return false;
+			}
+		);
+
 		// HasComponent(e,name)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "HasComponent" ,
