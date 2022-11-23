@@ -151,9 +151,21 @@ function S_UIManager(e)
         GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
     end
 	
+	-- enable roll dice button
 	local rollDiceBtn = GetGUIObject(GetEntity("RollDiceButton"))
-	rollDiceBtn.active = false
-	
+	if (GetEntityData(playerEntity).id == turnOrderManagerComponent.currentTurn and UIManagerComponent.diceRolled == false) then
+		rollDiceBtn.active = true
+		
+		local diceList = EntitiesWithScriptComponent("C_DiceScript")
+		for i = 1, #diceList do
+			if (GetComponent(diceList[i], "C_DiceScript").is_rolling == true) then
+				rollDiceBtn.active = false
+				break
+			end
+		end
+	else
+		rollDiceBtn.active = false
+	end
 	
 	-- print(UIManagerComponent.healthbar_size)
 	
