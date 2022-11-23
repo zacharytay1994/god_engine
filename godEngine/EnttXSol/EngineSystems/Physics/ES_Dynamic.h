@@ -146,7 +146,7 @@ namespace god
 			rigiddynamic.p_RigidDynamic->setAngularVelocity(physx::PxVec3(rigiddynamic.AngularVelocity.x, rigiddynamic.AngularVelocity.y, rigiddynamic.AngularVelocity.z), true);
 			rigiddynamic.p_RigidDynamic->setLinearVelocity(physx::PxVec3(rigiddynamic.LinearVelocity.x, rigiddynamic.LinearVelocity.y, rigiddynamic.LinearVelocity.z), true);
 			rigiddynamic.p_RigidDynamic->setGlobalPose(ConvertToPhysXTransform(transform.m_position, transform.m_rotation));
-			rigiddynamic.p_RigidDynamic->setMaxLinearVelocity(20.f);
+			rigiddynamic.p_RigidDynamic->setMaxLinearVelocity(50.f);
 
 			rigiddynamic.m_id = edata.m_id;
 			rigiddynamic.p_RigidDynamic->userData = &rigiddynamic;
@@ -207,7 +207,9 @@ namespace god
 		Transform& transform = std::get<1> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
 
-		
+		if (rigiddynamic.p_RigidDynamic == nullptr)
+			return;
+
 		if ( rigiddynamic.Active != rigiddynamic.Activeflag)
 		{
 			if (!rigiddynamic.Active)// Not active

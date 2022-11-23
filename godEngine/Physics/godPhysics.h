@@ -84,6 +84,7 @@ namespace god
 		bool mRunning;
 		float mAccumulator = 0.0f;
 		uint16_t numSteps = 1;
+		float idealStepSize = 1.0f / 30.f;
 		float mStepSize = 1.0f / 30.f;
 		
 		std::array < float, 5> sma_dt;
