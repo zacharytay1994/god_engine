@@ -242,6 +242,20 @@ namespace god
 		return FMOD_OK;
 	}
 
+	unsigned int AudioAPI::GetCurrentPlayTime(FMOD::Channel* channel)
+	{
+		unsigned int time_stamp;
+		channel->getPosition(&time_stamp, FMOD_TIMEUNIT_PCM);
+
+		return time_stamp;
+	}
+
+	void AudioAPI::SetCurrentPlayTime(FMOD::Channel* channel, unsigned int timeStamp)
+	{
+		channel->setPosition(timeStamp, FMOD_TIMEUNIT_PCM);
+	}
+
+
 	void AudioAPI::PlaySoundFromTime(FMOD::Channel* channel, float startPoint)
 	{
 		UINTLL dsp_clock = GetDSPClock(channel);
@@ -308,7 +322,7 @@ namespace god
 
 		ErrorCheck(channel->addFadePoint(dsp_clock, volume));
 		ErrorCheck(channel->addFadePoint(dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), 0.f));
-		ErrorCheck(channel->setDelay(0, dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), true)); // delay to stop sound
+		ErrorCheck(channel->setDelay(0, dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), false)); // delay to stop sound
 	}
 
 	void AudioAPI::RemoveFadeIn(FMOD::Channel* channel, float fadeInPoint)

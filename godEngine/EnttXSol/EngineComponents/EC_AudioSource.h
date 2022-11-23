@@ -18,7 +18,7 @@ namespace god
 		bool m_mute{ false };
 		bool m_loop{ false };
 
-		bool m_stop{ false };
+		unsigned int m_current_playtime{ 0 };
 
 		bool m_play_on_awake{ true };
 		bool m_awake_played{ false };
@@ -41,20 +41,19 @@ namespace god
 		// Fading Parameters
 		bool enable_fade_in{ false };
 		bool enable_fade_out{ false };
-		bool m_faded_in{ false };
-		bool m_faded_out{ false };
-
 		float m_fade_in_time{ 3.f };
 		float m_fade_out_time{ 3.f };
+
+		bool m_faded_in{ false };
+		bool m_faded_out{ false };
  	};
 	template <>
 	inline void NewLuaType<AudioSource>(sol::state& luaState, std::string const& name)
 	{
 		RegisterLuaType<AudioSource>(luaState, name,
 			"sound_id", &AudioSource::m_sound_id,
-			"finish_playing", &AudioSource::m_played,
+			"finish_playing", &AudioSource::m_played, // why is this m_played?
 			"played", &AudioSource::m_played,
-			"stop", &AudioSource::m_stop,
 			"mute", &AudioSource::m_mute,
 			"loop", &AudioSource::m_loop,
 			"play_on_awake", &AudioSource::m_play_on_awake,
@@ -64,8 +63,6 @@ namespace god
 			"max_distance", &AudioSource::m_max_distance,
 			"fade_in", &AudioSource::enable_fade_in,
 			"fade_out", &AudioSource::enable_fade_out,
-			"faded_in", &AudioSource::enable_fade_in,
-			"faded_out", &AudioSource::enable_fade_out,
 			"fade_in_time", &AudioSource::m_fade_in_time,
 			"fade_out_time", &AudioSource::m_fade_out_time
 			);
@@ -149,8 +146,14 @@ namespace god
 				ImGui::Checkbox("Mute", &component.m_mute);
 				ImGui::Checkbox("Loop", &component.m_loop);
 				ImGui::Checkbox("Play On Awake", &component.m_play_on_awake);
-				ImGui::Checkbox("Fade In", &component.enable_fade_in);
-				ImGui::Checkbox("Fade Out", &component.enable_fade_out);
+
+				ImGui::Checkbox("Enable Fade-In", &component.enable_fade_in);
+				ImGui::SameLine();
+				ImGui::InputFloat("Fade-In Duration", &component.m_fade_in_time);
+
+				ImGui::Checkbox("Enable Fade-Out", &component.enable_fade_out);
+				ImGui::SameLine();
+				ImGui::InputFloat("Fade-Out Duration", &component.m_fade_out_time);
 
 				ImGui::DragFloat("Volume", &component.m_volume, 0.01f, 0.f, 1.f);
 				ImGui::SliderFloat("Pitch", &component.m_pitch, 0.f, 1.5f, "%.01f", 1.f);
@@ -173,6 +176,8 @@ namespace god
 		RapidJSON::JSONifyToValue(value, document, "pitch", component.m_pitch);
 		RapidJSON::JSONifyToValue(value, document, "min_distance", component.m_min_distance);
 		RapidJSON::JSONifyToValue(value, document, "max_distance", component.m_max_distance);
+		RapidJSON::JSONifyToValue(value, document, "fade_in_time", component.m_fade_in_time);
+		RapidJSON::JSONifyToValue(value, document, "fade_out_time", component.m_fade_out_time);
 	}
 
 	template<>
@@ -189,5 +194,7 @@ namespace god
 		AssignIfExist(jsonObj, component.m_pitch, "pitch");
 		AssignIfExist(jsonObj, component.m_min_distance, "min_distance");
 		AssignIfExist(jsonObj, component.m_max_distance, "max_distance");
+		AssignIfExist(jsonObj, component.m_fade_in_time, "fade_in_time");
+		AssignIfExist(jsonObj, component.m_fade_out_time, "fade_out_time");
 	}
 }

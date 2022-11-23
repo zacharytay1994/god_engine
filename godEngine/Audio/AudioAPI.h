@@ -68,6 +68,9 @@ namespace god
 
 		static FMOD_RESULT CheckSoundPlayback(FMOD::Channel* channel, bool* isPlaying);
 
+		static unsigned int GetCurrentPlayTime(FMOD::Channel* channel);
+		static void SetCurrentPlayTime(FMOD::Channel* channel, unsigned int timeStamp);
+
 		static void PlaySoundFromTime(FMOD::Channel* channel, float startPoint);
 		static void PlaySoundUntilTime(FMOD::Channel* channel, float endPoint);
 		static void PlaySoundBetweenTimes(FMOD::Channel* channel, float startPoint, float endPoint);

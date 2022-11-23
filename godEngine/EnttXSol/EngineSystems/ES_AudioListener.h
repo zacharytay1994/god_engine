@@ -34,17 +34,20 @@ namespace god
 						AudioAPI::PlaySound(sound, &audio_source.m_channel, audio_source.m_played);
 				}
 
-				if (audio_source.m_stop)
-				{
-					AudioAPI::StopSound(audio_source.m_channel);
-					audio_source.m_played = false;
-					audio_source.enable_fade_in = true;
-					audio_source.m_stop = false;
-				}
+				//if (audio_source.m_stop)
+				//{
+				//	AudioAPI::StopSound(audio_source.m_channel);
+				//	audio_source.m_played = false;
+				//	audio_source.enable_fade_in = true;
+				//	audio_source.m_stop = false;
+				//}
 
 				// Fading Control --------------------------------------------------------------------
 				if (audio_source.enable_fade_in)
 				{
+					if (audio_source.m_channel == nullptr)
+						audio_source.m_played = false;
+
 					unsigned int points;
 					AudioAPI::GetFadePoints(audio_source.m_channel, &points);
 					if (points == 0 && !audio_source.m_faded_in)
@@ -71,7 +74,7 @@ namespace god
 					}
 					else
 					{
-						AudioAPI::RemoveFadeIn(audio_source.m_channel, audio_source.m_fade_out_time);
+						AudioAPI::RemoveFadeOut(audio_source.m_channel, audio_source.m_fade_out_time);
 						audio_source.m_faded_out = false;
 					}
 				}
