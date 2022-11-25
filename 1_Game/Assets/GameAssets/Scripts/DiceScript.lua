@@ -86,30 +86,21 @@ function S_DiceScript(e)
 	end
 	
 	local transform = GetTransform(e)
+	local isdicesleeping = GetisSleeping(e)
 
 	if (c_dice.is_rolling == true) then
-		if (c_dice.position_x == transform.position.x) then 
-			if (c_dice.position_y == transform.position.y) then
-				if (c_dice.position_z == transform.position.z) then
-					if (c_dice.rotation_x == transform.rotation.x) then
-						if (c_dice.rotation_y == transform.rotation.y) then
-							if (c_dice.rotation_z == transform.rotation.z) then
-								c_dice.is_rolling = false
-								local top_index_position_y = -999
-								for i = 0,5 do
-									if (top_index_position_y < WorldPosition(Child(e, i)).y) then
-										top_index_position_y = WorldPosition(Child(e, i)).y
-										-- c_dice.value = i + 1
-										c_dice.value = c_dice.dice_faces[i+1]
-									end
-								end
-								print("[DiceScript] Dice value:", c_dice.value)
-								print("[DiceScript] Dice color:", c_dice.color)
-							end
-						end
-					end
+		if (isdicesleeping == true) then 
+			c_dice.is_rolling = false
+			local top_index_position_y = -999
+			for i = 0,5 do
+				if (top_index_position_y < WorldPosition(Child(e, i)).y) then
+					top_index_position_y = WorldPosition(Child(e, i)).y
+					-- c_dice.value = i + 1
+					c_dice.value = c_dice.dice_faces[i+1]
 				end
 			end
+			print("[DiceScript] Dice value:", c_dice.value)
+			print("[DiceScript] Dice color:", c_dice.color)				
 		end
 		
 		if (transform.position.x > 10) then

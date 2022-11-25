@@ -2,9 +2,9 @@
 #include "godPhysics.h"
 #include "../Editor/EngineResources.h"
 #include "../EnttXSol/EngineComponents/EC_All.h"
-
-
 #include <assert.h>
+
+
 namespace god
 {
 
@@ -43,7 +43,6 @@ namespace god
 	PhysicsSystem::PhysicsSystem() 
 
 	{
-		mStepSize = 1.f / 30.f;
 
 		RayCastid = Null;
 		mRunning = false;
@@ -136,62 +135,46 @@ namespace god
 		}
 	}
 
-	void PhysicsSystem::SimpleMovingAverageDeltaTime(float dt)
-	{
-		sma_dt[sma_index++] = dt;
-		if (sma_index == sma_dt.size())
-			sma_index = 0;
 
-		mStepSize = (sma_dt[0] + sma_dt[1] + sma_dt[2] + sma_dt[3] + sma_dt[4]) / 5.f;
-
-	}
 
 	void PhysicsSystem::CalculateNumSteps()
 	{
-
-		if (mAccumulator < 1.0f)
-		{
-			numSteps = 1;
-		}
-		
-		if (mAccumulator > 2.0f)
-		{
-			numSteps = 2;
-		}
-		if (mAccumulator > 3.0f)
+		if (mAccumulator > 0.2f)
 		{
 			numSteps = 3;
 		}
-		
-
-		if(mAccumulator>5.0f)
+		else if (mAccumulator > 0.1f)
 		{
-			mStepSize = 1.f/15.f;
+			numSteps = 2;
+		}
+		else if (mAccumulator < 0.1f)
+		{
+			numSteps = 1;
 		}
 	}
 	void PhysicsSystem::Update(float dt , bool pause)
 	{
 		if (!mWindow->WindowsMinimized())
 			Raycast();
+		m_dt = dt;
+
 		if (pause)
 			return;
-	
+
 		mAccumulator += dt;
 		if (mAccumulator < mStepSize)
 			return;
 
-
 		CalculateNumSteps();
 		for (uint16_t i = 0; i < numSteps; ++i)
 		{
-			mAccumulator -= dt;
+			mAccumulator -= mStepSize;
 			mRunning = true;
 			mScene->simulate(mStepSize);
 
 			//Call fetchResultsStart. Get the set of pair headers
 			const physx::PxContactPairHeader* pairHeader;
 			physx::PxU32 nbContactPairs;
-
 			mScene->fetchResultsStart(pairHeader, nbContactPairs, true);
 
 			//Set up continuation task to be run after callbacks have been processed in parallel
@@ -200,16 +183,13 @@ namespace god
 
 			//process the callbacks
 			mScene->processCallbacks(&callbackFinishTask);
-
 			callbackFinishTask.removeReference();
-
 			callbackFinishTask.wait();
-
 			mScene->fetchResultsFinish();
+
 			mRunning = false;		
 		}
 
-		
 	}
 
 	void PhysicsSystem::CreatePVD()
