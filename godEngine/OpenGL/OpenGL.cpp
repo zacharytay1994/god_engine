@@ -553,8 +553,8 @@ namespace god
 
 		// draw model
 		glm::mat4 model = glm::mat4 ( 1.0f );
-
-		model = glm::translate ( model , glm::vec3 ( 1.0f , 1.0f , 5.0f ) ); // translate it down so it's at the center of the scene
+		
+		model = glm::translate ( model , glm::vec3 ( 50.0f , 1.0f , 5.0f ) ); // translate it down so it's at the center of the scene
 		model = glm::rotate ( model , glm::radians ( 90.0f ) , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );// rotate at y-axis
 		model = glm::scale ( model , glm::vec3 ( 1.0f ) );	// it's a bit too big for our scene, so scale it down
 		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uModel" , model );
@@ -618,6 +618,7 @@ namespace god
 		{
 			auto& [first , second] = data;
 			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uAlpha" , first.m_shininess );
 			std::get<1> ( textures.Get ( first.m_diffuse_id ) ).Bind ( 0 );
 
 			for ( auto& mesh : m_models[ first.m_model_id ] )
@@ -755,7 +756,7 @@ namespace god
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.density" , 0.03f );
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.equation" , 0 );
-			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.isEnabled" , false );
+			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.isEnabled" , true );
 
 			// Set Tint
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uTint" , glm::vec4 ( 0.0f ) );

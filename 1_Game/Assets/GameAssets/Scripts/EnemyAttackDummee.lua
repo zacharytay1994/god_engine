@@ -377,6 +377,7 @@ function EnemyAttackDummeeApplyDamage(dummee, victim)
             RemoveInstance(victim)
             GetComponent(dummee, "C_EnemyAttackDummee").damageApplied = true
             GetComponent(dummee, "C_EnemyAttackDummee").victim = nil
+            GetComponent(dummee, "C_EnemyAttackDummee").recoilComplete = true
             return
         end
     

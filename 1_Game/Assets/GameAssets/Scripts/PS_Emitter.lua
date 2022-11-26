@@ -14,13 +14,14 @@ end
 function S_PS_Emitter(e)
     local dt = GetDeltaTime()
     local ps = GetComponent(e, "C_PS_Emitter")
+    -- local ps_position = GetTransform(e).position.x
     local ps_position = GetTransform(e).position.x
 
     if (ps.Timer < ps.EmissionRate) then
         ps.Timer = ps.Timer + dt
     else
-        ps.Timer = 0.0
-        
+        ps.Timer = GenerateRandomNumberInRange(0, 10) / 10.0
+
         local x = GenerateRandomNumberInRange(0, 100) / 100 - 0.5
         local y = GenerateRandomNumberInRange(0, 100) / 100
         local z = GenerateRandomNumberInRange(0, 100) / 100 - 0.5
@@ -30,7 +31,7 @@ function S_PS_Emitter(e)
         transform.scale.x = 0.0
         transform.scale.y = 0.0
         local glow_flies = GetComponent(particle, "C_P_GlowFlies")
-        glow_flies.Scale = 0.2 * s;
+        glow_flies.Scale = 0.1 * s;
         glow_flies.Speed = s
     end
 end

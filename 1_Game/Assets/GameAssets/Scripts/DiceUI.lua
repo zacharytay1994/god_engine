@@ -96,6 +96,11 @@ end
 function SetDiceIcon(e, dicenumber)
 	local diceList = EntitiesWithScriptComponent("C_DiceScript")
 	local dice = GetComponent(diceList[dicenumber], "C_DiceScript")
+
+	if (dice.color == 0) then
+		print("[DiceUI] Error! Color should not be 0!")
+	end
+
 	if (dice.value == 0) then
 		if (dice.color == 1) then
 			ChangeTexture(e, "dice_jab")
@@ -127,6 +132,22 @@ function SetDiceIcon(e, dicenumber)
 			ChangeTexture(e, "dice_bolt_pink")
 		elseif (dice.color == 3) then
 			ChangeTexture(e, "dice_bolt_gold")
+		end
+	elseif (dice.value == 4) then
+		if (dice.color == 1) then
+			ChangeTexture(e, "dice_projectile")
+		elseif (dice.color == 2) then
+			ChangeTexture(e, "dice_projectile_pink")
+		elseif (dice.color == 3) then
+			ChangeTexture(e, "dice_projectile_gold")
+		end
+	elseif (dice.value == 6) then
+		if (dice.color == 1) then
+			ChangeTexture(e, "dice_cryogenesis")
+		elseif (dice.color == 2) then
+			ChangeTexture(e, "dice_cryogenesis_pink")
+		elseif (dice.color == 3) then
+			ChangeTexture(e, "dice_cryogenesis_gold")
 		end
 	end
 end 

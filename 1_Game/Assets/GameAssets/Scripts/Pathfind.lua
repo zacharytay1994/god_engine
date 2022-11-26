@@ -89,49 +89,100 @@ function S_Pathfind(e)
                     else
                         
                         -- -- adjust character's rotation here -----------------------------------------------------------
-                        local characterTransform = GetTransform(e)
+                        -- local characterTransform = GetTransform(e)
+                        -- local child_model = Child(e,0)
+                        -- local child_model_transform = GetTransform(child_model)
                         
-                        if (path[2].x > current_cell.x) then
-                            -- face left
-                            characterTransform.rotation.y = 90
-                        elseif (path[2].x < current_cell.x) then
-                            -- face right
-                            characterTransform.rotation.y = 270
-                        elseif (path[2].z > current_cell.z) then
-                            -- face front
-                            characterTransform.rotation.y = 0
-                        else
-                            -- face back
-                            characterTransform.rotation.y = 180         
-                        end
+                        -- if (path[2].x > current_cell.x) then
+                        --     -- face left
+                        --     child_model_transform.rotation.y = 90
+                        -- elseif (path[2].x < current_cell.x) then
+                        --     -- face right
+                        --     child_model_transform.rotation.y = 270
+                        -- elseif (path[2].z > current_cell.z) then
+                        --     -- face front
+                        --     child_model_transform.rotation.y = 0
+                        -- else
+                        --     -- face back
+                        --     child_model_transform.rotation.y = 180         
+                        -- end
                         -- -- end of adjusting rotation ------------------------------------------------------------------
                         
                         -- -- move the character -------------------------------------------------------------------------
                         -- set camera to track movement
-                        local world_position = WorldPosition(e)
-                        local dir_x = path[2].x - current_cell.x
-                        local dir_y = path[2].y - current_cell.y
-                        local dir_z = path[2].z - current_cell.z
-                        local dist_behind = 3
-                        local dist_above = 4
-                        if dir_x ~= 0 then
-                            if dir_x > 0 then
-                                SetCameraNextPosition(world_position.x-dist_behind, world_position.y + dir_y + dist_above, world_position.z)
-                            else 
-                                SetCameraNextPosition(world_position.x+dist_behind, world_position.y + dir_y + dist_above, world_position.z)
+                        if EntityName(e) == "Player" then
+                            local world_position = WorldPosition(e)
+                            local dir_x = path[2].x - current_cell.x
+                            local dir_y = path[2].y - current_cell.y
+                            local dir_z = path[2].z - current_cell.z
+                            local dist_behind = 3
+                            local dist_above = 4
+                            SetCameraMoveSpeed(2.0)
+                            SetCameraPanSpeed(3.0)
+                            if dir_x ~= 0 then
+                                if dir_x > 0 then
+                                    SetCameraNextPosition(world_position.x-dist_behind, world_position.y + dir_y + dist_above, world_position.z)
+                                else 
+                                    SetCameraNextPosition(world_position.x+dist_behind, world_position.y + dir_y + dist_above, world_position.z)
+                                end
+                            else
+                                if dir_z > 0 then
+                                    SetCameraNextPosition(world_position.x, world_position.y + dir_y + dist_above, world_position.z-dist_behind)
+                                else 
+                                    SetCameraNextPosition(world_position.x, world_position.y + dir_y + dist_above, world_position.z+dist_behind)
+                                end
                             end
+                            SetCameraNextLookAt(world_position.x+dir_x, world_position.y + dir_y, world_position.z+dir_z)
+
+                            local child_model = Child(e,0)
+                            local child_model_transform = GetTransform(child_model)
+                            
+                            if (path[2].x > current_cell.x) then
+                                -- face left
+                                child_model_transform.rotation.y = 90
+                            elseif (path[2].x < current_cell.x) then
+                                -- face right
+                                child_model_transform.rotation.y = 270
+                            elseif (path[2].z > current_cell.z) then
+                                -- face front
+                                child_model_transform.rotation.y = 0
+                            else
+                                -- face back
+                                child_model_transform.rotation.y = 180         
+                            end
+                            -- child_model_transform.position.x = (current_cell.x - path[2].x)*2.0
+                            -- child_model_transform.position.y = (current_cell.y - path[2].y)*2.0
+                            child_model_transform.position.z = (current_cell.z - path[2].z)*2.0
                         else
-                            if dir_z > 0 then
-                                SetCameraNextPosition(world_position.x, world_position.y + dir_y + dist_above, world_position.z-dist_behind)
-                            else 
-                                SetCameraNextPosition(world_position.x, world_position.y + dir_y + dist_above, world_position.z+dist_behind)
+                            local characterTransform = GetTransform(e)
+                            
+                            if (path[2].x > current_cell.x) then
+                                -- face left
+                                characterTransform.rotation.y = 90
+                            elseif (path[2].x < current_cell.x) then
+                                -- face right
+                                characterTransform.rotation.y = 270
+                            elseif (path[2].z > current_cell.z) then
+                                -- face front
+                                characterTransform.rotation.y = 0
+                            else
+                                -- face back
+                                characterTransform.rotation.y = 180         
                             end
                         end
-                        SetCameraNextLookAt(world_position.x+dir_x, world_position.y + dir_y, world_position.z+dir_z)
+                        
+                        -- print("SETTING OFFSET")
+                        -- Set child i.e. model position offset to start movement animation
+                        -- child_model_transform.position.x = (current_cell.x - path[2].x)*2.0
+                        -- child_model_transform.position.y = (current_cell.y - path[2].y)*2.0
+                        -- child_model_transform.position.z = (current_cell.z - path[2].z)*2.0
+                        -- print("OFFSET SET")
 
+                        -- Set parent i.e. base position
                         current_cell.x = path[2].x
                         current_cell.y = path[2].y
                         current_cell.z = path[2].z
+
                         -- print("found")
                         print(current_cell.x, current_cell.y, current_cell.z)
                         -- -- end of moving the character ----------------------------------------------------------------
@@ -144,6 +195,14 @@ function S_Pathfind(e)
                         if (charComp.currentStamina <= 0) then
                             pathfind.Path = false
                             pathfind.Timer = 0.0
+                            
+                            -- camera reset
+                            if EntityName(e) == "Player" then
+                                SetCameraMoveSpeed(1.0)
+                                SetCameraPanSpeed(1.5)
+                                SetCameraNextLookAt(1,0,-4)
+                                SetCameraNextPosition(-3,12,-15)
+                            end
                         end
                         -- -- end of reducing stamina --------------------------------------------------------------------
                     end

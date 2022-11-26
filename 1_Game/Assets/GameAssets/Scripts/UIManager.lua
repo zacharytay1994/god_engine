@@ -21,7 +21,7 @@ function C_UIManager()
         iconList = {},
 		
 		-- Size of healthbar
-		healthbar_size = 0.0,
+		healthbar_size = 0.7,
 		
 		-- Health record, used to optimize the healthbar UI
 		health_record = 0.0
@@ -77,26 +77,30 @@ function S_UIManager(e)
 
                 -- don't allow player to roll anymore for this turn
                 UIManagerComponent.diceRolled = true
+
+                local attackList = GetComponent(GetEntity("CombatManager"), "C_AttackList").attackList
                             
                 -- change the button textures
                 for j = 1, #diceList do
                     
                     currentDiceComponent = GetComponent(diceList[j], "C_DiceScript")
+
+                    UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = attackList[(currentDiceComponent.value * 3) + currentDiceComponent.color][1]   
                     
-                    -- currently only 2 attack types, will modify this part when more attack types are implemented
-                    if (currentDiceComponent.value == 0) then                       
-                        UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "FrontJab"                       
-                    elseif (currentDiceComponent.value == 1) then                       
-                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "BigSwing"                       
-                    elseif (currentDiceComponent.value == 2) then                       
-                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "GroundSmash"                       
-                    elseif (currentDiceComponent.value == 3) then
-                        UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "EnergyBolt"
-					elseif (currentDiceComponent.value == 4) then
-                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Projectile"             
-					elseif (currentDiceComponent.value == 5) then
-                        -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Corporikinesis"             
-                    end
+                    -- -- old code, leave here for reference 
+                    -- if (currentDiceComponent.value == 0) then                       
+                    --     UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "FrontJab"                       
+                    -- elseif (currentDiceComponent.value == 1) then                       
+                    --     -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "BigSwing"                       
+                    -- elseif (currentDiceComponent.value == 2) then                       
+                    --     -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "GroundSmash"                       
+                    -- elseif (currentDiceComponent.value == 3) then
+                    --     UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "EnergyBolt"
+					-- elseif (currentDiceComponent.value == 4) then
+                    --     -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Projectile"             
+					-- elseif (currentDiceComponent.value == 5) then
+                    --     -- UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = "Corporikinesis"             
+                    -- end
 
                     -- -- un-hardcoded solution 
                     -- -- (diceValue will be a value from 0 to 8, colorModifier will be a value from 1 to 3.
@@ -107,10 +111,16 @@ function S_UIManager(e)
                     -- end of setting selected action --------------------------------------------------
                 end
                 
+               print("before changing button textures")
+               print("UIManagerComponent.actionButtonList[1]", UIManagerComponent.actionButtonList[1])
+               print("UIManagerComponent.actionButtonList[2]", UIManagerComponent.actionButtonList[2])
+               print("UIManagerComponent.actionButtonList[3]", UIManagerComponent.actionButtonList[3])
+
                 -- change button textures to show the available actions
                 ChangeTexture(GetEntity("Button1"), UIManagerComponent.actionButtonList[1])
                 ChangeTexture(GetEntity("Button2"), UIManagerComponent.actionButtonList[2])
                 ChangeTexture(GetEntity("Button3"), UIManagerComponent.actionButtonList[3])
+                rint("after changing button textures")
                                 
                 -- reset dice value to zero
                 -- for k = 1, #diceList do
@@ -132,13 +142,40 @@ function S_UIManager(e)
         UIManagerComponent.actionButtonList = {}
     end
 	
-	local playerComponent = GetComponent(playerEntity, "C_Character")
-	GetGUIText(GetEntity("StaminaIcon")).text = tostring(playerComponent.currentStamina)
-	if(UIManagerComponent.health_record ~= playerComponent.currentHP) then
-		UIManagerComponent.health_record = playerComponent.currentHP
-		GetGUIText(GetEntity("HealthHeart")).text = tostring(playerComponent.currentHP)
-		GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
+    local playerComponent = GetComponent(playerEntity, "C_Character")
+
+    GetGUIText(GetEntity("StaminaIcon")).text = tostring(playerComponent.currentStamina)
+    if(UIManagerComponent.health_record ~= playerComponent.currentHP) then
+        UIManagerComponent.health_record = playerComponent.currentHP
+        GetGUIText(GetEntity("HealthHeart")).text = tostring(playerComponent.currentHP)
+        GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
+    end
+	
+	-- enable roll dice button
+	local rollDiceBtn = GetGUIObject(GetEntity("RollDiceButton"))
+	if (GetEntityData(playerEntity).id == turnOrderManagerComponent.currentTurn and UIManagerComponent.diceRolled == false) then
+		rollDiceBtn.active = true
+		
+		local diceList = EntitiesWithScriptComponent("C_DiceScript")
+		for i = 1, #diceList do
+			if (GetComponent(diceList[i], "C_DiceScript").is_rolling == true) then
+				rollDiceBtn.active = false
+				break
+			end
+		end
+		
+		if (rollDiceBtn.active == true) then
+			if (rollDiceBtn.pressed) then
+				for i = 1, #diceList do
+					DiceScript_RollDice(diceList[i], GetComponent(diceList[i], "C_DiceScript"))
+				end
+				rollDiceBtn.active = false
+			end
+		end
+	else
+		rollDiceBtn.active = false
 	end
+	
 	-- print(UIManagerComponent.healthbar_size)
 	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------

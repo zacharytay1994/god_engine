@@ -55,17 +55,14 @@ namespace god
 		SystemTimer::StartTimeSegment ( "GridSystem" );
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
 		SystemTimer::EndTimeSegment ( "GridSystem" );
-
 		//Physics
-		if ( isPause )
-		{
-			SystemTimer::StartTimeSegment ( "RigidStaticUpdate" );
-			enttxsol.RunEngineSystem ( engineResources , RigidStaticUpdate );
-			SystemTimer::EndTimeSegment ( "RigidStaticUpdate" );
-			SystemTimer::StartTimeSegment ( "RigidDynamicUpdate" );
-			enttxsol.RunEngineSystem ( engineResources , RigidDynamicUpdate );
-			SystemTimer::EndTimeSegment ( "RigidDynamicUpdate" );
-		}
+		SystemTimer::StartTimeSegment("RigidStaticUpdate");
+		enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
+		SystemTimer::EndTimeSegment("RigidStaticUpdate");
+		SystemTimer::StartTimeSegment("RigidDynamicUpdate");
+		enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);
+		SystemTimer::EndTimeSegment("RigidDynamicUpdate");
+
 	}
 
 	// runs at the start of a frame, i.e. runs before EngineSystems()
@@ -104,13 +101,12 @@ namespace god
 		enttxsol.RunEngineSystem ( engineResources , DebugStatic );
 		enttxsol.RunEngineSystem(engineResources, RayCastDynamic);
 		enttxsol.RunEngineSystem(engineResources, RayCastStatic);
-		
-			
 		SystemTimer::EndTimeSegment ( "Physics Frame End" );
 
 		if ( !enttxsol.m_pause )
 		{
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystemFrameEnd );
+
 			SystemTimer::StartTimeSegment ( "RigidDynamicFrameEnd" );
 			enttxsol.RunEngineSystem ( engineResources , RigidDynamicFrameEnd );
 			SystemTimer::EndTimeSegment ( "RigidDynamicFrameEnd" );
@@ -129,6 +125,13 @@ namespace god
 	{
 		enttxsol.RunEngineSystem ( engineResources , ExampleSystemInit );
 		enttxsol.RunEngineSystem ( engineResources , GridManipulateInit );
+
+		SystemTimer::StartTimeSegment ( "RigidStaticInit" );
+		enttxsol.RunEngineSystem ( engineResources , RigidStaticInit);
+		SystemTimer::EndTimeSegment ( "RigidStaticInit" );
+		SystemTimer::StartTimeSegment ( "RigidDynamicInit" );
+		enttxsol.RunEngineSystem ( engineResources , RigidDynamicInit);
+		SystemTimer::EndTimeSegment ( "RigidDynamicInit" );
 	}
 
 	// runs at the end before unloading the scene 
