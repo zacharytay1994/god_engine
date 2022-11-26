@@ -212,6 +212,18 @@ function S_Pathfind(e)
                 else
                     pathfind.Path = false
                     pathfind.Timer = 0.0 
+
+                    local entity = e
+                    if (EntityName(entity) == "Dummee") then
+                        print("[Pathfind.lua] Resetting Dummee move variables after failing to find path!")
+                        local moveComponent = GetComponent(entity, "C_EnemyMoveDummee")
+                        moveComponent.Time = 0.0
+                        moveComponent.startedPathfind = false
+                        moveComponent.executeMove = false
+                        GetComponent(entity, "C_EnemyController").movementForecast = false
+                        GetComponent(entity, "C_EnemyController").attackForecast = true
+                    end
+
                     -- print("#path <= 1, path not found")
                 end
             else

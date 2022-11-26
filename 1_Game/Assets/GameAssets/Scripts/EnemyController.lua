@@ -61,7 +61,6 @@ function S_EnemyController(e)
 
     if (enemyController.doingForecast == true and enemyController.initializedForecast == false) then
 
-        print("[EnemyController.lua] Checkpoint.")
         local movementScript = GetComponent(enemyEntity, enemyController.movementScriptName)
         enemyController.movementForecast = true
         movementScript.executeMove = true   
@@ -79,7 +78,6 @@ function S_EnemyController(e)
         enemyForecastComponent.indicatorsList[#enemyForecastComponent.indicatorsList + 1] = enemyController.indicatorEntity
 
         enemyController.initializedForecast = true
-        print("[EnemyController.lua] Executing forecast!")       
     end
 
     -- forecast attack based on ForecastIndicator's location
