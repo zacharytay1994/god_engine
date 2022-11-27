@@ -120,6 +120,11 @@ function S_Player(e)
                         "Special property:", playerAttackComponent.selectedAttack[3], "\n")
         UnselectAllButtons()
     end
+
+    -- press 8
+    if (CheckKeyPress(56)) then 
+        GetTransform(e).rotation.y = 90
+    end
 end
 
 -- this is to prevent Action Buttons from resetting due to using attacks through hotkeys
