@@ -53,7 +53,7 @@ namespace god
 
 	void godEngine::Update ()
 	{
-		FreeConsole ();
+		//FreeConsole ();
 		std::cout << "godEngine Update." << std::endl;
 		// create window
 		GLFWWindow window ( 1920 , 1080 );

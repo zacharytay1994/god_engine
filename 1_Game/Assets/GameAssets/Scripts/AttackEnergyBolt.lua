@@ -79,8 +79,12 @@ function S_EnergyBolt(e)
     if (attackComponent.canAttack == true) then 
         
         -- turn player to face enemy 
-        transformComponent = GetTransform(attackComponent.attacker)
-        transformComponent.rotation.y = attackComponent.playerRotation
+        -- transformComponent = GetTransform(attackComponent.attacker)
+        -- transformComponent.rotation.y = attackComponent.playerRotation
+        local child_model = Child(attackComponent.attacker, 0)
+        local child_model_transform = GetTransform(child_model)
+        child_model_transform.rotation.y = attackComponent.playerRotation
+        -- print("[AttackFrontJab.lua] Setting Player model's y-rotation to:", attackComponent.playerRotation)
 
         -- no screenshake here (will be triggered by the energy bolt entity's script)
 
