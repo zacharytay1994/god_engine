@@ -88,9 +88,9 @@ function S_AttackCryogenesis(e)
     -- if can use attack, turn the player and activate effects -----------------------------------------------------------
     if (attackComponent.canAttack == true) then 
         
-        -- turn player to face enemy 
-        transformComponent = GetTransform(attackComponent.attacker)
-        transformComponent.rotation.y = attackComponent.playerRotation
+        -- -- turn player to face enemy 
+        -- transformComponent = GetTransform(attackComponent.attacker)
+        -- transformComponent.rotation.y = attackComponent.playerRotation
 
         -- create an instance of a blue tile
         local iceTile = InstancePrefabParentedOnGridNow(GetEntity("Floor"), "IceTile", attackComponent.iceLocation[1], attackComponent.iceLocation[2], attackComponent.iceLocation[3])
