@@ -94,7 +94,7 @@ function S_GroundSmash(e)
         end
         
         -- trigger sound effect
-        InstancePrefab("SFX_Jab",0,0,0)
+        InstancePrefab("SFX_GroundSmash",0,0,0)
         
         -- trigger particles (if any)
         
