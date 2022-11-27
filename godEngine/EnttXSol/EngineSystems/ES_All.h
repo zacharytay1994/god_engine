@@ -111,16 +111,16 @@ namespace god
 			enttxsol.RunEngineSystem ( engineResources , RigidDynamicFrameEnd );
 			SystemTimer::EndTimeSegment ( "RigidDynamicFrameEnd" );
 
-			SystemTimer::StartTimeSegment("AudioListenerSystem");
-			enttxsol.RunEngineSystem(engineResources, AudioListenerSystem);
-			SystemTimer::EndTimeSegment("AudioListenerSystem");
+			//SystemTimer::StartTimeSegment("AudioListenerSystem");
+			//enttxsol.RunEngineSystem(engineResources, AudioListenerSystem);
+			//SystemTimer::EndTimeSegment("AudioListenerSystem");
 
 
 		}
 
-		//SystemTimer::StartTimeSegment ( "AudioListenerSystem" );
-		//enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
-		//SystemTimer::EndTimeSegment ( "AudioListenerSystem" );
+		SystemTimer::StartTimeSegment ( "AudioListenerSystem" );
+		enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
+		SystemTimer::EndTimeSegment ( "AudioListenerSystem" );
 
 
 	}
