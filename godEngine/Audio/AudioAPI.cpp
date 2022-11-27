@@ -157,6 +157,12 @@ namespace god
 		ErrorCheck(sound.m_sound_sample->setLoopCount(loop ? -1 : 0));
 	}
 
+	void AudioAPI::SetLoop(FMOD::Channel* channel, bool loop)
+	{
+		ErrorCheck(channel->setMode(loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF));
+		ErrorCheck(channel->setLoopCount(loop ? -1 : 0));
+	}
+
 	void AudioAPI::SetMute(FMOD::Channel* channel, bool mute)
 	{
 		ErrorCheck(channel->setMute(mute));
