@@ -45,6 +45,7 @@ namespace god
 	void RigidDynamicUpdate ( EnttXSol& entt , EngineResources& engineResources , std::tuple< EntityData& , Transform& , RigidDynamic& , Renderable3D& > component )
 	{
 		( entt );
+		( engineResources );
 		//EntityData& edata = std::get<0>(component);
 		//Transform& transform = std::get<1>(component);
 		RigidDynamic& rigiddynamic = std::get<2>(component);

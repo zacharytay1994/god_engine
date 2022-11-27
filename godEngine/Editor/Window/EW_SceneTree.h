@@ -530,7 +530,7 @@ namespace god
 			return (s.find(name) != std::string::npos);
 		});
 		if (it != m_scene_list.end()) {
-			m_selected_scene = it - m_scene_list.begin();
+			m_selected_scene = static_cast<int>(it - m_scene_list.begin());
 		}
 	}
 }

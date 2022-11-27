@@ -325,7 +325,7 @@ namespace god
 				scene_tree->SetSelectedScene ( scene_to_change );
 #endif
 
-				EntityGrid& grid = engine_resources.Get<EntityGrid> ().get ();
+				//EntityGrid& grid = engine_resources.Get<EntityGrid> ().get ();
 				grid = EntityGrid ();
 
 				enttxsol.ClearEntt ( engine_resources );

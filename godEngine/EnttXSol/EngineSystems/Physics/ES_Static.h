@@ -38,6 +38,7 @@ namespace god
 	void RigidStaticUpdate(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
 		( entt );
+		( engineResources );
 		//EntityData& edata = std::get<0>(component);
 		//Transform& transform = std::get<1>(component);
 		RigidStatic& rigidstatic = std::get<2>(component);

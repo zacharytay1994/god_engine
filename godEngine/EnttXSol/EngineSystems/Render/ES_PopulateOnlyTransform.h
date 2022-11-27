@@ -11,6 +11,7 @@ namespace god
 	{
 		( entt );
 		( components );
+		( engineResources );
 
 		auto& [entity_data , transform , active] = components;
 

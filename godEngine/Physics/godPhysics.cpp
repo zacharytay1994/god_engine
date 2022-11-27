@@ -112,7 +112,7 @@ namespace god
 				std::cerr << "PxCreateCooking failed!" << std::endl;
 			
 			physx::PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-			sceneDesc.gravity = physx::PxVec3(0.0f, -98.1, 0.0f);
+			sceneDesc.gravity = physx::PxVec3(0.0f, -98.1f, 0.0f);
 			mDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
 			if (!mDispatcher)
 				std::cerr << "PxDefaultCpuDispatcherCreate failed!" << std::endl;
@@ -223,12 +223,12 @@ namespace god
 		
 		physx::PxVec3 origin = mCamera->m_position;                 // [in] Ray origin
 		physx::PxVec3 unitDir = ray_dir;                // [in] Normalized ray direction
-		physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
+		//physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
 		physx::PxRaycastBuffer hit;                 // [out] Raycast results
 		
 		// Raycast against all static & dynamic objects (no filtering)
 		// The main result from this call is the closest hit, stored in the 'hit.block' structure
-		bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
+		//bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
 		if (hit.hasBlock)
 		{
 			mRayCastMouse = hit.block.actor;
