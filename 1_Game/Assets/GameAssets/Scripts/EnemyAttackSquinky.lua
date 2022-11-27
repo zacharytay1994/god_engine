@@ -61,7 +61,7 @@ function S_EnemyAttackSquinky(e)
         end
 
         -- trigger sound effect
-        InstancePrefab("SFX_Jab",0,0,0)
+        InstancePrefab("SFX_EnemyHit",0,0,0)
 
         -- trigger particles (if any)
             
