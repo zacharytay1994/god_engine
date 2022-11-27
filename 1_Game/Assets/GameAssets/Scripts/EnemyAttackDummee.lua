@@ -123,7 +123,7 @@ function S_EnemyAttackDummee(e)
             end
 
             -- trigger sound effect
-            InstancePrefab("SFX_Jab",0,0,0)
+            InstancePrefab("SFX_EnemyCharge",0,0,0)
 
             if (attackComponent.victim ~= nil) then
 
