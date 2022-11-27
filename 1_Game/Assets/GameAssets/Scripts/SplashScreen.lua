@@ -245,7 +245,7 @@ function OnLoad_SplashScreen()
     InstancePrefab("SS_Logo", 0, 0, 0)
 
     -- instance background music
-    InstancePrefab("BGM1", 0, 0, 0)
+    InstancePrefab("SplashScreen_BGM", 0, 0, 0)
 
     print("[SplashScreen.lua] OnLoad_SplashScreen")
 end
