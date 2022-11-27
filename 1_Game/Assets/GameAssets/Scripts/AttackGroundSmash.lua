@@ -118,9 +118,15 @@ function AttackGroundSmashCheckCorrectTileClicked(player, clickedEntity)
     local playerGrid = GetGridCell(player)
     local clickedEntityGrid = GetGridCell(clickedEntity)
 
-    if (playerGrid.x == clickedEntityGrid.x and playerGrid.y == clickedEntityGrid.y + 1 and playerGrid.z == clickedEntityGrid.z) then
+    if (playerGrid.x == clickedEntityGrid.x and playerGrid.y == clickedEntityGrid.y and playerGrid.z == clickedEntityGrid.z) then
         return true
     end
+
+    -- if (playerGrid.x == clickedEntityGrid.x and playerGrid.y == clickedEntityGrid.y + 1 and playerGrid.z == clickedEntityGrid.z) then
+    --     return true
+    -- elseif (playerGrid.x == clickedEntityGrid.x and playerGrid.y == clickedEntityGrid.y and playerGrid.z == clickedEntityGrid.z) then
+    --     return true
+    -- end
 
     return false
 end

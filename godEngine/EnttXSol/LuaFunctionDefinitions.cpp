@@ -536,6 +536,24 @@ namespace god
 			}
 		);
 
+
+		// GetisSleeping(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("GetisSleeping",
+			[&entt, &engineResources](entt::entity e)->bool
+			{
+				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+					;
+
+				if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+				{
+					return (entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->isSleeping() );
+				}
+				return true;
+			}
+		);
+
+
 		// SetTransformPosition(e,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "SetTransformPosition" ,

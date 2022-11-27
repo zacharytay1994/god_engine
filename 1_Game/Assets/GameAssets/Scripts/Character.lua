@@ -129,7 +129,9 @@ function S_Character(e)
         enemyList = EntitiesWithScriptComponent("C_EnemyController")
         
         for i = 1, #enemyList do
-            GetComponent(enemyList[i], "C_Character").currentHP = 0
+            if (EntityName(enemyList[i]) == "Dummee") then
+                GetComponent(enemyList[i], "C_Character").currentHP = 0
+            end
         end
         print("[Character.lua]", #enemyList, "enemies set to 0 HP!")
     end

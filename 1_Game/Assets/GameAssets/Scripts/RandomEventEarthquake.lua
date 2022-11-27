@@ -259,6 +259,9 @@ function S_RandomEventEarthquake(e)
 
             -- reset randomeventmanager.currentEvent
             randomEventManagerComponent.currentEvent = nil
+			
+			-- refresh the tile array to calculate movement
+			RefreshTileArray()
 
             print("[RandomEventEarthquake.lua] END OF EARTHQUAKE]\n")
         end

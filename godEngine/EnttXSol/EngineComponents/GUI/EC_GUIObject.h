@@ -17,6 +17,7 @@ namespace god
 		glm::vec3 m_size { 0.1f,0.1f,1.0f };
 		bool m_fixed_aspect_ratio { false };
 		float m_aspect_ratio { 1.0f };
+		float m_alpha { 1.0f };
 
 		bool m_hovered { false };
 		bool m_pressed { false };
@@ -51,7 +52,8 @@ namespace god
 			"up" , &GUIObject::m_released ,
 			"enter" , &GUIObject::m_enter ,
 			"exit" , &GUIObject::m_exit ,
-			"active" , &GUIObject::m_active );
+			"active" , &GUIObject::m_active ,
+			"alpha" , &GUIObject::m_alpha );
 	}
 	template<>
 	inline void ComponentInspector::operator() < GUIObject > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
@@ -76,6 +78,8 @@ namespace god
 				}
 
 				ImGui::Checkbox ( "Active" , &component.m_active );
+
+				ImGui::SliderFloat ( "Alpha" , &component.m_alpha , 0.0f , 1.0f );
 			} );
 	}
 

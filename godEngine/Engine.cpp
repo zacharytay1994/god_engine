@@ -41,7 +41,8 @@
 #include <godUtility/Math.h>
 #include <godUtility/Grid3D.h>
 
-#define ENABLE_EDITOR
+// comment out this for no editor
+//#define ENABLE_EDITOR
 
 namespace god
 {
@@ -52,6 +53,7 @@ namespace god
 
 	void godEngine::Update ()
 	{
+		FreeConsole ();
 		std::cout << "godEngine Update." << std::endl;
 		// create window
 		GLFWWindow window ( 1920 , 1080 );
@@ -121,7 +123,8 @@ namespace god
 			grid ,
 			sound_assets ,
 			godPhysicsSystem ,
-			scene
+			scene ,
+			fonts
 		);
 
 #ifdef ENABLE_EDITOR
@@ -129,7 +132,7 @@ namespace god
 		MainVariables main_variables = { "nil", false };
 #else
 		// starting scene for non editor mode
-		MainVariables main_variables = { "Level_1", true };
+		MainVariables main_variables = { "SplashScreen", true };
 #endif
 		RegisterLuaCPP ( enttxsol , engine_resources , main_variables );
 
@@ -352,9 +355,9 @@ namespace god
 			SystemTimer::EndTimeSegment ( "Overall" );
 
 			// set window title fps
-			std::stringstream ss;
+			/*std::stringstream ss;
 			ss << "God Engine - " << DeltaTimer::m_fps;
-			window.SetWindowTitle ( ss.str () );
+			window.SetWindowTitle ( ss.str () );*/
 		}
 	}
 }

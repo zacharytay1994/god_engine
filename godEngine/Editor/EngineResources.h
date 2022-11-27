@@ -8,6 +8,7 @@
 #include "../Window/GLFWWindow.h"
 #include "../OpenGL/OpenGL.h"
 #include "../OpenGL/Internal/OGLTexture.h"
+#include "../OpenGL/Font/Font.h"
 #include "../Audio/Internal/SoundManager.h"
 #include "../Physics/godPhysics.h"
 
@@ -34,6 +35,7 @@ namespace god
 		EntityGrid ,
 		SoundManager ,
 		PhysicsSystem ,
-		Scene
+		Scene,
+		Fonts
 	>;
 }

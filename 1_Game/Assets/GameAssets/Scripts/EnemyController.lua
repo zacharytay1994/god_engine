@@ -78,7 +78,6 @@ function S_EnemyController(e)
         enemyForecastComponent.indicatorsList[#enemyForecastComponent.indicatorsList + 1] = enemyController.indicatorEntity
 
         enemyController.initializedForecast = true
-        print("[EnemyController.lua] Executing forecast!")       
     end
 
     -- forecast attack based on ForecastIndicator's location
