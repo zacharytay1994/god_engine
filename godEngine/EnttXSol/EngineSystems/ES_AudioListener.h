@@ -22,7 +22,7 @@ namespace god
 				auto& resource = sound_manager.Get(audio_source.m_sound_id);
 				Sound& sound = std::get<1>(resource);
 
-				AudioAPI::SetLoop(sound, audio_source.m_loop);
+				//AudioAPI::SetLoop(sound, audio_source.m_loop);
 
 				if (audio_source.m_play_on_awake && !audio_source.m_awake_played)
 				{

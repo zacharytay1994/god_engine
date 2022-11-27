@@ -135,7 +135,7 @@ function S_BigSwing(e)
         end
         
         -- trigger sound effect
-        InstancePrefab("SFX_Jab",0,0,0)
+        InstancePrefab("SFX_Wave",0,0,0)
 
         -- set playerAttackComponent.targetEntity to middleEnemy
         local playerAttackComponent = GetComponent(playerEntity, "C_PlayerAttack")

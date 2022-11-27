@@ -19,7 +19,7 @@ namespace god
 	// PhysicsTypes id ,  Callback function( position of the entt) 
 	static std::vector< std::pair<PhysicsTypes::physicstype, void (*)(glm::vec3 const& pos)> > ContactCallBack
 	{
-		//{PhysicsTypes::Dice , DiceCallBack}
+		{PhysicsTypes::Dice , DiceCallBack}
 	};
 
 

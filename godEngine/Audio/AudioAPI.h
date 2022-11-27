@@ -51,6 +51,7 @@ namespace god
 		static void UnloadSound(Sound& sound);
 
 		static void SetLoop(Sound& sound, bool loop);
+		static void SetLoop(FMOD::Channel* channel, bool loop);
 		static void SetMute(FMOD::Channel* channel, bool mute);
 		static void SetVolume(FMOD::Channel* channel, float volume);
 		static void SetPitch(FMOD::Channel* channel, float pitch);

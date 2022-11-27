@@ -118,10 +118,6 @@ namespace god
 
 		}
 
-		//SystemTimer::StartTimeSegment ( "AudioListenerSystem" );
-		//enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
-		//SystemTimer::EndTimeSegment ( "AudioListenerSystem" );
-
 
 	}
 
