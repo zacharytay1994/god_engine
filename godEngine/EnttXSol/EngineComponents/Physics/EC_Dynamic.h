@@ -63,6 +63,7 @@ namespace god
 
 		bool operator==( RigidDynamic const& rhs )
 		{
+			( rhs );
 			return true;
 		}
 	};

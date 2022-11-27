@@ -272,6 +272,9 @@ namespace god
 
 	void AudioAPI::PlaySoundBetweenTimes(FMOD::Channel* channel, float startPoint, float endPoint)
 	{
+		( channel );
+		( startPoint );
+		( endPoint );
 	}
 
 	void AudioAPI::StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
@@ -299,6 +302,7 @@ namespace god
 
 	void AudioAPI::AddFadeIn(FMOD::Channel* channel, float fadeInTime, bool& fade)
 	{
+		( fade );
 		UINTLL dsp_clock = GetDSPClock(channel);
 
 		channel->setPaused(true);
@@ -313,6 +317,7 @@ namespace god
 
 	void AudioAPI::AddFadeOut(FMOD::Channel* channel, float fadeOutTime, bool& fade)
 	{
+		( fade );
 		UINTLL dsp_clock = GetDSPClock(channel);
 
 		float volume = GetVolume(channel);

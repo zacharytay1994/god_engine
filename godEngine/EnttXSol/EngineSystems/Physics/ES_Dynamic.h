@@ -44,16 +44,17 @@ namespace god
 	 */
 	void RigidDynamicUpdate ( EnttXSol& entt , EngineResources& engineResources , std::tuple< EntityData& , Transform& , RigidDynamic& , Renderable3D& > component )
 	{
-		EntityData& edata = std::get<0>(component);
-		Transform& transform = std::get<1>(component);
+		( entt );
+		//EntityData& edata = std::get<0>(component);
+		//Transform& transform = std::get<1>(component);
 		RigidDynamic& rigiddynamic = std::get<2>(component);
-		Renderable3D& renderable = std::get<3>(component);
-		PhysicsSystem& psys = engineResources.Get<PhysicsSystem>().get();
+		//Renderable3D& renderable = std::get<3>(component);
+		//PhysicsSystem& psys = engineResources.Get<PhysicsSystem>().get();
 
-		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
-		physx::PxCooking* mCooking = engineResources.Get<PhysicsSystem>().get().GetCooking();
-		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
-		Asset3DManager& assetmgr = engineResources.Get<Asset3DManager>().get();
+		//physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
+		//physx::PxCooking* mCooking = engineResources.Get<PhysicsSystem>().get().GetCooking();
+		//physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
+		//Asset3DManager& assetmgr = engineResources.Get<Asset3DManager>().get();
 
 		//Setting flags
 		if (rigiddynamic.Active != rigiddynamic.Activeflag)
@@ -89,7 +90,7 @@ namespace god
 		//wait for simulation
 		while ( psys.GetisRunning () )
 			;
-		EntityData& edata = std::get<0>(component);
+		//EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1> ( component );
 		RigidDynamic& rigiddynamic = std::get<2> ( component );
 
@@ -118,11 +119,12 @@ namespace god
 	 */
 	void RigidDynamicInit(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidDynamic&, Renderable3D& > component)
 	{
+		( entt );
 		EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1>(component);
 		RigidDynamic& rigiddynamic = std::get<2>(component);
 		Renderable3D& renderable = std::get<3>(component);
-		PhysicsSystem& psys = engineResources.Get<PhysicsSystem>().get();
+		//PhysicsSystem& psys = engineResources.Get<PhysicsSystem>().get();
 
 		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
 		physx::PxCooking* mCooking = engineResources.Get<PhysicsSystem>().get().GetCooking();

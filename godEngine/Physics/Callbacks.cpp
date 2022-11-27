@@ -11,7 +11,7 @@ namespace god
 
 	void ContactReportCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
 	{
-		for (int i = 0; i < count; i++)
+		for (unsigned int i = 0; i < count; i++)
 		{
 			for (auto const& [ptypeid, fp] : TriggerCallBack)
 			{
@@ -42,7 +42,9 @@ namespace god
 
 	void ContactReportCallback::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 	{
-		
+		( pairs );
+		( nbPairs );
+
 		for (auto const& [ptypeid,fp] : ContactCallBack)
 		{
 			int type0 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[0]->userData)->PhysicsTypeid;

@@ -20,7 +20,7 @@ namespace god
 			return;
 		}
 
-		Scene& scene = engineResources.Get<Scene> ().get ();
+		//Scene& scene = engineResources.Get<Scene> ().get ();
 
 		bool changed { false };
 		glm::mat4 parentTransform { 1.0f };

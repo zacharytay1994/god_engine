@@ -9,6 +9,7 @@ namespace god
 
 	void DiceCallBack(glm::vec3 const& pos)
 	{
+		( pos );
 		//AudioAPI::LoadSound("C:\\Users\\Tingl\\Desktop\\CSD3400\\god_engine\\1_Game\\Assets\\GameAssets\\Sounds\\Dice Hit.wav", diceSFX);
 		//std::cout << "Dice contacts: " << pos << std::endl;
 		//
@@ -26,6 +27,8 @@ namespace god
 
 	void ExamplePairCallBack(glm::vec3 const& pos, glm::vec3 const& pos1)
 	{
+		( pos );
+		( pos1 );
 		//std::cout << "Pair contacts: " << pos <<", " <<pos1<< std::endl;
 	}
 

@@ -37,12 +37,13 @@ namespace god
 	 */
 	void RigidStaticUpdate(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
-		EntityData& edata = std::get<0>(component);
-		Transform& transform = std::get<1>(component);
+		( entt );
+		//EntityData& edata = std::get<0>(component);
+		//Transform& transform = std::get<1>(component);
 		RigidStatic& rigidstatic = std::get<2>(component);
 
-		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
-		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
+		//physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
+		//physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
 	
 		//Setting flags
 		if (rigidstatic.Active != rigidstatic.Activeflag)
@@ -70,7 +71,8 @@ namespace god
 
 	void RigidStaticInit(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
-		EntityData& edata = std::get<0>(component);
+		( entt );
+		//EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1>(component);
 		RigidStatic& rigidstatic = std::get<2>(component);
 

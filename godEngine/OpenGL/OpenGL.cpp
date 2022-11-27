@@ -652,6 +652,7 @@ namespace god
 
 	void OpenGL::RenderTransparent ( Scene& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures , glm::vec3 const& camera_front )
 	{
+		( camera_front );
 		// Draw the normal model
 		m_textured_discard_shader.Use ();
 
