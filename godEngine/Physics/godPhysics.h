@@ -66,6 +66,10 @@ namespace god
 		physx::PxRigidActor* mRayCastMouse;
 		
 
+
+		physx::PxCudaContextManager* mCudaContextManager;
+
+
 		physx::PxDefaultAllocator      mDefaultAllocatorCallback;
 		physx::PxDefaultErrorCallback  mDefaultErrorCallback;
 

@@ -43,7 +43,7 @@ namespace god
 	PhysicsSystem::PhysicsSystem() 
 
 	{
-
+		mCudaContextManager = nullptr;
 		RayCastid = Null;
 		mRunning = false;
 		mCamera = nullptr;
@@ -113,14 +113,22 @@ namespace god
 			
 			physx::PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 			sceneDesc.gravity = physx::PxVec3(0.0f, -98.1f, 0.0f);
-			mDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
+			mDispatcher = physx::PxDefaultCpuDispatcherCreate(4);
 			if (!mDispatcher)
 				std::cerr << "PxDefaultCpuDispatcherCreate failed!" << std::endl;
 
-			
+			PxCudaContextManagerDesc cudaContextManagerDesc;
+
+			mCudaContextManager = PxCreateCudaContextManager(*mFoundation, cudaContextManagerDesc, PxGetProfilerCallback());
+			sceneDesc.flags |= PxSceneFlag::eENABLE_GPU_DYNAMICS;
+
+			sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
+			sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eGPU;
+
+
 			sceneDesc.cpuDispatcher = mDispatcher;
 			sceneDesc.filterShader = contactReportFilterShader;
-			sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eABP;//Automatic box pruning
+			
 
 			mScene = mPhysics->createScene(sceneDesc);
 			mScene->setSimulationEventCallback(&gContactReportCallback);
