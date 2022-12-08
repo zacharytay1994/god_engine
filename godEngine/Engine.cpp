@@ -15,6 +15,7 @@
 #include "EnttXSol/EnttXSol.h"
 
 #include "Physics/godPhysics.h"
+#include "Physics/PhysicsController.h"
 
 #include "Audio/AudioAPI.h"
 #include "Audio/Internal/SoundManager.h"
@@ -53,7 +54,7 @@ namespace god
 
 	void godEngine::Update ()
 	{
-		FreeConsole ();
+		//FreeConsole ();
 		std::cout << "godEngine Update." << std::endl;
 		// create window
 		GLFWWindow window ( 1920 , 1080 );
@@ -71,6 +72,7 @@ namespace god
 		glfwWindowHint ( GLFW_OPENGL_DEBUG_CONTEXT , true );
 
 		PhysicsSystem godPhysicsSystem {};
+		PX::PhysicsController godPhysicsController;
 
 		// setup camera
 		Camera camera;
@@ -123,6 +125,7 @@ namespace god
 			grid ,
 			sound_assets ,
 			godPhysicsSystem ,
+			godPhysicsController ,
 			scene ,
 			fonts
 		);
@@ -151,6 +154,7 @@ namespace god
 #endif
 
 		godPhysicsSystem.Init ( &window , &camera );
+		godPhysicsController.CreateControllerManager ( godPhysicsSystem.GetPhysicsScene () );
 
 		while ( !window.WindowShouldClose () )
 		{

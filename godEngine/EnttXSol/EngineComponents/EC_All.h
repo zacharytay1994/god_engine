@@ -14,6 +14,9 @@
 
 #include "Physics/EC_Static.h"
 #include "Physics/EC_Dynamic.h"
+#include "Physics/EC_PhysicsController.h"
+
+#include "Input/EC_PlayerController.h"
 
 #include "Grid/EC_GridManipulate.h"
 
@@ -42,7 +45,9 @@ namespace god
 			GridManipulate ,
 			GUIObject ,
 			GUIText ,
-			Transparent
+			Transparent ,
+			PhysicsController ,
+			PlayerController
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};

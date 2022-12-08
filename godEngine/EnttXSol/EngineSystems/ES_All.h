@@ -11,6 +11,9 @@
 #include "Physics/ES_RayCast.h"
 #include "Physics/ES_Static.h"
 #include "Physics/ES_Debug.h"
+#include "Physics/ES_PhysicsController.h"
+
+#include "Input/ES_PlayerController.h"
 
 #include "Render/ES_Transform.h"
 #include "Render/ES_FaceCamera.h"
@@ -43,9 +46,18 @@ namespace god
 			SystemTimer::StartTimeSegment ( "ExampleSystem" );
 			enttxsol.RunEngineSystem ( engineResources , ExampleSystem );
 			SystemTimer::EndTimeSegment ( "ExampleSystem" );
+
 			SystemTimer::StartTimeSegment ( "GridManipulateSystem" );
 			enttxsol.RunEngineSystem ( engineResources , GridManipulateSystem );
 			SystemTimer::EndTimeSegment ( "GridManipulateSystem" );
+
+			SystemTimer::StartTimeSegment ( "PhysicsControllerSystem" );
+			enttxsol.RunEngineSystem ( engineResources , PhysicsControllerSystem );
+			SystemTimer::EndTimeSegment ( "PhysicsControllerSystem" );
+
+			SystemTimer::StartTimeSegment ( "PlayerControllerSystem" );
+			enttxsol.RunEngineSystem ( engineResources , PlayerControllerSystem );
+			SystemTimer::EndTimeSegment ( "PlayerControllerSystem" );
 		}
 
 		// gui
@@ -56,12 +68,12 @@ namespace god
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
 		SystemTimer::EndTimeSegment ( "GridSystem" );
 		//Physics
-		SystemTimer::StartTimeSegment("RigidStaticUpdate");
-		enttxsol.RunEngineSystem(engineResources, RigidStaticUpdate);
-		SystemTimer::EndTimeSegment("RigidStaticUpdate");
-		SystemTimer::StartTimeSegment("RigidDynamicUpdate");
-		enttxsol.RunEngineSystem(engineResources, RigidDynamicUpdate);
-		SystemTimer::EndTimeSegment("RigidDynamicUpdate");
+		SystemTimer::StartTimeSegment ( "RigidStaticUpdate" );
+		enttxsol.RunEngineSystem ( engineResources , RigidStaticUpdate );
+		SystemTimer::EndTimeSegment ( "RigidStaticUpdate" );
+		SystemTimer::StartTimeSegment ( "RigidDynamicUpdate" );
+		enttxsol.RunEngineSystem ( engineResources , RigidDynamicUpdate );
+		SystemTimer::EndTimeSegment ( "RigidDynamicUpdate" );
 
 	}
 
@@ -99,8 +111,8 @@ namespace god
 		SystemTimer::StartTimeSegment ( "Physics Frame End" );
 		enttxsol.RunEngineSystem ( engineResources , DebugDynamic );
 		enttxsol.RunEngineSystem ( engineResources , DebugStatic );
-		enttxsol.RunEngineSystem(engineResources, RayCastDynamic);
-		enttxsol.RunEngineSystem(engineResources, RayCastStatic);
+		enttxsol.RunEngineSystem ( engineResources , RayCastDynamic );
+		enttxsol.RunEngineSystem ( engineResources , RayCastStatic );
 		SystemTimer::EndTimeSegment ( "Physics Frame End" );
 
 		if ( !enttxsol.m_pause )
@@ -111,11 +123,11 @@ namespace god
 			enttxsol.RunEngineSystem ( engineResources , RigidDynamicFrameEnd );
 			SystemTimer::EndTimeSegment ( "RigidDynamicFrameEnd" );
 
-			SystemTimer::StartTimeSegment("AudioListenerSystem");
-			enttxsol.RunEngineSystem(engineResources, AudioListenerSystem);
-			SystemTimer::EndTimeSegment("AudioListenerSystem");
+			enttxsol.RunEngineSystem ( engineResources , PhysicsControllerFrameEnd );
 
-
+			SystemTimer::StartTimeSegment ( "AudioListenerSystem" );
+			enttxsol.RunEngineSystem ( engineResources , AudioListenerSystem );
+			SystemTimer::EndTimeSegment ( "AudioListenerSystem" );
 		}
 
 
@@ -128,11 +140,13 @@ namespace god
 		enttxsol.RunEngineSystem ( engineResources , GridManipulateInit );
 
 		SystemTimer::StartTimeSegment ( "RigidStaticInit" );
-		enttxsol.RunEngineSystem ( engineResources , RigidStaticInit);
+		enttxsol.RunEngineSystem ( engineResources , RigidStaticInit );
 		SystemTimer::EndTimeSegment ( "RigidStaticInit" );
 		SystemTimer::StartTimeSegment ( "RigidDynamicInit" );
-		enttxsol.RunEngineSystem ( engineResources , RigidDynamicInit);
+		enttxsol.RunEngineSystem ( engineResources , RigidDynamicInit );
 		SystemTimer::EndTimeSegment ( "RigidDynamicInit" );
+
+		enttxsol.RunEngineSystem ( engineResources , PhysicsControllerInit );
 	}
 
 	// runs at the end before unloading the scene 

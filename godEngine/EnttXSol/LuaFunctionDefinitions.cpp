@@ -30,6 +30,11 @@ namespace god
 			"y" , &glm::ivec3::y ,
 			"z" , &glm::ivec3::z );
 
+		// glm::vec2
+		entt.RegisterLuaType<glm::vec2> ( "vec2" ,
+			"x" , &glm::vec2::x ,
+			"y" , &glm::vec2::y );
+
 		// ChangeScene(sceneName)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "ChangeScene" ,
@@ -43,8 +48,8 @@ namespace god
 
 		// Camera
 		entt.RegisterLuaType<Camera> ( "Camera" ,
-			"position"	, &Camera::m_position	, 
-			"lookat"	, &Camera::m_look_at	);
+			"position" , &Camera::m_position ,
+			"lookat" , &Camera::m_look_at );
 
 
 		// GetComponent(e,componentName)
@@ -278,6 +283,35 @@ namespace god
 			{
 				auto& window = engineResources.Get<GLFWWindow> ().get ();
 				return window.MouseRPressed ();
+			}
+		);
+
+		// CheckMouseOffsetX()
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "CheckMouseOffsetX" ,
+			[&engineResources]()->float
+			{
+				auto& window = engineResources.Get<GLFWWindow> ().get ();
+				return static_cast< float >( window.MouseOffsetX () );
+			}
+		);
+
+		// CheckMouseOffsetY()
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "CheckMouseOffsetY" ,
+			[&engineResources]()->float
+			{
+				auto& window = engineResources.Get<GLFWWindow> ().get ();
+				return static_cast< float >( window.MouseOffsetY () );
+			}
+		);
+
+		// RotateAngle(x,y,d)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "RotateAngle" ,
+			[&engineResources]( float x , float y , float degree )->glm::vec2
+			{
+				return RotateVector ( { x, y } , degree );
 			}
 		);
 
@@ -539,15 +573,15 @@ namespace god
 
 		// GetisSleeping(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("GetisSleeping",
-			[&entt, &engineResources](entt::entity e)->bool
+		entt.RegisterLuaFunction ( "GetisSleeping" ,
+			[&entt , &engineResources]( entt::entity e )->bool
 			{
-				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+				while ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () )
 					;
 
-				if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+				if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 				{
-					return (entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->isSleeping() );
+					return ( entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->isSleeping () );
 				}
 				return true;
 			}
@@ -602,8 +636,8 @@ namespace god
 				{
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->clearForce();
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->clearTorque();
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->clearForce ();
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->clearTorque ();
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setLinearVelocity ( ConvertToPhysXVector ( { x, y, z } ) );
 					}
 				}
@@ -642,7 +676,7 @@ namespace god
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
 
-						entt.GetEngineComponent<RigidDynamic>(e)->Active = !freeze;
+						entt.GetEngineComponent<RigidDynamic> ( e )->Active = !freeze;
 					}
 				}
 			}
@@ -712,19 +746,19 @@ namespace god
 
 		// WorldRotation(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("WorldRotation",
-			[&entt](entt::entity e)->glm::vec3
+		entt.RegisterLuaFunction ( "WorldRotation" ,
+			[&entt]( entt::entity e )->glm::vec3
 			{
-				return glm::vec3{ entt.GetEngineComponent<Transform>(e)->m_world_transform * glm::vec4{ entt.GetEngineComponent<Transform>(e)->m_rotation, 1.0f } };
+				return glm::vec3 { entt.GetEngineComponent<Transform> ( e )->m_world_transform * glm::vec4{ entt.GetEngineComponent<Transform> ( e )->m_rotation, 1.0f } };
 			}
 		);
 
 		// ParentRotation(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("ParentRotation",
-			[&entt](entt::entity e)->glm::vec3
+		entt.RegisterLuaFunction ( "ParentRotation" ,
+			[&entt]( entt::entity e )->glm::vec3
 			{
-				return glm::vec3{ entt.GetEngineComponent<Transform>(e)->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform>(e)->m_rotation, 1.0f } };
+				return glm::vec3 { entt.GetEngineComponent<Transform> ( e )->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform> ( e )->m_rotation, 1.0f } };
 			}
 		);
 	}

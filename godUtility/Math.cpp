@@ -68,4 +68,10 @@ namespace god
 		}
 		return glm::degrees ( acos ( norm_position.z ) );
 	}
+
+	glm::vec2 RotateVector ( glm::vec2 const& v , float degree )
+	{
+		degree = glm::radians ( degree );
+		return { v.x * cos ( degree ) - v.y * sin ( degree ), v.x * sin ( degree ) + v.y * cos ( degree ) };
+	}
 }

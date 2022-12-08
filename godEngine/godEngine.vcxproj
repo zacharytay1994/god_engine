@@ -131,7 +131,9 @@
     <ClInclude Include="EnttXSol\EngineComponents\Grid\EC_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIText.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Input\EC_PlayerController.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Dynamic.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_PhysicsController.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_Transparent.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_DirectionalLight.h" />
@@ -140,6 +142,8 @@
     <ClInclude Include="EnttXSol\EngineSystems\ES_AudioListener.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Input\ES_PlayerController.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_PhysicsController.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_FaceCamera.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateDefault.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateGUI.h" />
@@ -192,6 +196,7 @@
     <ClInclude Include="Physics\Callbacks.h" />
     <ClInclude Include="Physics\DiceCallBack.h" />
     <ClInclude Include="Physics\godPhysics.h" />
+    <ClInclude Include="Physics\PhysicsController.h" />
     <ClInclude Include="Physics\PhysicsInterface.h" />
     <ClInclude Include="Physics\PhysicUtils.h" />
     <ClInclude Include="Physics\SnippetUtils.h" />
@@ -348,6 +353,10 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Physics\godPhysics.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Physics\PhysicsController.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>

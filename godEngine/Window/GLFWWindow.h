@@ -20,7 +20,7 @@ namespace god
 
 		// getters & setters
 		HWND			GetWindowHandle ();
-		GLFWwindow*		GetGLFWWindow ();
+		GLFWwindow* GetGLFWWindow ();
 		uint32_t		GetWindowWidth ();
 		uint32_t		GetWindowHeight ();
 		bool			Resized ();
@@ -38,6 +38,9 @@ namespace god
 
 		double			ViewportMouseX ();
 		double			ViewportMouseY ();
+
+		double			MouseOffsetX ();
+		double			MouseOffsetY ();
 
 		bool			MouseLDown ( uint32_t priority = 0 );		// left mouse
 		bool			MouseLPressed ( uint32_t priority = 0 );
@@ -94,6 +97,8 @@ namespace god
 		void		SetViewportMouseCoordinates ( double x , double y );
 		void		SetWindowTitle ( std::string const& title );
 
+		void UpdateMouseOffset ();
+
 	private:
 		GLFWwindow* m_window;
 		int m_width { 0 };
@@ -134,5 +139,10 @@ namespace god
 
 		double m_viewport_mouse_x { 0.0f };
 		double m_viewport_mouse_y { 0.0f };
+
+		double m_last_mouse_x { 0.0f };
+		double m_last_mouse_y { 0.0f };
+		double m_mouse_offset_x { 0.0f };
+		double m_mouse_offset_y { 0.0f };
 	};
 }

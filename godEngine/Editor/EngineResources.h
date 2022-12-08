@@ -11,6 +11,7 @@
 #include "../OpenGL/Font/Font.h"
 #include "../Audio/Internal/SoundManager.h"
 #include "../Physics/godPhysics.h"
+#include "../Physics/PhysicsController.h"
 
 #define __PHYSICS
 
@@ -35,7 +36,8 @@ namespace god
 		EntityGrid ,
 		SoundManager ,
 		PhysicsSystem ,
-		Scene,
+		PX::PhysicsController ,
+		Scene ,
 		Fonts
 	>;
 }

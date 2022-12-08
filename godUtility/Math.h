@@ -18,4 +18,6 @@ namespace god
 	GODUTILITY_API float LengthSq ( glm::vec3 const& v );
 
 	GODUTILITY_API float HorizontalFaceCameraDegrees ( glm::vec3 const& cameraPosition , glm::vec3 const& targetPosition );
+
+	GODUTILITY_API glm::vec2 RotateVector ( glm::vec2 const& v , float degree );
 }
