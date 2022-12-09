@@ -18,7 +18,7 @@ namespace god
 				CAPSULE
 			};
 			physx::PxController* CreateController ( ControllerShape shape , physx::PxMaterial* material ,
-				physx::PxExtendedVec3 const& position = { 0,0,0 } , float height = 0.5f , float radius = 0.25f );
+				physx::PxExtendedVec3 const& position = { 0,0,0 } , float height = 1.0f , float radius = 0.5f );
 
 		private:
 			physx::PxControllerManager* m_controller_manager { nullptr };

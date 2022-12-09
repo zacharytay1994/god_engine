@@ -306,12 +306,21 @@ namespace god
 			}
 		);
 
-		// RotateAngle(x,y,d)
+		// RotateVec2(x,y,d)
 		// ==============================================================================================
-		entt.RegisterLuaFunction ( "RotateAngle" ,
+		entt.RegisterLuaFunction ( "RotateVec2" ,
 			[&engineResources]( float x , float y , float degree )->glm::vec2
 			{
 				return RotateVector ( { x, y } , degree );
+			}
+		);
+
+		// AngleBetweenVec2(x,y,d)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "DegreeBetweenVec2" ,
+			[&engineResources]( float x1 , float y1 , float x2 , float y2 )->float
+			{
+				return DegreeBetweenVec2 ( { x1,y1 } , { x2,y2 } );
 			}
 		);
 
@@ -558,6 +567,15 @@ namespace god
 				out.y = std::lerp ( y0 , y1 , lerpVal );
 				out.z = std::lerp ( z0 , z1 , lerpVal );
 				return out;
+			}
+		);
+
+		// Lerp(src, dst, dt)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "Lerp" ,
+			[]( float src, float dst, float dt )->float
+			{
+				return std::lerp ( src , dst , dt );
 			}
 		);
 

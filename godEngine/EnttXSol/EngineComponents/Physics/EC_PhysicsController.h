@@ -10,9 +10,14 @@ namespace god
 		float m_speed { 0.0f };
 		glm::vec3 m_heading { 0,0,0 };
 
-		float m_static_friction { 0.1f };
-		float m_dynamic_friction { 0.1f };
+		float m_static_friction { 0.02f };
+		float m_dynamic_friction { 0.05f };
 		float m_restitution { 0.1f };
+
+		// used for hacking jump behaviour
+		float m_jump { 0.0f };
+		float m_max_fall_speed { -0.35f };
+		float m_old_foot_y_position { 0.0f };
 
 		physx::PxController* m_controller { nullptr };
 
@@ -27,6 +32,7 @@ namespace god
 	{
 		RegisterLuaType<PhysicsController> ( luaState , name ,
 			"speed" , &PhysicsController::m_speed ,
+			"jump" , &PhysicsController::m_jump ,
 			"heading" , &PhysicsController::m_heading );
 	}
 	template<>

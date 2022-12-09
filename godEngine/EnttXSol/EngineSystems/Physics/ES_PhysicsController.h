@@ -18,7 +18,17 @@ namespace god
 		glm::vec3 vel = physics_controller.m_heading * physics_controller.m_speed;
 		if ( glm::length2 ( vel ) > 0.01f )
 		{
-			physics_controller.m_controller->move ( { vel.x , vel.y , vel.z } , 0.1f , DeltaTimer::m_dt , 0 );
+			physics_controller.m_controller->move ( { vel.x , 0 , vel.z } , 0.001f , DeltaTimer::m_dt , 0 );
+		}
+		if ( physics_controller.m_jump != 0.0f )
+		{
+			physics_controller.m_controller->move ( { 0 , physics_controller.m_jump , 0 } , 0.001f , DeltaTimer::m_dt , 0 );
+		}
+
+		// falling
+		if ( physics_controller.m_jump > physics_controller.m_max_fall_speed )
+		{
+			physics_controller.m_jump -= DeltaTimer::m_dt;
 		}
 	}
 
@@ -39,7 +49,7 @@ namespace god
 		// some code here ...
 
 		auto& [transform , physics_controller] = components;
-		auto controller_position = physics_controller.m_controller->getPosition ();
+		auto const& controller_position = physics_controller.m_controller->getPosition ();
 		transform.m_position = { controller_position.x, controller_position.y, controller_position.z };
 	}
 
