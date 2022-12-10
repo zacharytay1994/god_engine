@@ -20,6 +20,7 @@ namespace god
 		"GUIText" ,
 		"Transparent",
 		"PhysicsController",
-		"PlayerController"
+		"PlayerController",
+		"SkeleAnim3D"
 	};
 }

@@ -25,6 +25,7 @@ function S_LerpToHeading(e)
             -- print(parent_physics_controller.heading.x)
             -- print(parent_physics_controller.heading.y)
             -- print(heading_angle)
+            -- local corrected_angle = -heading_angle + 90
             local corrected_angle = -heading_angle + 90
             transform.rotation.y = Lerp(transform.rotation.y, corrected_angle, 0.8)
         end

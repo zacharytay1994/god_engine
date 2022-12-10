@@ -21,6 +21,7 @@
 #include "Render/ES_PopulateDefault.h"
 #include "Render/ES_PopulateTransparent.h"
 #include "Render/ES_PopulateGUI.h"
+#include "Render/ES_PopulateAnimations.h"
 
 #include "Grid/ES_GridManipulate.h"
 
@@ -40,6 +41,7 @@ namespace god
 		enttxsol.RunEngineSystem ( engineResources , PopulateDefault , std::tuple<GUIObject , Transparent> () );
 		enttxsol.RunEngineSystem ( engineResources , PopulateTransparent );
 		enttxsol.RunEngineSystem ( engineResources , PopulateGUI );
+		enttxsol.RunEngineSystem ( engineResources , PopulateAnimations );
 
 		if ( !isPause )
 		{

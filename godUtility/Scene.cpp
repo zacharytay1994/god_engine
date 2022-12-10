@@ -30,6 +30,11 @@ namespace god
 		m_billboard_sprites[ data ].push_back ( transform );
 	}
 
+	void Scene::AddAnimation ( InstancedRenderData const& data , glm::mat4 const& transform )
+	{
+		m_animation_data.push_back ( { data, transform } );
+	}
+
 	void Scene::ClearInstancedScene ()
 	{
 		for ( auto& instance : m_instanced_render_data )
@@ -48,6 +53,7 @@ namespace god
 		{
 			instance.second.clear ();
 		}
+		m_animation_data.clear ();
 	}
 
 	void Scene::AddPointLight ( PointLightData const& pld )

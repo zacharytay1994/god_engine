@@ -11,6 +11,7 @@
 #include "Render/EC_PointLight.h"
 #include "Render/EC_DirectionalLight.h"
 #include "Render/EC_Transparent.h"
+#include "Render/EC_Animation3D.h"
 
 #include "Physics/EC_Static.h"
 #include "Physics/EC_Dynamic.h"
@@ -47,7 +48,8 @@ namespace god
 			GUIText ,
 			Transparent ,
 			PhysicsController ,
-			PlayerController
+			PlayerController ,
+			SkeleAnim3D
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};
