@@ -17,7 +17,7 @@ namespace god
 		void Reset ();
 		EnttXSol::Entities::ID GetSelectedEntity ();
 		void ResetScene ( EDITOR_RESOURCES& engineResources );
-		void SetSelectedScene(std::string const& name);
+		void SetSelectedScene ( std::string const& name );
 	private:
 		std::string m_input_string { "NIL" };
 		EnttXSol::Entities::ID m_selected_entity { EnttXSol::Entities::Null };
@@ -68,16 +68,16 @@ namespace god
 	{
 		( dt );
 
-		GLFWWindow& glwind = engineResources.Get< GLFWWindow>().get();
-		PhysicsSystem& psys = engineResources.Get< PhysicsSystem>().get();
+		GLFWWindow& glwind = engineResources.Get< GLFWWindow> ().get ();
+		PhysicsSystem& psys = engineResources.Get< PhysicsSystem> ().get ();
 
-		if (glwind.KeyDown(GLFW_KEY_LEFT_CONTROL) && glwind.MouseLPressed())
+		if ( glwind.KeyDown ( GLFW_KEY_LEFT_CONTROL ) && glwind.MouseLPressed () )
 		{
-			m_selected_entity = psys.getRCMid();
+			m_selected_entity = psys.getRCMid ();
 		}
 
-	/*		if (glwind.KeyPressed(GLFW_KEY_P))
-				m_selected_entity = psys.getRCMid();*/
+		/*		if (glwind.KeyPressed(GLFW_KEY_P))
+					m_selected_entity = psys.getRCMid();*/
 
 
 
@@ -162,6 +162,15 @@ namespace god
 				ImGui::Separator ();
 				if ( ImGui::Button ( "Save Scene" , { ImGui::GetWindowWidth () , 0.0f } ) )
 				{
+					if ( m_selected_scene < m_scene_list.size () && m_selected_scene >= 0 )
+					{
+						std::string scene_path = m_scene_list[ m_selected_scene ];
+						auto last_dash = scene_path.find_last_of ( '/' );
+						auto last_dot = scene_path.find_last_of ( '.' );
+						std::string name = scene_path.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
+						m_input_string = name;
+					}
+
 					ImGui::OpenPopup ( "SerializeScene" );
 				}
 				this->ToolTipOnHover ( "Saves the current scene." );
@@ -247,9 +256,9 @@ namespace god
 					engineResources.Get<EntityGrid> ().get () = EntityGrid ();
 
 					// stopping and resetting all the sounds 
-					SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
-					auto& sounds = sound_manager.GetResources();
-					AudioAPI::StopAndResetAll(sounds);
+					SoundManager& sound_manager = engineResources.Get<SoundManager> ().get ();
+					auto& sounds = sound_manager.GetResources ();
+					AudioAPI::StopAndResetAll ( sounds );
 
 				}
 				this->ToolTipOnHover ( "Clears the current scene, providing a fresh canvas." );
@@ -393,7 +402,7 @@ namespace god
 				this->ToolTipOnHover ( "Add a prefab as child of this object." );
 				if ( ImGui::Selectable ( "Rename" ) )
 				{
-					
+
 				}
 				this->ToolTipOnHover ( "Rename this entity. // not implemented yet!" );
 				if ( ImGui::Selectable ( "Save" ) )
@@ -464,13 +473,24 @@ namespace god
 		{
 			ImGui::Text ( "Choose A Prefab :" );
 			ImGui::Separator ();
-			if ( ImGui::BeginListBox ( "##PrefabsList" ) )
+			if ( ImGui::BeginListBox ( "##PrefabsList" , ImVec2 ( 0 , 400.0f ) ) )
 			{
+				char first_alphabet { 'z' };
 				for ( auto const& prefab : m_prefabs_list )
 				{
 					auto last_dash = prefab.find_last_of ( '/' );
 					auto last_dot = prefab.find_last_of ( '.' );
 					std::string name = prefab.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
+
+					if ( std::toupper ( name[ 0 ] ) != first_alphabet )
+					{
+						first_alphabet = std::toupper ( name[ 0 ] );
+						ImGui::Separator ();
+						ImGui::SameLine ( ImGui::GetWindowWidth () - 50.0f );
+						ImGui::Text ( "[%c]" , first_alphabet );
+						ImGui::Separator ();
+					}
+
 					if ( ImGui::Selectable ( name.c_str () ) )
 					{
 						m_enttxsol.LoadPrefabV2 ( engineResources , name , m_selected_prefab_parent_temp );
@@ -519,18 +539,25 @@ namespace god
 				grid = EntityGrid ();
 				// reload scene
 				m_enttxsol.DeserializeStateV2 ( engineResources , name );
+
+				// stopping and resetting all the sounds 
+				SoundManager& sound_manager = engineResources.Get<SoundManager> ().get ();
+				auto& sounds = sound_manager.GetResources ();
+				AudioAPI::StopAndResetAll ( sounds );
 			}
 		}
 	}
 
 	template<typename EDITOR_RESOURCES>
-	inline void EW_SceneTree<EDITOR_RESOURCES>::SetSelectedScene(std::string const& name)
+	inline void EW_SceneTree<EDITOR_RESOURCES>::SetSelectedScene ( std::string const& name )
 	{
-		auto it = std::find_if(m_scene_list.begin(), m_scene_list.end(), [&name](auto const& s) {
-			return (s.find(name) != std::string::npos);
-		});
-		if (it != m_scene_list.end()) {
-			m_selected_scene = static_cast<int>(it - m_scene_list.begin());
+		auto it = std::find_if ( m_scene_list.begin () , m_scene_list.end () , [&name]( auto const& s )
+			{
+				return ( s.find ( name ) != std::string::npos );
+			} );
+		if ( it != m_scene_list.end () )
+		{
+			m_selected_scene = static_cast< int >( it - m_scene_list.begin () );
 		}
 	}
 }
