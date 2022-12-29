@@ -11,6 +11,8 @@ namespace god
 			PhysicsController ();
 			~PhysicsController ();
 			void CreateControllerManager ( physx::PxScene* scene );
+			void FlagFreeControllers ();
+			void FreeControllers ();
 
 			enum class ControllerShape
 			{
@@ -22,6 +24,7 @@ namespace god
 
 		private:
 			physx::PxControllerManager* m_controller_manager { nullptr };
+			bool m_free_controllers { false };
 		};
 	}
 }

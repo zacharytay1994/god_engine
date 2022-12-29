@@ -20,6 +20,21 @@ namespace god
 			std::cout << "Physics Controller - Controller manager created." << std::endl;
 		}
 
+		void PhysicsController::FlagFreeControllers ()
+		{
+			m_free_controllers = true;
+		}
+
+		void PhysicsController::FreeControllers ()
+		{
+			/*if ( m_free_controllers )
+			{
+				m_controller_manager->purgeControllers ();
+				m_free_controllers = false;
+			}*/
+			m_controller_manager->purgeControllers ();
+		}
+
 		physx::PxController* PhysicsController::CreateController ( ControllerShape shape , physx::PxMaterial* material ,
 			physx::PxExtendedVec3 const& position , float height , float radius )
 		{

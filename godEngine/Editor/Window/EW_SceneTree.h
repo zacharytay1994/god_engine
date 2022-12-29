@@ -537,6 +537,11 @@ namespace god
 				// reset grid
 				EntityGrid& grid = engineResources.Get<EntityGrid> ().get (); // clear tilemap grid
 				grid = EntityGrid ();
+
+				// reset physics controllers is any
+				PX::PhysicsController& physics_controller = engineResources.Get<PX::PhysicsController> ().get ();
+				physics_controller.FreeControllers ();
+
 				// reload scene
 				m_enttxsol.DeserializeStateV2 ( engineResources , name );
 

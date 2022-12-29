@@ -314,6 +314,9 @@ namespace god
 			// update FMOD system
 			AudioAPI::Update ();
 
+			// update physics controllers state
+			//godPhysicsController.FreeControllers ();
+
 			// change scene if any
 			auto& [scene_to_change , play_on_change] = main_variables;
 
