@@ -54,6 +54,8 @@ namespace god
 
 
 		// Data members
+
+
 		uint32_t RayCastid;
 		ContactReportCallback gContactReportCallback;
 
@@ -66,7 +68,7 @@ namespace god
 		physx::PxRigidActor* mRayCastMouse;
 		
 
-
+		char* scratchbuffer;
 		physx::PxCudaContextManager* mCudaContextManager;
 
 
@@ -88,8 +90,8 @@ namespace god
 		bool mRunning;
 		float mAccumulator = 0.0f;
 		uint16_t numSteps = 1;
-		float idealStepSize = 1.0f / 30.f;
-		const float mStepSize = 1.0f / 30.f;
+		float idealStepSize = 1.0f / 60.f;
+		const float mStepSize = 1.0f / 60.f;
 		float m_dt;
 
 	};

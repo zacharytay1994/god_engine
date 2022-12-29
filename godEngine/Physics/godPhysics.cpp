@@ -43,6 +43,7 @@ namespace god
 	PhysicsSystem::PhysicsSystem() 
 
 	{
+		scratchbuffer = new char[2048];
 		mCudaContextManager = nullptr;
 		RayCastid = Null;
 		mRunning = false;
@@ -66,6 +67,7 @@ namespace god
 		while (mRunning)
 			;
 
+		
 		callbackFinishTask.free();
 		mRayCastMouse = nullptr;
 		mScene->flushSimulation(false);
@@ -83,7 +85,7 @@ namespace god
 		}
 		
 		mFoundation->release();
-		
+		delete[] scratchbuffer;
 	}
 
 	void PhysicsSystem::Init(GLFWWindow* window, Camera* cam)
@@ -178,7 +180,7 @@ namespace god
 		{
 			mAccumulator -= mStepSize;
 			mRunning = true;
-			mScene->simulate(mStepSize);
+			mScene->simulate(mStepSize, NULL, scratchbuffer, (physx::PxU32)2048, true);
 
 			//Call fetchResultsStart. Get the set of pair headers
 			const physx::PxContactPairHeader* pairHeader;
