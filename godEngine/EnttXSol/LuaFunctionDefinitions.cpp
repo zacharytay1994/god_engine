@@ -539,6 +539,15 @@ namespace god
 			}
 		);
 
+		// Heading(glm::vec3 v1, glm::vec3 v2)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "Heading" ,
+			[]( glm::vec3 head , glm::vec3 tail )->glm::vec3
+			{
+				return glm::normalize ( head - tail );
+			}
+		);
+
 		// Sin(value)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "Sin" ,
@@ -573,7 +582,7 @@ namespace god
 		// Lerp(src, dst, dt)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "Lerp" ,
-			[]( float src, float dst, float dt )->float
+			[]( float src , float dst , float dt )->float
 			{
 				return std::lerp ( src , dst , dt );
 			}

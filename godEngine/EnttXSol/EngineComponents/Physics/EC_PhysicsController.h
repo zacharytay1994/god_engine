@@ -19,6 +19,7 @@ namespace god
 		float m_max_fall_speed { -0.35f };
 		float m_old_foot_y_position { 0.0f };
 
+		bool m_controller_initialized { false };
 		physx::PxController* m_controller { nullptr };
 
 		bool operator==( PhysicsController const& rhs )

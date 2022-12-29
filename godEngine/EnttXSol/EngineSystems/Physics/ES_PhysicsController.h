@@ -18,17 +18,17 @@ namespace god
 		glm::vec3 vel = physics_controller.m_heading * physics_controller.m_speed;
 		if ( glm::length2 ( vel ) > 0.01f )
 		{
-			physics_controller.m_controller->move ( { vel.x , 0 , vel.z } , 0.001f , DeltaTimer::m_dt , 0 );
+			physics_controller.m_controller->move ( { vel.x , 0 , vel.z } , 0.001f , 1.0f / 60.0f , 0 );
 		}
 		if ( physics_controller.m_jump != 0.0f )
 		{
-			physics_controller.m_controller->move ( { 0 , physics_controller.m_jump , 0 } , 0.001f , DeltaTimer::m_dt , 0 );
+			physics_controller.m_controller->move ( { 0 , physics_controller.m_jump , 0 } , 0.001f , 1.0f / 60.0f , 0 );
 		}
 
 		// falling
 		if ( physics_controller.m_jump > physics_controller.m_max_fall_speed )
 		{
-			physics_controller.m_jump -= DeltaTimer::m_dt;
+			physics_controller.m_jump -= 1.0f / 60.0f;
 		}
 	}
 
@@ -49,6 +49,17 @@ namespace god
 		// some code here ...
 
 		auto& [transform , physics_controller] = components;
+
+		// initialize controller if not yet initialized
+		if ( !physics_controller.m_controller_initialized )
+		{
+			auto& physics_controller_manager = engineResources.Get<PX::PhysicsController> ().get ();
+			physics_controller.m_controller = physics_controller_manager.CreateController ( PX::PhysicsController::ControllerShape::CAPSULE ,
+				engineResources.Get<PhysicsSystem> ().get ().GetPhysics ()->createMaterial ( physics_controller.m_static_friction , physics_controller.m_dynamic_friction , physics_controller.m_restitution ) ,
+				{ transform.m_position.x, transform.m_position.y, transform.m_position.z } );
+			physics_controller.m_controller_initialized = true;
+		}
+
 		auto const& controller_position = physics_controller.m_controller->getPosition ();
 		transform.m_position = { controller_position.x, controller_position.y, controller_position.z };
 	}
@@ -65,6 +76,7 @@ namespace god
 		physics_controller.m_controller = physics_controller_manager.CreateController ( PX::PhysicsController::ControllerShape::CAPSULE ,
 			engineResources.Get<PhysicsSystem> ().get ().GetPhysics ()->createMaterial ( physics_controller.m_static_friction , physics_controller.m_dynamic_friction , physics_controller.m_restitution ) ,
 			{ transform.m_position.x, transform.m_position.y, transform.m_position.y } );
+		physics_controller.m_controller_initialized = true;
 	}
 
 	//void PhysicsControllerCleanup ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform&> components )
