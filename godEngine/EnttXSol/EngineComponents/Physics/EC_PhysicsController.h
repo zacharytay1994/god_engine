@@ -19,6 +19,12 @@ namespace god
 		float m_max_fall_speed { -0.35f };
 		float m_old_foot_y_position { 0.0f };
 
+		// physics variables
+		float m_mass { 1.0f };
+		float m_acceleration_damping { 0.5f };
+		glm::vec3 m_velocity { 0.0f };
+		glm::vec3 m_acceleration { 0.0f };
+
 		bool m_controller_initialized { false };
 		physx::PxController* m_controller { nullptr };
 
@@ -48,6 +54,8 @@ namespace god
 				ImGui::Separator ();
 
 				ImGui::DragFloat ( "Speed" , &component.m_speed , 0.1f , 0.0f , 10'000.0f );
+				ImGui::InputFloat ( "Mass" , &component.m_mass );
+				ImGui::InputFloat ( "Damping" , &component.m_acceleration_damping );
 			} );
 	}
 

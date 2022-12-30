@@ -23,4 +23,8 @@ function S_FlockingBoid(e)
             physics_controller.heading = Heading(target_transform.position, boid_transform.position)
         end
     end
+
+    if CheckKeyPress(70) then
+        AddForce(e,50,0,0)
+    end
 end

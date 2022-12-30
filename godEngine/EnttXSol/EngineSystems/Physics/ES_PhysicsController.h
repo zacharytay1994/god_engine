@@ -2,6 +2,7 @@
 
 #include "../../EngineComponents/EC_All.h"
 #include "../../EnttXSol.h"
+#include <../godUtility/Math.h>
 
 namespace god
 {
@@ -15,10 +16,16 @@ namespace god
 
 		auto& [physics_controller] = components;
 
-		glm::vec3 vel = physics_controller.m_heading * physics_controller.m_speed;
-		if ( glm::length2 ( vel ) > 0.01f )
+		// set velocity to moving
+		physics_controller.m_velocity = physics_controller.m_heading * physics_controller.m_speed;
+		// add velocity by force on body
+		physics_controller.m_velocity += physics_controller.m_acceleration * DeltaTimer::m_dt;
+		// dampen acceleration by lerping to 0 by a value
+		physics_controller.m_acceleration = glm::mix ( physics_controller.m_acceleration , glm::vec3 ( 1.0f ) , physics_controller.m_acceleration_damping );
+
+		if ( glm::length2 ( physics_controller.m_velocity ) > 0.01f )
 		{
-			physics_controller.m_controller->move ( { vel.x , 0 , vel.z } , 0.001f , 1.0f / 60.0f , 0 );
+			physics_controller.m_controller->move ( { physics_controller.m_velocity.x , physics_controller.m_velocity.y , physics_controller.m_velocity.z } , 0.001f , 1.0f / 60.0f , 0 );
 		}
 		if ( physics_controller.m_jump != 0.0f )
 		{
@@ -28,7 +35,7 @@ namespace god
 		// falling
 		if ( physics_controller.m_jump > physics_controller.m_max_fall_speed )
 		{
-			physics_controller.m_jump -= 1.0f / 60.0f;
+			physics_controller.m_jump -= DeltaTimer::m_dt;
 		}
 	}
 

@@ -788,5 +788,21 @@ namespace god
 				return glm::vec3 { entt.GetEngineComponent<Transform> ( e )->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform> ( e )->m_rotation, 1.0f } };
 			}
 		);
+
+
+		// AddForce(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "AddForce" ,
+			[&entt]( entt::entity e , float x, float y, float z )
+			{
+				PhysicsController* physics_controller = entt.GetEngineComponent<PhysicsController> ( e );
+				if ( physics_controller )
+				{
+					glm::vec3 force { x, y, z };
+					// calculate acceleration added by force
+					physics_controller->m_acceleration += force / physics_controller->m_mass;
+				}
+			}
+		);
 	}
 }
