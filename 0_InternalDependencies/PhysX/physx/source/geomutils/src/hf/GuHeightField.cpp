@@ -1,4 +1,3 @@
-//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -23,34 +22,29 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// Copyright (c) 2008-2021 NVIDIA Corporation. All rights reserved.
+// Copyright (c) 2008-2022 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
-
-#include "foundation/PxMemory.h"
-#include "PsIntrinsics.h"
 #include "GuHeightField.h"
-#include "PsAllocator.h"
-#include "PsUtilities.h"
 #include "GuMeshFactory.h"
-#include "GuSerialize.h"
-#include "CmUtils.h"
-#include "CmBitMap.h"
-#include "PsFoundation.h"
+#include "CmSerialize.h"
+#include "foundation/PxBitMap.h"
 
 using namespace physx;
+using namespace Gu;
+using namespace Cm;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Gu::HeightField::HeightField(GuMeshFactory* meshFactory)
+HeightField::HeightField(MeshFactory* factory)
 : PxHeightField(PxConcreteType::eHEIGHTFIELD, PxBaseFlag::eOWNS_MEMORY | PxBaseFlag::eIS_RELEASABLE)
 , mSampleStride	(0)
 , mNbSamples	(0)
 , mMinHeight	(0.0f)
 , mMaxHeight	(0.0f)
 , mModifyCount	(0)
-, mMeshFactory	(meshFactory)
+, mMeshFactory	(factory)
 {
 	mData.format				= PxHeightFieldFormat::eS16_TM;
 	mData.rows					= 0;
@@ -62,14 +56,14 @@ Gu::HeightField::HeightField(GuMeshFactory* meshFactory)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Gu::HeightField::HeightField(GuMeshFactory& factory, Gu::HeightFieldData& data)
+HeightField::HeightField(MeshFactory* factory, HeightFieldData& data)
 : PxHeightField(PxConcreteType::eHEIGHTFIELD, PxBaseFlag::eOWNS_MEMORY | PxBaseFlag::eIS_RELEASABLE)
 , mSampleStride	(0)
 , mNbSamples	(0)
 , mMinHeight	(0.0f)
 , mMaxHeight	(0.0f)
 , mModifyCount	(0)
-, mMeshFactory	(&factory)
+, mMeshFactory	(factory)
 {
 	mData = data;
 	data.samples = NULL; // set to null so that we don't release the memory
@@ -77,31 +71,19 @@ Gu::HeightField::HeightField(GuMeshFactory& factory, Gu::HeightFieldData& data)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Gu::HeightField::~HeightField()
+HeightField::~HeightField()
 {
 	releaseMemory();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// PX_SERIALIZATION
-void Gu::HeightField::onRefCountZero()
+void HeightField::onRefCountZero()
 {
-	PX_ASSERT(mMeshFactory);
-	if(mMeshFactory->removeHeightField(*this))
-	{
-		GuMeshFactory* mf = mMeshFactory;
-		Cm::deletePxBase(this);
-		mf->notifyFactoryListener(this, PxConcreteType::eHEIGHTFIELD);
-		return;
-	}
-	
-	// PT: if we reach this point, we didn't find the mesh in the Physics object => don't delete!
-	// This prevents deleting the object twice.
-	Ps::getFoundation().error(PxErrorCode::eINVALID_OPERATION, __FILE__, __LINE__, "Gu::HeightField::onRefCountZero: double deletion detected!");
+	::onRefCountZero(this, mMeshFactory, false, "PxHeightField::release: double deletion detected!");
 }
 
-void Gu::HeightField::exportExtraData(PxSerializationContext& stream)
+void HeightField::exportExtraData(PxSerializationContext& stream)
 {
 	// PT: warning, order matters for the converter. Needs to export the base stuff first
 	const PxU32 size = mData.rows * mData.columns * sizeof(PxHeightFieldSample);
@@ -109,40 +91,38 @@ void Gu::HeightField::exportExtraData(PxSerializationContext& stream)
 	stream.writeData(mData.samples, size);
 }
 
-void Gu::HeightField::importExtraData(PxDeserializationContext& context)
+void HeightField::importExtraData(PxDeserializationContext& context)
 {
 	mData.samples = context.readExtraData<PxHeightFieldSample, PX_SERIAL_ALIGN>(mData.rows * mData.columns);
 }
 
-Gu::HeightField* Gu::HeightField::createObject(PxU8*& address, PxDeserializationContext& context)
+HeightField* HeightField::createObject(PxU8*& address, PxDeserializationContext& context)
 {
-	HeightField* obj = new (address) HeightField(PxBaseFlag::eIS_RELEASABLE);
+	HeightField* obj = PX_PLACEMENT_NEW(address, HeightField(PxBaseFlag::eIS_RELEASABLE));
 	address += sizeof(HeightField);	
 	obj->importExtraData(context);
 	obj->resolveReferences(context);
 	return obj;
 }
 
-//~PX_SERIALIZATION
-
-void Gu::HeightField::release()
+void HeightField::release()
 {
-	decRefCount();
+	RefCountable_decRefCount(*this);
 }
 
-void Gu::HeightField::acquireReference()
+void HeightField::acquireReference()
 {
-	incRefCount();
+	RefCountable_incRefCount(*this);
 }
 
-PxU32 Gu::HeightField::getReferenceCount() const
+PxU32 HeightField::getReferenceCount() const
 {
-	return getRefCount();
+	return RefCountable_getRefCount(*this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool Gu::HeightField::modifySamples(PxI32 startCol, PxI32 startRow, const PxHeightFieldDesc& desc, bool shrinkBounds)
+bool HeightField::modifySamples(PxI32 startCol, PxI32 startRow, const PxHeightFieldDesc& desc, bool shrinkBounds)
 {
 	const PxU32 nbCols = getNbColumns();
 	const PxU32 nbRows = getNbRows();
@@ -210,7 +190,7 @@ bool Gu::HeightField::modifySamples(PxI32 startCol, PxI32 startRow, const PxHeig
 	return true;
 }
 
-bool Gu::HeightField::load(PxInputStream& stream)
+bool HeightField::load(PxInputStream& stream)
 {
 	// release old memory
 	releaseMemory();
@@ -224,9 +204,18 @@ bool Gu::HeightField::load(PxInputStream& stream)
 	// load mData
 	mData.rows = readDword(endian, stream);
 	mData.columns = readDword(endian, stream);
-	mData.rowLimit = readFloat(endian, stream);
-	mData.colLimit = readFloat(endian, stream);
-	mData.nbColumns = readFloat(endian, stream);
+	if(version>=2)
+	{
+		mData.rowLimit = readDword(endian, stream);
+		mData.colLimit = readDword(endian, stream);
+		mData.nbColumns = readDword(endian, stream);
+	}
+	else
+	{
+		mData.rowLimit = PxU32(readFloat(endian, stream));
+		mData.colLimit = PxU32(readFloat(endian, stream));
+		mData.nbColumns = PxU32(readFloat(endian, stream));
+	}
 	const float thickness = readFloat(endian, stream);
 	PX_UNUSED(thickness);
 	mData.convexEdgeThreshold = readFloat(endian, stream);
@@ -256,12 +245,10 @@ bool Gu::HeightField::load(PxInputStream& stream)
 	const PxU32 nbVerts = mData.rows * mData.columns;
 	if (nbVerts > 0) 
 	{
-		mData.samples = reinterpret_cast<PxHeightFieldSample*>(PX_ALLOC(nbVerts*sizeof(PxHeightFieldSample), "PxHeightFieldSample"));
+		mData.samples = PX_ALLOCATE(PxHeightFieldSample, nbVerts, "PxHeightFieldSample");
 		if (mData.samples == NULL)
-		{
-			Ps::getFoundation().error(PxErrorCode::eOUT_OF_MEMORY, __FILE__, __LINE__, "Gu::HeightField::load: PX_ALLOC failed!");
-			return false;
-		}
+			return PxGetFoundation().error(PxErrorCode::eOUT_OF_MEMORY, PX_FL, "Gu::HeightField::load: PX_ALLOC failed!");
+
 		stream.read(mData.samples, mNbSamples*sizeof(PxHeightFieldSample));
 		if (endian)
 			for(PxU32 i = 0; i < mNbSamples; i++)
@@ -275,7 +262,7 @@ bool Gu::HeightField::load(PxInputStream& stream)
 	return true;
 }
 
-bool Gu::HeightField::loadFromDesc(const PxHeightFieldDesc& desc)
+bool HeightField::loadFromDesc(const PxHeightFieldDesc& desc)
 {
 	// verify descriptor	
 	PX_CHECK_AND_RETURN_NULL(desc.isValid(), "Gu::HeightField::loadFromDesc: desc.isValid() failed!");
@@ -291,10 +278,9 @@ bool Gu::HeightField::loadFromDesc(const PxHeightFieldDesc& desc)
 	mData.flags					= desc.flags;
 	mSampleStride				= desc.samples.stride;
 
-	// PT: precompute some data - mainly for Xbox
-	mData.rowLimit				= float(mData.rows - 2);
-	mData.colLimit				= float(mData.columns - 2);
-	mData.nbColumns				= float(desc.nbColumns);
+	mData.rowLimit				= mData.rows - 2;
+	mData.colLimit				= mData.columns - 2;
+	mData.nbColumns				= desc.nbColumns;
 
 	// allocate and copy height samples
 	// compute extents too
@@ -305,12 +291,10 @@ bool Gu::HeightField::loadFromDesc(const PxHeightFieldDesc& desc)
 
 	if(nbVerts > 0) 
 	{
-		mData.samples = reinterpret_cast<PxHeightFieldSample*>(PX_ALLOC(nbVerts*sizeof(PxHeightFieldSample), "PxHeightFieldSample"));
+		mData.samples = PX_ALLOCATE(PxHeightFieldSample, nbVerts, "PxHeightFieldSample");
 		if(!mData.samples)
-		{
-			Ps::getFoundation().error(PxErrorCode::eOUT_OF_MEMORY, __FILE__, __LINE__, "Gu::HeightField::load: PX_ALLOC failed!");
-			return false;
-		}
+			return PxGetFoundation().error(PxErrorCode::eOUT_OF_MEMORY, PX_FL, "Gu::HeightField::load: PX_ALLOC failed!");
+
 		const PxU8* PX_RESTRICT src = reinterpret_cast<const PxU8*>(desc.samples.data);
 		PxHeightFieldSample* PX_RESTRICT dst = mData.samples;
 		PxI16 minHeight = PX_MAX_I16;
@@ -349,9 +333,53 @@ bool Gu::HeightField::loadFromDesc(const PxHeightFieldDesc& desc)
 	return true;
 }
 
+bool HeightField::save(PxOutputStream& stream, bool endian)
+{
+	// write header
+	if(!writeHeader('H', 'F', 'H', 'F', PX_HEIGHTFIELD_VERSION, endian, stream))
+		return false;
+
+	const Gu::HeightFieldData& hfData = getData();
+
+	// write mData members
+	writeDword(hfData.rows, endian, stream);
+	writeDword(hfData.columns, endian, stream);
+	writeDword(hfData.rowLimit, endian, stream);
+	writeDword(hfData.colLimit, endian, stream);
+	writeDword(hfData.nbColumns, endian, stream);
+	writeFloat(0.0f, endian, stream);	// thickness
+	writeFloat(hfData.convexEdgeThreshold, endian, stream);
+	writeWord(hfData.flags, endian, stream);
+	writeDword(hfData.format, endian, stream);
+
+	writeFloat(hfData.mAABB.getMin(0), endian, stream);
+	writeFloat(hfData.mAABB.getMin(1), endian, stream);
+	writeFloat(hfData.mAABB.getMin(2), endian, stream);
+	writeFloat(hfData.mAABB.getMax(0), endian, stream);
+	writeFloat(hfData.mAABB.getMax(1), endian, stream);
+	writeFloat(hfData.mAABB.getMax(2), endian, stream);
+
+	// write this-> members
+	writeDword(mSampleStride, endian, stream);
+	writeDword(mNbSamples, endian, stream);
+	writeFloat(mMinHeight, endian, stream);
+	writeFloat(mMaxHeight, endian, stream);
+
+	// write samples
+	for(PxU32 i=0; i<mNbSamples; i++)
+	{
+		const PxHeightFieldSample& s = hfData.samples[i];
+		writeWord(PxU16(s.height), endian, stream);
+		stream.write(&s.materialIndex0, sizeof(s.materialIndex0));
+		stream.write(&s.materialIndex1, sizeof(s.materialIndex1));
+	}
+
+	return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-PxU32 Gu::HeightField::saveCells(void* destBuffer, PxU32 destBufferSize) const
+PxU32 HeightField::saveCells(void* destBuffer, PxU32 destBufferSize) const
 {
 	PxU32 n = mData.columns * mData.rows * sizeof(PxHeightFieldSample);
 	if (n > destBufferSize) n = destBufferSize;
@@ -362,24 +390,29 @@ PxU32 Gu::HeightField::saveCells(void* destBuffer, PxU32 destBufferSize) const
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-PX_PHYSX_COMMON_API void Gu::HeightField::releaseMemory()
+void HeightField::releaseMemory()
 {
-// PX_SERIALIZATION
 	if(getBaseFlags() & PxBaseFlag::eOWNS_MEMORY)
-//~PX_SERIALIZATION
 	{
 		PX_FREE(mData.samples);
-		mData.samples = NULL;
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// PT: TODO: use those faster functions everywhere
-namespace physx
+namespace
 {
+	struct EdgeData
+	{
+		PxU32	edgeIndex;
+		PxU32	cell;
+		PxU32	row;
+		PxU32	column;
+	};
+}
 
-PX_PHYSX_COMMON_API PxU32 getVertexEdgeIndices(const Gu::HeightField& heightfield, PxU32 vertexIndex, PxU32 row, PxU32 column, EdgeData edgeIndices[8])
+// PT: TODO: use those faster functions everywhere
+static PxU32 getVertexEdgeIndices(const HeightField& heightfield, PxU32 vertexIndex, PxU32 row, PxU32 column, EdgeData edgeIndices[8])
 {
 	const PxU32 nbColumns = heightfield.getData().columns;
 	const PxU32 nbRows = heightfield.getData().rows;
@@ -484,7 +517,7 @@ PX_PHYSX_COMMON_API PxU32 getVertexEdgeIndices(const Gu::HeightField& heightfiel
 	return count;
 }
 
-PX_PHYSX_COMMON_API PxU32 getEdgeTriangleIndices(const Gu::HeightField& heightfield, const EdgeData& edgeData, PxU32* PX_RESTRICT triangleIndices)
+static PxU32 getEdgeTriangleIndices(const HeightField& heightfield, const EdgeData& edgeData, PxU32* PX_RESTRICT triangleIndices)
 {
 	const PxU32 nbColumns = heightfield.getData().columns;
 	const PxU32 nbRows = heightfield.getData().rows;
@@ -543,19 +576,17 @@ PX_PHYSX_COMMON_API PxU32 getEdgeTriangleIndices(const Gu::HeightField& heightfi
 	return count;
 }
 
-}
-
 PX_FORCE_INLINE PxU32 anyHole(PxU32 doubleMatIndex, PxU16 holeMaterialIndex)
 {
 	return PxU32((doubleMatIndex & 0xFFFF) == holeMaterialIndex) | (PxU32(doubleMatIndex >> 16) == holeMaterialIndex);
 }
 
-void Gu::HeightField::parseTrianglesForCollisionVertices(PxU16 holeMaterialIndex)
+void HeightField::parseTrianglesForCollisionVertices(PxU16 holeMaterialIndex)
 {	
 	const PxU32 nbColumns = getNbColumnsFast();
 	const PxU32 nbRows = getNbRowsFast();
 
-	Cm::BitMap rowHoles[2];
+	PxBitMap rowHoles[2];
 	rowHoles[0].resizeAndClear(nbColumns + 1);
 	rowHoles[1].resizeAndClear(nbColumns + 1);
 
@@ -608,7 +639,7 @@ void Gu::HeightField::parseTrianglesForCollisionVertices(PxU16 holeMaterialIndex
 	}
 }
 
-bool Gu::HeightField::isSolidVertex(PxU32 vertexIndex, PxU32 row, PxU32 column, PxU16 holeMaterialIndex, bool& nbSolid) const
+bool HeightField::isSolidVertex(PxU32 vertexIndex, PxU32 row, PxU32 column, PxU16 holeMaterialIndex, bool& nbSolid) const
 {
 	// check if solid and boundary
 	// retrieve edge indices for current vertexIndex
@@ -656,7 +687,7 @@ bool Gu::HeightField::isSolidVertex(PxU32 vertexIndex, PxU32 row, PxU32 column, 
 	return false;
 }
 
-bool Gu::HeightField::isCollisionVertexPreca(PxU32 vertexIndex, PxU32 row, PxU32 column, PxU16 holeMaterialIndex) const
+bool HeightField::isCollisionVertexPreca(PxU32 vertexIndex, PxU32 row, PxU32 column, PxU16 holeMaterialIndex) const
 {
 #ifdef PX_HEIGHTFIELD_DEBUG
 	PX_ASSERT(isValidVertex(vertexIndex));
@@ -679,7 +710,7 @@ bool Gu::HeightField::isCollisionVertexPreca(PxU32 vertexIndex, PxU32 row, PxU32
 
 // AP: this naming is confusing and inconsistent with return value. the function appears to compute vertex coord rather than cell coords
 // it would most likely be better to stay in cell coords instead, since fractional vertex coords just do not make any sense
-PxU32 Gu::HeightField::computeCellCoordinates(PxReal x, PxReal z, PxReal& fracX, PxReal& fracZ) const
+PxU32 HeightField::computeCellCoordinates(PxReal x, PxReal z, PxReal& fracX, PxReal& fracZ) const
 {
 	namespace i = physx::intrinsics;
 
@@ -692,10 +723,10 @@ PxU32 Gu::HeightField::computeCellCoordinates(PxReal x, PxReal z, PxReal& fracX,
 		PX_ASSERT(PxFloor(ii+(1-1e-7f*ii)) == ii);
 	}
 #endif
-	PxF32 epsx = 1.0f - PxAbs(x+1.0f) * 1e-6f; // epsilon needs to scale with values of x,z...
-	PxF32 epsz = 1.0f - PxAbs(z+1.0f) * 1e-6f;
-	PxF32 x1 = i::selectMin(x, mData.rowLimit+epsx);
-	PxF32 z1 = i::selectMin(z, mData.colLimit+epsz);
+	const PxF32 epsx = 1.0f - PxAbs(x+1.0f) * 1e-6f; // epsilon needs to scale with values of x,z...
+	const PxF32 epsz = 1.0f - PxAbs(z+1.0f) * 1e-6f;
+	PxF32 x1 = i::selectMin(x, float(mData.rowLimit)+epsx);
+	PxF32 z1 = i::selectMin(z, float(mData.colLimit)+epsz);
 	x = PxFloor(x1);
 	fracX = x1 - x;
 	z = PxFloor(z1);
@@ -703,8 +734,8 @@ PxU32 Gu::HeightField::computeCellCoordinates(PxReal x, PxReal z, PxReal& fracX,
 	PX_ASSERT(x >= 0.0f && x < PxF32(mData.rows));
 	PX_ASSERT(z >= 0.0f && z < PxF32(mData.columns));
 
-	const PxU32 vertexIndex = PxU32(x * (mData.nbColumns) + z);
-	PX_ASSERT(vertexIndex < (mData.rows)*(mData.columns));
+	const PxU32 vertexIndex = PxU32(x) * mData.nbColumns + PxU32(z);
+	PX_ASSERT(vertexIndex < mData.rows*mData.columns);
 
 	return vertexIndex;
 }

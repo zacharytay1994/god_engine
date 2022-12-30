@@ -86,6 +86,24 @@ namespace god
 		return os;
 	}
 
+	std::ostream& operator<<(std::ostream& os, const glm::vec2& v2)
+	{
+		os << v2.x << ',' << v2.y;
+		return os;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const glm::vec3& v3)
+	{
+		os << v3.x << ',' << v3.y << ',' << v3.z;
+		return os;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const glm::vec4& v4)
+	{
+		os << v4.x << ',' << v4.y << ',' << v4.z << ',' << v4.w;
+		return os;
+	}
+
 
 
 }
