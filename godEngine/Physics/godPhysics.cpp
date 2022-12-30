@@ -43,13 +43,13 @@ namespace god
 	PhysicsSystem::PhysicsSystem() 
 
 	{
-		scratchbuffer = new char[2048];
+		scratchbuffer = new char[scratchBufferSize];//16kb
 		mCudaContextManager = nullptr;
 		RayCastid = Null;
 		mRunning = false;
 		mCamera = nullptr;
 		mWindow = nullptr;
-		mDispatcher = nullptr;
+		
 		mFoundation = nullptr;
 		mCooking = nullptr;
 		mPhysics = nullptr;
@@ -73,7 +73,9 @@ namespace god
 		mScene->flushSimulation(false);
 		mScene->release();
 		mDispatcher->release();
-		//PxCloseExtensions();
+		
+		
+		
 		mPhysics->release();
 		mCooking->release();
 		if (mPvd)
@@ -84,6 +86,9 @@ namespace god
 			transport->release();
 		}
 		
+		mCudaContextManager->release();
+
+		//PxCloseExtensions();	 only call if extensions used. can cause mem leak otherwise
 		mFoundation->release();
 		delete[] scratchbuffer;
 	}
@@ -110,13 +115,16 @@ namespace god
 		else
 		{
 			mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, physx::PxCookingParams(mToleranceScale));
+
 			if (!mCooking)
 				std::cerr << "PxCreateCooking failed!" << std::endl;
 			
 			physx::PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 			sceneDesc.gravity = physx::PxVec3(0.0f, -98.1f, 0.0f);
-			mDispatcher = physx::PxDefaultCpuDispatcherCreate(4);
-			if (!mDispatcher)
+			mDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
+			sceneDesc.cpuDispatcher = mDispatcher;
+			
+			if (!sceneDesc.cpuDispatcher)
 				std::cerr << "PxDefaultCpuDispatcherCreate failed!" << std::endl;
 
 			PxCudaContextManagerDesc cudaContextManagerDesc;
@@ -127,12 +135,15 @@ namespace god
 			sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
 			sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eGPU;
 
-
-			sceneDesc.cpuDispatcher = mDispatcher;
 			sceneDesc.filterShader = contactReportFilterShader;
-			
+
+			if (!sceneDesc.isValid())
+					std::cerr << "sceneDesc is not valid!" << std::endl;
 
 			mScene = mPhysics->createScene(sceneDesc);
+			if(!mScene)
+				std::cerr << "PxScene creation failed!" << std::endl;
+
 			mScene->setSimulationEventCallback(&gContactReportCallback);
 			
 
@@ -180,7 +191,7 @@ namespace god
 		{
 			mAccumulator -= mStepSize;
 			mRunning = true;
-			mScene->simulate(mStepSize, NULL, scratchbuffer, (physx::PxU32)2048, true);
+			mScene->simulate(mStepSize, NULL, scratchbuffer, (physx::PxU32)scratchBufferSize, true);
 
 			//Call fetchResultsStart. Get the set of pair headers
 			const physx::PxContactPairHeader* pairHeader;

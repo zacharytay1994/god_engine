@@ -22,6 +22,7 @@ namespace god
 	struct PhysicsSystem
 	{
 		static constexpr uint32_t Null = static_cast<uint32_t>(-1);
+		const int32_t scratchBufferSize = 16384; // 16KB
 	public:
 
 		PhysicsSystem();
