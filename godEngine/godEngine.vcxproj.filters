@@ -163,6 +163,8 @@
     <ClInclude Include="Physics\PhysicsController.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_Animation3D.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateAnimations.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Gam350\EC_350Level.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Gam350\ES_350Level.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

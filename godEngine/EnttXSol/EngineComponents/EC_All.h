@@ -24,6 +24,8 @@
 #include "GUI/EC_GUIObject.h"
 #include "GUI/EC_GUIText.h"
 
+#include "Gam350/EC_350Level.h"
+
 #include <tuple>
 #include <string>
 #include <array>
@@ -49,7 +51,8 @@ namespace god
 			Transparent ,
 			PhysicsController ,
 			PlayerController ,
-			SkeleAnim3D
+			SkeleAnim3D ,
+			_350Level
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};

@@ -21,6 +21,7 @@ namespace god
 		"Transparent",
 		"PhysicsController",
 		"PlayerController",
-		"SkeleAnim3D"
+		"SkeleAnim3D",
+		"_350Level"
 	};
 }

@@ -27,6 +27,8 @@
 
 #include "GUI/ES_GUIObject.h"
 
+#include "Gam350/ES_350Level.h"
+
 #include "../../Window/SystemTimer.h"
 
 namespace god
@@ -60,6 +62,8 @@ namespace god
 			SystemTimer::StartTimeSegment ( "PlayerControllerSystem" );
 			enttxsol.RunEngineSystem ( engineResources , PlayerControllerSystem );
 			SystemTimer::EndTimeSegment ( "PlayerControllerSystem" );
+
+			enttxsol.RunEngineSystem ( engineResources , _350LevelUpdate );
 		}
 
 		// gui
@@ -149,6 +153,8 @@ namespace god
 		SystemTimer::EndTimeSegment ( "RigidDynamicInit" );
 
 		enttxsol.RunEngineSystem ( engineResources , PhysicsControllerInit );
+
+		enttxsol.RunEngineSystem ( engineResources , _350LevelInit );
 	}
 
 	// runs at the end before unloading the scene 
