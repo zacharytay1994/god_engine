@@ -15,6 +15,7 @@ namespace god
 		float m_shininess { 32.0f };
 		float m_emissive { 0.0f };
 		bool m_visible { true };
+		glm::vec4 m_tint { 1.0f,1.0f,1.0f,1.0f };
 
 		bool operator==( Renderable3D const& rhs )
 		{
@@ -23,7 +24,8 @@ namespace god
 				m_diffuse_id == rhs.m_diffuse_id &&
 				m_specular_id == rhs.m_specular_id &&
 				m_shininess == rhs.m_shininess &&
-				m_emissive == rhs.m_emissive;
+				m_emissive == rhs.m_emissive &&
+				m_tint == rhs.m_tint;
 		}
 	};
 	template <>
@@ -31,7 +33,8 @@ namespace god
 	{
 		RegisterLuaType<Renderable3D> ( luaState , name ,
 			"model_id" , &Renderable3D::m_model_id ,
-			"visible" , &Renderable3D::m_visible );
+			"visible" , &Renderable3D::m_visible ,
+			"tint" , &Renderable3D::m_tint );
 	}
 	template<>
 	inline void ComponentInspector::operator() < Renderable3D > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& engineResources )
@@ -121,6 +124,11 @@ namespace god
 
 				ImGui::Text ( "- Emissive :" );
 				ImGui::DragFloat ( "##Emissive" , &component.m_emissive );
+
+				ImGui::DragFloat ( "TintR" , &component.m_tint.x , 0.01f , 0.0f , 1.0f );
+				ImGui::DragFloat ( "TintG" , &component.m_tint.y , 0.01f , 0.0f , 1.0f );
+				ImGui::DragFloat ( "TintB" , &component.m_tint.z , 0.01f , 0.0f , 1.0f );
+				ImGui::DragFloat ( "TintA" , &component.m_tint.w , 0.01f , 0.0f , 1.0f );
 			} );
 	}
 

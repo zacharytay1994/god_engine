@@ -779,6 +779,40 @@ namespace god
 				RecursivePopulateScene<S , T , R> ( scene , fonts , child , world_changed , transform.m_world_transform , cameraPosition );
 			}
 		}
+		else if ( m_registry.all_of<T , SkeleAnim3D> ( m_entities[ e ].m_id ) )
+		{
+			auto [transform , skele_anim] = m_registry.get<T , R> ( m_entities[ e ].m_id );
+
+			bool world_changed { false };
+			if ( changed )
+			{
+				transform.m_parent_transform = parentTransform;
+				world_changed = true;
+			}
+			if ( transform.m_changed )
+			{
+				glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
+				transform.m_local_transform = model_transform;
+				world_changed = true;
+			}
+			if ( world_changed )
+			{
+				transform.m_world_transform = transform.m_parent_transform * transform.m_local_transform;
+			}
+
+			// add to scene
+			if ( skele_anim.m_animation_id != static_cast< uint32_t >( -1 ) )
+			{
+				scene.AddAnimation ( { skele_anim.m_animation_id ,
+						skele_anim.m_diffuse_id , skele_anim.m_specular_id , skele_anim.m_shininess , skele_anim.m_emissive } , transform.m_world_transform );
+			}
+
+			// populate scene with children
+			for ( auto const& child : m_entities[ e ].m_children )
+			{
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , world_changed , transform.m_world_transform , cameraPosition );
+			}
+		}
 		// if only transform component
 		else if ( m_registry.all_of<T> ( m_entities[ e ].m_id ) )
 		{

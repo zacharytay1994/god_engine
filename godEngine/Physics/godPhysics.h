@@ -38,6 +38,7 @@ namespace god
 		physx::PxPhysics* const GetPhysics() const;
 		physx::PxCooking* const GetCooking() const;
 		physx::PxScene* const GetPhysicsScene() const;
+		physx::PxScene* GetPhysicsScene ();
 
 		
 		ContactReportCallback& getContactReportCallback();

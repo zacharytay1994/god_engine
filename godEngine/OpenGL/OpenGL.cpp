@@ -6,6 +6,7 @@
 #include "../Window/SystemTimer.h"
 
 #include "Internal/OGLDebug.h"
+#include <godUtility/Internal/FolderHelper.h>
 
 #pragma comment(lib, "opengl32.lib")
 
@@ -63,6 +64,10 @@ namespace god
 		m_textured_discard_shader.InitializeFromFile (
 			"Assets/EngineAssets/OpenGLShaders/texturemaps.vs" ,
 			"Assets/EngineAssets/OpenGLShaders/texturemapsWithDiscard.fs" );
+
+		m_textured_discard_shader_no_lighting.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/texturemaps.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/texturemapsWithDiscardNoLighting.fs" );
 
 		m_single_colour_outline_shader.InitializeFromFile (
 			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.vs" ,
@@ -207,6 +212,8 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/anim_model.vs" ,
 			"Assets/EngineAssets/OpenGLShaders/texturemaps.fs"
 		);
+
+		LoadAllAnimations ();
 
 		//----------------------------------------
 
@@ -440,127 +447,128 @@ namespace god
 
 		//[Animation - START]-----------------------------------------------------------------------
 
+		RenderAnimations ( scene , projection , view , camera_position , textures , camera_front );
 		// Draw the normal model
-		m_animation_shader.Use ();
+		//m_animation_shader.Use ();
 
-		// reset point light uniforms
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumPointLight" , 0 );
+		//// reset point light uniforms
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumPointLight" , 0 );
 
-		// reset directional light uniforms
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumDirectionalLight" , 0 );
+		//// reset directional light uniforms
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumDirectionalLight" , 0 );
 
-		auto transforms = m_animator.GetFinalBoneMatrices ();
-		for ( int i = 0; i < transforms.size (); ++i )
-		{
-			std::string temp = "bone_transforms[" + std::to_string ( i ) + "]";
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , temp.c_str () , transforms[ i ] );
-		}
+		//auto transforms = m_animator.GetFinalBoneMatrices ();
+		//for ( int i = 0; i < transforms.size (); ++i )
+		//{
+		//	std::string temp = "bone_transforms[" + std::to_string ( i ) + "]";
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , temp.c_str () , transforms[ i ] );
+		//}
 
-		// projection matrix
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uProjection" , projection );
+		//// projection matrix
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uProjection" , projection );
 
-		// view matrix
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uView" , view );
+		//// view matrix
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uView" , view );
 
-		// set uniforms for fragment shader
-		// set view position
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uViewPosition" , camera_position );
+		//// set uniforms for fragment shader
+		//// set view position
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uViewPosition" , camera_position );
 
-		// set material
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
-		std::get<1> ( textures.Get ( textures.GetID ( "White" ) ) ).Bind ( 0 );
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.specular_map" , 1 );
-		std::get<1> ( textures.Get ( textures.GetID ( "White" ) ) ).Bind ( 1 );
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.shininess" , 32.0f );
+		//// set material
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+		//std::get<1> ( textures.Get ( textures.GetID ( "White" ) ) ).Bind ( 0 );
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.specular_map" , 1 );
+		//std::get<1> ( textures.Get ( textures.GetID ( "White" ) ) ).Bind ( 1 );
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.shininess" , 32.0f );
 
-		// set reflection
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uSkybox" , 2 );
-		m_cubemap.Bind ( 2 );
+		//// set reflection
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uSkybox" , 2 );
+		//m_cubemap.Bind ( 2 );
 
-		// set shadowmap
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uShadowMap" , 3 );
-		m_shadowmap.Bind ( 3 );
+		//// set shadowmap
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uShadowMap" , 3 );
+		//m_shadowmap.Bind ( 3 );
 
-		// bind caustic map textures
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uCausticMap" , 8 );
-		//m_causticmap_textures.Bind( 8 );
-		std::get<1> ( textures.Get ( textures.GetID ( "None" ) ) ).Bind ( 8 );
+		//// bind caustic map textures
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uCausticMap" , 8 );
+		////m_causticmap_textures.Bind( 8 );
+		//std::get<1> ( textures.Get ( textures.GetID ( "None" ) ) ).Bind ( 8 );
 
-		// pass in delta time into shader 
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uDT" , DeltaTimer::m_acc_dt );
+		//// pass in delta time into shader 
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uDT" , DeltaTimer::m_acc_dt );
 
-		// render point lights
-		std::sort ( scene.m_point_light_data.begin () , scene.m_point_light_data.end () ,
-			[&camera_position]( Scene::PointLightData const& pld1 , Scene::PointLightData const& pld2 )
-			{
-				return LengthSq ( pld1.m_position - camera_position ) < LengthSq ( pld2.m_position - camera_position );
-			}
-		);
-		int num_point_light = static_cast< int >( scene.m_point_light_data.size () > m_max_point_lights ? m_max_point_lights : scene.m_point_light_data.size () );
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumPointLight" , num_point_light );
-		for ( auto i = 0; i < num_point_light; ++i )
-		{
-			auto const& light = scene.m_point_light_data[ i ];
+		//// render point lights
+		//std::sort ( scene.m_point_light_data.begin () , scene.m_point_light_data.end () ,
+		//	[&camera_position]( Scene::PointLightData const& pld1 , Scene::PointLightData const& pld2 )
+		//	{
+		//		return LengthSq ( pld1.m_position - camera_position ) < LengthSq ( pld2.m_position - camera_position );
+		//	}
+		//);
+		//int num_point_light = static_cast< int >( scene.m_point_light_data.size () > m_max_point_lights ? m_max_point_lights : scene.m_point_light_data.size () );
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumPointLight" , num_point_light );
+		//for ( auto i = 0; i < num_point_light; ++i )
+		//{
+		//	auto const& light = scene.m_point_light_data[ i ];
 
-			// max 5 point lights as defined in the shader
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].position" ).c_str () , light.m_position );
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].colour" ).c_str () , light.m_colour );
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].ambient" ).c_str () , light.m_ambient );
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].diffuse" ).c_str () , light.m_diffuse );
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].specular" ).c_str () , light.m_specular );
-		}
+		//	// max 5 point lights as defined in the shader
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].position" ).c_str () , light.m_position );
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].colour" ).c_str () , light.m_colour );
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].ambient" ).c_str () , light.m_ambient );
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].diffuse" ).c_str () , light.m_diffuse );
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].specular" ).c_str () , light.m_specular );
+		//}
 
-		// render directional lights
-		std::sort ( scene.m_directional_light_data.begin () , scene.m_directional_light_data.end () ,
-			[&camera_position]( Scene::DirectionalLightData const& dld1 , Scene::DirectionalLightData const& dld2 )
-			{
-				return LengthSq ( dld1.m_position - camera_position ) < LengthSq ( dld2.m_position - camera_position );
-			}
-		);
-		int num_directional_light = static_cast< int >( scene.m_directional_light_data.size () > m_max_directional_lights ? m_max_directional_lights : scene.m_directional_light_data.size () );
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumDirectionalLight" , num_directional_light );
-		for ( auto i = 0; i < num_directional_light; ++i )
-		{
-			auto const& light = scene.m_directional_light_data[ i ];
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].position" ).c_str () , light.m_position );
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].direction" ).c_str () , -glm::normalize ( light.m_position ) );
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].colour" ).c_str () , light.m_colour );
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].ambient" ).c_str () , light.m_ambient );
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].diffuse" ).c_str () , light.m_diffuse );
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].specular" ).c_str () , light.m_specular );
+		//// render directional lights
+		//std::sort ( scene.m_directional_light_data.begin () , scene.m_directional_light_data.end () ,
+		//	[&camera_position]( Scene::DirectionalLightData const& dld1 , Scene::DirectionalLightData const& dld2 )
+		//	{
+		//		return LengthSq ( dld1.m_position - camera_position ) < LengthSq ( dld2.m_position - camera_position );
+		//	}
+		//);
+		//int num_directional_light = static_cast< int >( scene.m_directional_light_data.size () > m_max_directional_lights ? m_max_directional_lights : scene.m_directional_light_data.size () );
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumDirectionalLight" , num_directional_light );
+		//for ( auto i = 0; i < num_directional_light; ++i )
+		//{
+		//	auto const& light = scene.m_directional_light_data[ i ];
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].position" ).c_str () , light.m_position );
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].direction" ).c_str () , -glm::normalize ( light.m_position ) );
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].colour" ).c_str () , light.m_colour );
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].ambient" ).c_str () , light.m_ambient );
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].diffuse" ).c_str () , light.m_diffuse );
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].specular" ).c_str () , light.m_specular );
 
-			m_light_space_matrix =
-				glm::ortho ( -20.0f , 20.0f , -20.0f , 20.0f , 1.0f , 20.0f ) *
-				glm::lookAt (
-					glm::vec3 ( light.m_position ) ,
-					glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
-					glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
+		//	m_light_space_matrix =
+		//		glm::ortho ( -20.0f , 20.0f , -20.0f , 20.0f , 1.0f , 20.0f ) *
+		//		glm::lookAt (
+		//			glm::vec3 ( light.m_position ) ,
+		//			glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
+		//			glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
 
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
-		}
+		//	OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
+		//}
 
-		// Set Fog
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.linearStart" , 10.0f );
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.density" , 0.03f );
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.equation" , 0 );
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.isEnabled" , false );
+		//// Set Fog
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.linearStart" , 10.0f );
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.density" , 0.03f );
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.equation" , 0 );
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.isEnabled" , false );
 
-		// Set Tint
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uIsTint" , false );
-		//OGLShader::SetUniform( m_animation_shader.GetShaderID(), "uTint", glm::vec4( 0.8f, 0.8f, 0.8f, 1.0f ) );
+		//// Set Tint
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uIsTint" , false );
+		////OGLShader::SetUniform( m_animation_shader.GetShaderID(), "uTint", glm::vec4( 0.8f, 0.8f, 0.8f, 1.0f ) );
 
-		// draw model
-		glm::mat4 model = glm::mat4 ( 1.0f );
-		
-		model = glm::translate ( model , glm::vec3 ( 50.0f , 1.0f , 5.0f ) ); // translate it down so it's at the center of the scene
-		model = glm::rotate ( model , glm::radians ( 90.0f ) , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );// rotate at y-axis
-		model = glm::scale ( model , glm::vec3 ( 1.0f ) );	// it's a bit too big for our scene, so scale it down
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uModel" , model );
+		//// draw model
+		//glm::mat4 model = glm::mat4 ( 1.0f );
 
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uEmissive" , 100.0f );
-		m_animation_model.Draw ( m_animation_shader );
+		//model = glm::translate ( model , glm::vec3 ( 50.0f , 1.0f , 5.0f ) ); // translate it down so it's at the center of the scene
+		//model = glm::rotate ( model , glm::radians ( 90.0f ) , glm::vec3 ( 0.0f , 1.0f , 0.0f ) );// rotate at y-axis
+		//model = glm::scale ( model , glm::vec3 ( 1.0f ) );	// it's a bit too big for our scene, so scale it down
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uModel" , model );
+
+		//OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uEmissive" , 100.0f );
+		//m_animation_model.Draw ( m_animation_shader );
 
 
 
@@ -674,6 +682,8 @@ namespace god
 		glEnable ( GL_BLEND );
 		glBlendFunc ( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
 		glDisable ( GL_CULL_FACE );
+
+		// billboard with lighting
 		for ( auto const& data : scene.m_billboard_sprites )
 		{
 			// Draw the normal model
@@ -763,6 +773,40 @@ namespace god
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uTint" , glm::vec4 ( 0.0f ) );
 
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uEmissive" , data.first.m_emissive );
+
+			// draw model
+			for ( auto& mesh : m_models[ data.first.m_model_id ] )
+			{
+				mesh.SetTransformData ( data.second );
+				mesh.DrawInstanced ( GL_TRIANGLES );
+			}
+		}
+
+		// billboard sprites with no lighting
+		m_textured_discard_shader_no_lighting.Use ();
+
+		// projection matrix
+		OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uProjection" , projection );
+
+		// view matrix
+		OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uView" , view );
+
+		for ( auto const& data : scene.m_billboard_sprites_no_lighting )
+		{
+			// Draw the normal model
+			//m_textured_discard_shader_no_lighting.Use ();
+
+			// set material
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			std::get<1> ( textures.Get ( data.first.m_diffuse_id ) ).Bind ( 0 );
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uMaterial.specular_map" , 1 );
+			std::get<1> ( textures.Get ( data.first.m_specular_id ) ).Bind ( 1 );
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uMaterial.shininess" , data.first.m_shininess );
+
+			// Set Tint
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uTint" , data.first.m_tint );
+
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uEmissive" , data.first.m_emissive );
 
 			// draw model
 			for ( auto& mesh : m_models[ data.first.m_model_id ] )
@@ -873,6 +917,170 @@ namespace god
 		}
 	}
 
+	void OpenGL::LoadAllAnimations ()
+	{
+		auto files = FolderHelper::GetFiles ( "Assets/GameAssets/3DAssets/Animation/" );
+		for ( auto const& file : files )
+		{
+			if ( file.find ( ".fbx" ) != std::string::npos ||
+				file.find ( ".dae" ) != std::string::npos )
+			{
+				std::string trimmed_name;
+				size_t start_trim { std::string::npos };
+				if ( ( start_trim = file.find_last_of ( '\\' ) ) != std::string::npos )
+				{
+					trimmed_name = file.substr ( start_trim + 1 , file.find_last_of ( '.' ) - start_trim - 1 );
+				}
+				else if ( ( start_trim = file.find_last_of ( '/' ) ) != std::string::npos )
+				{
+					trimmed_name = file.substr ( start_trim + 1 , file.find_last_of ( '.' ) - start_trim - 1 );
+				}
+				m_animations.insert ( { trimmed_name , {} } );
+				// initialize with animation data
+				m_animations[ trimmed_name ].Initialize ( file );
+				m_animation_names.push_back ( trimmed_name );
+			}
+		}
+	}
+
+	void OpenGL::RenderAnimations ( Scene& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures , glm::vec3 const& camera_front )
+	{
+		// update all animations
+		for ( auto& animation : m_animations )
+		{
+			for ( auto i = 0; i < animation.second.m_animators.Size (); ++i )
+			{
+				if ( animation.second.m_animators.Valid ( i ) )
+				{
+					animation.second.m_animators[ i ].UpdateAnimation ( DeltaTimer::m_dt );
+				}
+			}
+		}
+
+		m_animation_shader.Use ();
+
+		// reset point light uniforms
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumPointLight" , 0 );
+
+		// reset directional light uniforms
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumDirectionalLight" , 0 );
+
+		// projection matrix
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uProjection" , projection );
+
+		// view matrix
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uView" , view );
+
+		// set uniforms for fragment shader
+		// set view position
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uViewPosition" , camera_position );
+
+		// set reflection
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uSkybox" , 2 );
+		m_cubemap.Bind ( 2 );
+
+		// set shadowmap
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uShadowMap" , 3 );
+		m_shadowmap.Bind ( 3 );
+
+		// bind caustic map textures
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uCausticMap" , 8 );
+		//m_causticmap_textures.Bind( 8 );
+		std::get<1> ( textures.Get ( textures.GetID ( "None" ) ) ).Bind ( 8 );
+
+		// pass in delta time into shader 
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uDT" , DeltaTimer::m_acc_dt );
+
+		// render point lights
+		std::sort ( scene.m_point_light_data.begin () , scene.m_point_light_data.end () ,
+			[&camera_position]( Scene::PointLightData const& pld1 , Scene::PointLightData const& pld2 )
+			{
+				return LengthSq ( pld1.m_position - camera_position ) < LengthSq ( pld2.m_position - camera_position );
+			}
+		);
+		int num_point_light = static_cast< int >( scene.m_point_light_data.size () > m_max_point_lights ? m_max_point_lights : scene.m_point_light_data.size () );
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumPointLight" , num_point_light );
+		for ( auto i = 0; i < num_point_light; ++i )
+		{
+			auto const& light = scene.m_point_light_data[ i ];
+
+			// max 5 point lights as defined in the shader
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].position" ).c_str () , light.m_position );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].colour" ).c_str () , light.m_colour );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].ambient" ).c_str () , light.m_ambient );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].diffuse" ).c_str () , light.m_diffuse );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uPointLight[" + std::to_string ( i ) + "].specular" ).c_str () , light.m_specular );
+		}
+
+		// render directional lights
+		std::sort ( scene.m_directional_light_data.begin () , scene.m_directional_light_data.end () ,
+			[&camera_position]( Scene::DirectionalLightData const& dld1 , Scene::DirectionalLightData const& dld2 )
+			{
+				return LengthSq ( dld1.m_position - camera_position ) < LengthSq ( dld2.m_position - camera_position );
+			}
+		);
+		int num_directional_light = static_cast< int >( scene.m_directional_light_data.size () > m_max_directional_lights ? m_max_directional_lights : scene.m_directional_light_data.size () );
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uNumDirectionalLight" , num_directional_light );
+		for ( auto i = 0; i < num_directional_light; ++i )
+		{
+			auto const& light = scene.m_directional_light_data[ i ];
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].position" ).c_str () , light.m_position );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].direction" ).c_str () , -glm::normalize ( light.m_position ) );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].colour" ).c_str () , light.m_colour );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].ambient" ).c_str () , light.m_ambient );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].diffuse" ).c_str () , light.m_diffuse );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , ( "uDirectionalLight[" + std::to_string ( i ) + "].specular" ).c_str () , light.m_specular );
+
+			m_light_space_matrix =
+				glm::ortho ( -20.0f , 20.0f , -20.0f , 20.0f , 1.0f , 20.0f ) *
+				glm::lookAt (
+					glm::vec3 ( light.m_position ) ,
+					glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
+					glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
+
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
+		}
+
+		// Set Fog
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.linearStart" , 10.0f );
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.density" , 0.03f );
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.equation" , 0 );
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.isEnabled" , false );
+
+		// Set Tint
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uIsTint" , false );
+		//OGLShader::SetUniform( m_animation_shader.GetShaderID(), "uTint", glm::vec4( 0.8f, 0.8f, 0.8f, 1.0f ) );
+
+		for ( auto const& data : scene.m_animation_data )
+		{
+			auto& [render_data , transform] = data;
+			auto& animator = m_animations[ m_animation_names[ render_data.m_model_id ] ].m_animators[ static_cast< uint32_t >( render_data.m_shininess ) ];
+
+			auto transforms = animator.GetFinalBoneMatrices ();
+			for ( int i = 0; i < transforms.size (); ++i )
+			{
+				std::string temp = "bone_transforms[" + std::to_string ( i ) + "]";
+				OGLShader::SetUniform ( m_animation_shader.GetShaderID () , temp.c_str () , transforms[ i ] );
+			}
+
+			// set material
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			std::get<1> ( textures.Get ( textures.GetID ( "White" ) ) ).Bind ( 0 );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.specular_map" , 1 );
+			std::get<1> ( textures.Get ( textures.GetID ( "White" ) ) ).Bind ( 1 );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.shininess" , 32.0f );
+
+			// draw model
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uModel" , transform );
+
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uEmissive" , render_data.m_emissive );
+
+			m_animations[ m_animation_names[ render_data.m_model_id ] ].m_model.Draw ( m_animation_shader );
+		}
+	}
+
 	void OpenGL::FirstPassRenderToDepthmap ( Scene const& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures )
 	{
 		( textures );
@@ -967,5 +1175,27 @@ namespace god
 		m_square_mesh.Draw ( GL_TRIANGLES );
 
 		OGLShader::UnUse ();
+	}
+
+	std::tuple<uint32_t , uint32_t> OpenGL::AddAnimationInstance ( std::string const& name )
+	{
+		if ( m_animations.find ( name ) != m_animations.end () )
+		{
+			auto it = std::find_if ( m_animation_names.begin () , m_animation_names.end () , [&name]( auto const& val ) { return val == name; } );
+			return { it - m_animation_names.begin (), m_animations[ name ].AddInstance () };
+		}
+		return { -1,-1 };
+	}
+
+	void AnimationWrap::Initialize ( std::string const& path )
+	{
+		std::cout << "Trying to load animation from " << path << std::endl;
+		m_model = Animation3D::Model { path };
+		m_animation = Animation3D::Animation { path, &m_model };
+	}
+
+	uint32_t AnimationWrap::AddInstance ()
+	{
+		return m_animators.Push ( { &m_animation } );
 	}
 }

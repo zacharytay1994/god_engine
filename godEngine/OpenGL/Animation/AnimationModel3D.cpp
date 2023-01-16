@@ -96,7 +96,10 @@ namespace god
 				Vertex vertex;
 				SetVertexBoneDataToDefault( vertex );
 				vertex.Position = AssimpGLMHelpers::GetGLMVec( mesh->mVertices[i] );
-				vertex.Normal = AssimpGLMHelpers::GetGLMVec( mesh->mNormals[i] );
+				if ( mesh->mNormals )
+				{
+					vertex.Normal = AssimpGLMHelpers::GetGLMVec( mesh->mNormals[i] );
+				}
 
 				if ( mesh->mTextureCoords[0] )
 				{

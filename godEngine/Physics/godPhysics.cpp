@@ -31,7 +31,6 @@ namespace god
 		// generate contacts for all that were not filtered above
 		pairFlags = PxPairFlag::eCONTACT_DEFAULT;
 
-			
 		// all initial and persisting reports for everything, with per-point data
 		pairFlags = PxPairFlag::eSOLVE_CONTACT | PxPairFlag::eDETECT_DISCRETE_CONTACT
 			| PxPairFlag::eNOTIFY_TOUCH_FOUND
@@ -301,6 +300,11 @@ namespace god
 	}
 
 	physx::PxScene* const PhysicsSystem::GetPhysicsScene() const
+	{
+		return mScene;
+	}
+
+	physx::PxScene* PhysicsSystem::GetPhysicsScene ()
 	{
 		return mScene;
 	}
