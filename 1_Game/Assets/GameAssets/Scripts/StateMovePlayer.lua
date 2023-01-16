@@ -84,6 +84,10 @@ function S_StateMovePlayer(e)
 
                         if (stateMovePlayerComponent.callEnemyForecast) then
                             print("[StateMovePlayer.lua] Player has reached destination! Refreshing enemy forecasts.")
+                            SetCameraMoveSpeed(1.0)
+                            SetCameraPanSpeed(1.5)
+                            SetCameraNextLookAt(1,0,-4)
+                            SetCameraNextPosition(-3,12,-15)
                             RefreshEnemyForecast()
                             stateMovePlayerComponent.callEnemyForecast = false
 							

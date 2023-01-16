@@ -82,8 +82,12 @@ function S_FrontJab(e)
     if (attackComponent.canAttack == true) then 
         
         -- turn player to face enemy 
-        transformComponent = GetTransform(attackComponent.attacker)
-        transformComponent.rotation.y = attackComponent.playerRotation
+        -- transformComponent = GetTransform(attackComponent.attacker)
+        -- transformComponent.rotation.y = attackComponent.playerRotation
+        local child_model = Child(attackComponent.attacker, 0)
+        local child_model_transform = GetTransform(child_model)
+        child_model_transform.rotation.y = attackComponent.playerRotation
+        -- print("[AttackFrontJab.lua] Setting Player model's y-rotation to:", attackComponent.playerRotation)
         
         -- activate screenshake
         screenShakeEntity = GetEntity("ScreenShake")
@@ -123,12 +127,12 @@ function CheckPlayerAdjacentToEnemy(attacker, defender, e)
 
     if (attackerGrid.y == defenderGrid.y) then 
 
-        -- enemy behind player
+        -- enemy in front of player
         if (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z - 1) then
             result = true 
             attackComponent.playerRotation = 0
 
-        -- enemy in front of player
+        -- enemy behind player
         elseif (attackerGrid.x == defenderGrid.x and attackerGrid.z == defenderGrid.z + 1) then
             result = true 
             attackComponent.playerRotation = 180

@@ -5,6 +5,8 @@
 #include <fmod.hpp>
 #include <fmod_errors.h>
 
+#define UINTLL unsigned long long 
+
 namespace god
 {
 	struct Sound
@@ -27,6 +29,11 @@ namespace god
 		~AudioAPI();
 
 		static void Update();
+		static void ErrorCheck(FMOD_RESULT result)
+		{
+			if (result != FMOD_OK)
+				assert(FMOD_ErrorString(result));
+		}
 
 	public:
 		static FMOD::ChannelGroup* CreateChannelGroup(const char* name);
@@ -44,9 +51,15 @@ namespace god
 		static void UnloadSound(Sound& sound);
 
 		static void SetLoop(Sound& sound, bool loop);
+		static void SetLoop(FMOD::Channel* channel, bool loop);
 		static void SetMute(FMOD::Channel* channel, bool mute);
 		static void SetVolume(FMOD::Channel* channel, float volume);
 		static void SetPitch(FMOD::Channel* channel, float pitch);
+
+		static bool GetLoop(Sound& sound);
+		static bool GetMute(FMOD::Channel* channel);
+		static float GetVolume(FMOD::Channel* channel);
+		static float GetPitch(FMOD::Channel* channel);
 
 		static void PlaySound(Sound& sound); 
 		static void PlaySound(Sound& sound, FMOD::Channel** channel, bool& played); 
@@ -56,9 +69,29 @@ namespace god
 
 		static FMOD_RESULT CheckSoundPlayback(FMOD::Channel* channel, bool* isPlaying);
 
+		static void GetCurrentPlayTime(FMOD::Channel* channel, unsigned int* timeStamp);
+		static void SetCurrentPlayTime(FMOD::Channel* channel, unsigned int timeStamp);
+
+		static void PlaySoundFromTime(FMOD::Channel* channel, float startPoint);
+		static void PlaySoundUntilTime(FMOD::Channel* channel, float endPoint);
+		static void PlaySoundBetweenTimes(FMOD::Channel* channel, float startPoint, float endPoint);
+
 		static void PauseAll();
 		static void ResumeAll();
 		static void StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets);
+
+	public:
+		static void ToggleDSPEffects(bool toggle);
+		static void AddEcho(FMOD::Channel* channel);
+		static void AddFadeIn(FMOD::Channel* channel, float fadeInTime, bool& fade);
+		static void AddFadeOut(FMOD::Channel* channel, float fadeOutTime, bool& fade);
+
+		static void RemoveFadeIn(FMOD::Channel* channel, float fadeInTime);
+		static void RemoveFadeOut(FMOD::Channel* channel, float fadeOutTime);
+
+		static void GetFadePoints(FMOD::Channel* channel, unsigned int* points);
+		static int GetSampleRate();
+		static UINTLL GetDSPClock(FMOD::Channel* channel);
 
 	public:
 		static void SetListenerAttributes(const FMOD_VECTOR* position, const FMOD_VECTOR* velocity, const FMOD_VECTOR* forward, const FMOD_VECTOR* up);
@@ -78,5 +111,14 @@ namespace god
 		static std::unordered_map<int, const char*> m_channel_group_names;
 
 		static std::vector<Sound> m_extra_sounds;
+
+		// DSP Effects
+		static int m_sample_rate;
+
+		static FMOD::DSP* dsp_echo;
+
+		static std::unordered_map<int, FMOD::DSP*> m_dsp_effects;
+		static std::unordered_map<int, const char*> m_dsp_effects_names;
+
 	};
 }

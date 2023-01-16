@@ -27,6 +27,7 @@ namespace god
 		bool Trigger{ false };
 
 		//Non serialize data
+		bool Activeflag;
 		physx::PxMaterial* p_material{ nullptr };
 		physx::PxShape* p_shape;
 
@@ -37,7 +38,7 @@ namespace god
 		//Ctor
 		RigidStatic() :  StaticFriction{ 0.5f }, DynamicFriction{ 0.5f }, Restitution{ 0.5f }, p_material{ nullptr }, 
 			Shapeid{ 0 }, PhysicsTypeid{ 5 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, locktoscale{ true }, Offset{ 0.f, 0.f, 0.f },
-			Active{ true },  Simulation{ true },  Trigger{ false }, p_shape{ nullptr }, p_RigidStatic{ nullptr }, mScene{nullptr}
+			Active{ true }, Activeflag{ Active },  Simulation{ true }, Trigger{ false }, p_shape{ nullptr }, p_RigidStatic{ nullptr }, mScene{ nullptr }
 		{};
 
 		~RigidStatic()
@@ -51,6 +52,7 @@ namespace god
 
 		bool operator==( RigidStatic const& rhs )
 		{
+			( rhs );
 			/*return StaticFriction == rhs.StaticFriction &&
 				DynamicFriction == rhs.DynamicFriction &&
 				Restitution == rhs.Restitution &&

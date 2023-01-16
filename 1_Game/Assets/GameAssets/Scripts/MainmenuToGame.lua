@@ -9,8 +9,8 @@ function C_MainmenuToGame()
 end
 
 dice_1_faces = { 0, 0, 0, 0, 0, 0 }
-dice_2_faces = { 0, 0, 0, 3, 3, 3 }
-dice_3_faces = { 0, 0, 0, 3, 3, 3 }
+dice_2_faces = { 0, 1, 2, 3, 4, 6 }
+dice_3_faces = { 0, 1, 2, 3, 4, 6 }
 
 --[IsSystem]
 function S_MainmenuToGame(e)

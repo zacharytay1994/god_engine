@@ -21,7 +21,7 @@ function C_UIManager()
         iconList = {},
 		
 		-- Size of healthbar
-		healthbar_size = 0.7,
+		healthbar_size = 0.0,
 		
 		-- Health record, used to optimize the healthbar UI
 		health_record = 0.0
@@ -86,7 +86,6 @@ function S_UIManager(e)
                     currentDiceComponent = GetComponent(diceList[j], "C_DiceScript")
 
                     UIManagerComponent.actionButtonList[#UIManagerComponent.actionButtonList + 1] = attackList[(currentDiceComponent.value * 3) + currentDiceComponent.color][1]   
-                    print(attackList[(currentDiceComponent.value * 3) + currentDiceComponent.color][1])
                     
                     -- -- old code, leave here for reference 
                     -- if (currentDiceComponent.value == 0) then                       
@@ -112,10 +111,16 @@ function S_UIManager(e)
                     -- end of setting selected action --------------------------------------------------
                 end
                 
+               print("before changing button textures")
+               print("UIManagerComponent.actionButtonList[1]", UIManagerComponent.actionButtonList[1])
+               print("UIManagerComponent.actionButtonList[2]", UIManagerComponent.actionButtonList[2])
+               print("UIManagerComponent.actionButtonList[3]", UIManagerComponent.actionButtonList[3])
+
                 -- change button textures to show the available actions
                 ChangeTexture(GetEntity("Button1"), UIManagerComponent.actionButtonList[1])
                 ChangeTexture(GetEntity("Button2"), UIManagerComponent.actionButtonList[2])
                 ChangeTexture(GetEntity("Button3"), UIManagerComponent.actionButtonList[3])
+                rint("after changing button textures")
                                 
                 -- reset dice value to zero
                 -- for k = 1, #diceList do
@@ -145,6 +150,32 @@ function S_UIManager(e)
         GetGUIText(GetEntity("HealthHeart")).text = tostring(playerComponent.currentHP)
         GetGUIObject(GetEntity("HealthbarRed")).size.x = (playerComponent.currentHP / playerComponent.maxHP) * UIManagerComponent.healthbar_size
     end
+	
+	-- enable roll dice button
+	local rollDiceBtn = GetGUIObject(GetEntity("RollDiceButton"))
+	if (GetEntityData(playerEntity).id == turnOrderManagerComponent.currentTurn and UIManagerComponent.diceRolled == false) then
+		rollDiceBtn.active = true
+		
+		local diceList = EntitiesWithScriptComponent("C_DiceScript")
+		for i = 1, #diceList do
+			if (GetComponent(diceList[i], "C_DiceScript").is_rolling == true) then
+				rollDiceBtn.active = false
+				break
+			end
+		end
+		
+		if (rollDiceBtn.active == true) then
+			if (rollDiceBtn.pressed) then
+				for i = 1, #diceList do
+					DiceScript_RollDice(diceList[i], GetComponent(diceList[i], "C_DiceScript"))
+				end
+				rollDiceBtn.active = false
+			end
+		end
+	else
+		rollDiceBtn.active = false
+	end
+	
 	-- print(UIManagerComponent.healthbar_size)
 	
     -- end of updating buttons -----------------------------------------------------------------------------------------------------------

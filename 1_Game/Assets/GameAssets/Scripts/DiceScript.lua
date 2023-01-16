@@ -24,7 +24,7 @@ function C_DiceScript()
 		rotation_y = 0.0,
 		rotation_z = 0.0,
 		
-		dice_faces = { 0, 0, 0, 3, 3, 3 },
+		dice_faces = { 0, 1, 2, 3, 4, 5 },
 		dice_id = 0
     }
     return function()
@@ -68,7 +68,7 @@ function S_DiceScript(e)
 				ChangeModel(Child(e, i), "dice_bolt3D")
 			elseif (c_dice.dice_faces[i+1] == 4) then
 				ChangeModel(Child(e, i), "dice_projectile3D")
-			elseif (c_dice.dice_faces[i+1] == 5) then
+			elseif (c_dice.dice_faces[i+1] == 6) then
 				ChangeModel(Child(e, i), "dice_cryogenesis3D")
 			end
 		end
@@ -86,29 +86,21 @@ function S_DiceScript(e)
 	end
 	
 	local transform = GetTransform(e)
+	local isdicesleeping = GetisSleeping(e)
 
 	if (c_dice.is_rolling == true) then
-		if (c_dice.position_x == transform.position.x) then 
-			if (c_dice.position_y == transform.position.y) then
-				if (c_dice.position_z == transform.position.z) then
-					if (c_dice.rotation_x == transform.rotation.x) then
-						if (c_dice.rotation_y == transform.rotation.y) then
-							if (c_dice.rotation_z == transform.rotation.z) then
-								c_dice.is_rolling = false
-								local top_index_position_y = -999
-								for i = 0,5 do
-									if (top_index_position_y < WorldPosition(Child(e, i)).y) then
-										top_index_position_y = WorldPosition(Child(e, i)).y
-										-- c_dice.value = i + 1
-										c_dice.value = c_dice.dice_faces[i+1]
-									end
-								end
-								print("[DiceScript] Dice value:", c_dice.value)
-							end
-						end
-					end
+		if (isdicesleeping == true) then 
+			c_dice.is_rolling = false
+			local top_index_position_y = -999
+			for i = 0,5 do
+				if (top_index_position_y < WorldPosition(Child(e, i)).y) then
+					top_index_position_y = WorldPosition(Child(e, i)).y
+					-- c_dice.value = i + 1
+					c_dice.value = c_dice.dice_faces[i+1]
 				end
 			end
+			print("[DiceScript] Dice value:", c_dice.value)
+			print("[DiceScript] Dice color:", c_dice.color)				
 		end
 		
 		if (transform.position.x > 10) then
@@ -134,7 +126,7 @@ function S_DiceScript(e)
 		c_dice.rotation_y = transform.rotation.y
 		c_dice.rotation_z = transform.rotation.z
 		
-		c_dice.current_timer = c_dice.current_timer - (10 * GetDeltaTime())
+		c_dice.current_timer = c_dice.current_timer - (5 * GetDeltaTime())
 		if (c_dice.current_timer < 0) then
 			c_dice.current_timer = c_dice.current_timer + c_dice.blue_chance
 			c_dice.color = 1
@@ -161,12 +153,18 @@ function DiceScript_RollDice(e, c_dice)
 	c_dice.current_timer = GenerateRandomNumberInRange(0, c_dice.blue_chance)
 	if (c_dice.current_timer < c_dice.gold_chance) then
 		c_dice.color = 3
+		ChangeTexture(e, "Pixel_Gold")
 	elseif (c_dice.current_timer < c_dice.pink_chance) then
 		c_dice.color = 2
+		ChangeTexture(e, "Pixel_Pink")
 	else
 		c_dice.color = 1
+		ChangeTexture(e, "Pixel_Blue")
 	end
 	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
+	
+	-- trigger sound effect
+	InstancePrefab("SFX_Reroll",0,0,0)
 end
 
 function DiceScript_DisableDice(e, c_dice)

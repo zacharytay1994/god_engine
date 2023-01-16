@@ -25,9 +25,9 @@
       },
       "RigidDynamic": {
         "Active": true,
-        "StaticFriction": 0.5,
-        "DynamicFriction": 0.5,
-        "Restitution": 0.5,
+        "StaticFriction": 0.3,
+        "DynamicFriction": 0.1,
+        "Restitution": 0.7,
         "x extent": 0.999870240688324,
         "y extent": 0.999860405921936,
         "z extent": 0.9999836087226868,

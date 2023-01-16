@@ -123,7 +123,7 @@ function S_EnemyAttackDummee(e)
             end
 
             -- trigger sound effect
-            InstancePrefab("SFX_Jab",0,0,0)
+            InstancePrefab("SFX_EnemyCharge",0,0,0)
 
             if (attackComponent.victim ~= nil) then
 
@@ -377,6 +377,7 @@ function EnemyAttackDummeeApplyDamage(dummee, victim)
             RemoveInstance(victim)
             GetComponent(dummee, "C_EnemyAttackDummee").damageApplied = true
             GetComponent(dummee, "C_EnemyAttackDummee").victim = nil
+            GetComponent(dummee, "C_EnemyAttackDummee").recoilComplete = true
             return
         end
     

@@ -32,8 +32,8 @@ namespace god
 		bool Trigger{ false };
 		
 		//Non serialize data
-		bool Activeflag{ true };
-		bool Gravityflag{ false };
+		bool Activeflag;
+		bool Gravityflag;
 		uint32_t m_id;
 		physx::PxTriangleMesh* p_trimesh;
 		physx::PxMaterial* p_material;
@@ -48,6 +48,7 @@ namespace god
 			p_material{ nullptr }, p_RigidDynamic{ nullptr }, mScene{ nullptr }, p_trimesh{nullptr},
 			Shapeid{ 0 }, PhysicsTypeid{ 0 }, extents{ physx::PxVec3(20.f, 20.f, 20.f) }, p_shape{ nullptr },
 			locktoscale{ true }, Active{ true }, Simulation{ true }, Trigger{ false }, Gravity{ true },
+			Activeflag{ Active }, Gravityflag{ Gravity }, m_id{PhysicsSystem::Null},
 			StaticFriction{ 0.5f }, DynamicFriction{ 0.5f }, Restitution{ 0.5f }, 
 			AngularVelocity{ 0.f,0.f,0.f }, LinearVelocity{ 0.f,0.f,0.f }, Density{ 1.f }, updateRigidDynamic{ true }
 		{};
@@ -62,6 +63,7 @@ namespace god
 
 		bool operator==( RigidDynamic const& rhs )
 		{
+			( rhs );
 			return true;
 		}
 	};

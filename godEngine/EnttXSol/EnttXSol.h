@@ -374,6 +374,7 @@ namespace god
 	template<typename ...T , typename ...E>
 	inline void EnttXSol::RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) , std::tuple<E...> const& exclude )
 	{
+		( exclude );
 		auto view = m_registry.view<std::remove_reference<T>::type...> ( entt::exclude<E...> );
 		//view.each ( system );
 
@@ -513,6 +514,8 @@ namespace god
 	template<typename S , typename T , typename R , typename F>
 	inline void EnttXSol::PopulateScene ( S& scene , F& fonts , glm::vec3 const& cameraPosition )
 	{
+		( fonts );
+		( cameraPosition );
 		// add objects to scene
 		/*scene.ClearInstancedScene ();
 		for ( uint32_t i = 0; i < m_entities.Size (); ++i )

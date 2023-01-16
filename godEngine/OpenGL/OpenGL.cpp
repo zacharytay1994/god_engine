@@ -618,6 +618,7 @@ namespace god
 		{
 			auto& [first , second] = data;
 			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uAlpha" , first.m_shininess );
 			std::get<1> ( textures.Get ( first.m_diffuse_id ) ).Bind ( 0 );
 
 			for ( auto& mesh : m_models[ first.m_model_id ] )
@@ -651,6 +652,7 @@ namespace god
 
 	void OpenGL::RenderTransparent ( Scene& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures , glm::vec3 const& camera_front )
 	{
+		( camera_front );
 		// Draw the normal model
 		m_textured_discard_shader.Use ();
 
@@ -755,7 +757,7 @@ namespace god
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.density" , 0.03f );
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.equation" , 0 );
-			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.isEnabled" , false );
+			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.isEnabled" , true );
 
 			// Set Tint
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uTint" , glm::vec4 ( 0.0f ) );

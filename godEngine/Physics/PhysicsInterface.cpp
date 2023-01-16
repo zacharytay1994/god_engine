@@ -20,7 +20,7 @@ namespace god
 		
 	}
 
-	physx::PxVec3 const& PhysicsAPI::GetPhysicsPos(physx::PxRigidBody* rb)
+	physx::PxVec3 PhysicsAPI::GetPhysicsPos(physx::PxRigidBody* rb)
 	{
 		while (p_psys->GetisRunning())
 			;

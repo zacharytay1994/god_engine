@@ -536,6 +536,24 @@ namespace god
 			}
 		);
 
+
+		// GetisSleeping(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("GetisSleeping",
+			[&entt, &engineResources](entt::entity e)->bool
+			{
+				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+					;
+
+				if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+				{
+					return (entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->isSleeping() );
+				}
+				return true;
+			}
+		);
+
+
 		// SetTransformPosition(e,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "SetTransformPosition" ,
@@ -689,6 +707,24 @@ namespace god
 			[&entt]( entt::entity e )->glm::vec3
 			{
 				return glm::vec3 { entt.GetEngineComponent<Transform> ( e )->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform> ( e )->m_position, 1.0f } };
+			}
+		);
+
+		// WorldRotation(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("WorldRotation",
+			[&entt](entt::entity e)->glm::vec3
+			{
+				return glm::vec3{ entt.GetEngineComponent<Transform>(e)->m_world_transform * glm::vec4{ entt.GetEngineComponent<Transform>(e)->m_rotation, 1.0f } };
+			}
+		);
+
+		// ParentRotation(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("ParentRotation",
+			[&entt](entt::entity e)->glm::vec3
+			{
+				return glm::vec3{ entt.GetEngineComponent<Transform>(e)->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform>(e)->m_rotation, 1.0f } };
 			}
 		);
 	}

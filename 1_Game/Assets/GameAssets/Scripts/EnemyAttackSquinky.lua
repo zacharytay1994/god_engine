@@ -61,7 +61,7 @@ function S_EnemyAttackSquinky(e)
         end
 
         -- trigger sound effect
-        InstancePrefab("SFX_Jab",0,0,0)
+        InstancePrefab("SFX_EnemyHit",0,0,0)
 
         -- trigger particles (if any)
             
@@ -69,7 +69,7 @@ function S_EnemyAttackSquinky(e)
 
         -- reset variables
         attackComponent.executeAttack = false
-        attackComponent.dummeeRotation = 0
+        -- attackComponent.dummeeRotation = 0
 
         -- end the attackc
         enemyController.hasAttacked = true
@@ -80,7 +80,7 @@ function S_EnemyAttackSquinky(e)
         
         -- reset variables
         attackComponent.executeAttack = false
-        attackComponent.dummeeRotation = 0
+        -- attackComponent.dummeeRotation = 0
 
         -- end the attackc
         enemyController.hasAttacked = true
@@ -97,27 +97,29 @@ function EnemyAttackSquinkyAdjacentToPlayer(enemy, player)
     local enemyGrid = GetGridCell(enemy)
     local playerGrid = GetGridCell(player)
 
+    local attackComponent = GetComponent(enemy, "C_EnemyAttackSquinky")
+
     if (enemyGrid.y == playerGrid.y) then 
 
         -- enemy behind player
         if     (enemyGrid.x == playerGrid.x and enemyGrid.z == playerGrid.z - 1) then
             result = true 
-            squinkyRotation = 180
+            attackComponent.squinkyRotation = 0
 
         -- enemy in front of player
         elseif (enemyGrid.x == playerGrid.x and enemyGrid.z == playerGrid.z + 1) then
             result = true 
-            squinkyRotation = 0
+            attackComponent.squinkyRotation = 180
 
         -- enemy to player's left
         elseif (enemyGrid.z == playerGrid.z and enemyGrid.x == playerGrid.x - 1) then
             result = true 
-            squinkyRotation = 90
+            attackComponent.squinkyRotation = 90
 
         -- enemy to player's right
         elseif (enemyGrid.z == playerGrid.z and enemyGrid.x == playerGrid.x + 1) then
             result = true  
-            squinkyRotation = 270
+            attackComponent.squinkyRotation = 270
         end
     end
 

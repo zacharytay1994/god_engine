@@ -163,10 +163,10 @@ namespace god
 		{
 			this->Get<EW_SceneTree> ()->ResetScene ( engineResources );
 
-			// stopping and resetting all the sounds 
-			SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
-			auto& sounds = sound_manager.GetResources();
-			AudioAPI::StopAndResetAll(sounds);
+			//// stopping and resetting all the sounds 
+			//SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
+			//auto& sounds = sound_manager.GetResources();
+			//AudioAPI::StopAndResetAll(sounds);
 		}
 		this->ToolTipOnHover ( "Resets the scene to its original state." );
 

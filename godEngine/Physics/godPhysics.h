@@ -22,6 +22,7 @@ namespace god
 	struct PhysicsSystem
 	{
 		static constexpr uint32_t Null = static_cast<uint32_t>(-1);
+		const int32_t scratchBufferSize = 16384; // 16KB
 	public:
 
 		PhysicsSystem();
@@ -44,7 +45,7 @@ namespace god
 		bool debugdraw;
 	private:
 	
-		void SimpleMovingAverageDeltaTime(float dt);
+
 		void CalculateNumSteps();
 		void Raycast();
 
@@ -54,6 +55,8 @@ namespace god
 
 
 		// Data members
+
+
 		uint32_t RayCastid;
 		ContactReportCallback gContactReportCallback;
 
@@ -65,6 +68,10 @@ namespace god
 
 		physx::PxRigidActor* mRayCastMouse;
 		
+
+		char* scratchbuffer;
+		physx::PxCudaContextManager* mCudaContextManager;
+
 
 		physx::PxDefaultAllocator      mDefaultAllocatorCallback;
 		physx::PxDefaultErrorCallback  mDefaultErrorCallback;
@@ -84,11 +91,10 @@ namespace god
 		bool mRunning;
 		float mAccumulator = 0.0f;
 		uint16_t numSteps = 1;
-		float idealStepSize = 1.0f / 30.f;
-		float mStepSize = 1.0f / 30.f;
-		
-		std::array < float, 5> sma_dt;
-		int sma_index = 0;
+		float idealStepSize = 1.0f / 60.f;
+		const float mStepSize = 1.0f / 60.f;
+		float m_dt;
+
 	};
 
 
