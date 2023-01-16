@@ -18,6 +18,13 @@ namespace god
 {
 	void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources , MainVariables& mainVariables )
 	{
+		// glm::vec4
+		entt.RegisterLuaType<glm::vec4> ( "vec4" ,
+			"x" , &glm::vec4::x ,
+			"y" , &glm::vec4::y ,
+			"z" , &glm::vec4::z ,
+			"w" , &glm::vec4::w );
+
 		// glm::vec3
 		entt.RegisterLuaType<glm::vec3> ( "vec3" ,
 			"x" , &glm::vec3::x ,
@@ -29,6 +36,11 @@ namespace god
 			"x" , &glm::ivec3::x ,
 			"y" , &glm::ivec3::y ,
 			"z" , &glm::ivec3::z );
+
+		// glm::vec2
+		entt.RegisterLuaType<glm::vec2> ( "vec2" ,
+			"x" , &glm::vec2::x ,
+			"y" , &glm::vec2::y );
 
 		// ChangeScene(sceneName)
 		// ==============================================================================================
@@ -43,8 +55,8 @@ namespace god
 
 		// Camera
 		entt.RegisterLuaType<Camera> ( "Camera" ,
-			"position"	, &Camera::m_position	, 
-			"lookat"	, &Camera::m_look_at	);
+			"position" , &Camera::m_position ,
+			"lookat" , &Camera::m_look_at );
 
 
 		// GetComponent(e,componentName)
@@ -281,6 +293,44 @@ namespace god
 			}
 		);
 
+		// CheckMouseOffsetX()
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "CheckMouseOffsetX" ,
+			[&engineResources]()->float
+			{
+				auto& window = engineResources.Get<GLFWWindow> ().get ();
+				return static_cast< float >( window.MouseOffsetX () );
+			}
+		);
+
+		// CheckMouseOffsetY()
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "CheckMouseOffsetY" ,
+			[&engineResources]()->float
+			{
+				auto& window = engineResources.Get<GLFWWindow> ().get ();
+				return static_cast< float >( window.MouseOffsetY () );
+			}
+		);
+
+		// RotateVec2(x,y,d)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "RotateVec2" ,
+			[&engineResources]( float x , float y , float degree )->glm::vec2
+			{
+				return RotateVector ( { x, y } , degree );
+			}
+		);
+
+		// AngleBetweenVec2(x,y,d)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "DegreeBetweenVec2" ,
+			[&engineResources]( float x1 , float y1 , float x2 , float y2 )->float
+			{
+				return DegreeBetweenVec2 ( { x1,y1 } , { x2,y2 } );
+			}
+		);
+
 		// GenerateRandomProbability()
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "GenerateRandomProbability" ,
@@ -496,6 +546,15 @@ namespace god
 			}
 		);
 
+		// Heading(glm::vec3 v1, glm::vec3 v2)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "Heading" ,
+			[]( glm::vec3 head , glm::vec3 tail )->glm::vec3
+			{
+				return glm::normalize ( head - tail );
+			}
+		);
+
 		// Sin(value)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "Sin" ,
@@ -527,6 +586,15 @@ namespace god
 			}
 		);
 
+		// Lerp(src, dst, dt)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "Lerp" ,
+			[]( float src , float dst , float dt )->float
+			{
+				return std::lerp ( src , dst , dt );
+			}
+		);
+
 		// EntityName(e)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "EntityName" ,
@@ -539,15 +607,15 @@ namespace god
 
 		// GetisSleeping(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("GetisSleeping",
-			[&entt, &engineResources](entt::entity e)->bool
+		entt.RegisterLuaFunction ( "GetisSleeping" ,
+			[&entt , &engineResources]( entt::entity e )->bool
 			{
-				while (engineResources.Get<PhysicsSystem>().get().GetisRunning())
+				while ( engineResources.Get<PhysicsSystem> ().get ().GetisRunning () )
 					;
 
-				if (entt.HasComponent(e, "RigidDynamic") && entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic)
+				if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 				{
-					return (entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->isSleeping() );
+					return ( entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->isSleeping () );
 				}
 				return true;
 			}
@@ -602,8 +670,8 @@ namespace god
 				{
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->clearForce();
-						entt.GetEngineComponent<RigidDynamic>(e)->p_RigidDynamic->clearTorque();
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->clearForce ();
+						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->clearTorque ();
 						entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic->setLinearVelocity ( ConvertToPhysXVector ( { x, y, z } ) );
 					}
 				}
@@ -642,7 +710,7 @@ namespace god
 					if ( entt.HasComponent ( e , "RigidDynamic" ) && entt.GetEngineComponent<RigidDynamic> ( e )->p_RigidDynamic )
 					{
 
-						entt.GetEngineComponent<RigidDynamic>(e)->Active = !freeze;
+						entt.GetEngineComponent<RigidDynamic> ( e )->Active = !freeze;
 					}
 				}
 			}
@@ -712,19 +780,35 @@ namespace god
 
 		// WorldRotation(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("WorldRotation",
-			[&entt](entt::entity e)->glm::vec3
+		entt.RegisterLuaFunction ( "WorldRotation" ,
+			[&entt]( entt::entity e )->glm::vec3
 			{
-				return glm::vec3{ entt.GetEngineComponent<Transform>(e)->m_world_transform * glm::vec4{ entt.GetEngineComponent<Transform>(e)->m_rotation, 1.0f } };
+				return glm::vec3 { entt.GetEngineComponent<Transform> ( e )->m_world_transform * glm::vec4{ entt.GetEngineComponent<Transform> ( e )->m_rotation, 1.0f } };
 			}
 		);
 
 		// ParentRotation(e)
 		// ==============================================================================================
-		entt.RegisterLuaFunction("ParentRotation",
-			[&entt](entt::entity e)->glm::vec3
+		entt.RegisterLuaFunction ( "ParentRotation" ,
+			[&entt]( entt::entity e )->glm::vec3
 			{
-				return glm::vec3{ entt.GetEngineComponent<Transform>(e)->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform>(e)->m_rotation, 1.0f } };
+				return glm::vec3 { entt.GetEngineComponent<Transform> ( e )->m_parent_transform * glm::vec4{ entt.GetEngineComponent<Transform> ( e )->m_rotation, 1.0f } };
+			}
+		);
+
+
+		// AddForce(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "AddForce" ,
+			[&entt]( entt::entity e , float x, float y, float z )
+			{
+				PhysicsController* physics_controller = entt.GetEngineComponent<PhysicsController> ( e );
+				if ( physics_controller )
+				{
+					glm::vec3 force { x, y, z };
+					// calculate acceleration added by force
+					physics_controller->m_acceleration += force / physics_controller->m_mass;
+				}
 			}
 		);
 	}

@@ -268,9 +268,7 @@ namespace god
 
 		glfwPollEvents ();
 
-		
-
-
+		UpdateMouseOffset ();
 	}
 
 	void GLFWWindow::SwapWindowBuffers ()
@@ -362,6 +360,16 @@ namespace god
 		}
 	}
 
+	double GLFWWindow::MouseOffsetX ()
+	{
+		return m_mouse_offset_x;
+	}
+
+	double GLFWWindow::MouseOffsetY ()
+	{
+		return m_mouse_offset_y;
+	}
+
 	bool GLFWWindow::MouseLDown ( uint32_t priority )
 	{
 		m_left_mouse_recent_down_priority = priority > m_left_mouse_recent_down_priority ? priority : m_left_mouse_recent_down_priority;
@@ -445,5 +453,13 @@ namespace god
 	void GLFWWindow::SetWindowTitle ( std::string const& title )
 	{
 		glfwSetWindowTitle ( m_window , title.c_str () );
+	}
+
+	void GLFWWindow::UpdateMouseOffset ()
+	{
+		m_mouse_offset_x = ViewportMouseX () - m_last_mouse_x;
+		m_mouse_offset_y = ViewportMouseY () - m_last_mouse_y;
+		m_last_mouse_x = ViewportMouseX ();
+		m_last_mouse_y = ViewportMouseY ();
 	}
 }

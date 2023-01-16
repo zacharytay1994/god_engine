@@ -89,7 +89,7 @@ namespace god
 		// interpolate look at
 		glm::vec3 curr_to_next_lookat = m_next_look_at - m_look_at;
 		float pan_distance = glm::length ( curr_to_next_lookat );
-		if ( distance > m_epsilon )
+		if ( pan_distance > m_epsilon )
 		{
 			m_look_at.x = std::lerp ( m_look_at.x , m_next_look_at.x , dt * m_camera_pan_speed );
 			m_look_at.y = std::lerp ( m_look_at.y , m_next_look_at.y , dt * m_camera_pan_speed );

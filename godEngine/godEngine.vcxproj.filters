@@ -49,6 +49,7 @@
     <ClCompile Include="Physics\PhysicsInterface.cpp" />
     <ClCompile Include="Physics\Callbacks.cpp" />
     <ClCompile Include="Physics\DiceCallBack.cpp" />
+    <ClCompile Include="Physics\PhysicsController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioAPI.h" />
@@ -155,6 +156,13 @@
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateTransparent.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateDefault.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateOnlyTransform.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_PhysicsController.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_PhysicsController.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Input\ES_PlayerController.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Input\EC_PlayerController.h" />
+    <ClInclude Include="Physics\PhysicsController.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Render\EC_Animation3D.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateAnimations.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

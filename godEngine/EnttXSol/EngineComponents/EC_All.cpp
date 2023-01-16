@@ -18,6 +18,9 @@ namespace god
 		"GridManipulate" ,
 		"GUIObject" ,
 		"GUIText" ,
-		"Transparent"
+		"Transparent",
+		"PhysicsController",
+		"PlayerController",
+		"SkeleAnim3D"
 	};
 }

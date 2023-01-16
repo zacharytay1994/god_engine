@@ -82,8 +82,9 @@ namespace god
 		std::vector<std::string> GetFiles ( const std::string& dir )
 		{
 			std::vector<std::string> files;
-			for ( const auto& entry : std::filesystem::directory_iterator ( dir ) )
-				files.push_back ( entry.path ().string () );
+			for ( const auto& entry : std::filesystem::recursive_directory_iterator ( dir ) )
+				if (!entry.is_directory() )
+					files.push_back ( entry.path ().string () );
 			return files;
 		}
 	}
