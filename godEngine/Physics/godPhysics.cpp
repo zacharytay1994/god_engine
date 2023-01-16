@@ -129,10 +129,10 @@ namespace god
 			PxCudaContextManagerDesc cudaContextManagerDesc;
 
 			mCudaContextManager = PxCreateCudaContextManager(*mFoundation, cudaContextManagerDesc, PxGetProfilerCallback());
-			sceneDesc.flags |= PxSceneFlag::eENABLE_GPU_DYNAMICS;
-
-			sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
-			sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eGPU;
+		
+	
+			//sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
+			//sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eSAP;
 
 			sceneDesc.filterShader = contactReportFilterShader;
 
