@@ -10,6 +10,7 @@ namespace god
 		bool m_facing_horizontal { true };
 		float m_facing_rotation_y { 0.0f };
 		bool m_changed { false };
+		bool m_lighting { true };
 
 		bool operator==( Transparent const& rhs )
 		{
@@ -34,6 +35,7 @@ namespace god
 				ImGui::Separator ();
 
 				ImGui::Checkbox ( "Face Camera [H]" , &component.m_facing_horizontal );
+				ImGui::Checkbox ( "Lighting" , &component.m_lighting );
 			} );
 	}
 
@@ -44,6 +46,7 @@ namespace god
 		// serialize
 		//RapidJSON::JSONifyToValue ( value , document , "facing_h" , component.facing_h );
 		RapidJSON::JSONifyToValue ( value , document , "facing_horizontal" , component.m_facing_horizontal );
+		RapidJSON::JSONifyToValue ( value , document , "lighting" , component.m_lighting );
 	}
 
 	template<>
@@ -53,5 +56,6 @@ namespace god
 		// deserialize
 		//AssignIfExist ( jsonObj , component.facing_h , "facing_h" );
 		AssignIfExist ( jsonObj , component.m_facing_horizontal , "facing_horizontal" );
+		AssignIfExist ( jsonObj , component.m_lighting , "lighting" );
 	}
 }

@@ -25,6 +25,13 @@ function S_FlockingBoid(e)
     end
 
     if CheckKeyPress(70) then
-        AddForce(e,50,0,0)
+        AddForce(e, 50, 0, 0)
+        local vfx = InstancePrefabParentedNow(e, "VFX_OnHit1", 0, 0, 0)
+        local main1 = Child(vfx, 0)
+        local main2 = Child(vfx, 1)
+        -- ChangeTexture(main1, "VFX_Splash" .. GenerateRandomNumberInRange(1, 4))
+        -- ChangeTexture(main2, "VFX_Splash" .. GenerateRandomNumberInRange(1, 4))
+        ChangeTexture(main1, "VFX_Splash1")
+        ChangeTexture(main2, "VFX_Splash2")
     end
 end

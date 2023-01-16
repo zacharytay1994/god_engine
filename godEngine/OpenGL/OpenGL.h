@@ -112,6 +112,7 @@ namespace god
 		OGLShader m_flat_shader;
 		OGLShader m_textured_shader;
 		OGLShader m_textured_discard_shader;
+		OGLShader m_textured_discard_shader_no_lighting;
 		OGLShader m_single_colour_outline_shader;
 		OGLShader m_cubemap_shader;
 		OGLShader m_depthmap_shader;

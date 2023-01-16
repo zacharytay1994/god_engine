@@ -65,6 +65,10 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/texturemaps.vs" ,
 			"Assets/EngineAssets/OpenGLShaders/texturemapsWithDiscard.fs" );
 
+		m_textured_discard_shader_no_lighting.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/texturemaps.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/texturemapsWithDiscardNoLighting.fs" );
+
 		m_single_colour_outline_shader.InitializeFromFile (
 			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.vs" ,
 			"Assets/EngineAssets/OpenGLShaders/single_colour_outline.fs" );
@@ -678,6 +682,8 @@ namespace god
 		glEnable ( GL_BLEND );
 		glBlendFunc ( GL_SRC_ALPHA , GL_ONE_MINUS_SRC_ALPHA );
 		glDisable ( GL_CULL_FACE );
+
+		// billboard with lighting
 		for ( auto const& data : scene.m_billboard_sprites )
 		{
 			// Draw the normal model
@@ -767,6 +773,40 @@ namespace god
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uTint" , glm::vec4 ( 0.0f ) );
 
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uEmissive" , data.first.m_emissive );
+
+			// draw model
+			for ( auto& mesh : m_models[ data.first.m_model_id ] )
+			{
+				mesh.SetTransformData ( data.second );
+				mesh.DrawInstanced ( GL_TRIANGLES );
+			}
+		}
+
+		// billboard sprites with no lighting
+		m_textured_discard_shader_no_lighting.Use ();
+
+		// projection matrix
+		OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uProjection" , projection );
+
+		// view matrix
+		OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uView" , view );
+
+		for ( auto const& data : scene.m_billboard_sprites_no_lighting )
+		{
+			// Draw the normal model
+			//m_textured_discard_shader_no_lighting.Use ();
+
+			// set material
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			std::get<1> ( textures.Get ( data.first.m_diffuse_id ) ).Bind ( 0 );
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uMaterial.specular_map" , 1 );
+			std::get<1> ( textures.Get ( data.first.m_specular_id ) ).Bind ( 1 );
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uMaterial.shininess" , data.first.m_shininess );
+
+			// Set Tint
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uTint" , data.first.m_tint );
+
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uEmissive" , data.first.m_emissive );
 
 			// draw model
 			for ( auto& mesh : m_models[ data.first.m_model_id ] )

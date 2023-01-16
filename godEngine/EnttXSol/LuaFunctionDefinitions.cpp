@@ -18,6 +18,13 @@ namespace god
 {
 	void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources , MainVariables& mainVariables )
 	{
+		// glm::vec4
+		entt.RegisterLuaType<glm::vec4> ( "vec4" ,
+			"x" , &glm::vec4::x ,
+			"y" , &glm::vec4::y ,
+			"z" , &glm::vec4::z ,
+			"w" , &glm::vec4::w );
+
 		// glm::vec3
 		entt.RegisterLuaType<glm::vec3> ( "vec3" ,
 			"x" , &glm::vec3::x ,
