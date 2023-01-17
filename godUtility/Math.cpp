@@ -86,4 +86,32 @@ namespace god
 		}
 		return degree;
 	}
+
+	std::tuple<bool , float> RayIntersectAABB ( glm::vec3 const& rayOrigin , glm::vec3 const& rayDirection , glm::vec3 const& aabbMin , glm::vec3 const& aabbMax )
+	{
+		float tmin { 0.0f };
+		float tmax = std::numeric_limits<float>::max ();
+
+		for ( int i = 0; i < 3; ++i )
+		{
+			float invD = 1.0f / rayDirection[ i ];
+			float t0 = ( aabbMin[ i ] - rayOrigin[ i ] ) * invD;
+			float t1 = ( aabbMax[ i ] - rayOrigin[ i ] ) * invD;
+
+			if ( invD < 0.0f )
+			{
+				std::swap ( t0 , t1 );
+			}
+
+			tmin = std::max ( tmin , t0 );
+			tmax = std::min ( tmax , t1 );
+
+			if ( tmax < tmin )
+			{
+				return { false,std::numeric_limits<float>::max () };
+			}
+		}
+
+		return { true,tmin };
+	}
 }

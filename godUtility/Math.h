@@ -22,4 +22,6 @@ namespace god
 	GODUTILITY_API glm::vec2 RotateVector ( glm::vec2 const& v , float degree );
 
 	GODUTILITY_API float DegreeBetweenVec2 ( glm::vec2 const& v1 , glm::vec2 const& v2 );
+
+	GODUTILITY_API std::tuple<bool , float> RayIntersectAABB ( glm::vec3 const& rayOrigin , glm::vec3 const& rayDirection , glm::vec3 const& aabbMin , glm::vec3 const& aabbMax );
 }

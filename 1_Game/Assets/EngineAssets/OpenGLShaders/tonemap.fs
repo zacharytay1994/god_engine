@@ -15,7 +15,7 @@ void main()
     // reinhard tone mapping
     vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
     // gamma correction 
-    // mapped = pow(mapped, vec3(1.0 / 2.2));
+    mapped = pow(mapped, vec3(1.0 / 2.2));
   
     FragColor = vec4(mapped, 1.0);
 }
