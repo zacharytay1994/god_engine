@@ -551,6 +551,16 @@ namespace god
 						}
 
 						transform->m_scale = glm::vec3 ( 1.0f );
+
+						EntityData* entity_data = entt.GetEngineComponent<EntityData> ( tile.m_entity_id );
+						if ( entity_data && entt.m_entities[ entity_data->m_id ].m_children.size () > 0 )
+						{
+							Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ entity_data->m_id ].m_children[ 0 ] );
+							if ( renderable )
+							{
+								renderable->m_outlined = false;
+							}
+						}
 					}
 				}
 
@@ -561,6 +571,15 @@ namespace god
 					if ( transform )
 					{
 						transform->m_scale = glm::vec3 ( 1.1f );
+					}
+					EntityData* entity_data = entt.GetEngineComponent<EntityData> ( m_selected_entity->m_entity_id );
+					if ( entity_data && entt.m_entities[ entity_data->m_id ].m_children.size () > 0 )
+					{
+						Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ entity_data->m_id ].m_children[ 0 ] );
+						if ( renderable )
+						{
+							renderable->m_outlined = true;
+						}
 					}
 				}
 
@@ -584,7 +603,7 @@ namespace god
 				}
 
 				// if theres no enemies left, reset the level
-				if ( m_enemies.empty () )
+				if ( m_enemies.empty () && m_initialized )
 				{
 					m_to_restart = true;
 				}

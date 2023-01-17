@@ -293,13 +293,16 @@ namespace god
 
 		for ( auto const& data : scene.m_instanced_render_data )
 		{
-			// Make it so the stencil test always passes
-			//glStencilFunc( GL_ALWAYS, 1, 0xFF );
-			//// Enable modifying of the stencil buffer
-			//glStencilMask( 0xFF );
+			if ( data.first.m_outlined )
+			{
+				// Make it so the stencil test always passes
+				glStencilFunc ( GL_ALWAYS , 1 , 0xFF );
+				// Enable modifying of the stencil buffer
+				glStencilMask ( 0xFF );
+			}
 
 			// Draw the normal model
-			//m_textured_shader.Use ();
+			m_textured_shader.Use ();
 
 			// set uniforms for fragment shader
 
@@ -396,29 +399,32 @@ namespace god
 			}
 
 			// Make it so only the pixels without the value 1 pass the test
-			//glStencilFunc( GL_NOTEQUAL, 1, 0xFF );
-			//// Disable modifying of the stencil buffer
-			//glStencilMask( 0x00 );
-			//// Disable the depth buffer
-			//glDisable( GL_DEPTH_TEST );
+			if ( data.first.m_outlined )
+			{
+				glStencilFunc ( GL_NOTEQUAL , 1 , 0xFF );
+				// Disable modifying of the stencil buffer
+				glStencilMask ( 0x00 );
+				// Disable the depth buffer
+				//glDisable( GL_DEPTH_TEST );
 
-			//m_single_colour_outline_shader.Use();
-			//OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uProjection", projection );
-			//OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uView", view );
-			//OGLShader::SetUniform( m_single_colour_outline_shader.GetShaderID(), "uOutlining", 0.01f );
+				m_single_colour_outline_shader.Use ();
+				OGLShader::SetUniform ( m_single_colour_outline_shader.GetShaderID () , "uProjection" , projection );
+				OGLShader::SetUniform ( m_single_colour_outline_shader.GetShaderID () , "uView" , view );
+				OGLShader::SetUniform ( m_single_colour_outline_shader.GetShaderID () , "uOutlining" , 0.05f );
 
-			//for ( auto& mesh : m_models[data.first.m_model_id] )
-			//{
-			//	mesh.SetTransformData( data.second );
-			//	mesh.DrawInstanced( GL_TRIANGLES );
-			//}
+				for ( auto& mesh : m_models[ data.first.m_model_id ] )
+				{
+					mesh.SetTransformData ( data.second );
+					mesh.DrawInstanced ( GL_TRIANGLES );
+				}
 
-			//// Enable modifying of the stencil buffer
-			//glStencilMask( 0xFF );
-			//// Clear stencil buffer
-			//glStencilFunc( GL_ALWAYS, 0, 0xFF );
-			//// Enable the depth buffer
-			//glEnable( GL_DEPTH_TEST );
+				// Enable modifying of the stencil buffer
+				glStencilMask ( 0xFF );
+				// Clear stencil buffer
+				glStencilFunc ( GL_ALWAYS , 1 , 0xFF );
+				// Enable the depth buffer
+				//glEnable( GL_DEPTH_TEST );
+			}
 		}
 
 		// [Draw Billboard Sprites]
