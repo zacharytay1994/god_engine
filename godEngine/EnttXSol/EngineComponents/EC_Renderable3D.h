@@ -16,6 +16,7 @@ namespace god
 		float m_emissive { 0.0f };
 		bool m_visible { true };
 		glm::vec4 m_tint { 1.0f,1.0f,1.0f,1.0f };
+		bool m_outlined { false };
 
 		bool operator==( Renderable3D const& rhs )
 		{
@@ -129,6 +130,8 @@ namespace god
 				ImGui::DragFloat ( "TintG" , &component.m_tint.y , 0.01f , 0.0f , 1.0f );
 				ImGui::DragFloat ( "TintB" , &component.m_tint.z , 0.01f , 0.0f , 1.0f );
 				ImGui::DragFloat ( "TintA" , &component.m_tint.w , 0.01f , 0.0f , 1.0f );
+
+				ImGui::Checkbox ( "Outline" , &component.m_outlined );
 			} );
 	}
 
