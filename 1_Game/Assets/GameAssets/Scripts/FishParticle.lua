@@ -1,7 +1,9 @@
+-- modified to randomize swimming direction
+
 --[IsComponent]
 function C_FishParticle()
     local var = {
-        Lifetime = 3.0,
+        Lifetime = 10.0,
         Timer = 0.0,
         --[SerializeFloat]
         Speed = 3.0,
@@ -30,6 +32,11 @@ function S_FishParticle(e)
         --transform.position.y = transform.position.y + dt * fish_particle.Speed
 
         -- move the fish swim vertically
-        transform.position.z = transform.position.z + dt * fish_particle.Speed
+        if (GetEntityData(e).id % 3 == 0) then
+            transform.position.z = transform.position.z + (dt * fish_particle.Speed * -1)
+            transform.rotation.y = 180
+        else
+            transform.position.z = transform.position.z + dt * fish_particle.Speed
+        end
     end
 end
