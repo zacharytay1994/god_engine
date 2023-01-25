@@ -46,9 +46,9 @@ function S_FishParticleSystem(e)
         fish_ps.Timer = 0.0
 
         -- generate random location (near the emitter) and scale 
-        local x = GenerateRandomNumberInRange(0, 10)
-        local y = GenerateRandomNumberInRange(0, 10)
-        local z = GenerateRandomNumberInRange(0, 10)
+        local x = GenerateRandomNumberInRange(0, 2)
+        local y = GenerateRandomNumberInRange(-5, 5)
+        local z = GenerateRandomNumberInRange(0, 2)
         local fish_particle = InstancePrefabParentedNow(e, "FishParticle", x, y, z)
         --print(GetEntityData(fish_particle).id)
     end

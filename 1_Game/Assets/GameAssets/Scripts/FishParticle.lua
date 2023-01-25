@@ -3,7 +3,7 @@
 --[IsComponent]
 function C_FishParticle()
     local var = {
-        Lifetime = 10.0,
+        Lifetime = 30.0,
         Timer = 0.0,
         --[SerializeFloat]
         Speed = 3.0,
