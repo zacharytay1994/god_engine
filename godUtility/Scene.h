@@ -24,6 +24,7 @@ namespace god
 			float		m_shininess { 0.0f };
 			float		m_emissive{ 1.0f };
 			glm::vec4	m_tint { 1.0f,1.0f,1.0f,1.0f };
+			bool		m_outlined { false };
 		};
 
 		struct PointLightData

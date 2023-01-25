@@ -51,8 +51,10 @@ namespace god
 		// add to scene
 		if ( renderable.m_model_id != -1 && renderable.m_visible )
 		{
-			scene.AddInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-				renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive } , transform.m_world_transform );
+			Scene::InstancedRenderData render_data { static_cast< uint32_t >( renderable.m_model_id ) ,
+				renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive };
+			render_data.m_outlined = renderable.m_outlined;
+			scene.AddInstancedObject ( render_data , transform.m_world_transform );
 		}
 
 		// populate scene with children

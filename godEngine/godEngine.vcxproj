@@ -128,6 +128,7 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_All.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Gam350\EC_350Level.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Grid\EC_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIText.h" />
@@ -143,6 +144,7 @@
     <ClInclude Include="EnttXSol\EngineSystems\ES_AudioListener.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Gam350\ES_350Level.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Input\ES_PlayerController.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_PhysicsController.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_FaceCamera.h" />

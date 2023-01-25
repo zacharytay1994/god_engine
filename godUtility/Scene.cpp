@@ -87,6 +87,7 @@ namespace god
 		HashCombine ( seed , data.m_tint.y );
 		HashCombine ( seed , data.m_tint.z );
 		HashCombine ( seed , data.m_tint.w );
+		HashCombine ( seed , data.m_outlined );
 		return seed;
 	}
 
@@ -97,7 +98,8 @@ namespace god
 			m_specular_id == rhs.m_specular_id &&
 			m_shininess == rhs.m_shininess &&
 			m_emissive == rhs.m_emissive &&
-			m_tint == rhs.m_tint;
+			m_tint == rhs.m_tint &&
+			m_outlined == rhs.m_outlined;
 	}
 
 	Scene::PointLightData& Scene::PointLightData::operator=( PointLightData const& rhs )
