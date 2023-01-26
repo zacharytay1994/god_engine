@@ -4,6 +4,8 @@
 #include <godUtility/FileIO.h>
 #include <godUtility/Internal/RapidJSONWrapper.h>
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace god
 {
 	/* ENGINE COMPONENTS */
@@ -17,6 +19,7 @@ namespace god
 		bool m_visible { true };
 		glm::vec4 m_tint { 1.0f,1.0f,1.0f,1.0f };
 		bool m_outlined { false };
+		glm::ivec2 m_spritesheet_data { 0,1 };
 
 		bool operator==( Renderable3D const& rhs )
 		{
@@ -132,6 +135,10 @@ namespace god
 				ImGui::DragFloat ( "TintA" , &component.m_tint.w , 0.01f , 0.0f , 1.0f );
 
 				ImGui::Checkbox ( "Outline" , &component.m_outlined );
+
+				// sprite sheet
+				ImGui::Separator ();
+				ImGui::InputInt2 ( "SpriteSheet" , glm::value_ptr ( component.m_spritesheet_data ) );
 			} );
 	}
 
@@ -181,6 +188,8 @@ namespace god
 		// serialize emissive
 		RapidJSON::JSONifyToValue ( value , document , "emissive" , component.m_emissive );
 		RapidJSON::JSONifyToValue ( value , document , "visible" , component.m_visible );
+		RapidJSON::JSONifyToValue ( value , document , "spritesheetframe" , component.m_spritesheet_data.x );
+		RapidJSON::JSONifyToValue ( value , document , "spritesheetcolumns" , component.m_spritesheet_data.y );
 	}
 
 	template<>
@@ -222,5 +231,7 @@ namespace god
 
 		AssignIfExist ( jsonObj , component.m_emissive , "emissive" );
 		AssignIfExist ( jsonObj , component.m_visible , "visible" );
+		AssignIfExist ( jsonObj , component.m_spritesheet_data.x , "spritesheetframe" );
+		AssignIfExist ( jsonObj , component.m_spritesheet_data.y , "spritesheetcolumns" );
 	}
 }
