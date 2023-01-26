@@ -683,7 +683,7 @@ namespace god
 												// move on top of clicked tile
 												GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
 												m_playable_walkable = playable.Walkable ( { x , y + 1 , z } );
-												if ( window.MouseLPressed () )
+												if ( window.MouseLPressed ( 2 ) )
 												{
 													if ( m_playable_walkable )
 													{
