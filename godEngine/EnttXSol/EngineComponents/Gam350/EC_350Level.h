@@ -231,9 +231,9 @@ namespace god
 			float m_camera_move_speed { 8.0f };
 			float m_circle_value { 0.0f };
 			float m_camera_circle_speed { 1.4f };
-			float m_camera_height { 12.0f };
+			float m_camera_height { 2.0f };
 			float m_camera_zoom_speed { 8.0f };
-			float m_camera_zoom_distance { 8.0f };
+			float m_camera_zoom_distance { 16.0f };
 			float m_min_camera_zoom { 1.0f };
 			float m_max_camera_zoom { 20.0f };
 
@@ -504,10 +504,10 @@ namespace god
 				// zoom camera
 				if ( window.KeyDown ( GLFW_KEY_W ) )
 				{
-					if ( m_camera_zoom_distance > m_min_camera_zoom && m_camera_height > m_min_camera_zoom )
+					if ( m_camera_zoom_distance > m_min_camera_zoom )
 					{
 						m_camera_zoom_distance -= dt * m_camera_zoom_speed;
-						m_camera_height -= dt * m_camera_zoom_speed;
+						m_camera_height += dt * m_camera_zoom_speed;
 					}
 				}
 				if ( window.KeyDown ( GLFW_KEY_S ) )
@@ -515,7 +515,7 @@ namespace god
 					if ( m_camera_zoom_distance < m_max_camera_zoom && m_camera_height < m_max_camera_zoom )
 					{
 						m_camera_zoom_distance += dt * m_camera_zoom_speed;
-						m_camera_height += dt * m_camera_zoom_speed;
+						m_camera_height -= dt * m_camera_zoom_speed;
 					}
 				}
 			}
