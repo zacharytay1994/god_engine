@@ -304,7 +304,7 @@ namespace god
 			// Draw the normal model
 			m_textured_shader.Use ();
 
-			// set uniforms for fragment shader
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uSpritesheetData" , data.first.m_spritesheet_data );
 
 			// set material
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
@@ -380,8 +380,8 @@ namespace god
 
 			// Set Fog
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.linearStart" , 10.0f );
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.linearStart" , 150.0f );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.linearEnd" , 300.0f );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.density" , 0.03f );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.equation" , 0 );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.isEnabled" , true );
@@ -631,6 +631,9 @@ namespace god
 		for ( auto const& data : sorted_render_data )
 		{
 			auto& [first , second] = data;
+
+			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uSpritesheetData" , first.m_spritesheet_data );
+
 			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
 			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uAlpha" , first.m_shininess );
 			std::get<1> ( textures.Get ( first.m_diffuse_id ) ).Bind ( 0 );
@@ -694,6 +697,8 @@ namespace god
 		{
 			// Draw the normal model
 			m_textured_discard_shader.Use ();
+
+			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uSpritesheetData" , data.first.m_spritesheet_data );
 
 			// set material
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
@@ -801,6 +806,7 @@ namespace god
 		{
 			// Draw the normal model
 			//m_textured_discard_shader_no_lighting.Use ();
+			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uSpritesheetData" , data.first.m_spritesheet_data );
 
 			// set material
 			OGLShader::SetUniform ( m_textured_discard_shader_no_lighting.GetShaderID () , "uMaterial.diffuse_map" , 0 );

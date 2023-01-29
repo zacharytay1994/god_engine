@@ -243,21 +243,22 @@ namespace god
 		
 		physx::PxVec3 origin = mCamera->m_position;                 // [in] Ray origin
 		physx::PxVec3 unitDir = ray_dir;                // [in] Normalized ray direction
-		//physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
+		physx::PxReal maxDistance = 1000.f;            // [in] Raycast max distance
 		physx::PxRaycastBuffer hit;                 // [out] Raycast results
 		
 		// Raycast against all static & dynamic objects (no filtering)
 		// The main result from this call is the closest hit, stored in the 'hit.block' structure
-		//bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
+		bool status = mScene->raycast(origin, unitDir, maxDistance, hit);
 		if (hit.hasBlock)
 		{
 			mRayCastMouse = hit.block.actor;
-			//SetRCMid(reinterpret_cast<EntityData*>(mRayCastMouse->userData)->m_id);
+			//PhysicsSystem::setRCMid(reinterpret_cast<EntityData*>(mRayCastMouse->userData)->m_id);
 		}
 		else
 		{
 			mRayCastMouse = nullptr;
-			//SetRCMid(Null);
+			//setRCMid(Null);
+			
 		}
 	}
 

@@ -210,7 +210,7 @@ namespace god
 
 					int32_t dx = x - sx , dy = y - sy , dz = z - sz;
 
-					return !( dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1 );
+					return !( dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1 ) && cell != m_cell;
 				}
 				}
 				return false;
@@ -221,9 +221,21 @@ namespace god
 		{
 			bool m_initialized { false };
 			bool m_to_restart { false };
+			bool m_playable_walkable { false };
 			std::vector<Tile> m_tiles;
 			std::vector<Enemy> m_enemies;
 			std::vector<Playable> m_playables;
+
+			// camera controls
+			glm::vec3 m_center { 0.0f,0.0f,0.0f };
+			float m_camera_move_speed { 8.0f };
+			float m_circle_value { 0.0f };
+			float m_camera_circle_speed { 1.4f };
+			float m_camera_height { 2.0f };
+			float m_camera_zoom_speed { 8.0f };
+			float m_camera_zoom_distance { 16.0f };
+			float m_min_camera_zoom { 1.0f };
+			float m_max_camera_zoom { 20.0f };
 
 			friend struct Enemy;
 
@@ -462,6 +474,52 @@ namespace god
 				}
 			}
 
+			template<typename ENGINE_RESOURCES>
+			void UpdateCameraControls ( float dt , ENGINE_RESOURCES& engineResources )
+			{
+				GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
+				Camera& camera = engineResources.Get<Camera> ().get ();
+
+				// spin camera 
+				camera.m_camera_pan_speed = 1.0f;
+				camera.SetNextLookAt ( m_center );
+				float c_x = std::sin ( m_circle_value );
+				float c_z = std::cos ( m_circle_value );
+
+				camera.m_camera_move_speed = 5.0f;
+				camera.SetNextPosition ( m_center +
+					glm::vec3 ( c_x * m_camera_zoom_distance ,
+						m_camera_height ,
+						c_z * m_camera_zoom_distance ) );
+
+				// move camera left
+				if ( window.KeyDown ( GLFW_KEY_A ) )
+				{
+					m_circle_value -= dt * m_camera_circle_speed;
+				}
+				if ( window.KeyDown ( GLFW_KEY_D ) )
+				{
+					m_circle_value += dt * m_camera_circle_speed;
+				}
+				// zoom camera
+				if ( window.KeyDown ( GLFW_KEY_W ) )
+				{
+					if ( m_camera_zoom_distance > m_min_camera_zoom )
+					{
+						m_camera_zoom_distance -= dt * m_camera_zoom_speed;
+						m_camera_height += dt * m_camera_zoom_speed;
+					}
+				}
+				if ( window.KeyDown ( GLFW_KEY_S ) )
+				{
+					if ( m_camera_zoom_distance < m_max_camera_zoom && m_camera_height < m_max_camera_zoom )
+					{
+						m_camera_zoom_distance += dt * m_camera_zoom_speed;
+						m_camera_height -= dt * m_camera_zoom_speed;
+					}
+				}
+			}
+
 			template <typename ENTT , typename ENGINE_RESOURCES>
 			void Update ( float dt , ENTT& entt , ENGINE_RESOURCES& engineResources , EntityData& level , Transform& level_transform )
 			{
@@ -527,6 +585,47 @@ namespace god
 					m_initialized = true;
 				}
 
+				// test raycast to all entities
+				GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
+				Camera& camera = engineResources.Get<Camera> ().get ();
+				glm::vec3 ray_dir = ViewportToWorldRay (
+					{ window.ViewportMouseX (), window.ViewportMouseY () } ,
+					window.GetWindowWidth () ,
+					window.GetWindowHeight () ,
+					camera.GetPerpectiveProjectionMatrix () ,
+					camera.GetCameraViewMatrix () );
+				float min = std::numeric_limits<float>::max ();
+				m_selected_entity = nullptr;
+				for ( auto& tile : m_tiles )
+				{
+					Transform* transform = entt.GetEngineComponent<Transform> ( tile.m_entity_id );
+					if ( transform )
+					{
+						glm::vec3 center = transform->m_parent_transform * glm::vec4 ( transform->m_position , 1.0f );
+						auto [intersect , tmin] = RayIntersectAABB ( camera.m_position , ray_dir , center - glm::vec3 ( 1 , 1 , 1 ) , center + glm::vec3 ( 1 , 1 , 1 ) );
+						tile.m_moused_over = intersect;
+						tile.m_tmin = tmin;
+
+						if ( tmin < min )
+						{
+							min = tmin;
+							m_selected_entity = static_cast< Entity* >( &tile );
+						}
+
+						transform->m_scale = glm::vec3 ( 1.0f );
+
+						EntityData* entity_data = entt.GetEngineComponent<EntityData> ( tile.m_entity_id );
+						if ( entity_data && entt.m_entities[ entity_data->m_id ].m_children.size () > 0 )
+						{
+							Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ entity_data->m_id ].m_children[ 0 ] );
+							if ( renderable )
+							{
+								renderable->m_outlined = false;
+							}
+						}
+					}
+				}
+
 				if ( m_initialized )
 				{
 					// update movement of playable
@@ -552,6 +651,7 @@ namespace god
 					}
 
 					// process gameplay
+					m_playable_walkable = false;
 					switch ( m_turn_order )
 					{
 					case ( TurnOrder::Playable ):
@@ -582,9 +682,10 @@ namespace god
 											{
 												// move on top of clicked tile
 												GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
-												if ( window.MouseLPressed () )
+												m_playable_walkable = playable.Walkable ( { x , y + 1 , z } );
+												if ( window.MouseLPressed ( 2 ) )
 												{
-													if ( playable.Walkable ( { x , y + 1 , z } ) )
+													if ( m_playable_walkable )
 													{
 														/*MoveEntityOnTopOf ( entt , engineResources ,
 															m_playables.front () , *m_selected_entity );*/
@@ -606,6 +707,7 @@ namespace god
 										}
 									}
 								}
+								break;
 							}
 							}
 						}
@@ -659,50 +761,27 @@ namespace god
 					}
 					}
 				}
-
-				// test raycast to all entities
-				GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
-				Camera& camera = engineResources.Get<Camera> ().get ();
-				glm::vec3 ray_dir = ViewportToWorldRay (
-					{ window.ViewportMouseX (), window.ViewportMouseY () } ,
-					window.GetWindowWidth () ,
-					window.GetWindowHeight () ,
-					camera.GetPerpectiveProjectionMatrix () ,
-					camera.GetCameraViewMatrix () );
-				float min = std::numeric_limits<float>::max ();
-				m_selected_entity = nullptr;
-				for ( auto& tile : m_tiles )
+				else
 				{
-					Transform* transform = entt.GetEngineComponent<Transform> ( tile.m_entity_id );
-					if ( transform )
+					// if not initialized, recalculate center
+					if ( !m_tiles.empty () )
 					{
-						glm::vec3 center = transform->m_parent_transform * glm::vec4 ( transform->m_position , 1.0f );
-						auto [intersect , tmin] = RayIntersectAABB ( camera.m_position , ray_dir , center - glm::vec3 ( 1 , 1 , 1 ) , center + glm::vec3 ( 1 , 1 , 1 ) );
-						tile.m_moused_over = intersect;
-						tile.m_tmin = tmin;
-
-						if ( tmin < min )
+						m_center = { 0.0f };
+						for ( auto const& tile : m_tiles )
 						{
-							min = tmin;
-							m_selected_entity = static_cast< Entity* >( &tile );
+							auto const& [x , y , z] = tile.m_cell;
+							m_center += glm::vec3 ( 2.0f * x , 2.0f * y , 2.0f * z );
 						}
-
-						transform->m_scale = glm::vec3 ( 1.0f );
-
-						EntityData* entity_data = entt.GetEngineComponent<EntityData> ( tile.m_entity_id );
-						if ( entity_data && entt.m_entities[ entity_data->m_id ].m_children.size () > 0 )
-						{
-							Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ entity_data->m_id ].m_children[ 0 ] );
-							if ( renderable )
-							{
-								renderable->m_outlined = false;
-							}
-						}
+						m_center /= m_tiles.size ();
 					}
+
+					// spin camera
+					m_circle_value += dt * m_camera_circle_speed;
 				}
 
 				// enlarge selected entity
-				if ( m_selected_entity )
+				// only ray cast on player turn
+				if ( m_selected_entity && m_turn_order == TurnOrder::Playable && m_playable_walkable )
 				{
 					Transform* transform = entt.GetEngineComponent<Transform> ( m_selected_entity->m_entity_id );
 					if ( transform )
@@ -808,6 +887,8 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct _350Level
 	{
+		bool m_focused { true };
+
 		_350::Grid m_grid;
 		std::string m_level_layout { "" };
 		std::string m_enemy_layout { "" };
