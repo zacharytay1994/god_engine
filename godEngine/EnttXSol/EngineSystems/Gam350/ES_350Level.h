@@ -23,7 +23,7 @@ namespace god
 			if ( level.m_grid.m_to_restart )
 			{
 				entt.QueueDelete ( entity_data.m_id );
-				auto id = entt.AddPrefabToScene ( engineResources , "350Level" );
+				auto id = entt.AddPrefabToScene ( engineResources , entt.m_entities[ entity_data.m_id ].m_name );
 				EntityData* new_entity_data = entt.GetEngineComponent<EntityData> ( id );
 				_350Level* new_level = entt.GetEngineComponent<_350Level> ( id );
 				Transform* new_transform = entt.GetEngineComponent<Transform> ( id );
