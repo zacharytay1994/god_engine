@@ -223,6 +223,7 @@ namespace god
 			rigiddynamic.p_RigidDynamic->setContactReportThreshold ( 0.1f );
 			rigiddynamic.p_RigidDynamic->setAngularVelocity ( physx::PxVec3 ( rigiddynamic.AngularVelocity.x , rigiddynamic.AngularVelocity.y , rigiddynamic.AngularVelocity.z ) , true );
 			rigiddynamic.p_RigidDynamic->setLinearVelocity ( physx::PxVec3 ( rigiddynamic.LinearVelocity.x , rigiddynamic.LinearVelocity.y , rigiddynamic.LinearVelocity.z ) , true );
+			
 			rigiddynamic.p_RigidDynamic->setGlobalPose ( ConvertToPhysXTransform ( transform.m_position , transform.m_rotation ) );
 			rigiddynamic.p_RigidDynamic->setMaxLinearVelocity ( 50.f );
 

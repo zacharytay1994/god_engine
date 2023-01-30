@@ -86,22 +86,16 @@ namespace god
 			float radius = rigiddynamic.extents.x;
 			glm::vec3 center = transform.m_local_transform * glm::vec4(transform.m_position, 1.0);
 
-			for (int i = 0; i < 360; i += 10)
+			// Instead of drawing individual lines, we will draw a circle
+			// around the sphere with a certain number of vertices
+			const int NUM_VERTICES = 20;
+			glm::vec3 last_point = center + radius * glm::vec3(cos(0), sin(0), 0);
+			for (int i = 1; i <= NUM_VERTICES; i++)
 			{
-				float theta1 = glm::radians((float)i);
-				float theta2 = glm::radians((float)i + (float)10);
-				glm::vec3 point1 = center + radius * glm::vec3(cos(theta1), sin(theta1), 0);
-				glm::vec3 point2 = center + radius * glm::vec3(cos(theta2), sin(theta2), 0);
-				OpenGL::DrawLine(point1, point2);
-			}
-
-			for (int i = 0; i < 180; i += 10)
-			{
-				float phi1 = glm::radians((float)i);
-				float phi2 = glm::radians((float)i + (float)10);
-				glm::vec3 point1 = center + radius * glm::vec3(cos(phi1) * sin(phi1), sin(phi1) * sin(phi1), cos(phi1));
-				glm::vec3 point2 = center + radius * glm::vec3(cos(phi2) * sin(phi2), sin(phi2) * sin(phi2), cos(phi2));
-				OpenGL::DrawLine(point1, point2);
+				float theta = glm::radians((float)(i * 360) / NUM_VERTICES);
+				glm::vec3 next_point = center + radius * glm::vec3(cos(theta), sin(theta), 0);
+				OpenGL::DrawLine(last_point, next_point);
+				last_point = next_point;
 			}
 			break;
 		}
