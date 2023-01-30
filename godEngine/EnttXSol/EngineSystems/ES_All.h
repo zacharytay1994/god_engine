@@ -22,6 +22,7 @@
 #include "Render/ES_PopulateTransparent.h"
 #include "Render/ES_PopulateGUI.h"
 #include "Render/ES_PopulateAnimations.h"
+#include "Render/ES_Renderable3D.h"
 
 #include "Grid/ES_GridManipulate.h"
 
@@ -44,6 +45,7 @@ namespace god
 		enttxsol.RunEngineSystem ( engineResources , PopulateTransparent );
 		enttxsol.RunEngineSystem ( engineResources , PopulateGUI );
 		enttxsol.RunEngineSystem ( engineResources , PopulateAnimations );
+		enttxsol.RunEngineSystem ( engineResources , Renderable3DUpdate );
 
 		if ( !isPause )
 		{

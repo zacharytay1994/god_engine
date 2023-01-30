@@ -265,6 +265,7 @@ void main( )
     if ( uFogParams.isEnabled )
     {
         float fogCoordinate = abs( vEyeSpacePosition.z / vEyeSpacePosition.w );
+        // output_color = mix( output_color , vec4( uFogParams.color , 1.0 ) , getFogFactor( uFogParams , fogCoordinate ) );
         output_color = mix( output_color , vec4( uFogParams.color , 1.0 ) , getFogFactor( uFogParams , fogCoordinate ) );
     }
 

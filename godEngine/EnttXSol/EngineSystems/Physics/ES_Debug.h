@@ -62,7 +62,7 @@ namespace god
 			{
 				vert = transform.m_local_transform * glm::vec4{ vert,1.f };
 			}
-			min= transform.m_local_transform * glm::vec4{ min,1.f };
+			min = transform.m_local_transform * glm::vec4{ min,1.f };
 			max = transform.m_local_transform * glm::vec4{ max,1.f };
 
 			OpenGL::DrawLine(min, pt[0]);
@@ -83,19 +83,31 @@ namespace god
 			break;
 		case PhysicsTypes::Sphere:
 		{
-			//float radius = rigiddynamic.extents.x;
-			//glm::vec3 start = transform.m_local_transform * glm::vec4(transform.m_position,1.0);
+			float radius = rigiddynamic.extents.x;
+			glm::vec3 center = transform.m_local_transform * glm::vec4(transform.m_position, 1.0);
 
-			////float pi = glm::pi<float>();
+			for (int i = 0; i < 360; i += 10)
+			{
+				float theta1 = glm::radians((float)i);
+				float theta2 = glm::radians((float)i + (float)10);
+				glm::vec3 point1 = center + radius * glm::vec3(cos(theta1), sin(theta1), 0);
+				glm::vec3 point2 = center + radius * glm::vec3(cos(theta2), sin(theta2), 0);
+				OpenGL::DrawLine(point1, point2);
+			}
 
-			//for (int i = 0; i < 10; ++i)
-			//{
-			//	OpenGL::DrawLine(start + glm::vec3(std::sin(i * 2), 0, 0), start + glm::vec3(std::sin((i + 1) * 2 ), 0, 0));
-			//}
-
-			//std::cout << "lol";
+			for (int i = 0; i < 180; i += 10)
+			{
+				float phi1 = glm::radians((float)i);
+				float phi2 = glm::radians((float)i + (float)10);
+				glm::vec3 point1 = center + radius * glm::vec3(cos(phi1) * sin(phi1), sin(phi1) * sin(phi1), cos(phi1));
+				glm::vec3 point2 = center + radius * glm::vec3(cos(phi2) * sin(phi2), sin(phi2) * sin(phi2), cos(phi2));
+				OpenGL::DrawLine(point1, point2);
+			}
 			break;
 		}
+
+
+
 		case PhysicsTypes::Capsule:
 
 
@@ -115,7 +127,7 @@ namespace god
 			return;
 
 		Transform& transform = std::get<1>(component);
-		//std::cout << "DebugDynamic\n";
+	
 		glm::vec3 scale = glm::vec3{ 1.f,1.f,1.f };
 		glm::vec3 scale2 = glm::vec3{ 2.f,2.f,2.f };
 
@@ -132,8 +144,6 @@ namespace god
 		pt[2].x = pt[0].x;
 		pt[2].z = pt[1].z;
 
-
-
 		pt[3] = max;
 		pt[4] = max;
 		pt[5] = max;
@@ -142,7 +152,6 @@ namespace god
 		pt[4].z = max.z - scale2.z;
 		pt[5] = pt[3];
 		pt[5].z -= scale2.z;
-
 
 		//parent * local if got parent
 		for (auto& vert : pt)
@@ -162,7 +171,6 @@ namespace god
 
 		OpenGL::DrawLine(pt[3], pt[5]);
 		OpenGL::DrawLine(pt[4], pt[5]);
-
 
 		OpenGL::DrawLine(pt[1], pt[3]);
 		OpenGL::DrawLine(pt[2], max);

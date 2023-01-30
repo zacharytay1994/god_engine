@@ -153,6 +153,7 @@
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateGUI.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateOnlyTransform.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateTransparent.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_Renderable3D.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_Transform.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_AudioSource.h" />

@@ -88,6 +88,8 @@ namespace god
 		HashCombine ( seed , data.m_tint.z );
 		HashCombine ( seed , data.m_tint.w );
 		HashCombine ( seed , data.m_outlined );
+		HashCombine ( seed , data.m_spritesheet_data.x );
+		HashCombine ( seed , data.m_spritesheet_data.y );
 		return seed;
 	}
 

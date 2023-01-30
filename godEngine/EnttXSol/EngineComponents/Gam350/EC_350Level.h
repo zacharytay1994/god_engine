@@ -36,6 +36,30 @@ namespace god
 			bool m_moused_over { false };
 			float m_tmin { 0.0f };
 			bool m_to_destroy { false };
+
+			// movement
+			bool m_moved { false };
+			glm::vec3 m_lerp_to { 0,0,0 };
+
+			void LerpPositionTo ( glm::vec3& position , float lerpSpeed , float dt )
+			{
+				position.x = std::lerp ( position.x , m_lerp_to.x , lerpSpeed * dt );
+				position.y = std::lerp ( position.y , m_lerp_to.y , lerpSpeed * dt );
+				position.z = std::lerp ( position.z , m_lerp_to.z , lerpSpeed * dt );
+
+				if ( glm::length2 ( m_lerp_to - position ) < 0.1f )
+				{
+					m_moved = true;
+				}
+			}
+
+			void UpdateLerpTo ( float lerpSpeed , float dt )
+			{
+				auto const& [x , y , z] = m_cell;
+				m_lerp_to.x = std::lerp ( m_lerp_to.x , 2 * x , lerpSpeed * dt );
+				m_lerp_to.y = std::lerp ( m_lerp_to.y , 2 * y , lerpSpeed * dt );
+				m_lerp_to.z = std::lerp ( m_lerp_to.z , 2 * z , lerpSpeed * dt );
+			}
 		};
 
 		struct Tile : public Entity
@@ -83,15 +107,20 @@ namespace god
 					// move to previous decided
 					if ( m_destination != static_cast< uint32_t >( -1 ) )
 					{
-						grid.MoveEntityOnTopOf ( entt , engineResources ,
+						/*grid.MoveEntityOnTopOf ( entt , engineResources ,
+							*static_cast< Entity* >( this ) , *static_cast< Entity* >( &grid.m_tiles[ m_destination ] ) );*/
+						grid.LerpEntityOnTopOf ( entt , engineResources ,
 							*static_cast< Entity* >( this ) , *static_cast< Entity* >( &grid.m_tiles[ m_destination ] ) );
 
 						// if position is triton
 						Tile& tile = grid.m_tiles[ m_destination ];
 						auto& [x , y , z] = tile.m_cell;
-						if ( grid.HasTriton ( x , y + 1 , z ) )
+						Entity* triton = grid.GetTriton ( x , y + 1 , z );
+						if ( /*grid.HasTriton ( x , y + 1 , z )*/triton )
 						{
-							grid.m_to_restart = true;
+							triton->m_to_destroy = true;
+							/*Get
+							grid.m_to_restart = true;*/
 						}
 					}
 					// try searching for destination
@@ -181,7 +210,7 @@ namespace god
 
 					int32_t dx = x - sx , dy = y - sy , dz = z - sz;
 
-					return !( dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1 );
+					return !( dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1 ) && cell != m_cell;
 				}
 				}
 				return false;
@@ -192,9 +221,21 @@ namespace god
 		{
 			bool m_initialized { false };
 			bool m_to_restart { false };
+			bool m_playable_walkable { false };
 			std::vector<Tile> m_tiles;
 			std::vector<Enemy> m_enemies;
 			std::vector<Playable> m_playables;
+
+			// camera controls
+			glm::vec3 m_center { 0.0f,0.0f,0.0f };
+			float m_camera_move_speed { 8.0f };
+			float m_circle_value { 0.0f };
+			float m_camera_circle_speed { 1.4f };
+			float m_camera_height { 2.0f };
+			float m_camera_zoom_speed { 8.0f };
+			float m_camera_zoom_distance { 16.0f };
+			float m_min_camera_zoom { 1.0f };
+			float m_max_camera_zoom { 20.0f };
 
 			friend struct Enemy;
 
@@ -212,6 +253,44 @@ namespace god
 					auto& [x , y , z] = dst.m_cell;
 					src.m_cell = { x,y + 1,z };
 				}
+			}
+
+			template <typename ENTT , typename ENGINE_RESOURCES>
+			void LerpEntityOnTopOf ( ENTT& entt , ENGINE_RESOURCES& engineResources ,
+				Entity& src , Entity& dst )
+			{
+				Transform* src_transform = entt.GetEngineComponent<Transform> ( src.m_entity_id );
+				Transform* dst_transform = entt.GetEngineComponent<Transform> ( dst.m_entity_id );
+				if ( src_transform && dst_transform )
+				{
+					// calculate midpoint
+					glm::vec3 midpoint = src_transform->m_position + ( dst_transform->m_position - src_transform->m_position ) / 2.0f;
+					// height offset is height diff of src and dst + k, offset is 0 if negative
+					float height_max = dst_transform->m_position.y - src_transform->m_position.y;
+					auto const& [sx , sy , sz] = src.m_cell;
+					auto const& [dx , dy , dz] = dst.m_cell;
+					int32_t diagonal_x = dx - sx + sx;
+					int32_t diagonal_z = dz - sz + sz;
+					float potential_heighest { 0.0f };
+					for ( int i = 0; i < 10; ++i )
+					{
+						if ( HasTile ( diagonal_x , i , sz ) || HasTile ( sx , i , diagonal_z ) )
+						{
+							potential_heighest = 2 * ( i - std::get<1> ( src.m_cell ) );
+							if ( potential_heighest > height_max )
+							{
+								height_max = potential_heighest;
+							}
+						}
+					}
+
+					midpoint.y = 2.0f * std::get<1> ( src.m_cell ) + std::max ( height_max , 0.0f ) * 3.0f + 5.0f;
+					src.m_lerp_to = midpoint;
+					auto& [x , y , z] = dst.m_cell;
+					src.m_cell = { x,y + 1,z };
+				}
+
+				src.m_moved = false;
 			}
 
 			template <typename ENTT , typename ENGINE_RESOURCES>
@@ -321,7 +400,7 @@ namespace god
 				return it != m_enemies.end ();
 			}
 
-			Enemy* GetEnemy ( int32_t x , int32_t y , int32_t z )
+			Entity* GetEnemy ( int32_t x , int32_t y , int32_t z )
 			{
 				auto it = std::find_if ( m_enemies.begin () , m_enemies.end () , [&x , &y , &z]( Enemy const& enemy )
 					{
@@ -329,7 +408,7 @@ namespace god
 					} );
 				if ( it != m_enemies.end () )
 				{
-					return &*it;
+					return static_cast< Entity* >( &*it );
 				}
 				return nullptr;
 			}
@@ -341,6 +420,19 @@ namespace god
 						return playable.m_cell == std::make_tuple ( x , y , z ) && playable.m_type == Playable::Type::Triton;
 					} );
 				return it != m_playables.end ();
+			}
+
+			Entity* GetTriton ( int32_t x , int32_t y , int32_t z )
+			{
+				auto it = std::find_if ( m_playables.begin () , m_playables.end () , [&x , &y , &z]( Playable const& playable )
+					{
+						return playable.m_cell == std::make_tuple ( x , y , z ) && playable.m_type == Playable::Type::Triton;
+					} );
+				if ( it != m_playables.end () )
+				{
+					return static_cast< Entity* >( &*it );
+				}
+				return nullptr;
 			}
 
 			template <typename ENTT , typename ENGINE_RESOURCES>
@@ -366,6 +458,7 @@ namespace god
 					Enemy enemy ( static_cast< Enemy::Type >( type ) , orientation_map[ orientation ] );
 					enemy.m_cell = std::make_tuple ( x , y , z );
 					enemy.m_parent_type = Entity::Type::Enemy;
+					enemy.m_lerp_to = { 2 * x , 2 * y , 2 * z };
 					m_nonset_enemies.push ( enemy );
 				}
 
@@ -376,7 +469,54 @@ namespace god
 					Playable playable ( static_cast< Playable::Type >( type ) , orientation_map[ orientation ] );
 					playable.m_cell = std::make_tuple ( x , y , z );
 					playable.m_parent_type = Entity::Type::Playable;
+					playable.m_lerp_to = { 2 * x , 2 * y , 2 * z };
 					m_nonset_playable.push ( playable );
+				}
+			}
+
+			template<typename ENGINE_RESOURCES>
+			void UpdateCameraControls ( float dt , ENGINE_RESOURCES& engineResources )
+			{
+				GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
+				Camera& camera = engineResources.Get<Camera> ().get ();
+
+				// spin camera 
+				camera.m_camera_pan_speed = 1.0f;
+				camera.SetNextLookAt ( m_center );
+				float c_x = std::sin ( m_circle_value );
+				float c_z = std::cos ( m_circle_value );
+
+				camera.m_camera_move_speed = 5.0f;
+				camera.SetNextPosition ( m_center +
+					glm::vec3 ( c_x * m_camera_zoom_distance ,
+						m_camera_height ,
+						c_z * m_camera_zoom_distance ) );
+
+				// move camera left
+				if ( window.KeyDown ( GLFW_KEY_A ) )
+				{
+					m_circle_value -= dt * m_camera_circle_speed;
+				}
+				if ( window.KeyDown ( GLFW_KEY_D ) )
+				{
+					m_circle_value += dt * m_camera_circle_speed;
+				}
+				// zoom camera
+				if ( window.KeyDown ( GLFW_KEY_W ) )
+				{
+					if ( m_camera_zoom_distance > m_min_camera_zoom )
+					{
+						m_camera_zoom_distance -= dt * m_camera_zoom_speed;
+						m_camera_height += dt * m_camera_zoom_speed;
+					}
+				}
+				if ( window.KeyDown ( GLFW_KEY_S ) )
+				{
+					if ( m_camera_zoom_distance < m_max_camera_zoom && m_camera_height < m_max_camera_zoom )
+					{
+						m_camera_zoom_distance += dt * m_camera_zoom_speed;
+						m_camera_height -= dt * m_camera_zoom_speed;
+					}
 				}
 			}
 
@@ -388,6 +528,7 @@ namespace god
 				{
 					m_to_restart = true;
 				}
+
 				// add tiles
 				if ( m_nonset_tiles.size () > 0 )
 				{
@@ -444,85 +585,6 @@ namespace god
 					m_initialized = true;
 				}
 
-				if ( m_initialized )
-				{
-					// process gameplay
-					switch ( m_turn_order )
-					{
-					case ( TurnOrder::Playable ):
-					{
-						// process playables
-						if ( m_playable_i < m_playables.size () )
-						{
-							auto& playable = m_playables[ m_playable_i ];
-
-							// highlight current playable todo
-
-							// update playable
-							switch ( playable.m_type )
-							{
-							case ( Playable::Type::Triton ):
-							{
-								if ( m_selected_entity )
-								{
-									if ( m_selected_entity->m_parent_type == Entity::Type::Tile )
-									{
-										switch ( static_cast< Tile* >( m_selected_entity )->m_type )
-										{
-										case ( Tile::Type::Normal ):
-										{
-											// check if tile has nothing on top
-											auto [x , y , z] = m_selected_entity->m_cell;
-											if ( !HasTile ( x , y + 1 , z ) )
-											{
-												// move on top of clicked tile
-												GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
-												if ( window.MouseLPressed () )
-												{
-													if ( playable.Walkable ( { x , y + 1 , z } ) )
-													{
-														MoveEntityOnTopOf ( entt , engineResources ,
-															m_playables.front () , *m_selected_entity );
-
-														// check if tile walked on has enemy, if so eat it
-														Enemy* enemy = GetEnemy ( x , y + 1 , z );
-														if ( enemy )
-														{
-															enemy->m_to_destroy = true;
-														}
-
-														++m_playable_i;
-													}
-												}
-											}
-										}
-										}
-									}
-								}
-							}
-							}
-						}
-						else
-						{
-							m_playable_i = 0;
-							m_turn_order = TurnOrder::Enemy;
-						}
-						break;
-					}
-					case ( TurnOrder::Enemy ):
-					{
-						// update enemies
-						for ( auto& enemy : m_enemies )
-						{
-							enemy.Update ( entt , engineResources , *this );
-						}
-
-						m_turn_order = TurnOrder::Playable;
-						break;
-					}
-					}
-				}
-
 				// test raycast to all entities
 				GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
 				Camera& camera = engineResources.Get<Camera> ().get ();
@@ -564,8 +626,162 @@ namespace god
 					}
 				}
 
+				if ( m_initialized )
+				{
+					// update movement of playable
+					for ( auto& playable : m_playables )
+					{
+						Transform* transform = entt.GetEngineComponent<Transform> ( playable.m_entity_id );
+						if ( transform )
+						{
+							playable.LerpPositionTo ( transform->m_position , 4.0f , dt );
+						}
+						playable.UpdateLerpTo ( 3.0f , dt );
+					}
+
+					// update movement of enemies
+					for ( auto& enemy : m_enemies )
+					{
+						Transform* transform = entt.GetEngineComponent<Transform> ( enemy.m_entity_id );
+						if ( transform )
+						{
+							enemy.LerpPositionTo ( transform->m_position , 4.0f , dt );
+						}
+						enemy.UpdateLerpTo ( 3.0f , dt );
+					}
+
+					// process gameplay
+					m_playable_walkable = false;
+					switch ( m_turn_order )
+					{
+					case ( TurnOrder::Playable ):
+					{
+						// process playables
+						if ( m_playable_i < m_playables.size () )
+						{
+							auto& playable = m_playables[ m_playable_i ];
+
+							// highlight current playable todo
+
+							// update playable
+							switch ( playable.m_type )
+							{
+							case ( Playable::Type::Triton ):
+							{
+								if ( m_selected_entity )
+								{
+									if ( m_selected_entity->m_parent_type == Entity::Type::Tile )
+									{
+										switch ( static_cast< Tile* >( m_selected_entity )->m_type )
+										{
+										case ( Tile::Type::Normal ):
+										{
+											// check if tile has nothing on top
+											auto [x , y , z] = m_selected_entity->m_cell;
+											if ( !HasTile ( x , y + 1 , z ) )
+											{
+												// move on top of clicked tile
+												GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
+												m_playable_walkable = playable.Walkable ( { x , y + 1 , z } );
+												if ( window.MouseLPressed ( 2 ) )
+												{
+													if ( m_playable_walkable )
+													{
+														/*MoveEntityOnTopOf ( entt , engineResources ,
+															m_playables.front () , *m_selected_entity );*/
+														LerpEntityOnTopOf ( entt , engineResources ,
+															m_playables.front () , *m_selected_entity );
+
+														// check if tile walked on has enemy, if so eat it
+														Entity* enemy = GetEnemy ( x , y + 1 , z );
+														if ( enemy )
+														{
+															enemy->m_to_destroy = true;
+														}
+
+														++m_playable_i;
+													}
+												}
+											}
+										}
+										}
+									}
+								}
+								break;
+							}
+							}
+						}
+						else
+						{
+							bool all_moved { true };
+							for ( auto& playable : m_playables )
+							{
+								if ( !playable.m_moved )
+								{
+									all_moved = false;
+								}
+							}
+							if ( all_moved )
+							{
+								m_playable_i = 0;
+								m_turn_order = TurnOrder::Enemy;
+								m_turn_changed = true;
+							}
+						}
+						break;
+					}
+					case ( TurnOrder::Enemy ):
+					{
+						// update enemies
+						if ( !m_updated_enemies )
+						{
+							for ( auto& enemy : m_enemies )
+							{
+								enemy.Update ( entt , engineResources , *this );
+							}
+							m_updated_enemies = true;
+						}
+						bool all_moved { true };
+						for ( auto& enemy : m_enemies )
+						{
+							if ( !enemy.m_moved )
+							{
+								all_moved = false;
+							}
+						}
+
+						// check if all moved
+						if ( all_moved )
+						{
+							m_updated_enemies = false;
+							m_turn_order = TurnOrder::Playable;
+							m_turn_changed = true;
+						}
+						break;
+					}
+					}
+				}
+				else
+				{
+					// if not initialized, recalculate center
+					if ( !m_tiles.empty () )
+					{
+						m_center = { 0.0f };
+						for ( auto const& tile : m_tiles )
+						{
+							auto const& [x , y , z] = tile.m_cell;
+							m_center += glm::vec3 ( 2.0f * x , 2.0f * y , 2.0f * z );
+						}
+						m_center /= m_tiles.size ();
+					}
+
+					// spin camera
+					m_circle_value += dt * m_camera_circle_speed;
+				}
+
 				// enlarge selected entity
-				if ( m_selected_entity )
+				// only ray cast on player turn
+				if ( m_selected_entity && m_turn_order == TurnOrder::Playable && m_playable_walkable )
 				{
 					Transform* transform = entt.GetEngineComponent<Transform> ( m_selected_entity->m_entity_id );
 					if ( transform )
@@ -583,29 +799,54 @@ namespace god
 					}
 				}
 
-				// destroy all to be destroyed entities
-				for ( auto e_it = m_enemies.begin (); e_it != m_enemies.end (); )
+				// check on turn change
+				if ( m_turn_changed )
 				{
-					auto& enemy = *e_it;
-					if ( enemy.m_to_destroy )
+					// destroy all to be destroyed entities
+					for ( auto e_it = m_enemies.begin (); e_it != m_enemies.end (); )
 					{
-						EntityData* entity_data = entt.GetEngineComponent<EntityData> ( enemy.m_entity_id );
-						if ( entity_data )
+						auto& enemy = *e_it;
+						if ( enemy.m_to_destroy )
 						{
-							entt.QueueDelete ( entity_data->m_id );
+							EntityData* entity_data = entt.GetEngineComponent<EntityData> ( enemy.m_entity_id );
+							if ( entity_data )
+							{
+								entt.QueueDelete ( entity_data->m_id );
+							}
+							e_it = m_enemies.erase ( e_it );
 						}
-						e_it = m_enemies.erase ( e_it );
+						else
+						{
+							++e_it;
+						}
 					}
-					else
-					{
-						++e_it;
-					}
-				}
 
-				// if theres no enemies left, reset the level
-				if ( m_enemies.empty () && m_initialized )
-				{
-					m_to_restart = true;
+					// destroy all to be destroyed playables
+					for ( auto p_it = m_playables.begin (); p_it != m_playables.end (); )
+					{
+						auto& playable = *p_it;
+						if ( playable.m_to_destroy )
+						{
+							EntityData* entity_data = entt.GetEngineComponent<EntityData> ( playable.m_entity_id );
+							if ( entity_data )
+							{
+								entt.QueueDelete ( entity_data->m_id );
+							}
+							p_it = m_playables.erase ( p_it );
+						}
+						else
+						{
+							++p_it;
+						}
+					}
+
+					// if theres no enemies left, reset the level
+					if ( ( m_enemies.empty () || m_playables.empty () ) && m_initialized )
+					{
+						m_to_restart = true;
+					}
+
+					m_turn_changed = false;
 				}
 			}
 
@@ -637,6 +878,8 @@ namespace god
 			uint32_t m_playable_i { 0 };
 			uint32_t m_enemy_i { 0 };
 			Entity* m_selected_entity { nullptr };
+			bool m_updated_enemies { false };
+			bool m_turn_changed { false };
 
 		};
 	}
@@ -644,6 +887,8 @@ namespace god
 	/* ENGINE COMPONENTS */
 	struct _350Level
 	{
+		bool m_focused { true };
+
 		_350::Grid m_grid;
 		std::string m_level_layout { "" };
 		std::string m_enemy_layout { "" };

@@ -17,11 +17,13 @@ smooth out vec4 vEyeSpacePosition;
 uniform mat4 uProjection;
 uniform mat4 uView;
 uniform mat4 uLightSpaceMatrix;
+uniform vec2 uSpritesheetData = vec2(0,1);
 
 void main() 
 {
 	gl_Position = uProjection * uView * aModel * vec4(aPos, 1.0);
-	vUV = aUV;
+	// vUV = aUV;
+	vUV = vec2( ( uSpritesheetData.x * 1.0 + aUV.x ) / uSpritesheetData.y , aUV.y );
 	vNormal = mat3(transpose(inverse(aModel))) * aNormal;
     vWorldPos = vec3(aModel * vec4(aPos, 1.0));
 	vFragPosLightSpace = uLightSpaceMatrix * vec4(vWorldPos, 1.0f);
