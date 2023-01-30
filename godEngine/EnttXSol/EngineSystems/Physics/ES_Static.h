@@ -92,6 +92,7 @@ namespace god
 			if (rigidstatic.p_shape == nullptr)
 			{
 				//exclusive shape (can be modified)
+				rigidstatic.extents = transform.m_scale;
 				switch (rigidstatic.Shapeid)
 				{
 				case PhysicsTypes::Cube:

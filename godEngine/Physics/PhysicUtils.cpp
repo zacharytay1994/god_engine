@@ -13,8 +13,12 @@ namespace god
 	 */
 	physx::PxTransform ConvertToPhysXTransform(const glm::vec3& translation, const glm::vec3& rotation)
 	{
-		return physx::PxTransform(ConvertToPhysXVector(translation), ConvertToPhysXQuat(glm::quat(rotation)));
+		glm::vec3 radianRotation = rotation * (glm::pi<float>() / 180.0f);
+		glm::quat quaternion = glm::quat(radianRotation);
+		physx::PxTransform result(physx::PxVec3(translation.x, translation.y, translation.z), physx::PxQuat(quaternion.x, quaternion.y, quaternion.z, quaternion.w));
+		return result;
 	}
+
 
 
 	physx::PxVec3 ConvertToPhysXVector(const glm::vec3& vector)
