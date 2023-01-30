@@ -31,7 +31,7 @@ function S_FishParticle(e)
         -- move the particle up
         --transform.position.y = transform.position.y + dt * fish_particle.Speed
 
-        -- move the fish swim vertically
+        -- move the fish swim horizontally, every third fish will swim in the opposite direction
         if (GetEntityData(e).id % 3 == 0) then
             transform.position.z = transform.position.z + (dt * fish_particle.Speed * -1)
             transform.rotation.y = 180
