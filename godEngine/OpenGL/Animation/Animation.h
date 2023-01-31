@@ -26,22 +26,24 @@ namespace god
 		class Animation
 		{
 		public:
-			Animation() = default;
 
-			Animation( const std::string& animationPath, Model* model );
+			Animation () = default;
 
-			~Animation()
-			{}
+			Animation ( const std::string& animationPath , Model* model );
 
-			Bone* FindBone( const std::string& name );
+			~Animation ()
+			{
+			}
 
-			float GetTicksPerSecond();
+			Bone* FindBone ( const std::string& name );
 
-			float GetDuration();
+			float GetTicksPerSecond ();
 
-			const AssimpNodeData& GetRootNode();
+			float GetDuration ();
 
-			const std::map<std::string, BoneInfo>& GetBoneIDMap();
+			const AssimpNodeData& GetRootNode ();
+
+			const std::map<std::string , BoneInfo>& GetBoneIDMap ();
 
 		private:
 
@@ -49,11 +51,11 @@ namespace god
 			double m_TicksPerSecond;
 			std::vector<Bone> m_Bones;
 			AssimpNodeData m_RootNode;
-			std::map<std::string, BoneInfo> m_BoneInfoMap;
+			std::map<std::string , BoneInfo> m_BoneInfoMap;
 
-			void ReadMissingBones( const aiAnimation* animation, Model& model );
+			void ReadMissingBones ( const aiAnimation* animation , Model& model );
 
-			void ReadHeirarchyData( AssimpNodeData& dest, const aiNode* src );
+			void ReadHeirarchyData ( AssimpNodeData& dest , const aiNode* src );
 
 		};
 	}

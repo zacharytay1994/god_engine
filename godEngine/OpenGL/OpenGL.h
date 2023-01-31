@@ -35,10 +35,13 @@ namespace god
 	{
 		Animation3D::Model m_model;
 		Animation3D::Animation m_animation;
+		std::vector<std::vector<glm::mat4>> m_cached_node_transforms;
 		RecycleVector<Animation3D::Animator> m_animators;
 
 		void Initialize ( std::string const& path );
 		uint32_t AddInstance ();
+		void PreCalculateBoneTransform ( uint32_t frame , float currentTime , const Animation3D::AssimpNodeData* node ,
+			glm::mat4 parentTransform );
 	};
 
 	struct Scene;
@@ -95,7 +98,7 @@ namespace god
 		std::vector<std::vector<OGLMesh>> getMesh () { return m_models; }
 
 		// animation interface
-		std::tuple<uint32_t,uint32_t> AddAnimationInstance ( std::string const& name );
+		std::tuple<uint32_t , uint32_t> AddAnimationInstance ( std::string const& name );
 
 		// blur 
 		OGLRenderPass<1> m_blur_pingpong_1;

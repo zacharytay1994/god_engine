@@ -268,7 +268,7 @@ namespace god
 	{
 		( camera_front );
 		// Update animation transformation 
-		m_animator.UpdateAnimation ( DeltaTimer::m_dt ); //--
+		//m_animator.UpdateAnimation ( DeltaTimer::m_dt ); //--
 
 		glViewport ( 0 , 0 , m_screen_width , m_screen_height );
 		ClearColour ();
@@ -958,16 +958,18 @@ namespace god
 	void OpenGL::RenderAnimations ( Scene& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures , glm::vec3 const& camera_front )
 	{
 		// update all animations
+		SystemTimer::StartTimeSegment ( "UpdateAnimations" );
 		for ( auto& animation : m_animations )
 		{
 			for ( auto i = 0; i < animation.second.m_animators.Size (); ++i )
 			{
 				if ( animation.second.m_animators.Valid ( i ) )
 				{
-					animation.second.m_animators[ i ].UpdateAnimation ( DeltaTimer::m_dt );
+					animation.second.m_animators[ i ].UpdateAnimation ( DeltaTimer::m_dt , animation.second.m_cached_node_transforms );
 				}
 			}
 		}
+		SystemTimer::EndTimeSegment ( "UpdateAnimations" );
 
 		m_animation_shader.Use ();
 
@@ -1204,10 +1206,62 @@ namespace god
 		std::cout << "Trying to load animation from " << path << std::endl;
 		m_model = Animation3D::Model { path };
 		m_animation = Animation3D::Animation { path, &m_model };
+
+		// cache all node transforms at fix timestep of 60 fps
+		float current_time { 0.0f };
+		uint32_t frame { 0 };
+		while ( current_time < m_animation.GetDuration () )
+		{
+			PreCalculateBoneTransform ( frame , current_time , &m_animation.GetRootNode () , glm::mat4 ( 1.0f ) );
+			current_time += m_animation.GetTicksPerSecond () * 1.0f / 60.0f;
+			++frame;
+		}
+
+		m_cached_node_transforms;
+		int test = 1;
 	}
 
 	uint32_t AnimationWrap::AddInstance ()
 	{
 		return m_animators.Push ( { &m_animation } );
+	}
+
+	void AnimationWrap::PreCalculateBoneTransform ( uint32_t frame , float currentTime , const Animation3D::AssimpNodeData* node , glm::mat4 parentTransform )
+	{
+		std::string nodeName = node->name;
+		glm::mat4 nodeTransform = node->transformation;
+
+		glm::mat4 globalTransformation = glm::mat4 ( 1.0f );
+
+		Animation3D::Bone* Bone = m_animation.FindBone ( nodeName );
+
+		if ( Bone )
+		{
+			Bone->Update ( currentTime );
+			nodeTransform = Bone->GetLocalTransform ();
+		}
+
+		globalTransformation = parentTransform * nodeTransform;
+
+		auto boneInfoMap = m_animation.GetBoneIDMap ();
+		if ( boneInfoMap.find ( nodeName ) != boneInfoMap.end () )
+		{
+			int index = boneInfoMap[ nodeName ].id;
+			glm::mat4 offset = boneInfoMap[ nodeName ].offset;
+			//uint32_t frame_index = static_cast< uint32_t >( currentTime * 60.0f );
+			if ( index >= m_cached_node_transforms.size () )
+			{
+				m_cached_node_transforms.resize ( index + 1 );
+			}
+			if ( frame >= m_cached_node_transforms[ index ].size () )
+			{
+				m_cached_node_transforms[ index ].resize ( frame + 1 );
+			}
+			m_cached_node_transforms[ index ][ frame ] = globalTransformation * offset;
+			//m_FinalBoneMatrices[ index ] = ( globalTransformation /** glm::mat4( 10.0f )*/ ) *offset; //sus
+		}
+
+		for ( int i = 0; i < node->childrenCount; i++ )
+			PreCalculateBoneTransform ( frame , currentTime , &node->children[ i ] , globalTransformation );
 	}
 }
