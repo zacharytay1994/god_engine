@@ -104,6 +104,8 @@ namespace god
 		OGLRenderPass<1> m_blur_pingpong_1;
 		OGLRenderPass<1> m_blur_pingpong_2;
 
+		std::unordered_map<std::string , AnimationWrap> m_animations;
+
 	private:
 		int m_screen_width { 0 } , m_screen_height { 0 };
 
@@ -147,7 +149,6 @@ namespace god
 		glm::mat4 m_light_space_matrix;
 		OGLShadowMap m_shadowmap;
 
-		std::unordered_map<std::string , AnimationWrap> m_animations;
 		std::vector<std::string> m_animation_names;
 		void LoadAllAnimations ();
 		void RenderAnimations ( Scene& scene ,
