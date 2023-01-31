@@ -961,12 +961,26 @@ namespace god
 		SystemTimer::StartTimeSegment ( "UpdateAnimations" );
 		for ( auto& animation : m_animations )
 		{
+			std::vector<uint32_t> to_remove;
 			for ( auto i = 0; i < animation.second.m_animators.Size (); ++i )
 			{
 				if ( animation.second.m_animators.Valid ( i ) )
 				{
-					animation.second.m_animators[ i ].UpdateAnimation ( DeltaTimer::m_dt , animation.second.m_cached_node_transforms );
+					if ( animation.second.m_animators[ i ].m_alive )
+					{
+						animation.second.m_animators[ i ].UpdateAnimation ( DeltaTimer::m_dt , animation.second.m_cached_node_transforms );
+						animation.second.m_animators[ i ].m_alive = false;
+					}
+					else
+					{
+						// remove animator
+						to_remove.push_back ( i );
+					}
 				}
+			}
+			for ( auto const& i : to_remove )
+			{
+				animation.second.m_animators.Erase ( i );
 			}
 		}
 		SystemTimer::EndTimeSegment ( "UpdateAnimations" );

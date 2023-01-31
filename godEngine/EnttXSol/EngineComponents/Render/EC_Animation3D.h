@@ -27,12 +27,14 @@ namespace god
 
 		bool operator==( SkeleAnim3D const& rhs )
 		{
-			return
+			/*return
 				m_animation == rhs.m_animation &&
 				m_diffuse_id == rhs.m_diffuse_id &&
 				m_specular_id == rhs.m_specular_id &&
 				m_shininess == rhs.m_shininess &&
-				m_emissive == rhs.m_emissive;
+				m_emissive == rhs.m_emissive;*/
+			( rhs );
+			return true;
 		}
 	};
 	template <>

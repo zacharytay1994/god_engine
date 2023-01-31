@@ -1626,6 +1626,10 @@ namespace god
 
 	EnttXSol::Entities::ID EnttXSol::InstancePrefabFromMaster ( std::string const& fileName , Entities::ID parent )
 	{
+		if ( fileName == "350Triton" )
+		{
+			int i = 0;
+		}
 		return MakeEntityCopy ( m_entity_pool[ fileName ] , parent );
 	}
 
@@ -1655,6 +1659,8 @@ namespace god
 				}
 				else
 				{
+					auto src_component = storage.get ( m_entities[ src ].m_id );
+					glm::vec3 scale = static_cast<Transform*>(src_component)->m_scale;
 					storage.emplace ( m_entities[ new_entity ].m_id , storage.get ( m_entities[ src ].m_id ) );
 				}
 			}

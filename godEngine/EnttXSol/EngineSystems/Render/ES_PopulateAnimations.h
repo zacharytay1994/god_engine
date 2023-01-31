@@ -7,12 +7,12 @@
 
 namespace god
 {
-	void PopulateAnimations ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , SkeleAnim3D& , ActiveComponent&> components )
+	void PopulateAnimations ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , SkeleAnim3D&> components )
 	{
 		( entt );
 		( components );
 
-		auto& [entity_data , transform , skele_anim , active] = components;
+		auto& [entity_data , transform , skele_anim] = components;
 
 		// initialize animation
 		if ( !skele_anim.m_initialized )
@@ -36,6 +36,8 @@ namespace god
 					animator.m_startTime = start;
 					animator.m_endTime = end;
 				}
+				// let animator know entity is still alive
+				animator.m_alive = true;
 			}
 		}
 

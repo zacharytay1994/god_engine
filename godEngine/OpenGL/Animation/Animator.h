@@ -38,6 +38,7 @@ namespace god
 
 			float m_startTime { 0.0f };
 			float m_endTime { 1.0f };
+			bool m_alive { true };
 
 		private:
 			std::vector<glm::mat4> m_FinalBoneMatrices;
