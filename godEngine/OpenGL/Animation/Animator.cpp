@@ -20,7 +20,11 @@ namespace god
 			if ( m_CurrentAnimation )
 			{
 				m_CurrentTime += m_CurrentAnimation->GetTicksPerSecond () * dt;
-				m_CurrentTime = fmod ( m_CurrentTime , m_CurrentAnimation->GetDuration () );
+				//m_CurrentTime = fmod ( m_CurrentTime , m_CurrentAnimation->GetDuration () );
+				if ( m_CurrentTime > m_endTime || m_CurrentTime < m_startTime )
+				{
+					m_CurrentTime = m_startTime;
+				}
 				uint32_t frame = static_cast< uint32_t >( m_CurrentTime / m_CurrentAnimation->GetTicksPerSecond () * 60.0f );
 				CalculateBoneTransform ( frame , &m_CurrentAnimation->GetRootNode () , cachedTransforms );
 			}

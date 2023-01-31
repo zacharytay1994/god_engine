@@ -17,7 +17,7 @@ namespace god
 		float m_emissive { 0.0f };
 		bool m_visible { true };
 
-		std::unordered_map<std::string , std::tuple<float , float>> m_sub_animations { {"test", {0.2f,0.4f}} };
+		std::unordered_map<std::string , std::tuple<float , float>> m_sub_animations;
 		std::string m_current_sub_animation { "" };
 		std::string m_new_sub_animation_name { "" };
 		float m_start { 0.0f };
@@ -68,8 +68,10 @@ namespace god
 						ImGui::Separator ();
 						ImGui::Text ( "Sub-Animations" );
 						ImGui::InputText ( "Current Sub" , &component.m_current_sub_animation );
+						int i { 0 };
 						for ( auto& sub_animation : component.m_sub_animations )
 						{
+							ImGui::PushID ( i++ );
 							auto& [start , end] = sub_animation.second;
 							ImGui::Text ( "[:" );
 							ImGui::SameLine ();
@@ -81,6 +83,7 @@ namespace god
 							ImGui::SameLine ();
 							ImGui::SetNextItemWidth ( width );
 							ImGui::Text ( sub_animation.first.c_str () );
+							ImGui::PopID ();
 						}
 						if ( ImGui::Button ( "Add Sub-Animation" ) )
 						{
@@ -201,6 +204,7 @@ namespace god
 		RapidJSON::JSONifyToValue ( value , document , "visible" , component.m_visible );
 
 		// serialize sub animation
+		RapidJSON::JSONifyToValue ( value , document , "currentsubanimation" , component.m_current_sub_animation );
 		std::stringstream ss;
 		for ( auto& sub_animation : component.m_sub_animations )
 		{
@@ -240,6 +244,7 @@ namespace god
 		AssignIfExist ( jsonObj , component.m_visible , "visible" );
 
 		// deserialize sub animations
+		AssignIfExist ( jsonObj , component.m_current_sub_animation , "currentsubanimation" );
 		std::string sub_animations;
 		AssignIfExist ( jsonObj , sub_animations , "subanimations" );
 		std::stringstream ss;

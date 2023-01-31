@@ -36,6 +36,9 @@ namespace god
 
 			std::vector<glm::mat4> GetFinalBoneMatrices ();
 
+			float m_startTime { 0.0f };
+			float m_endTime { 1.0f };
+
 		private:
 			std::vector<glm::mat4> m_FinalBoneMatrices;
 			Animation* m_CurrentAnimation;
