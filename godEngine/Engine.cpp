@@ -200,6 +200,7 @@ namespace god
 #endif
 
 			// depth map pass
+			opengl.UpdateAnimations ( DeltaTimer::m_dt );
 			opengl.FirstPassRenderToDepthmap (
 				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,

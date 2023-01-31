@@ -89,6 +89,7 @@ namespace god
 		void SetLineWidth ( float size );
 
 		// shadow stuff
+		void UpdateAnimations (float dt);
 		void FirstPassRenderToDepthmap ( Scene const& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures );
 
 		// gaussian blur
@@ -121,6 +122,7 @@ namespace god
 		OGLShader m_single_colour_outline_shader;
 		OGLShader m_cubemap_shader;
 		OGLShader m_depthmap_shader;
+		OGLShader m_anim_depthmap_shader;
 		OGLShader m_hdr_shader;
 		OGLShader m_blur_shader;
 		OGLShader m_blend_shader;

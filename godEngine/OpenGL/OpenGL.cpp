@@ -83,6 +83,10 @@ namespace god
 			"Assets/EngineAssets/OpenGLShaders/depthmap.vs" ,
 			"Assets/EngineAssets/OpenGLShaders/depthmap.fs" );
 
+		m_anim_depthmap_shader.InitializeFromFile (
+			"Assets/EngineAssets/OpenGLShaders/anim_depthmap.vs" ,
+			"Assets/EngineAssets/OpenGLShaders/depthmap.fs" );
+
 		// Create 2D shader
 		m_2D_shader.InitializeFromFile (
 			"Assets/EngineAssets/OpenGLShaders/texturemaps2D.vs" ,
@@ -958,32 +962,32 @@ namespace god
 	void OpenGL::RenderAnimations ( Scene& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures , glm::vec3 const& camera_front )
 	{
 		// update all animations
-		SystemTimer::StartTimeSegment ( "UpdateAnimations" );
-		for ( auto& animation : m_animations )
-		{
-			std::vector<uint32_t> to_remove;
-			for ( auto i = 0; i < animation.second.m_animators.Size (); ++i )
-			{
-				if ( animation.second.m_animators.Valid ( i ) )
-				{
-					if ( animation.second.m_animators[ i ].m_alive )
-					{
-						animation.second.m_animators[ i ].UpdateAnimation ( DeltaTimer::m_dt , animation.second.m_cached_node_transforms );
-						animation.second.m_animators[ i ].m_alive = false;
-					}
-					else
-					{
-						// remove animator
-						to_remove.push_back ( i );
-					}
-				}
-			}
-			for ( auto const& i : to_remove )
-			{
-				animation.second.m_animators.Erase ( i );
-			}
-		}
-		SystemTimer::EndTimeSegment ( "UpdateAnimations" );
+		//SystemTimer::StartTimeSegment ( "UpdateAnimations" );
+		//for ( auto& animation : m_animations )
+		//{
+		//	std::vector<uint32_t> to_remove;
+		//	for ( auto i = 0; i < animation.second.m_animators.Size (); ++i )
+		//	{
+		//		if ( animation.second.m_animators.Valid ( i ) )
+		//		{
+		//			if ( animation.second.m_animators[ i ].m_alive )
+		//			{
+		//				animation.second.m_animators[ i ].UpdateAnimation ( DeltaTimer::m_dt , animation.second.m_cached_node_transforms );
+		//				animation.second.m_animators[ i ].m_alive = false;
+		//			}
+		//			else
+		//			{
+		//				// remove animator
+		//				to_remove.push_back ( i );
+		//			}
+		//		}
+		//	}
+		//	for ( auto const& i : to_remove )
+		//	{
+		//		animation.second.m_animators.Erase ( i );
+		//	}
+		//}
+		//SystemTimer::EndTimeSegment ( "UpdateAnimations" );
 
 		m_animation_shader.Use ();
 
@@ -1094,10 +1098,14 @@ namespace god
 			}
 
 			// set material
-			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			/*OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
 			std::get<1> ( textures.Get ( textures.GetID ( "White" ) ) ).Bind ( 0 );
 			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.specular_map" , 1 );
-			std::get<1> ( textures.Get ( textures.GetID ( "White" ) ) ).Bind ( 1 );
+			std::get<1> ( textures.Get ( textures.GetID ( "White" ) ) ).Bind ( 1 );*/
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
+			std::get<1> ( textures.Get ( render_data.m_diffuse_id ) ).Bind ( 0 );
+			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.specular_map" , 1 );
+			std::get<1> ( textures.Get ( render_data.m_specular_id ) ).Bind ( 1 );
 			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uMaterial.shininess" , 32.0f );
 
 			// draw model
@@ -1106,6 +1114,34 @@ namespace god
 			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uEmissive" , render_data.m_emissive );
 
 			m_animations[ m_animation_names[ render_data.m_model_id ] ].m_model.Draw ( m_animation_shader );
+		}
+	}
+
+	void OpenGL::UpdateAnimations (float dt)
+	{
+		for ( auto& animation : m_animations )
+		{
+			std::vector<uint32_t> to_remove;
+			for ( auto i = 0; i < animation.second.m_animators.Size (); ++i )
+			{
+				if ( animation.second.m_animators.Valid ( i ) )
+				{
+					if ( animation.second.m_animators[ i ].m_alive )
+					{
+						animation.second.m_animators[ i ].UpdateAnimation ( dt , animation.second.m_cached_node_transforms );
+						animation.second.m_animators[ i ].m_alive = false;
+					}
+					else
+					{
+						// remove animator
+						to_remove.push_back ( i );
+					}
+				}
+			}
+			for ( auto const& i : to_remove )
+			{
+				animation.second.m_animators.Erase ( i );
+			}
 		}
 	}
 
@@ -1118,6 +1154,7 @@ namespace god
 
 		//glCheckError();
 		m_shadowmap.EnableDepthMap ();
+
 		for ( auto const& data : scene.m_instanced_render_data )
 		{
 			// Draw the normal model
@@ -1135,6 +1172,33 @@ namespace god
 				mesh.DrawInstanced ( GL_TRIANGLES );
 			}
 		}
+
+		m_anim_depthmap_shader.Use ();
+
+		OGLShader::SetUniform (
+			m_anim_depthmap_shader.GetShaderID () ,
+			"uLightSpaceMatrix" ,
+			m_light_space_matrix );
+
+		for ( auto const& data : scene.m_animation_data )
+		{
+			auto& [render_data , transform] = data;
+			auto& animator = m_animations[ m_animation_names[ render_data.m_model_id ] ].m_animators[ static_cast< uint32_t >( render_data.m_shininess ) ];
+
+			auto transforms = animator.GetFinalBoneMatrices ();
+			for ( int i = 0; i < transforms.size (); ++i )
+			{
+				std::string temp = "bone_transforms[" + std::to_string ( i ) + "]";
+				OGLShader::SetUniform ( m_anim_depthmap_shader.GetShaderID () , temp.c_str () , transforms[ i ] );
+			}
+
+			// draw model
+			OGLShader::SetUniform ( m_anim_depthmap_shader.GetShaderID () , "uModel" , transform );
+
+			m_animations[ m_animation_names[ render_data.m_model_id ] ].m_model.Draw ( m_anim_depthmap_shader );
+		}
+		m_anim_depthmap_shader.UnUse ();
+
 		m_shadowmap.DisableDepthMap ();
 
 	}
@@ -1271,8 +1335,10 @@ namespace god
 			{
 				m_cached_node_transforms[ index ].resize ( frame + 1 );
 			}
+
 			m_cached_node_transforms[ index ][ frame ] = globalTransformation * offset;
-			//m_FinalBoneMatrices[ index ] = ( globalTransformation /** glm::mat4( 10.0f )*/ ) *offset; //sus
+			//m_FinalBoneMatrices[ index ] = ( globalTransformation * glm::mat4( 10.0f ) ) *offset; //sus
+			//m_cached_node_transforms[ index ][ frame ] = ( globalTransformation * glm::mat4 ( 10.0f ) ) * offset;
 		}
 
 		for ( int i = 0; i < node->childrenCount; i++ )
