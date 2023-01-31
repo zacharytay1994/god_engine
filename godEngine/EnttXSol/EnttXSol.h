@@ -161,6 +161,9 @@ namespace god
 		template<typename...COMPONENTS>
 		auto GetView ();
 
+		template<typename...COMPONENTS, typename...EXCLUDE>
+		auto GetView ( std::tuple< COMPONENTS...> const& include , std::tuple<EXCLUDE...> const& exclude );
+
 		friend void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources , MainVariables& name );
 
 		// helper functor to attach script components
@@ -375,12 +378,18 @@ namespace god
 	inline void EnttXSol::RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) , std::tuple<E...> const& exclude )
 	{
 		( exclude );
-		auto view = m_registry.view<std::remove_reference<T>::type...> ( entt::exclude<E...> );
+		/*entt::runtime_view view {};
+		view.iterate ( m_registry.storage<ActiveComponent> () )
+			.iterate ( m_registry.storage<std::remove_reference<T>::type...> () )
+			.exclude ( m_registry.storage<E...> () );*/
+		auto view = m_registry.view<std::remove_reference<T>::type..., ActiveComponent> ( entt::exclude<E...> );
+		//auto view = GetView ( std::make_tuple<T...> () , exclude );
+		//auto view = GetView<T...> ();
 		//view.each ( system );
 
 		for ( auto entity : view )
 		{
-			system ( *this , engineResources , view.get ( entity ) );
+			system ( *this , engineResources , view.get<std::remove_reference<T>::type...> ( entity ) );
 		}
 	}
 
@@ -856,6 +865,12 @@ namespace god
 	inline auto EnttXSol::GetView ()
 	{
 		return m_registry.view<ActiveComponent , COMPONENTS...> ();
+	}
+
+	template<typename ...COMPONENTS , typename ...EXCLUDE>
+	inline auto EnttXSol::GetView ( std::tuple<COMPONENTS...> const& include , std::tuple<EXCLUDE...> const& exclude )
+	{
+		return m_registry.view<ActiveComponent , COMPONENTS...> ( entt::exclude<EXCLUDE...> );
 	}
 
 	template<typename T>

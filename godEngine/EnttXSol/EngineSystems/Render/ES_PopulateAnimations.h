@@ -7,12 +7,12 @@
 
 namespace god
 {
-	void PopulateAnimations ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , SkeleAnim3D& , ActiveComponent&> components )
+	void PopulateAnimations ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , SkeleAnim3D&> components )
 	{
 		( entt );
 		( components );
 
-		auto& [entity_data , transform , skele_anim , active] = components;
+		auto& [entity_data , transform , skele_anim] = components;
 
 		// initialize animation
 		if ( !skele_anim.m_initialized )
@@ -22,6 +22,23 @@ namespace god
 			skele_anim.m_animation_id = animation;
 			skele_anim.m_animator_id = animator;
 			skele_anim.m_initialized = true;
+		}
+		else
+		{
+			// update animator on opengl side
+			auto& opengl = engineResources.Get<OpenGL> ().get ();
+			if ( opengl.m_animations.find ( skele_anim.m_animation ) != opengl.m_animations.end () )
+			{
+				auto& animator = opengl.m_animations[ skele_anim.m_animation ].m_animators[ skele_anim.m_animator_id ];
+				if ( skele_anim.m_sub_animations.find ( skele_anim.m_current_sub_animation ) != skele_anim.m_sub_animations.end () )
+				{
+					auto& [start , end] = skele_anim.m_sub_animations[ skele_anim.m_current_sub_animation ];
+					animator.m_startTime = start;
+					animator.m_endTime = end;
+				}
+				// let animator know entity is still alive
+				animator.m_alive = true;
+			}
 		}
 
 		// return if not valid

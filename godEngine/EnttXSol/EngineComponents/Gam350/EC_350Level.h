@@ -357,6 +357,7 @@ namespace god
 
 				// instance entity prefab
 				auto e = entt.InstancePrefab ( engineResources , m_player_names[ static_cast< int >( playable.m_type ) ] , level.m_id );
+				Transform* child_transform = entt.GetEngineComponent<Transform> ( entt.m_entities[ e ].m_children[ 0 ] );
 				m_playables.back ().m_entity_id = e;
 				Transform* transform = entt.GetEngineComponent<Transform> ( e );
 				if ( transform )

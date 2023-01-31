@@ -35,10 +35,13 @@ namespace god
 	{
 		Animation3D::Model m_model;
 		Animation3D::Animation m_animation;
+		std::vector<std::vector<glm::mat4>> m_cached_node_transforms;
 		RecycleVector<Animation3D::Animator> m_animators;
 
 		void Initialize ( std::string const& path );
 		uint32_t AddInstance ();
+		void PreCalculateBoneTransform ( uint32_t frame , float currentTime , const Animation3D::AssimpNodeData* node ,
+			glm::mat4 parentTransform );
 	};
 
 	struct Scene;
@@ -86,6 +89,7 @@ namespace god
 		void SetLineWidth ( float size );
 
 		// shadow stuff
+		void UpdateAnimations (float dt);
 		void FirstPassRenderToDepthmap ( Scene const& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures );
 
 		// gaussian blur
@@ -95,11 +99,13 @@ namespace god
 		std::vector<std::vector<OGLMesh>> getMesh () { return m_models; }
 
 		// animation interface
-		std::tuple<uint32_t,uint32_t> AddAnimationInstance ( std::string const& name );
+		std::tuple<uint32_t , uint32_t> AddAnimationInstance ( std::string const& name );
 
 		// blur 
 		OGLRenderPass<1> m_blur_pingpong_1;
 		OGLRenderPass<1> m_blur_pingpong_2;
+
+		std::unordered_map<std::string , AnimationWrap> m_animations;
 
 	private:
 		int m_screen_width { 0 } , m_screen_height { 0 };
@@ -116,6 +122,7 @@ namespace god
 		OGLShader m_single_colour_outline_shader;
 		OGLShader m_cubemap_shader;
 		OGLShader m_depthmap_shader;
+		OGLShader m_anim_depthmap_shader;
 		OGLShader m_hdr_shader;
 		OGLShader m_blur_shader;
 		OGLShader m_blend_shader;
@@ -144,7 +151,6 @@ namespace god
 		glm::mat4 m_light_space_matrix;
 		OGLShadowMap m_shadowmap;
 
-		std::unordered_map<std::string , AnimationWrap> m_animations;
 		std::vector<std::string> m_animation_names;
 		void LoadAllAnimations ();
 		void RenderAnimations ( Scene& scene ,

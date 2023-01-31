@@ -7,12 +7,12 @@
 
 namespace god
 {
-	void PopulateTransparent ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , Renderable3D& , Transparent& , ActiveComponent&> components )
+	void PopulateTransparent ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , Renderable3D& , Transparent&> components )
 	{
 		( entt );
 		( components );
 
-		auto& [entity_data , transform , renderable , transparent , active] = components;
+		auto& [entity_data , transform , renderable , transparent] = components;
 
 		// return if not valid
 		if ( !entt.m_entities.Valid ( entity_data.m_id ) )
