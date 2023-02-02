@@ -11,8 +11,8 @@ function C_VFXShow()
         --[SerializeFloat]
         fadeDelay = 1.5,
 
-        -- How quickly the VFX fades away
-        fadeRate = 1,
+        -- How quickly the VFX fades away (currently unused)
+        -- fadeRate = 1,
 
         timer = 0.0
     }
@@ -41,23 +41,18 @@ function S_VFXShow(e)
         -- end
 
         -- then remove instance
-        RemoveInstance(e)
+        --RemoveInstance(e)
 
     end
 end
 
-function SpawnVFX(vfxName, duration, posX, posY, posZ)
+function SpawnVFX(vfxName, posX, posY, posZ)
 
     print("SPAWNVFX()")
     print("vfxName:", vfxName)
-    print("duration:", duration)
     print("position:", posX, posY, posZ)
 
     local spawnedVFX = InstancePrefabNow(vfxName, posX, posY, posZ)
-
-    local VFXFadeComponent = GetComponent(spawnedVFX, "C_VFXShow")
-    VFXFadeComponent.fadeDelay = duration
-
     return spawnedVFX
     
 end
