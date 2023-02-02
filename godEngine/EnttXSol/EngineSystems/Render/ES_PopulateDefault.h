@@ -7,12 +7,12 @@
 
 namespace god
 {
-	void PopulateDefault ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , Renderable3D& , ActiveComponent&> components )
+	void PopulateDefault ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , Renderable3D&> components )
 	{
 		( entt );
 		( components );
 
-		auto& [entity_data , transform , renderable  , active] = components;
+		auto& [entity_data , transform , renderable] = components;
 
 		// return if not valid
 		if ( !entt.m_entities.Valid ( entity_data.m_id ) )

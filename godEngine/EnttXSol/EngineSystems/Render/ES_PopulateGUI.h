@@ -7,9 +7,9 @@
 
 namespace god
 {
-	void PopulateGUI ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , Renderable3D& , GUIObject& , ActiveComponent&> components )
+	void PopulateGUI ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , Renderable3D& , GUIObject&> components )
 	{
-		auto [entity_data , transform , renderable , gui_object , active] = components;
+		auto [entity_data , transform , renderable , gui_object] = components;
 
 		// return if not valid
 		if ( !entt.m_entities.Valid ( entity_data.m_id ) )

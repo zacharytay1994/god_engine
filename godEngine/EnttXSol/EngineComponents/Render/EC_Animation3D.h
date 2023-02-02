@@ -17,16 +17,24 @@ namespace god
 		float m_emissive { 0.0f };
 		bool m_visible { true };
 
+		std::unordered_map<std::string , std::tuple<float , float>> m_sub_animations;
+		std::string m_current_sub_animation { "" };
+		std::string m_new_sub_animation_name { "" };
+		float m_start { 0.0f };
+		float m_end { 0.0f };
+
 		bool m_initialized { false };
 
 		bool operator==( SkeleAnim3D const& rhs )
 		{
-			return
+			/*return
 				m_animation == rhs.m_animation &&
 				m_diffuse_id == rhs.m_diffuse_id &&
 				m_specular_id == rhs.m_specular_id &&
 				m_shininess == rhs.m_shininess &&
-				m_emissive == rhs.m_emissive;
+				m_emissive == rhs.m_emissive;*/
+			( rhs );
+			return true;
 		}
 	};
 	template <>
@@ -48,6 +56,56 @@ namespace god
 				ImGui::Separator ();
 
 				ImGui::InputText ( "Animation" , &component.m_animation );
+
+				// sub animation interface
+				if ( component.m_initialized )
+				{
+					OpenGL& opengl = resources.Get<OpenGL> ().get ();
+					if ( opengl.m_animations.find ( component.m_animation ) != opengl.m_animations.end () )
+					{
+						auto& animation_wrap = opengl.m_animations[ component.m_animation ];
+						float max_duration = animation_wrap.m_animation.GetDuration ();
+
+						auto width = ImGui::GetWindowWidth () / 4;
+						ImGui::Separator ();
+						ImGui::Text ( "Sub-Animations" );
+						ImGui::InputText ( "Current Sub" , &component.m_current_sub_animation );
+						int i { 0 };
+						for ( auto& sub_animation : component.m_sub_animations )
+						{
+							ImGui::PushID ( i++ );
+							auto& [start , end] = sub_animation.second;
+							ImGui::Text ( "[:" );
+							ImGui::SameLine ();
+							ImGui::SetNextItemWidth ( width );
+							ImGui::DragFloat ( "##[: " , &start , 0.1f , 0.0f , max_duration );
+							ImGui::SameLine ();
+							ImGui::SetNextItemWidth ( width );
+							ImGui::DragFloat ( ":]" , &end , 0.1f , 0.0f , max_duration );
+							ImGui::SameLine ();
+							ImGui::SetNextItemWidth ( width );
+							ImGui::Text ( sub_animation.first.c_str () );
+							ImGui::PopID ();
+						}
+						if ( ImGui::Button ( "Add Sub-Animation" ) )
+						{
+							component.m_sub_animations[ component.m_new_sub_animation_name ] = { component.m_start, component.m_end };
+						}
+						ImGui::PushID ( 999 );
+						ImGui::Text ( "[:" );
+						ImGui::SameLine ();
+						ImGui::SetNextItemWidth ( width );
+						ImGui::DragFloat ( "##[: " , &component.m_start , 0.1f , 0.0f , max_duration );
+						ImGui::SameLine ();
+						ImGui::SetNextItemWidth ( width );
+						ImGui::DragFloat ( ":]" , &component.m_end , 0.1f , 0.0f , max_duration );
+						ImGui::SameLine ();
+						ImGui::SetNextItemWidth ( width );
+						ImGui::InputText ( "##NewSubanimation" , &component.m_new_sub_animation_name );
+						ImGui::PopID ();
+					}
+				}
+
 
 				auto& textures = resources.Get<OGLTextureManager> ();
 
@@ -146,6 +204,16 @@ namespace god
 		// serialize emissive
 		RapidJSON::JSONifyToValue ( value , document , "emissive" , component.m_emissive );
 		RapidJSON::JSONifyToValue ( value , document , "visible" , component.m_visible );
+
+		// serialize sub animation
+		RapidJSON::JSONifyToValue ( value , document , "currentsubanimation" , component.m_current_sub_animation );
+		std::stringstream ss;
+		for ( auto& sub_animation : component.m_sub_animations )
+		{
+			auto& [start , end] = sub_animation.second;
+			ss << sub_animation.first << " " << start << " " << end << " ";
+		}
+		RapidJSON::JSONifyToValue ( value , document , "subanimations" , ss.str () );
 	}
 
 	template<>
@@ -176,5 +244,18 @@ namespace god
 
 		AssignIfExist ( jsonObj , component.m_emissive , "emissive" );
 		AssignIfExist ( jsonObj , component.m_visible , "visible" );
+
+		// deserialize sub animations
+		AssignIfExist ( jsonObj , component.m_current_sub_animation , "currentsubanimation" );
+		std::string sub_animations;
+		AssignIfExist ( jsonObj , sub_animations , "subanimations" );
+		std::stringstream ss;
+		ss << sub_animations;
+		std::string name;
+		float start , end;
+		while ( ss >> name >> start >> end )
+		{
+			component.m_sub_animations.insert ( { name,{start, end} } );
+		}
 	}
 }

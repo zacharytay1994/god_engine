@@ -64,7 +64,7 @@ function GenerateMediumBubbles(bubbleEmitterEntity, deltaTime, bubbleEmitterComp
 
     bubbleEmitterComponent.mediumTimer = 0.0
     
-    print("GenerateMediumBubbles() called!")
+    -- print("GenerateMediumBubbles() called!")
     
     -- generate bubble at random location (near the emitter)
     local x = GenerateRandomNumberInRange(-20, 20)
@@ -85,7 +85,7 @@ function GenerateLargeBubbles(bubbleEmitterEntity, deltaTime, bubbleEmitterCompo
 
     bubbleEmitterComponent.largeTimer = 0.0
     
-    print("GenerateLargeBubbles() called!")
+    -- print("GenerateLargeBubbles() called!")
     
     -- generate bubble at random location (near the emitter)
     local x = GenerateRandomNumberInRange(-20, 20)
