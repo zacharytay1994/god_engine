@@ -19,10 +19,22 @@ function S_VFXVibration(e)
     --     SpawnVFX("VFX_Slash", 1.0, GetTransform(e).position.x, GetTransform(e).position.y, GetTransform(e).position.z)
     -- end
 
-    local smallRing = GetChild(e, 0)
-    local mediumRing = GetChild(e, 1)
-    local largeRing = GetChild(e, 2)
+    --print("start of S_VFXVibration")
+    local smallRing = Child(e, 0)
+    local mediumRing = Child(e, 1)
+    local largeRing = Child(e, 2)
+    --print(EntityName(smallRing), EntityName(mediumRing), EntityName(largeRing))
 
-    print(EntityName(smallRing), EntityName(mediumRing), EntityName(largeRing))
+    MoveForward(smallRing, 0.1)
+    MoveForward(mediumRing, 0.2)
+    MoveForward(largeRing, 0.3)
+
+end
+
+function MoveForward(e, speed)
+
+    local transform = GetTransform(e)
+
+    transform.position.z = transform.position.z + (speed * GetDeltaTime())
 
 end
