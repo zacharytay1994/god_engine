@@ -17,7 +17,7 @@ function S_VFXTest(e)
 
     -- just for testing (press Z)
     if (CheckKeyPress(90)) then
-        SpawnVFX("VFX_Slash", 1.0, GetTransform(e).position.x, GetTransform(e).position.y, GetTransform(e).position.z)
+        SpawnVFX("VFX_Vibration", 1.0, GetTransform(e).position.x, GetTransform(e).position.y, GetTransform(e).position.z)
     end
 
 end
