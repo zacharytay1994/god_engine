@@ -57,4 +57,7 @@ function SpawnVFX(vfxName, duration, posX, posY, posZ)
 
     local VFXFadeComponent = GetComponent(spawnedVFX, "C_VFXShow")
     VFXFadeComponent.fadeDelay = duration
+
+    return spawnedVFX
+    
 end
