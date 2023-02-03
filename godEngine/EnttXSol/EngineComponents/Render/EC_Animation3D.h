@@ -20,8 +20,12 @@ namespace god
 		std::unordered_map<std::string , std::tuple<float , float>> m_sub_animations;
 		std::string m_current_sub_animation { "" };
 		std::string m_new_sub_animation_name { "" };
+
+		std::string m_old_sub_animation { "" };
 		float m_start { 0.0f };
 		float m_end { 0.0f };
+		bool m_animation_played { false };
+		bool m_repeat { true };
 
 		bool m_initialized { false };
 
@@ -35,6 +39,12 @@ namespace god
 				m_emissive == rhs.m_emissive;*/
 			( rhs );
 			return true;
+		}
+
+		void PlayAnimation ( std::string const& name , bool repeat )
+		{
+			m_current_sub_animation = name;
+			m_repeat = repeat;
 		}
 	};
 	template <>

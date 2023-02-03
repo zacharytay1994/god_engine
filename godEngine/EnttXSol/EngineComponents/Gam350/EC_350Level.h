@@ -89,6 +89,7 @@ namespace god
 			West
 		};
 
+		struct Playable;
 		struct Enemy : public Entity
 		{
 			enum class Type
@@ -107,7 +108,10 @@ namespace god
 
 			template <typename ENTT , typename ENGINE_RESOURCES , typename GRID>
 			void Update ( ENTT& entt , ENGINE_RESOURCES& engineResources ,
-				GRID& grid )
+				GRID& grid ,
+				Enemy*& enemy ,
+				Playable*& playable ,
+				bool& combatAttacking )
 			{
 				switch ( m_type )
 				{
@@ -125,11 +129,13 @@ namespace god
 						Tile& tile = grid.m_tiles[ m_destination ];
 						auto& [x , y , z] = tile.m_cell;
 						Entity* triton = grid.GetTriton ( x , y + 1 , z );
-						if ( /*grid.HasTriton ( x , y + 1 , z )*/triton )
+						if ( triton )
 						{
 							triton->m_to_destroy = true;
-							/*Get
-							grid.m_to_restart = true;*/
+							// check if tile walked on has playable, if so eat it
+							playable = static_cast< Playable* >( triton );
+							enemy = this;
+							combatAttacking = false;
 						}
 					}
 					// try searching for destination
@@ -237,6 +243,7 @@ namespace god
 
 			bool m_combat_paused { false };
 			bool m_combat_attacking { true };
+			bool m_combat_done { false };
 			Playable* m_combat_playable { nullptr };
 			Enemy* m_combat_enemy { nullptr };
 			glm::vec3 m_combat_area_offset { 10'000,10'000,10'000 };
@@ -245,6 +252,9 @@ namespace god
 			float m_combat_prep_time_counter { m_combat_prep_time };
 			glm::vec3 m_pre_combat_camera_position { 0.0f };
 			glm::vec3 m_pre_combat_camera_lookat { 0.0f };
+			bool m_combat_start_animation { false };
+			float m_combat_end_lag { 1.0f };
+			float m_combat_end_lag_counter { m_combat_end_lag };
 
 			// camera controls
 			glm::vec3 m_center { 0.0f,0.0f,0.0f };
@@ -747,6 +757,7 @@ namespace god
 										combat_playable_transform->m_position += m_combat_area_offset;
 										m_combat_playable->m_lerp_to += m_combat_area_offset;
 										combat_enemy_transform->m_position += m_combat_area_offset;
+										m_combat_enemy->m_lerp_to += m_combat_area_offset;
 										// move the camera to the combat area
 										Camera& camera = engineResources.Get<Camera> ().get ();
 										// cache camera position
@@ -853,7 +864,7 @@ namespace god
 								{
 									for ( auto& enemy : m_enemies )
 									{
-										enemy.Update ( entt , engineResources , *this );
+										enemy.Update ( entt , engineResources , *this , m_combat_enemy , m_combat_playable , m_combat_attacking );
 									}
 									m_updated_enemies = true;
 								}
@@ -915,7 +926,7 @@ namespace god
 									// face each other
 									glm::vec3 norm_dir = glm::normalize ( dir );
 									float a1 = DegreeBetweenVec2 ( { 1,0 } , { norm_dir.x, norm_dir.z } );
-									float a2 = DegreeBetweenVec2 ( { -norm_dir.x, -norm_dir.z } , { 1,0 } );
+									float a2 = DegreeBetweenVec2 ( { 1,0 } , { -norm_dir.x, -norm_dir.z } );
 									combat_playable_transform->m_rotation.y = a1;
 									combat_enemy_transform->m_rotation.y = a2;
 								}
@@ -930,43 +941,150 @@ namespace god
 									}
 									playable.UpdateCombatLerpTo ( 3.0f , dt , m_combat_area_offset );
 								}
-							}
 
-							GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
-							if ( window.KeyPressed ( GLFW_KEY_I ) )
-							{
-								m_combat_paused = false;
-
-								// reset combat variables
-								m_combat_prep_time_counter = m_combat_prep_time;
-
-								// create combat transtion, i.e. white screen
-								entt.InstancePrefab ( engineResources , "WhiteFade" );
-
-								// reset remaining entity
-								if ( m_combat_attacking )
+								// process animations
+								SkeleAnim3D* playable_anim = entt.GetEngineComponent<SkeleAnim3D> ( entt.m_entities[ entt.m_entities[ m_combat_playable->m_entity_id ].m_children[ 0 ] ].m_children[ 0 ] );
+								SkeleAnim3D* enemy_anim = entt.GetEngineComponent<SkeleAnim3D> ( entt.m_entities[ entt.m_entities[ m_combat_enemy->m_entity_id ].m_children[ 0 ] ].m_children[ 0 ] );
+								if ( !m_combat_start_animation && playable_anim )
 								{
-									Transform* transform = entt.GetEngineComponent<Transform> ( m_combat_playable->m_entity_id );
+									playable_anim->PlayAnimation ( "AOE" , false );
+									m_combat_start_animation = true;
+								}
+								if ( playable_anim->m_current_sub_animation == "AOE" && playable_anim->m_animation_played )
+								{
+									playable_anim->PlayAnimation ( "Idle" , true );
+									if ( enemy_anim )
+									{
+										enemy_anim->PlayAnimation ( "Death" , false );
+									}
+								}
+								if ( enemy_anim->m_current_sub_animation == "Death" && enemy_anim->m_animation_played )
+								{
+									m_combat_done = true;
+								}
+							}
+							// enemy is the one attacking
+							else
+							{
+								Transform* combat_playable_transform = entt.GetEngineComponent<Transform> ( m_combat_playable->m_entity_id );
+								Transform* combat_enemy_transform = entt.GetEngineComponent<Transform> ( m_combat_enemy->m_entity_id );
+
+								if ( combat_playable_transform && combat_enemy_transform )
+								{
+									// continue updating camera position as midpoint of both
+									// set new camera pan
+									Camera& camera = engineResources.Get<Camera> ().get ();
+									glm::vec3 v1 = combat_enemy_transform->m_position - combat_playable_transform->m_position;
+									glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
+									camera.m_camera_move_speed = 3.0f;
+									camera.SetNextLookAt ( midpoint );
+									camera.SetNextPosition ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f );
+
+									// move player away from enemy
+									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;
+									dir.y = 0;
+									glm::vec3 dst = combat_enemy_transform->m_position - glm::normalize ( dir ) * 1.0f;
+
+									combat_playable_transform->m_position.x = std::lerp ( combat_playable_transform->m_position.x , dst.x , 5.0f * dt );
+									combat_playable_transform->m_position.y = std::lerp ( combat_playable_transform->m_position.y , dst.y , 5.0f * dt );
+									combat_playable_transform->m_position.z = std::lerp ( combat_playable_transform->m_position.z , dst.z , 5.0f * dt );
+
+									// face each other
+									glm::vec3 norm_dir = glm::normalize ( dir );
+									float a1 = DegreeBetweenVec2 ( { 1,0 } , { norm_dir.x, norm_dir.z } );
+									float a2 = DegreeBetweenVec2 ( { 1,0 } , { -norm_dir.x, -norm_dir.z } );
+									combat_playable_transform->m_rotation.y = a1;
+									combat_enemy_transform->m_rotation.y = a2;
+								}
+
+								// update movement of enemies
+								for ( auto& enemy : m_enemies )
+								{
+									Transform* transform = entt.GetEngineComponent<Transform> ( enemy.m_entity_id );
 									if ( transform )
 									{
-										transform->m_position -= m_combat_area_offset;
+										enemy.LerpPositionTo ( transform->m_position , 4.0f , dt );
 									}
-									m_combat_playable->m_lerp_to -= m_combat_area_offset;
+									enemy.UpdateCombatLerpTo ( 3.0f , dt , m_combat_area_offset );
+								}
 
+								SkeleAnim3D* playable_anim = entt.GetEngineComponent<SkeleAnim3D> ( entt.m_entities[ entt.m_entities[ m_combat_playable->m_entity_id ].m_children[ 0 ] ].m_children[ 0 ] );
+								SkeleAnim3D* enemy_anim = entt.GetEngineComponent<SkeleAnim3D> ( entt.m_entities[ entt.m_entities[ m_combat_enemy->m_entity_id ].m_children[ 0 ] ].m_children[ 0 ] );
+								if ( !m_combat_start_animation && enemy_anim )
+								{
+									enemy_anim->PlayAnimation ( "Headbutt" , false );
+									m_combat_start_animation = true;
+								}
+								if ( enemy_anim->m_current_sub_animation == "Headbutt" && enemy_anim->m_animation_played )
+								{
+									enemy_anim->PlayAnimation ( "Idle" , true );
+									if ( playable_anim )
+									{
+										playable_anim->PlayAnimation ( "Death" , false );
+									}
+								}
+								if ( playable_anim->m_current_sub_animation == "Death" && playable_anim->m_animation_played )
+								{
+									m_combat_done = true;
+								}
+
+								GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
+								if ( window.KeyPressed ( GLFW_KEY_I ) )
+								{
+									m_combat_done = true;
+								}
+							}
+
+							if ( m_combat_done )
+							{
+								if ( m_combat_end_lag_counter > 0.0f )
+								{
+									m_combat_end_lag_counter -= dt;
 								}
 								else
 								{
+									m_combat_paused = false;
+									m_combat_done = false;
 
+									// reset combat variables
+									m_combat_start_animation = false;
+									m_combat_prep_time_counter = m_combat_prep_time;
+									m_combat_end_lag_counter = m_combat_end_lag;
+
+									// create combat transtion, i.e. white screen
+									entt.InstancePrefab ( engineResources , "WhiteFade" );
+
+									// reset remaining entity
+									if ( m_combat_attacking )
+									{
+										Transform* transform = entt.GetEngineComponent<Transform> ( m_combat_playable->m_entity_id );
+										if ( transform )
+										{
+											transform->m_position -= m_combat_area_offset;
+										}
+										m_combat_playable->m_lerp_to -= m_combat_area_offset;
+									}
+									else
+									{
+										Transform* transform = entt.GetEngineComponent<Transform> ( m_combat_enemy->m_entity_id );
+										if ( transform )
+										{
+											transform->m_position -= m_combat_area_offset;
+										}
+										m_combat_playable->m_lerp_to -= m_combat_area_offset;
+									}
+
+									// reset camera
+									Camera& camera = engineResources.Get<Camera> ().get ();
+									camera.SetPosition ( m_pre_combat_camera_position );
+									camera.SetLookAt ( m_pre_combat_camera_lookat );
+
+									// set combat entities back
+									m_combat_enemy = nullptr;
+									m_combat_playable = nullptr;
 								}
-
-								// reset camera
-								Camera& camera = engineResources.Get<Camera> ().get ();
-								camera.SetPosition ( m_pre_combat_camera_position );
-								camera.SetLookAt ( m_pre_combat_camera_lookat );
 							}
 						}
-
-						// flag combat phase done
 					}
 				}
 				else
