@@ -41,11 +41,13 @@ function S_VFXShow(e)
         -- end
 
         -- then remove instance
-        --RemoveInstance(e)
+        RemoveInstance(e)
 
     end
 end
 
+-- can't get size of the 3D model, so the caller will need to adjust 
+-- the position when using this function.
 function SpawnVFX(vfxName, posX, posY, posZ)
 
     print("SPAWNVFX()")
