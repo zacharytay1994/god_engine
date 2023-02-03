@@ -19,11 +19,21 @@ namespace god
 			m_DeltaTime = dt;
 			if ( m_CurrentAnimation )
 			{
+				m_played = false;
+				float og_current_time = m_CurrentTime;
 				m_CurrentTime += m_CurrentAnimation->GetTicksPerSecond () * dt;
 				//m_CurrentTime = fmod ( m_CurrentTime , m_CurrentAnimation->GetDuration () );
 				if ( m_CurrentTime > m_endTime || m_CurrentTime < m_startTime )
 				{
-					m_CurrentTime = m_startTime;
+					if ( m_repeat )
+					{
+						m_CurrentTime = m_startTime;
+					}
+					else
+					{
+						m_CurrentTime = og_current_time;
+					}
+					m_played = true;
 				}
 				uint32_t frame = static_cast< uint32_t >( m_CurrentTime / m_CurrentAnimation->GetTicksPerSecond () * 60.0f );
 				CalculateBoneTransform ( frame , &m_CurrentAnimation->GetRootNode () , cachedTransforms );

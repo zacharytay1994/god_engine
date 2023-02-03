@@ -16,6 +16,12 @@ namespace god
 		//std::cout << "Update" << std::endl;
 		auto& [entity_data , level , transform] = components;
 
+		GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
+		if ( window.KeyPressed ( GLFW_KEY_P ) )
+		{
+			level.m_focused = !level.m_focused;
+		}
+
 		if ( level.m_focused )
 		{
 			level.m_grid.Update ( DeltaTimer::m_dt , entt , engineResources , entity_data , transform );
@@ -35,7 +41,7 @@ namespace god
 				}
 			}
 
-			level.m_grid.UpdateCameraControls ( DeltaTimer::m_dt , engineResources );
+			//level.m_grid.UpdateCameraControls ( DeltaTimer::m_dt , engineResources );
 		}
 	}
 
