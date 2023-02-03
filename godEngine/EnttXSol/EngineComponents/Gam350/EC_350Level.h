@@ -6,6 +6,7 @@
 #include <queue>
 #include <tuple>
 #include <unordered_map>
+#include <algorithm>
 
 #include <godUtility/Math.h>
 
@@ -255,6 +256,11 @@ namespace god
 			float m_camera_zoom_distance { 20.0f };
 			float m_min_camera_zoom { 1.0f };
 			float m_max_camera_zoom { 20.0f };
+
+			float m_click_circle_value { 0.0f };
+			float m_click_position_x , m_click_position_y;
+			float m_click_zoom_value { 0.0f };
+			float m_click_height_value { 0.0f };
 
 			friend struct Enemy;
 
@@ -511,6 +517,33 @@ namespace god
 					glm::vec3 ( c_x * m_camera_zoom_distance ,
 						m_camera_height ,
 						c_z * m_camera_zoom_distance ) );
+
+				if ( window.MouseRPressed () )
+				{
+					m_click_circle_value = m_circle_value;
+					m_click_position_x = window.ViewportMouseX ();
+
+					m_click_zoom_value = m_camera_zoom_distance;
+					m_click_height_value = m_camera_height;
+					m_click_position_y = window.ViewportMouseY ();
+				}
+				if ( window.MouseRUp () )
+				{
+
+				}
+
+				if ( window.MouseRDown () )
+				{
+					m_circle_value = m_click_circle_value + ( m_click_position_x - window.ViewportMouseX () ) * 0.002f;
+
+					float z = m_click_zoom_value + ( m_click_position_y - window.ViewportMouseY () ) * 0.02f;
+
+					if ( z > m_min_camera_zoom && z < m_max_camera_zoom )
+					{
+						m_camera_zoom_distance = z;
+						m_camera_height = m_click_height_value - ( m_click_position_y - window.ViewportMouseY () ) * 0.02f;
+					}
+				}
 
 				// move camera left
 				if ( window.KeyDown ( GLFW_KEY_A ) )
