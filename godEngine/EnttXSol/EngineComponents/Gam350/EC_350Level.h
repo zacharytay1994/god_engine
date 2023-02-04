@@ -265,7 +265,7 @@ namespace god
 			glm::vec3 m_center { 0.0f,0.0f,0.0f };
 			float m_camera_move_speed { 8.0f };
 			float m_circle_value { 0.0f };
-			float m_camera_circle_speed { 2.0f };
+			float m_camera_circle_speed { 1.4f };
 			float m_camera_height { 4.0f };
 			float m_camera_zoom_speed { 8.0f };
 			float m_camera_zoom_distance { 18.0f };
@@ -529,7 +529,7 @@ namespace god
 				float c_x = std::sin ( m_circle_value );
 				float c_z = std::cos ( m_circle_value );
 
-				camera.m_camera_move_speed = 5.0f;
+				camera.m_camera_move_speed = 3.0f;
 				camera.SetNextPosition ( pos +
 					glm::vec3 ( c_x * m_camera_zoom_distance ,
 						m_camera_height ,
@@ -861,6 +861,28 @@ namespace god
 										}
 										break;
 									}
+									}
+
+									// rotate playable to face tile
+									if ( m_selected_entity && m_turn_order == TurnOrder::Playable && m_playable_walkable )
+									{
+										Transform* tile_transform = entt.GetEngineComponent<Transform> ( m_selected_entity->m_entity_id );
+										Transform* playable_transform = entt.GetEngineComponent<Transform> ( playable.m_entity_id );
+										if ( tile_transform && playable_transform )
+										{
+											glm::vec3 dir = tile_transform->m_position - playable_transform->m_position;
+											glm::vec2 dir2 = { dir.x, dir.z };
+											float deg = DegreeBetweenVec2 ( { 1,0 } , glm::normalize ( dir2 ) );
+											float lerp_to = playable_transform->m_rotation.y - deg;
+											if ( lerp_to > 180.0f )
+											{
+												playable_transform->m_rotation.y = std::lerp ( playable_transform->m_rotation.y , deg - 180.0f , dt * 10.0f );
+											}
+											else
+											{
+												playable_transform->m_rotation.y = std::lerp ( playable_transform->m_rotation.y , deg , dt * 10.0f );
+											}
+										}
 									}
 								}
 								else
@@ -1213,7 +1235,7 @@ namespace god
 			std::queue<Tile> m_nonset_tiles;
 			std::queue<Enemy> m_nonset_enemies;
 			std::queue<Playable> m_nonset_playable;
-			float m_add_interval { 0.05f };
+			float m_add_interval { 0.1f };
 			float m_add_interval_timer { m_add_interval };
 
 			// names

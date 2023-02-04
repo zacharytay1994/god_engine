@@ -43,6 +43,7 @@ namespace god
 						animator.m_CurrentTime = start;
 						animator.m_endTime = end;
 						animator.m_repeat = skele_anim.m_repeat;
+						animator.m_played = false;
 					}
 				}
 			}
