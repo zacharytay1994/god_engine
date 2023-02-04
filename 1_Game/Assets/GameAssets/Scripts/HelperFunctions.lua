@@ -3,6 +3,9 @@
 -- AllUnoccupiedFloorTiles()
     -- returns a list of unoccupied floor tiles
 
+-- ForwardVector(e)
+    -- returns a normalized vector in the direction that the entity is facing.
+
 -- NothingInGridAbove(entity) 
     -- checks if the grid cell above the input entity is empty.
     -- returns true if empty, false if not empty (occupied by another entity).
@@ -31,7 +34,15 @@ function AllUnoccupiedFloorTiles()
     return unoccupiedTileList
 end
 
+ -- returns a normalized vector in the direction that the entity is facing.
+ function ForwardVector(entity)
+    local entityTransform = GetTransform(entity)
+    -- print("entity y-rotation is", entityTransform.rotation.y)
+    local newX = Sin(entityTransform.rotation.y)
+    local newY = Cos(entityTransform.rotation.y)
+    return Normalize(newX, 1, newY)
 
+end
 
 -- checks if the grid cell above the input entity is empty.
 -- returns true if empty, false if not empty (occupied by another entity).
@@ -72,4 +83,3 @@ function RandomUnoccupiedFloorTile()
     return unoccupiedTileList[randomNumber]
 
 end
-
