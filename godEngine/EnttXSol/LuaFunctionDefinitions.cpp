@@ -564,6 +564,24 @@ namespace god
 			}
 		);
 
+		// Cos(value)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("Cos",
+			[](float value)->float
+			{
+				return glm::cos(value);
+			}
+		);
+
+		// Normalize(value)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("Normalize",
+			[](float x, float y, float z)->glm::vec3
+			{
+				return glm::normalize(glm::vec3(x, y, z));
+			}
+		);
+
 		// Abs(value)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "Abs" ,
