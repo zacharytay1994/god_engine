@@ -29,7 +29,7 @@ function S_DustParticleSystem(e)
     for i = 1, dustEmitterComponent.particleCount do
 
         --spawn dust here
-        local dustParticle = InstancePrefabParentedNow(e, "DustParticle", 0, 0, 0)
+        local dustParticle = InstancePrefabParentedNow(e, "DustParticle", 0, -1, 0)
 
         -- each dust particle spawned will face a different direction
         GetTransform(dustParticle).rotation.y = 360 / dustEmitterComponent.particleCount * i
