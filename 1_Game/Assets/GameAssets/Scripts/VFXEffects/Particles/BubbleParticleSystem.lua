@@ -62,9 +62,9 @@ function GenerateSmallBubbles(bubbleEmitterEntity, deltaTime, bubbleEmitterCompo
     GetComponent(bubble_particle, "C_BubbleParticle").initialHeight = GetTransform(bubbleEmitterEntity).position.y
 
     -- make small bubbles look small
-    GetTransform(bubble_particle).scale.x = 0.1
-    GetTransform(bubble_particle).scale.y = 0.1
-    GetTransform(bubble_particle).scale.z = 0.1
+    GetTransform(bubble_particle).scale.x = 0.2
+    GetTransform(bubble_particle).scale.y = 0.2
+    GetTransform(bubble_particle).scale.z = 0.2
 end
 
 function GenerateMediumBubbles(bubbleEmitterEntity, deltaTime, bubbleEmitterComponent)
@@ -134,7 +134,7 @@ function GenerateLargeBubbles(bubbleEmitterEntity, deltaTime, bubbleEmitterCompo
     GetComponent(bubble_particle, "C_BubbleParticle").initialHeight = GetTransform(bubbleEmitterEntity).position.y
 
     -- make large bubbles look large
-    GetTransform(bubble_particle).scale.x = 0.5
-    GetTransform(bubble_particle).scale.y = 0.5
-    GetTransform(bubble_particle).scale.z = 0.5
+    GetTransform(bubble_particle).scale.x = 0.4
+    GetTransform(bubble_particle).scale.y = 0.4
+    GetTransform(bubble_particle).scale.z = 0.4
 end
