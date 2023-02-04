@@ -53,7 +53,8 @@ namespace god
 	{
 		RegisterLuaType<SkeleAnim3D> ( luaState , name ,
 			"animation" , &SkeleAnim3D::m_animation ,
-			"visible" , &SkeleAnim3D::m_visible );
+			"visible" , &SkeleAnim3D::m_visible,
+			"played", &SkeleAnim3D::m_animation_played );
 	}
 	template<>
 	inline void ComponentInspector::operator() < SkeleAnim3D > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
