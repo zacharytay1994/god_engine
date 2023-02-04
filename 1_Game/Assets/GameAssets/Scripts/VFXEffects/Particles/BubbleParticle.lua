@@ -8,7 +8,7 @@ function C_BubbleParticle()
     local var = {
         
         -- total distance the bubble is allowed to travel
-        Lifetime = 100.0,
+        Lifetime = 150.0,
 
         -- unused
         --Timer = 0.0,

@@ -44,7 +44,18 @@ function GenerateSmallBubbles(bubbleEmitterEntity, deltaTime, bubbleEmitterCompo
     local x = GenerateRandomNumberInRange(-15, 15)
     local y = 0
     local z = GenerateRandomNumberInRange(-15, 15)
-    local bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle", x, y, z)
+    local bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle2D", x, y, z)
+
+    -- -- testing mixed bubbles
+    -- local bubble_particle
+    -- local randomNumber = GenerateRandomNumberInRange(0, 1)
+    -- if (randomNumber == 1) then
+    --     bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle2D", x, y, z)
+    --     print("2D small")
+    -- else
+    --     bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle3D", x, y, z)
+    --     print("3D small")
+    -- end
     
     -- make small bubbles move faster
     GetComponent(bubble_particle, "C_BubbleParticle").Speed = 6.0
@@ -71,7 +82,18 @@ function GenerateMediumBubbles(bubbleEmitterEntity, deltaTime, bubbleEmitterComp
     local x = GenerateRandomNumberInRange(-15, 15)
     local y = 0
     local z = GenerateRandomNumberInRange(-15, 15)
-    local bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle", x, y, z)
+    local bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle3D", x, y, z)
+
+    -- -- testing mixed bubbles
+    -- local bubble_particle
+    -- local randomNumber = GenerateRandomNumberInRange(0, 1)
+    -- if (randomNumber == 1) then
+    --     bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle2D", x, y, z)
+    --     print("2D medium")
+    -- else
+    --     bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle3D", x, y, z)
+    --     print("3D medium")
+    -- end
 
     GetComponent(bubble_particle, "C_BubbleParticle").initialHeight = GetTransform(bubbleEmitterEntity).position.y
     
@@ -94,7 +116,18 @@ function GenerateLargeBubbles(bubbleEmitterEntity, deltaTime, bubbleEmitterCompo
     local x = GenerateRandomNumberInRange(-15, 15)
     local y = 0
     local z = GenerateRandomNumberInRange(-15, 15)
-    local bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle", x, y, z)
+    local bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle3D", x, y, z)
+
+    -- -- testing mixed bubbles
+    -- local bubble_particle
+    -- local randomNumber = GenerateRandomNumberInRange(0, 1)
+    -- if (randomNumber == 1) then
+    --     bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle2D", x, y, z)
+    --     print("2D large")
+    -- else
+    --     bubble_particle = InstancePrefabParentedNow(bubbleEmitterEntity, "BubbleParticle3D", x, y, z)
+    --     print("3D large")
+    -- end
     
     -- make large bubbles move slower
     GetComponent(bubble_particle, "C_BubbleParticle").Speed = 2.5
