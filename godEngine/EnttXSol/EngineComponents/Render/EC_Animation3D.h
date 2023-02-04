@@ -45,6 +45,7 @@ namespace god
 		{
 			m_current_sub_animation = name;
 			m_repeat = repeat;
+			m_animation_played = false;
 		}
 	};
 	template <>

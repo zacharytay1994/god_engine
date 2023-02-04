@@ -234,8 +234,13 @@ namespace god
 
 		struct Grid
 		{
+			bool m_deserialized { false };
 			bool m_initialized { false };
+			bool m_ready { false };
+			bool m_start { false };
+
 			bool m_to_restart { false };
+			bool m_won { false };
 			bool m_playable_walkable { false };
 			std::vector<Tile> m_tiles;
 			std::vector<Enemy> m_enemies;
@@ -260,10 +265,10 @@ namespace god
 			glm::vec3 m_center { 0.0f,0.0f,0.0f };
 			float m_camera_move_speed { 8.0f };
 			float m_circle_value { 0.0f };
-			float m_camera_circle_speed { 1.4f };
-			float m_camera_height { 2.0f };
+			float m_camera_circle_speed { 2.0f };
+			float m_camera_height { 4.0f };
 			float m_camera_zoom_speed { 8.0f };
-			float m_camera_zoom_distance { 20.0f };
+			float m_camera_zoom_distance { 18.0f };
 			float m_min_camera_zoom { 1.0f };
 			float m_max_camera_zoom { 20.0f };
 
@@ -508,22 +513,24 @@ namespace god
 					playable.m_lerp_to = { 2 * x , 2 * y , 2 * z };
 					m_nonset_playable.push ( playable );
 				}
+
+				m_deserialized = true;
 			}
 
 			template<typename ENGINE_RESOURCES>
-			void UpdateCameraControls ( float dt , ENGINE_RESOURCES& engineResources )
+			void UpdateCameraControls ( float dt , ENGINE_RESOURCES& engineResources , glm::vec3 pos )
 			{
 				GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
 				Camera& camera = engineResources.Get<Camera> ().get ();
 
 				// spin camera 
-				camera.m_camera_pan_speed = 1.0f;
-				camera.SetNextLookAt ( m_center );
+				camera.m_camera_pan_speed = 3.0f;
+				camera.SetNextLookAt ( pos );
 				float c_x = std::sin ( m_circle_value );
 				float c_z = std::cos ( m_circle_value );
 
 				camera.m_camera_move_speed = 5.0f;
-				camera.SetNextPosition ( m_center +
+				camera.SetNextPosition ( pos +
 					glm::vec3 ( c_x * m_camera_zoom_distance ,
 						m_camera_height ,
 						c_z * m_camera_zoom_distance ) );
@@ -592,68 +599,80 @@ namespace god
 					m_to_restart = true;
 				}
 
-				// add tiles
-				if ( m_nonset_tiles.size () > 0 )
+				// add tiles, to ready state
+				if ( !m_ready && m_deserialized )
 				{
-					if ( m_add_interval_timer < m_add_interval )
+					if ( m_nonset_tiles.size () > 0 )
 					{
-						m_add_interval_timer += dt;
+						if ( m_add_interval_timer < m_add_interval )
+						{
+							m_add_interval_timer += dt;
+						}
+						else
+						{
+							// add a tile
+							auto& tile = m_nonset_tiles.front ();
+							AddTile ( entt , engineResources , level , level_transform , tile );
+							m_nonset_tiles.pop ();
+
+							m_add_interval_timer = 0.0f;
+						}
+					}
+					// add enemies
+					else if ( m_nonset_enemies.size () > 0 )
+					{
+						if ( m_add_interval_timer < m_add_interval )
+						{
+							m_add_interval_timer += dt;
+						}
+						else
+						{
+							// add an entity
+							auto& entity = m_nonset_enemies.front ();
+							AddEnemy ( entt , engineResources , level , level_transform , entity );
+							m_nonset_enemies.pop ();
+
+							m_add_interval_timer = 0.0f;
+						}
 					}
 					else
 					{
-						// add a tile
-						auto& tile = m_nonset_tiles.front ();
-						AddTile ( entt , engineResources , level , level_transform , tile );
-						m_nonset_tiles.pop ();
-
-						m_add_interval_timer = 0.0f;
+						m_ready = true;
 					}
 				}
-				// add enemies
-				else if ( m_nonset_enemies.size () > 0 )
+
+				if ( m_start && m_ready && !m_initialized )
 				{
-					if ( m_add_interval_timer < m_add_interval )
+					// add playable
+					if ( m_nonset_playable.size () > 0 )
 					{
-						m_add_interval_timer += dt;
+						if ( m_add_interval_timer < m_add_interval )
+						{
+							m_add_interval_timer += dt;
+						}
+						else
+						{
+							// add an entity
+							auto& entity = m_nonset_playable.front ();
+							AddPlayable ( entt , engineResources , level , level_transform , entity );
+							m_nonset_playable.pop ();
+
+							m_add_interval_timer = 0.0f;
+						}
 					}
+					// add black combat box
 					else
 					{
-						// add an entity
-						auto& entity = m_nonset_enemies.front ();
-						AddEnemy ( entt , engineResources , level , level_transform , entity );
-						m_nonset_enemies.pop ();
+						// add black box at combat offset position
+						auto e = entt.InstancePrefab ( engineResources , "350BlackBox" , level.m_id );
+						Transform* transform = entt.GetEngineComponent<Transform> ( e );
+						if ( transform )
+						{
+							transform->m_position = m_combat_area_offset;
+						}
 
-						m_add_interval_timer = 0.0f;
+						m_initialized = true;
 					}
-				}
-				// add playable
-				else if ( m_nonset_playable.size () > 0 )
-				{
-					if ( m_add_interval_timer < m_add_interval )
-					{
-						m_add_interval_timer += dt;
-					}
-					else
-					{
-						// add an entity
-						auto& entity = m_nonset_playable.front ();
-						AddPlayable ( entt , engineResources , level , level_transform , entity );
-						m_nonset_playable.pop ();
-
-						m_add_interval_timer = 0.0f;
-					}
-				}
-				else if ( !m_initialized )
-				{
-					// add black box at combat offset position
-					auto e = entt.InstancePrefab ( engineResources , "350BlackBox" , level.m_id );
-					Transform* transform = entt.GetEngineComponent<Transform> ( e );
-					if ( transform )
-					{
-						transform->m_position = m_combat_area_offset;
-					}
-
-					m_initialized = true;
 				}
 
 				// test raycast to all entities
@@ -669,29 +688,33 @@ namespace god
 				m_selected_entity = nullptr;
 				for ( auto& tile : m_tiles )
 				{
-					Transform* transform = entt.GetEngineComponent<Transform> ( tile.m_entity_id );
-					if ( transform )
+					// only test normal tiles, i.e. not rocks
+					if ( tile.m_type == Tile::Type::Normal )
 					{
-						glm::vec3 center = transform->m_parent_transform * glm::vec4 ( transform->m_position , 1.0f );
-						auto [intersect , tmin] = RayIntersectAABB ( camera.m_position , ray_dir , center - glm::vec3 ( 1 , 1 , 1 ) , center + glm::vec3 ( 1 , 1 , 1 ) );
-						tile.m_moused_over = intersect;
-						tile.m_tmin = tmin;
-
-						if ( tmin < min )
+						Transform* transform = entt.GetEngineComponent<Transform> ( tile.m_entity_id );
+						if ( transform )
 						{
-							min = tmin;
-							m_selected_entity = static_cast< Entity* >( &tile );
-						}
+							glm::vec3 center = transform->m_parent_transform * glm::vec4 ( transform->m_position , 1.0f );
+							auto [intersect , tmin] = RayIntersectAABB ( camera.m_position , ray_dir , center - glm::vec3 ( 1 , 1 , 1 ) , center + glm::vec3 ( 1 , 1 , 1 ) );
+							tile.m_moused_over = intersect;
+							tile.m_tmin = tmin;
 
-						transform->m_scale = glm::vec3 ( 1.0f );
-
-						EntityData* entity_data = entt.GetEngineComponent<EntityData> ( tile.m_entity_id );
-						if ( entity_data && entt.m_entities[ entity_data->m_id ].m_children.size () > 0 )
-						{
-							Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ entity_data->m_id ].m_children[ 0 ] );
-							if ( renderable )
+							if ( tmin < min )
 							{
-								renderable->m_outlined = false;
+								min = tmin;
+								m_selected_entity = static_cast< Entity* >( &tile );
+							}
+
+							transform->m_scale = glm::vec3 ( 1.0f );
+
+							EntityData* entity_data = entt.GetEngineComponent<EntityData> ( tile.m_entity_id );
+							if ( entity_data && entt.m_entities[ entity_data->m_id ].m_children.size () > 0 )
+							{
+								Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ entity_data->m_id ].m_children[ 0 ] );
+								if ( renderable )
+								{
+									renderable->m_outlined = false;
+								}
 							}
 						}
 					}
@@ -700,7 +723,7 @@ namespace god
 				// update camera controls 
 				if ( !m_combat_paused )
 				{
-					UpdateCameraControls ( dt , engineResources );
+					UpdateCameraControls ( dt , engineResources , level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( m_center , 1.0f ) );
 				}
 
 
@@ -762,14 +785,16 @@ namespace god
 										Camera& camera = engineResources.Get<Camera> ().get ();
 										// cache camera position
 										m_pre_combat_camera_position = camera.m_position;
-										camera.SetPosition ( camera.m_position + m_combat_area_offset );
-										camera.SetLookAt ( camera.m_look_at + m_combat_area_offset );
+										m_pre_combat_camera_lookat = camera.m_look_at;
+										glm::vec3 world_combat_area_offset { level_transform.m_parent_transform /** level_transform.m_local_transform*/ * glm::vec4 ( m_combat_area_offset,1.0f ) };
+										camera.SetPosition ( camera.m_position + world_combat_area_offset );
+										camera.SetLookAt ( camera.m_look_at + world_combat_area_offset );
 										// set new camera pan
 										glm::vec3 v1 = combat_enemy_transform->m_position - combat_playable_transform->m_position;
 										glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
 										camera.m_camera_move_speed = 3.0f;
-										camera.SetNextLookAt ( midpoint );
-										camera.SetNextPosition ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f );
+										camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
+										camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
 									}
 								}
 							}
@@ -911,8 +936,8 @@ namespace god
 									glm::vec3 v1 = combat_enemy_transform->m_position - combat_playable_transform->m_position;
 									glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
 									camera.m_camera_move_speed = 3.0f;
-									camera.SetNextLookAt ( midpoint );
-									camera.SetNextPosition ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f );
+									camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
+									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
 
 									// move enemy away from player, works no matter who is attacking
 									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;
@@ -977,8 +1002,8 @@ namespace god
 									glm::vec3 v1 = combat_enemy_transform->m_position - combat_playable_transform->m_position;
 									glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
 									camera.m_camera_move_speed = 3.0f;
-									camera.SetNextLookAt ( midpoint );
-									camera.SetNextPosition ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f );
+									camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
+									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
 
 									// move player away from enemy
 									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;
@@ -1167,9 +1192,13 @@ namespace god
 					}
 
 					// if theres no enemies left, reset the level
-					if ( ( m_enemies.empty () || m_playables.empty () ) && m_initialized )
+					if ( m_playables.empty () && m_initialized )
 					{
 						m_to_restart = true;
+					}
+					if ( m_enemies.empty () && m_initialized )
+					{
+						m_won = true;
 					}
 
 					m_turn_changed = false;
@@ -1184,7 +1213,7 @@ namespace god
 			std::queue<Tile> m_nonset_tiles;
 			std::queue<Enemy> m_nonset_enemies;
 			std::queue<Playable> m_nonset_playable;
-			float m_add_interval { 0.1f };
+			float m_add_interval { 0.05f };
 			float m_add_interval_timer { m_add_interval };
 
 			// names
