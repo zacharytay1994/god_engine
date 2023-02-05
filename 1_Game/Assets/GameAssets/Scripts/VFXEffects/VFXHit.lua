@@ -4,8 +4,17 @@
 --[IsComponent]
 function C_VFXHit()
     local var = {
+        
+        -- number of particles to spawn
         particleCount = 8,
-        particleEmitted = false
+
+        -- to tell emitter to emit once, then wait until all children
+        -- are dead before removing itself
+        particleEmitted = false,
+
+        -- this is for checking whether the caller is Triton or Dummish
+        -- for some reason Triton is huge af, so need to scale up some properties
+        parentObject = nil
     }
     return function()
         return var
@@ -17,7 +26,8 @@ function S_VFXHit(e)
 
     local emitterComponent = GetComponent(e, "C_VFXHit")
 
-    if (emitterComponent.dustEmitted) then
+    -- if particles have already been emitted, just stop the code here
+    if (emitterComponent.particleEmitted) then
         if (ChildCount(e) == 0) then
             RemoveInstance(e)
         end
@@ -28,32 +38,41 @@ function S_VFXHit(e)
 
     for i = 1, emitterComponent.particleCount do
 
-        
+        -- y-coordinate for each particles' spawn location depends on whether
+        -- the VFX is for Triton or Dummish
+        local ySpawn
+        if (EntityName(emitterComponent.parentObject) == "350TritonModel") then
+            ySpawn = 150
+        else
+            ySpawn = 1.5
+        end
+
         -- spawn hit particle, cycle between 2 particle shapes
         local hitParticle
         if (i % 2 == 0) then
-            hitParticle = InstancePrefabParentedNow(e, "HitParticle1", 0, -0.25, 0.35)
+            hitParticle = InstancePrefabParentedNow(e, "HitParticle1", 0, ySpawn, 0.35)
         else
-            hitParticle = InstancePrefabParentedNow(e, "HitParticle2", 0, -0.25, 0.35)
+            hitParticle = InstancePrefabParentedNow(e, "HitParticle2", 0, ySpawn, 0.35)
         end
         
         -- each particle spawned will face a different direction (evenly spread across 360 degrees)
         GetTransform(hitParticle).rotation.z = 360 / emitterComponent.particleCount * i
 
-        local forwardVec = HitParticleForwardVector(hitParticle)
-        print(forwardVec.x, forwardVec.y, forwardVec.z)
-        print()
-        GetComponent(hitParticle, "C_HitParticle").forwardVector = forwardVec
+        -- scale up particle size for player model
+        if (EntityName(emitterComponent.parentObject) == "350TritonModel") then
+            GetTransform(hitParticle).scale.x = GetTransform(hitParticle).scale.x * 400
+            GetTransform(hitParticle).scale.y = GetTransform(hitParticle).scale.y * 400
+            GetTransform(hitParticle).scale.z = GetTransform(hitParticle).scale.z * 400
+            GetComponent(hitParticle, "C_HitParticle").Speed = 1500.0
+        end
+        -- print(EntityName(emitterComponent.parentObject))
 
-        -- for debugging
-        GetComponent(hitParticle, "C_HitParticle").forwardVectorX = forwardVec.x
-        GetComponent(hitParticle, "C_HitParticle").forwardVectorY = forwardVec.y
-        GetComponent(hitParticle, "C_HitParticle").forwardVectorZ = forwardVec.z
-        GetComponent(hitParticle, "C_HitParticle").spawnSequence = i
-        
+        -- calculate the direction that the particle should move towards
+        local forwardVec = HitParticleForwardVector(hitParticle)
+        GetComponent(hitParticle, "C_HitParticle").forwardVector = forwardVec
     end
 
-    emitterComponent.dustEmitted = true
+    emitterComponent.particleEmitted = true
 
 end
 
@@ -62,11 +81,8 @@ end
  function HitParticleForwardVector(entity)
     
     local entityTransform = GetTransform(entity)
-    --print("entity rotation is", entityTransform.rotation.x, entityTransform.rotation.y, entityTransform.rotation.z)
     
     local newX = Abs(Cos(RadianToDegree(entityTransform.rotation.z)))
-    -- print("sin90 = ", Sin(90))
-    -- print("RadianToDegree(90):", RadianToDegree(90))
     local newY = Abs(Sin(RadianToDegree(entityTransform.rotation.z)))
 
     if (entityTransform.rotation.z > 0 and entityTransform.rotation.z < 180) then
@@ -77,7 +93,5 @@ end
         newX = newX * -1
     end
 
-
     return Normalize(newX, newY, 1)
-
 end

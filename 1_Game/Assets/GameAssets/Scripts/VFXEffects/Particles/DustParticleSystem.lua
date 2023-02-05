@@ -8,7 +8,8 @@ function C_DustParticleSystem()
     local var = {
         --[SerializeFloat]
         particleCount = 5,
-        dustEmitted = false
+        dustEmitted = false,
+        parentObject = nil
     }
     return function()
         return var
@@ -32,7 +33,15 @@ function S_DustParticleSystem(e)
     for i = 1, dustEmitterComponent.particleCount do
 
         --spawn dust here
-        local dustParticle = InstancePrefabParentedNow(e, "DustParticle", 0, -1, 0)
+        local dustParticle = InstancePrefabParentedNow(e, "DustParticle", 0, 1, 0)
+
+        if (EntityName(dustEmitterComponent.parentObject) == "350TritonModel") then
+            -- increase scale by 100 times because the Triton model is 0.01
+            GetTransform(dustParticle).scale.x = GetTransform(dustParticle).scale.x * 100
+            GetTransform(dustParticle).scale.y = GetTransform(dustParticle).scale.y * 100
+            GetTransform(dustParticle).scale.z = GetTransform(dustParticle).scale.z * 100
+            GetComponent(dustParticle, "C_DustParticle").Speed = 250.0            
+        end
 
         -- each dust particle spawned will face a different direction
         GetTransform(dustParticle).rotation.y = 360 / dustEmitterComponent.particleCount * i

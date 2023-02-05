@@ -48,13 +48,14 @@ end
 
 -- can't get size of the 3D model, so the caller will need to adjust 
 -- the position when using this function.
-function SpawnVFX(vfxName, posX, posY, posZ)
+function SpawnVFX(parent, vfxName, posX, posY, posZ)
 
-    -- print("SPAWNVFX()")
-    -- print("vfxName:", vfxName)
-    -- print("position:", posX, posY, posZ)
+    print("SPAWNVFX()")
+    print("vfxName:", vfxName)
+    print("position:", posX, posY, posZ)
 
-    local spawnedVFX = InstancePrefabNow(vfxName, posX, posY, posZ)
+    local spawnedVFX = InstancePrefabParentedNow(parent, vfxName, posX, posY, posZ)
+    print("successfully spawned!")
     return spawnedVFX
     
 end

@@ -1,5 +1,3 @@
-
-
 --[IsComponent]
 function C_HitParticle()
     local var = {
@@ -15,19 +13,6 @@ function C_HitParticle()
         isAlive = true,
 
         forwardVector = nil,
-
-        --[SerializeFloat]
-        forwardVectorX = 0.0,
-
-        --[SerializeFloat]
-        forwardVectorY = 0.0,
-
-        --[SerializeFloat]
-        forwardVectorZ = 0.0,
-
-        -- for debugging
-        --[SerializeInt]
-        spawnSequence = 0
     }
     return function()
         return var
@@ -40,12 +25,12 @@ function S_HitParticle(e)
     local particleTransform = GetTransform(e)
     local particleComponent = GetComponent(e, "C_HitParticle")
     local dt = GetDeltaTime()
+    --print(particleComponent.Speed)
     
     if (particleComponent.Timer > particleComponent.Lifetime) 
     then
         isAlive = false
         RemoveInstance(e)      
-        --print(dustParticleComponent.forwardVector.x, dustParticleComponent.forwardVector.y, dustParticleComponent.forwardVector.z)
     else
         particleComponent.Timer = particleComponent.Timer + dt
         
@@ -53,7 +38,5 @@ function S_HitParticle(e)
         particleTransform.position.y = particleTransform.position.y + (dt * particleComponent.Speed * particleComponent.forwardVector.y)
         particleTransform.position.x = particleTransform.position.x + (dt * particleComponent.Speed * particleComponent.forwardVector.x)
         particleTransform.position.z = particleTransform.position.z + (dt * particleComponent.Speed * particleComponent.forwardVector.z * 0.5)
-
-
     end
 end

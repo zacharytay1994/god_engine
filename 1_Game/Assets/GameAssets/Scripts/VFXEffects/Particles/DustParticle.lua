@@ -13,8 +13,7 @@ function C_DustParticle()
         -- timer
         Timer = 0.0,
         
-        --[SerializeFloat]
-        Speed = 1.0,
+        Speed = 2.5,
         
         isAlive = true,
 
@@ -36,7 +35,6 @@ function S_DustParticle(e)
     then
         isAlive = false
         RemoveInstance(e)      
-        --print(dustParticleComponent.forwardVector.x, dustParticleComponent.forwardVector.y, dustParticleComponent.forwardVector.z)
     else
         dustParticleComponent.Timer = dustParticleComponent.Timer + dt
         
@@ -44,7 +42,5 @@ function S_DustParticle(e)
         dustTransform.position.y = dustTransform.position.y + (dt * dustParticleComponent.Speed * dustParticleComponent.forwardVector.y * 0.5)
         dustTransform.position.x = dustTransform.position.x + (dt * dustParticleComponent.Speed * dustParticleComponent.forwardVector.x)
         dustTransform.position.z = dustTransform.position.z + (dt * dustParticleComponent.Speed * dustParticleComponent.forwardVector.z)
-
-
     end
 end
