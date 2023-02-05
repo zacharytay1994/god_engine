@@ -1117,7 +1117,7 @@ namespace god
 		}
 	}
 
-	void OpenGL::UpdateAnimations (float dt)
+	void OpenGL::UpdateAnimations ( float dt )
 	{
 		for ( auto& animation : m_animations )
 		{
@@ -1267,6 +1267,28 @@ namespace god
 		m_square_mesh.Draw ( GL_TRIANGLES );
 
 		OGLShader::UnUse ();
+	}
+
+	void OpenGL::RenderTexture ( unsigned int texture )
+	{
+		m_2D_shader.Use ();
+
+		// vertex shader
+		OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uProjection" , glm::mat4 ( 1.0f ) );
+
+		// fragment shader
+		OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "diffuse_map" , 0 );
+		glActiveTexture ( GL_TEXTURE0 );
+		glBindTexture ( GL_TEXTURE_2D , texture );
+
+		OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uAlpha" , 1.0f );
+
+		m_square_mesh.SetTransformData ( { glm::mat4 ( 1.0f ) } );
+		m_square_mesh.DrawInstanced ( GL_TRIANGLES );
+
+		//m_square_mesh.Draw ( GL_TRIANGLES );
+
+		m_2D_shader.UnUse ();
 	}
 
 	std::tuple<uint32_t , uint32_t> OpenGL::AddAnimationInstance ( std::string const& name )

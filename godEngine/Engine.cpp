@@ -282,15 +282,21 @@ namespace god
 			// if fullscreen, render game over imgui
 			if ( window.m_fullscreen )
 			{
+				//extra_renderpass.Bind ();
 				opengl.RenderBlendTextures ( imgui_renderpass.GetTexture () , blur.GetTexture () );
 				opengl.RenderGUI ( scene , camera.GetOrthographicProjectionMatrix ( static_cast< float >( window.GetWindowWidth () ) , static_cast< float >( window.GetWindowHeight () ) ) , ogl_textures );
+				//extra_renderpass.UnBind ();
+
+				//opengl.RenderTexture ( extra_renderpass.GetTexture () );
 			}
+
 
 			SystemTimer::StartTimeSegment ( "Window Buffer Swap" );
 			window.SwapWindowBuffers ();
 			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
 
 			// free camera update
+#ifdef ENABLE_EDITOR
 			camera.FreeCamera ( 0.02f ,
 				true ,
 				window.KeyDown ( GLFW_KEY_W ) ,
@@ -308,6 +314,7 @@ namespace god
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );
+#endif
 
 			camera.InterpolateCameraState ( DeltaTimer::m_dt );
 

@@ -690,7 +690,7 @@ namespace god
 					else
 					{
 						// add black box at combat offset position
-						auto e = entt.InstancePrefab ( engineResources , "350BlackBox" , level.m_id );
+						auto e = entt.InstancePrefab ( engineResources , "350BlackBox2" , level.m_id );
 						Transform* transform = entt.GetEngineComponent<Transform> ( e );
 						if ( transform )
 						{
@@ -1026,26 +1026,27 @@ namespace god
 					// combat phase
 					else
 					{
-						// skip combat
-						uint32_t skip_button = entt.GetEntity ( "SkipButton" );
-						if ( skip_button != static_cast< uint32_t >( -1 ) )
-						{
-							GUIObject* skip_gui = entt.GetEngineComponent<GUIObject> ( skip_button );
-							if ( skip_gui )
-							{
-								if ( skip_gui->m_released )
-								{
-									m_combat_done = true;
-								}
-							}
-						}
-
 						if ( m_combat_prep_time_counter > 0.0f )
 						{
 							m_combat_prep_time_counter -= dt;
 						}
 						else
 						{
+							// skip combat
+							uint32_t skip_button = entt.GetEntity ( "SkipButton" );
+							if ( skip_button != static_cast< uint32_t >( -1 ) )
+							{
+								GUIObject* skip_gui = entt.GetEngineComponent<GUIObject> ( skip_button );
+								if ( skip_gui )
+								{
+									if ( skip_gui->m_released )
+									{
+										m_combat_done = true;
+										entt.SetEntityActive ( skip_button , false );
+									}
+								}
+							}
+
 							if ( m_combat_attacking )
 							{
 								Transform* combat_playable_transform = entt.GetEngineComponent<Transform> ( m_combat_playable->m_entity_id );
