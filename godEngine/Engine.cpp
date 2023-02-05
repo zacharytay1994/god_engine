@@ -43,7 +43,7 @@
 #include <godUtility/Grid3D.h>
 
 // comment out this for no editor
-#define ENABLE_EDITOR
+//#define ENABLE_EDITOR
 
 namespace god
 {
@@ -135,7 +135,8 @@ namespace god
 		MainVariables main_variables = { "nil", false };
 #else
 		// starting scene for non editor mode
-		MainVariables main_variables = { "SplashScreen", true };
+		MainVariables main_variables = { "SplashScreen", true }; 
+		AudioAPI::PlayBGM ();
 #endif
 		RegisterLuaCPP ( enttxsol , engine_resources , main_variables );
 

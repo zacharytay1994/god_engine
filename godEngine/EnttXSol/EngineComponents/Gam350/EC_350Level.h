@@ -137,6 +137,9 @@ namespace god
 							enemy = this;
 							combatAttacking = false;
 						}
+
+						// walk sound
+						entt.QueueInstancePrefab ( "SFX_FootStep01" , 0.f , 0.f , 0.f );
 					}
 					// try searching for destination
 					for ( int i = 0; i < 2; ++i )
@@ -897,6 +900,16 @@ namespace god
 														// move on top of clicked tile
 														GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
 														m_playable_walkable = playable.Walkable ( { x , y + 1 , z } );
+
+														if ( m_playable_walkable )
+														{
+															if ( m_previous_selected_entity != m_selected_entity )
+															{
+																m_previous_selected_entity = m_selected_entity;
+																entt.QueueInstancePrefab ( "SFX_Hover02" , 0.f , 0.f , 0.f );
+															}
+														}
+
 														if ( window.MouseLPressed ( 2 ) )
 														{
 															if ( m_playable_walkable )
@@ -917,12 +930,21 @@ namespace god
 																}
 
 																++m_playable_i;
+
+																entt.QueueInstancePrefab ( "SFX_ButtonPress" , 0.f , 0.f , 0.f );
+																entt.QueueInstancePrefab ( "SFX_FootStep03" , 0.f , 0.f , 0.f );
+															}
+															else
+															{
+																entt.QueueInstancePrefab ( "SFX_Invalid" , 0.f , 0.f , 0.f );
 															}
 														}
 													}
 												}
 												}
 											}
+
+											m_previous_selected_entity = m_selected_entity;
 										}
 										break;
 									}
@@ -1075,7 +1097,7 @@ namespace god
 								{
 									playable_anim->PlayAnimation ( "AOE" , false );
 									// will be moved to lua script 
-									entt.QueueInstancePrefab("SFX_AnimGroundSmash", 0.f, 0.f, 0.f);
+									entt.QueueInstancePrefab ( "SFX_AnimGroundSmash" , 0.f , 0.f , 0.f );
 									m_combat_start_animation = true;
 								}
 								if ( playable_anim->m_current_sub_animation == "AOE" && playable_anim->m_animation_played )
@@ -1085,7 +1107,7 @@ namespace god
 									{
 										enemy_anim->PlayAnimation ( "Death" , false );
 										// will be moved to lua script 
-										entt.QueueInstancePrefab("SFX_EnemyDeath", 0.f, 0.f, 0.f);
+										entt.QueueInstancePrefab ( "SFX_EnemyDeath" , 0.f , 0.f , 0.f );
 									}
 								}
 								if ( enemy_anim->m_current_sub_animation == "Death" && enemy_anim->m_animation_played )
@@ -1144,7 +1166,7 @@ namespace god
 								{
 									enemy_anim->PlayAnimation ( "Headbutt" , false );
 									// will be moved to lua script 
-									entt.QueueInstancePrefab("SFX_EnemyCharge", 0.f, 0.f, 0.f);
+									entt.QueueInstancePrefab ( "SFX_EnemyCharge" , 0.f , 0.f , 0.f );
 									m_combat_start_animation = true;
 								}
 								if ( enemy_anim->m_current_sub_animation == "Headbutt" && enemy_anim->m_animation_played )
@@ -1154,7 +1176,7 @@ namespace god
 									{
 										playable_anim->PlayAnimation ( "Death" , false );
 										// will be moved to lua script 
-										entt.QueueInstancePrefab("SFX_PlayerDeath", 0.f, 0.f, 0.f);
+										entt.QueueInstancePrefab ( "SFX_PlayerDeath" , 0.f , 0.f , 0.f );
 									}
 								}
 								if ( playable_anim->m_current_sub_animation == "Death" && playable_anim->m_animation_played )
@@ -1359,6 +1381,7 @@ namespace god
 			uint32_t m_playable_i { 0 };
 			uint32_t m_enemy_i { 0 };
 			Entity* m_selected_entity { nullptr };
+			Entity* m_previous_selected_entity { nullptr };
 			bool m_updated_enemies { false };
 			bool m_turn_changed { false };
 

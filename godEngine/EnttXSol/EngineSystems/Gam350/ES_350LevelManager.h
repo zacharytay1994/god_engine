@@ -48,6 +48,8 @@ namespace god
 					// initialize next lvl
 					level_manager.m_initializing = false;
 					++level_manager.m_currently_initializing;
+					// transition sound
+					entt.QueueInstancePrefab ( "SFX_Wave" , 0.f , 0.f , 0.f );
 				}
 			}
 		}
@@ -82,6 +84,9 @@ namespace god
 				{
 					level->m_focused = false;
 					++level_manager.m_currently_playing;
+
+					// transition sound
+					entt.QueueInstancePrefab ( "SFX_Wave" , 0.f , 0.f , 0.f );
 
 					// deactivate tutorial gui
 					EnttXSol::Entities::ID tut_camera = entt.GetEntity ( "TutCamera" );
