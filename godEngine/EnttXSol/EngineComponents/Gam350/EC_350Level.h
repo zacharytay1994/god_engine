@@ -1074,6 +1074,8 @@ namespace god
 								if ( !m_combat_start_animation && playable_anim )
 								{
 									playable_anim->PlayAnimation ( "AOE" , false );
+									// will be moved to lua script 
+									entt.QueueInstancePrefab("SFX_AnimGroundSmash", 0.f, 0.f, 0.f);
 									m_combat_start_animation = true;
 								}
 								if ( playable_anim->m_current_sub_animation == "AOE" && playable_anim->m_animation_played )
@@ -1082,6 +1084,8 @@ namespace god
 									if ( enemy_anim )
 									{
 										enemy_anim->PlayAnimation ( "Death" , false );
+										// will be moved to lua script 
+										entt.QueueInstancePrefab("SFX_EnemyDeath", 0.f, 0.f, 0.f);
 									}
 								}
 								if ( enemy_anim->m_current_sub_animation == "Death" && enemy_anim->m_animation_played )
@@ -1139,6 +1143,8 @@ namespace god
 								if ( !m_combat_start_animation && enemy_anim )
 								{
 									enemy_anim->PlayAnimation ( "Headbutt" , false );
+									// will be moved to lua script 
+									entt.QueueInstancePrefab("SFX_EnemyCharge", 0.f, 0.f, 0.f);
 									m_combat_start_animation = true;
 								}
 								if ( enemy_anim->m_current_sub_animation == "Headbutt" && enemy_anim->m_animation_played )
@@ -1147,6 +1153,8 @@ namespace god
 									if ( playable_anim )
 									{
 										playable_anim->PlayAnimation ( "Death" , false );
+										// will be moved to lua script 
+										entt.QueueInstancePrefab("SFX_PlayerDeath", 0.f, 0.f, 0.f);
 									}
 								}
 								if ( playable_anim->m_current_sub_animation == "Death" && playable_anim->m_animation_played )

@@ -573,6 +573,15 @@ namespace god
 			}
 		);
 
+		// RadianToDegree(radianValue)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("RadianToDegree",
+			[](float radianValue)->float
+			{
+				return radianValue * glm::pi<float>() / 180.0f;
+			}
+		);
+
 		// Normalize(value)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "Normalize" ,
@@ -747,6 +756,16 @@ namespace god
 			}
 		);
 
+		// ChildCount(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("ChildCount",
+			[&entt]( entt::entity e )->int
+			{
+				return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children.size();
+			}
+		);
+
+
 		// ChangeTexture(e, texture name)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "ChangeTexture" ,
@@ -836,7 +855,7 @@ namespace god
 			[&entt, &engineResources]( entt::entity e )->float
 			{
 				SkeleAnim3D* skele_anim = entt.GetEngineComponent<SkeleAnim3D> ( e );
-				if ( skele_anim )
+				if ( skele_anim && skele_anim->m_initialized)
 				{
 					OpenGL& opengl = engineResources.Get<OpenGL> ().get ();
 					return opengl.m_animations[ skele_anim->m_animation ].m_animators[ skele_anim->m_animator_id ].m_CurrentTime;

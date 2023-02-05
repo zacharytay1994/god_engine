@@ -1,0 +1,1 @@
+{"VFX_Hit":{"Type":"Default","Script Components":{"C_VFXHit":{}},"Engine Components":{"Transform":{"position_x":8.0,"position_y":3.0,"position_z":-1.0,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0},"Renderable3D":{"emissive":0.0,"visible":true,"spritesheetframe":0,"spritesheetcolumns":1,"framerate":1.0}},"Children":{}}}
