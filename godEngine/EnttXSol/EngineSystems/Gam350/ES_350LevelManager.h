@@ -123,6 +123,12 @@ namespace god
 				}
 			}
 		}
+		else
+		{
+			// change back to splash screen
+			level_manager.m_done = true;
+
+		}
 	}
 
 	void _350LevelManagerFrameStart ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , _350LevelManager& , Transform&> components )

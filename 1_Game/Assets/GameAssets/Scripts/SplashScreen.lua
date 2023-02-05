@@ -170,6 +170,8 @@ end
 -- initialization of data before play button is trigged
 function OnLoad_SplashScreen()
 
+    InstancePrefabNow("BlackScreen", 0,0,0)
+
     -- new array
     local objs_placement = {}
     for row = minRows, maxRows, 1 do

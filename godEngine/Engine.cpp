@@ -135,7 +135,7 @@ namespace god
 		MainVariables main_variables = { "nil", false };
 #else
 		// starting scene for non editor mode
-		MainVariables main_variables = { "SplashScreen", true }; 
+		MainVariables main_variables = { "DigipenScreen", true }; 
 		AudioAPI::PlayBGM ();
 #endif
 		RegisterLuaCPP ( enttxsol , engine_resources , main_variables );
