@@ -41,6 +41,11 @@ function S_DustParticleSystem(e)
             GetTransform(dustParticle).scale.y = GetTransform(dustParticle).scale.y * 100
             GetTransform(dustParticle).scale.z = GetTransform(dustParticle).scale.z * 100
             GetComponent(dustParticle, "C_DustParticle").Speed = 250.0            
+        else
+            -- make it a bit smaller for dummish
+            GetTransform(dustParticle).scale.x = GetTransform(dustParticle).scale.x * 0.8
+            GetTransform(dustParticle).scale.y = GetTransform(dustParticle).scale.y * 0.8
+            GetTransform(dustParticle).scale.z = GetTransform(dustParticle).scale.z * 0.8
         end
 
         -- each dust particle spawned will face a different direction

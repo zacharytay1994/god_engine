@@ -29,10 +29,13 @@ function S_VFXHit(e)
     -- if particles have already been emitted, just stop the code here
     if (emitterComponent.particleEmitted) then
         if (ChildCount(e) == 0) then
+            --print("END OF VFX_HIT")
             RemoveInstance(e)
         end
         return
     end
+
+    --print("START OF VFX_HIT")
 
     local emitterPosition = GetTransform(e).position
 
@@ -60,9 +63,9 @@ function S_VFXHit(e)
 
         -- scale up particle size for player model
         if (EntityName(emitterComponent.parentObject) == "350TritonModel") then
-            GetTransform(hitParticle).scale.x = GetTransform(hitParticle).scale.x * 400
-            GetTransform(hitParticle).scale.y = GetTransform(hitParticle).scale.y * 400
-            GetTransform(hitParticle).scale.z = GetTransform(hitParticle).scale.z * 400
+            GetTransform(hitParticle).scale.x = GetTransform(hitParticle).scale.x * 200
+            GetTransform(hitParticle).scale.y = GetTransform(hitParticle).scale.y * 200
+            GetTransform(hitParticle).scale.z = GetTransform(hitParticle).scale.z * 200
             GetComponent(hitParticle, "C_HitParticle").Speed = 1500.0
         end
         -- print(EntityName(emitterComponent.parentObject))
@@ -73,6 +76,8 @@ function S_VFXHit(e)
     end
 
     emitterComponent.particleEmitted = true
+
+    
 
 end
 

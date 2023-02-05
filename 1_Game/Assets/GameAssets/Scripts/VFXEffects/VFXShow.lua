@@ -50,7 +50,7 @@ end
 -- the position when using this function.
 function SpawnVFX(parent, vfxName, posX, posY, posZ)
 
-    print("SPAWNVFX()")
+    print("\nSPAWNVFX()")
     print("vfxName:", vfxName)
     print("position:", posX, posY, posZ)
 
