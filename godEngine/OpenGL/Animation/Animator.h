@@ -38,12 +38,14 @@ namespace god
 
 			float m_startTime { 0.0f };
 			float m_endTime { 1.0f };
+			bool m_repeat { true };
+			bool m_played { false };
 			bool m_alive { true };
+			float m_CurrentTime;
 
 		private:
 			std::vector<glm::mat4> m_FinalBoneMatrices;
 			Animation* m_CurrentAnimation;
-			float m_CurrentTime;
 			float m_DeltaTime;
 		};
 	}

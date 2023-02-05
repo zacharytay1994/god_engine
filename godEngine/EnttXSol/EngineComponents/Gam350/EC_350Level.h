@@ -6,6 +6,7 @@
 #include <queue>
 #include <tuple>
 #include <unordered_map>
+#include <algorithm>
 
 #include <godUtility/Math.h>
 
@@ -60,6 +61,14 @@ namespace god
 				m_lerp_to.y = std::lerp ( m_lerp_to.y , 2 * y , lerpSpeed * dt );
 				m_lerp_to.z = std::lerp ( m_lerp_to.z , 2 * z , lerpSpeed * dt );
 			}
+
+			void UpdateCombatLerpTo ( float lerpSpeed , float dt , glm::vec3 combatOffset )
+			{
+				auto const& [x , y , z] = m_cell;
+				m_lerp_to.x = std::lerp ( m_lerp_to.x , 2 * x + combatOffset.x , lerpSpeed * dt );
+				m_lerp_to.y = std::lerp ( m_lerp_to.y , 2 * y + combatOffset.y , lerpSpeed * dt );
+				m_lerp_to.z = std::lerp ( m_lerp_to.z , 2 * z + combatOffset.z , lerpSpeed * dt );
+			}
 		};
 
 		struct Tile : public Entity
@@ -80,6 +89,7 @@ namespace god
 			West
 		};
 
+		struct Playable;
 		struct Enemy : public Entity
 		{
 			enum class Type
@@ -98,7 +108,10 @@ namespace god
 
 			template <typename ENTT , typename ENGINE_RESOURCES , typename GRID>
 			void Update ( ENTT& entt , ENGINE_RESOURCES& engineResources ,
-				GRID& grid )
+				GRID& grid ,
+				Enemy*& enemy ,
+				Playable*& playable ,
+				bool& combatAttacking )
 			{
 				switch ( m_type )
 				{
@@ -116,11 +129,13 @@ namespace god
 						Tile& tile = grid.m_tiles[ m_destination ];
 						auto& [x , y , z] = tile.m_cell;
 						Entity* triton = grid.GetTriton ( x , y + 1 , z );
-						if ( /*grid.HasTriton ( x , y + 1 , z )*/triton )
+						if ( triton )
 						{
 							triton->m_to_destroy = true;
-							/*Get
-							grid.m_to_restart = true;*/
+							// check if tile walked on has playable, if so eat it
+							playable = static_cast< Playable* >( triton );
+							enemy = this;
+							combatAttacking = false;
 						}
 					}
 					// try searching for destination
@@ -219,23 +234,48 @@ namespace god
 
 		struct Grid
 		{
+			bool m_deserialized { false };
 			bool m_initialized { false };
+			bool m_ready { false };
+			bool m_start { false };
+
 			bool m_to_restart { false };
+			bool m_won { false };
 			bool m_playable_walkable { false };
 			std::vector<Tile> m_tiles;
 			std::vector<Enemy> m_enemies;
 			std::vector<Playable> m_playables;
+
+			bool m_combat_paused { false };
+			bool m_combat_attacking { true };
+			bool m_combat_done { false };
+			Playable* m_combat_playable { nullptr };
+			Enemy* m_combat_enemy { nullptr };
+			glm::vec3 m_combat_area_offset { 10'000,10'000,10'000 };
+			float m_combat_trigger_distance { 0.7f };
+			float m_combat_prep_time { 1.0f };
+			float m_combat_prep_time_counter { m_combat_prep_time };
+			glm::vec3 m_pre_combat_camera_position { 0.0f };
+			glm::vec3 m_pre_combat_camera_lookat { 0.0f };
+			bool m_combat_start_animation { false };
+			float m_combat_end_lag { 1.0f };
+			float m_combat_end_lag_counter { m_combat_end_lag };
 
 			// camera controls
 			glm::vec3 m_center { 0.0f,0.0f,0.0f };
 			float m_camera_move_speed { 8.0f };
 			float m_circle_value { 0.0f };
 			float m_camera_circle_speed { 1.4f };
-			float m_camera_height { 2.0f };
+			float m_camera_height { 4.0f };
 			float m_camera_zoom_speed { 8.0f };
-			float m_camera_zoom_distance { 16.0f };
+			float m_camera_zoom_distance { 18.0f };
 			float m_min_camera_zoom { 1.0f };
 			float m_max_camera_zoom { 20.0f };
+
+			float m_click_circle_value { 0.0f };
+			float m_click_position_x , m_click_position_y;
+			float m_click_zoom_value { 0.0f };
+			float m_click_height_value { 0.0f };
 
 			friend struct Enemy;
 
@@ -473,25 +513,54 @@ namespace god
 					playable.m_lerp_to = { 2 * x , 2 * y , 2 * z };
 					m_nonset_playable.push ( playable );
 				}
+
+				m_deserialized = true;
 			}
 
 			template<typename ENGINE_RESOURCES>
-			void UpdateCameraControls ( float dt , ENGINE_RESOURCES& engineResources )
+			void UpdateCameraControls ( float dt , ENGINE_RESOURCES& engineResources , glm::vec3 pos )
 			{
 				GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
 				Camera& camera = engineResources.Get<Camera> ().get ();
 
 				// spin camera 
-				camera.m_camera_pan_speed = 1.0f;
-				camera.SetNextLookAt ( m_center );
+				camera.m_camera_pan_speed = 3.0f;
+				camera.SetNextLookAt ( pos );
 				float c_x = std::sin ( m_circle_value );
 				float c_z = std::cos ( m_circle_value );
 
-				camera.m_camera_move_speed = 5.0f;
-				camera.SetNextPosition ( m_center +
+				camera.m_camera_move_speed = 3.0f;
+				camera.SetNextPosition ( pos +
 					glm::vec3 ( c_x * m_camera_zoom_distance ,
 						m_camera_height ,
 						c_z * m_camera_zoom_distance ) );
+
+				if ( window.MouseRPressed () )
+				{
+					m_click_circle_value = m_circle_value;
+					m_click_position_x = window.ViewportMouseX ();
+
+					m_click_zoom_value = m_camera_zoom_distance;
+					m_click_height_value = m_camera_height;
+					m_click_position_y = window.ViewportMouseY ();
+				}
+				if ( window.MouseRUp () )
+				{
+
+				}
+
+				if ( window.MouseRDown () )
+				{
+					m_circle_value = m_click_circle_value + ( m_click_position_x - window.ViewportMouseX () ) * 0.002f;
+
+					float z = m_click_zoom_value + ( m_click_position_y - window.ViewportMouseY () ) * 0.02f;
+
+					if ( z > m_min_camera_zoom && z < m_max_camera_zoom )
+					{
+						m_camera_zoom_distance = z;
+						m_camera_height = m_click_height_value - ( m_click_position_y - window.ViewportMouseY () ) * 0.02f;
+					}
+				}
 
 				// move camera left
 				if ( window.KeyDown ( GLFW_KEY_A ) )
@@ -530,60 +599,80 @@ namespace god
 					m_to_restart = true;
 				}
 
-				// add tiles
-				if ( m_nonset_tiles.size () > 0 )
+				// add tiles, to ready state
+				if ( !m_ready && m_deserialized )
 				{
-					if ( m_add_interval_timer < m_add_interval )
+					if ( m_nonset_tiles.size () > 0 )
 					{
-						m_add_interval_timer += dt;
+						if ( m_add_interval_timer < m_add_interval )
+						{
+							m_add_interval_timer += dt;
+						}
+						else
+						{
+							// add a tile
+							auto& tile = m_nonset_tiles.front ();
+							AddTile ( entt , engineResources , level , level_transform , tile );
+							m_nonset_tiles.pop ();
+
+							m_add_interval_timer = 0.0f;
+						}
+					}
+					// add enemies
+					else if ( m_nonset_enemies.size () > 0 )
+					{
+						if ( m_add_interval_timer < m_add_interval )
+						{
+							m_add_interval_timer += dt;
+						}
+						else
+						{
+							// add an entity
+							auto& entity = m_nonset_enemies.front ();
+							AddEnemy ( entt , engineResources , level , level_transform , entity );
+							m_nonset_enemies.pop ();
+
+							m_add_interval_timer = 0.0f;
+						}
 					}
 					else
 					{
-						// add a tile
-						auto& tile = m_nonset_tiles.front ();
-						AddTile ( entt , engineResources , level , level_transform , tile );
-						m_nonset_tiles.pop ();
-
-						m_add_interval_timer = 0.0f;
+						m_ready = true;
 					}
 				}
-				// add enemies
-				else if ( m_nonset_enemies.size () > 0 )
+
+				if ( m_start && m_ready && !m_initialized )
 				{
-					if ( m_add_interval_timer < m_add_interval )
+					// add playable
+					if ( m_nonset_playable.size () > 0 )
 					{
-						m_add_interval_timer += dt;
+						if ( m_add_interval_timer < m_add_interval )
+						{
+							m_add_interval_timer += dt;
+						}
+						else
+						{
+							// add an entity
+							auto& entity = m_nonset_playable.front ();
+							AddPlayable ( entt , engineResources , level , level_transform , entity );
+							m_nonset_playable.pop ();
+
+							m_add_interval_timer = 0.0f;
+						}
 					}
+					// add black combat box
 					else
 					{
-						// add an entity
-						auto& entity = m_nonset_enemies.front ();
-						AddEnemy ( entt , engineResources , level , level_transform , entity );
-						m_nonset_enemies.pop ();
+						// add black box at combat offset position
+						auto e = entt.InstancePrefab ( engineResources , "350BlackBox" , level.m_id );
+						Transform* transform = entt.GetEngineComponent<Transform> ( e );
+						if ( transform )
+						{
+							transform->m_position = m_combat_area_offset;
+						}
 
-						m_add_interval_timer = 0.0f;
+						m_initialized = true;
 					}
-				}
-				// add playable
-				else if ( m_nonset_playable.size () > 0 )
-				{
-					if ( m_add_interval_timer < m_add_interval )
-					{
-						m_add_interval_timer += dt;
-					}
-					else
-					{
-						// add an entity
-						auto& entity = m_nonset_playable.front ();
-						AddPlayable ( entt , engineResources , level , level_transform , entity );
-						m_nonset_playable.pop ();
-
-						m_add_interval_timer = 0.0f;
-					}
-				}
-				else
-				{
-					m_initialized = true;
 				}
 
 				// test raycast to all entities
@@ -599,167 +688,450 @@ namespace god
 				m_selected_entity = nullptr;
 				for ( auto& tile : m_tiles )
 				{
-					Transform* transform = entt.GetEngineComponent<Transform> ( tile.m_entity_id );
-					if ( transform )
+					// only test normal tiles, i.e. not rocks
+					if ( tile.m_type == Tile::Type::Normal )
 					{
-						glm::vec3 center = transform->m_parent_transform * glm::vec4 ( transform->m_position , 1.0f );
-						auto [intersect , tmin] = RayIntersectAABB ( camera.m_position , ray_dir , center - glm::vec3 ( 1 , 1 , 1 ) , center + glm::vec3 ( 1 , 1 , 1 ) );
-						tile.m_moused_over = intersect;
-						tile.m_tmin = tmin;
-
-						if ( tmin < min )
+						Transform* transform = entt.GetEngineComponent<Transform> ( tile.m_entity_id );
+						if ( transform )
 						{
-							min = tmin;
-							m_selected_entity = static_cast< Entity* >( &tile );
-						}
+							glm::vec3 center = transform->m_parent_transform * glm::vec4 ( transform->m_position , 1.0f );
+							auto [intersect , tmin] = RayIntersectAABB ( camera.m_position , ray_dir , center - glm::vec3 ( 1 , 1 , 1 ) , center + glm::vec3 ( 1 , 1 , 1 ) );
+							tile.m_moused_over = intersect;
+							tile.m_tmin = tmin;
 
-						transform->m_scale = glm::vec3 ( 1.0f );
-
-						EntityData* entity_data = entt.GetEngineComponent<EntityData> ( tile.m_entity_id );
-						if ( entity_data && entt.m_entities[ entity_data->m_id ].m_children.size () > 0 )
-						{
-							Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ entity_data->m_id ].m_children[ 0 ] );
-							if ( renderable )
+							if ( tmin < min )
 							{
-								renderable->m_outlined = false;
+								min = tmin;
+								m_selected_entity = static_cast< Entity* >( &tile );
+							}
+
+							transform->m_scale = glm::vec3 ( 1.0f );
+
+							EntityData* entity_data = entt.GetEngineComponent<EntityData> ( tile.m_entity_id );
+							if ( entity_data && entt.m_entities[ entity_data->m_id ].m_children.size () > 0 )
+							{
+								Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ entity_data->m_id ].m_children[ 0 ] );
+								if ( renderable )
+								{
+									renderable->m_outlined = false;
+								}
 							}
 						}
 					}
 				}
 
+				// update camera controls 
+				if ( !m_combat_paused )
+				{
+					UpdateCameraControls ( dt , engineResources , level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( m_center , 1.0f ) );
+				}
+
+
 				if ( m_initialized )
 				{
-					// update movement of playable
-					for ( auto& playable : m_playables )
+					if ( !m_combat_paused )
 					{
-						Transform* transform = entt.GetEngineComponent<Transform> ( playable.m_entity_id );
-						if ( transform )
+						if ( m_combat_prep_time_counter > 0.0f )
 						{
-							playable.LerpPositionTo ( transform->m_position , 4.0f , dt );
+							m_combat_prep_time_counter -= dt;
 						}
-						playable.UpdateLerpTo ( 3.0f , dt );
-					}
-
-					// update movement of enemies
-					for ( auto& enemy : m_enemies )
-					{
-						Transform* transform = entt.GetEngineComponent<Transform> ( enemy.m_entity_id );
-						if ( transform )
+						else
 						{
-							enemy.LerpPositionTo ( transform->m_position , 4.0f , dt );
-						}
-						enemy.UpdateLerpTo ( 3.0f , dt );
-					}
-
-					// process gameplay
-					m_playable_walkable = false;
-					switch ( m_turn_order )
-					{
-					case ( TurnOrder::Playable ):
-					{
-						// process playables
-						if ( m_playable_i < m_playables.size () )
-						{
-							auto& playable = m_playables[ m_playable_i ];
-
-							// highlight current playable todo
-
-							// update playable
-							switch ( playable.m_type )
+							// update movement of playable
+							for ( auto& playable : m_playables )
 							{
-							case ( Playable::Type::Triton ):
-							{
-								if ( m_selected_entity )
+								Transform* transform = entt.GetEngineComponent<Transform> ( playable.m_entity_id );
+								if ( transform )
 								{
-									if ( m_selected_entity->m_parent_type == Entity::Type::Tile )
+									playable.LerpPositionTo ( transform->m_position , 4.0f , dt );
+								}
+								playable.UpdateLerpTo ( 3.0f , dt );
+							}
+
+							// update movement of enemies
+							for ( auto& enemy : m_enemies )
+							{
+								Transform* transform = entt.GetEngineComponent<Transform> ( enemy.m_entity_id );
+								if ( transform )
+								{
+									enemy.LerpPositionTo ( transform->m_position , 4.0f , dt );
+								}
+								enemy.UpdateLerpTo ( 3.0f , dt );
+							}
+
+							// if combat entities playable and enemy is !nullptr, prepare to do combat cutscene, and combat pause
+							if ( m_combat_playable && m_combat_enemy )
+							{
+								Transform* combat_playable_transform = entt.GetEngineComponent<Transform> ( m_combat_playable->m_entity_id );
+								Transform* combat_enemy_transform = entt.GetEngineComponent<Transform> ( m_combat_enemy->m_entity_id );
+
+								if ( combat_playable_transform && combat_enemy_transform )
+								{
+									// if near enough
+									if ( glm::length2 ( combat_playable_transform->m_position - combat_enemy_transform->m_position ) < m_combat_trigger_distance )
 									{
-										switch ( static_cast< Tile* >( m_selected_entity )->m_type )
+										// set combat prep
+										m_combat_prep_time_counter = m_combat_prep_time;
+										// create combat transtion, i.e. white screen
+										entt.InstancePrefab ( engineResources , "WhiteFade" );
+										// activate combat pause 
+										m_combat_paused = true;
+										// move the 2 entities to the combat area
+										combat_playable_transform->m_position += m_combat_area_offset;
+										m_combat_playable->m_lerp_to += m_combat_area_offset;
+										combat_enemy_transform->m_position += m_combat_area_offset;
+										m_combat_enemy->m_lerp_to += m_combat_area_offset;
+										// move the camera to the combat area
+										Camera& camera = engineResources.Get<Camera> ().get ();
+										// cache camera position
+										m_pre_combat_camera_position = camera.m_position;
+										m_pre_combat_camera_lookat = camera.m_look_at;
+										glm::vec3 world_combat_area_offset { level_transform.m_parent_transform /** level_transform.m_local_transform*/ * glm::vec4 ( m_combat_area_offset,1.0f ) };
+										camera.SetPosition ( camera.m_position + world_combat_area_offset );
+										camera.SetLookAt ( camera.m_look_at + world_combat_area_offset );
+										// set new camera pan
+										glm::vec3 v1 = combat_enemy_transform->m_position - combat_playable_transform->m_position;
+										glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
+										camera.m_camera_move_speed = 3.0f;
+										camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
+										camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
+									}
+								}
+							}
+
+							// process gameplay
+							m_playable_walkable = false;
+							switch ( m_turn_order )
+							{
+							case ( TurnOrder::Playable ):
+							{
+								// process playables
+								if ( m_playable_i < m_playables.size () )
+								{
+									auto& playable = m_playables[ m_playable_i ];
+
+									// highlight current playable todo
+
+									// update playable
+									switch ( playable.m_type )
+									{
+									case ( Playable::Type::Triton ):
+									{
+										if ( m_selected_entity )
 										{
-										case ( Tile::Type::Normal ):
-										{
-											// check if tile has nothing on top
-											auto [x , y , z] = m_selected_entity->m_cell;
-											if ( !HasTile ( x , y + 1 , z ) )
+											if ( m_selected_entity->m_parent_type == Entity::Type::Tile )
 											{
-												// move on top of clicked tile
-												GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
-												m_playable_walkable = playable.Walkable ( { x , y + 1 , z } );
-												if ( window.MouseLPressed ( 2 ) )
+												switch ( static_cast< Tile* >( m_selected_entity )->m_type )
 												{
-													if ( m_playable_walkable )
+												case ( Tile::Type::Normal ):
+												{
+													// check if tile has nothing on top
+													auto [x , y , z] = m_selected_entity->m_cell;
+													if ( !HasTile ( x , y + 1 , z ) )
 													{
-														/*MoveEntityOnTopOf ( entt , engineResources ,
-															m_playables.front () , *m_selected_entity );*/
-														LerpEntityOnTopOf ( entt , engineResources ,
-															m_playables.front () , *m_selected_entity );
-
-														// check if tile walked on has enemy, if so eat it
-														Entity* enemy = GetEnemy ( x , y + 1 , z );
-														if ( enemy )
+														// move on top of clicked tile
+														GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
+														m_playable_walkable = playable.Walkable ( { x , y + 1 , z } );
+														if ( window.MouseLPressed ( 2 ) )
 														{
-															enemy->m_to_destroy = true;
-														}
+															if ( m_playable_walkable )
+															{
+																/*MoveEntityOnTopOf ( entt , engineResources ,
+																	m_playables.front () , *m_selected_entity );*/
+																LerpEntityOnTopOf ( entt , engineResources ,
+																	m_playables.front () , *m_selected_entity );
 
-														++m_playable_i;
+																// check if tile walked on has enemy, if so eat it
+																m_combat_playable = &playable;
+																m_combat_enemy = static_cast< Enemy* >( GetEnemy ( x , y + 1 , z ) );
+																m_combat_attacking = true;
+																//Entity* enemy = GetEnemy ( x , y + 1 , z );
+																if ( m_combat_enemy )
+																{
+																	m_combat_enemy->m_to_destroy = true;
+																}
+
+																++m_playable_i;
+															}
+														}
 													}
+												}
 												}
 											}
 										}
+										break;
+									}
+									}
+
+									// rotate playable to face tile
+									if ( m_selected_entity && m_turn_order == TurnOrder::Playable && m_playable_walkable )
+									{
+										Transform* tile_transform = entt.GetEngineComponent<Transform> ( m_selected_entity->m_entity_id );
+										Transform* playable_transform = entt.GetEngineComponent<Transform> ( playable.m_entity_id );
+										if ( tile_transform && playable_transform )
+										{
+											glm::vec3 dir = tile_transform->m_position - playable_transform->m_position;
+											glm::vec2 dir2 = { dir.x, dir.z };
+											float deg = DegreeBetweenVec2 ( { 1,0 } , glm::normalize ( dir2 ) );
+											float lerp_to = playable_transform->m_rotation.y - deg;
+											if ( lerp_to > 180.0f )
+											{
+												playable_transform->m_rotation.y = std::lerp ( playable_transform->m_rotation.y , deg - 180.0f , dt * 10.0f );
+											}
+											else
+											{
+												playable_transform->m_rotation.y = std::lerp ( playable_transform->m_rotation.y , deg , dt * 10.0f );
+											}
 										}
 									}
+								}
+								else
+								{
+									bool all_moved { true };
+									for ( auto& playable : m_playables )
+									{
+										if ( !playable.m_moved )
+										{
+											all_moved = false;
+										}
+									}
+									if ( all_moved )
+									{
+										m_playable_i = 0;
+										m_turn_order = TurnOrder::Enemy;
+										m_turn_changed = true;
+									}
+								}
+								break;
+							}
+							case ( TurnOrder::Enemy ):
+							{
+								// update enemies
+								if ( !m_updated_enemies )
+								{
+									for ( auto& enemy : m_enemies )
+									{
+										enemy.Update ( entt , engineResources , *this , m_combat_enemy , m_combat_playable , m_combat_attacking );
+									}
+									m_updated_enemies = true;
+								}
+								bool all_moved { true };
+								for ( auto& enemy : m_enemies )
+								{
+									if ( !enemy.m_moved )
+									{
+										all_moved = false;
+									}
+								}
+
+								// check if all moved
+								if ( all_moved )
+								{
+									m_updated_enemies = false;
+									m_turn_order = TurnOrder::Playable;
+									m_turn_changed = true;
 								}
 								break;
 							}
 							}
 						}
+					}
+					// combat phase
+					else
+					{
+						if ( m_combat_prep_time_counter > 0.0f )
+						{
+							m_combat_prep_time_counter -= dt;
+						}
 						else
 						{
-							bool all_moved { true };
-							for ( auto& playable : m_playables )
+							if ( m_combat_attacking )
 							{
-								if ( !playable.m_moved )
+								Transform* combat_playable_transform = entt.GetEngineComponent<Transform> ( m_combat_playable->m_entity_id );
+								Transform* combat_enemy_transform = entt.GetEngineComponent<Transform> ( m_combat_enemy->m_entity_id );
+
+								if ( combat_playable_transform && combat_enemy_transform )
 								{
-									all_moved = false;
+									// continue updating camera position as midpoint of both
+									// set new camera pan
+									Camera& camera = engineResources.Get<Camera> ().get ();
+									glm::vec3 v1 = combat_enemy_transform->m_position - combat_playable_transform->m_position;
+									glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
+									camera.m_camera_move_speed = 3.0f;
+									camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
+									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
+
+									// move enemy away from player, works no matter who is attacking
+									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;
+									dir.y = 0;
+									glm::vec3 dst = combat_playable_transform->m_position + glm::normalize ( dir ) * 1.0f;
+
+									combat_enemy_transform->m_position.x = std::lerp ( combat_enemy_transform->m_position.x , dst.x , 5.0f * dt );
+									combat_enemy_transform->m_position.y = std::lerp ( combat_enemy_transform->m_position.y , dst.y , 5.0f * dt );
+									combat_enemy_transform->m_position.z = std::lerp ( combat_enemy_transform->m_position.z , dst.z , 5.0f * dt );
+
+									// face each other
+									glm::vec3 norm_dir = glm::normalize ( dir );
+									float a1 = DegreeBetweenVec2 ( { 1,0 } , { norm_dir.x, norm_dir.z } );
+									float a2 = DegreeBetweenVec2 ( { 1,0 } , { -norm_dir.x, -norm_dir.z } );
+									combat_playable_transform->m_rotation.y = a1;
+									combat_enemy_transform->m_rotation.y = a2;
+								}
+
+								// update movement of playable
+								for ( auto& playable : m_playables )
+								{
+									Transform* transform = entt.GetEngineComponent<Transform> ( playable.m_entity_id );
+									if ( transform )
+									{
+										playable.LerpPositionTo ( transform->m_position , 4.0f , dt );
+									}
+									playable.UpdateCombatLerpTo ( 3.0f , dt , m_combat_area_offset );
+								}
+
+								// process animations
+								SkeleAnim3D* playable_anim = entt.GetEngineComponent<SkeleAnim3D> ( entt.m_entities[ entt.m_entities[ m_combat_playable->m_entity_id ].m_children[ 0 ] ].m_children[ 0 ] );
+								SkeleAnim3D* enemy_anim = entt.GetEngineComponent<SkeleAnim3D> ( entt.m_entities[ entt.m_entities[ m_combat_enemy->m_entity_id ].m_children[ 0 ] ].m_children[ 0 ] );
+								if ( !m_combat_start_animation && playable_anim )
+								{
+									playable_anim->PlayAnimation ( "AOE" , false );
+									m_combat_start_animation = true;
+								}
+								if ( playable_anim->m_current_sub_animation == "AOE" && playable_anim->m_animation_played )
+								{
+									playable_anim->PlayAnimation ( "Idle" , true );
+									if ( enemy_anim )
+									{
+										enemy_anim->PlayAnimation ( "Death" , false );
+									}
+								}
+								if ( enemy_anim->m_current_sub_animation == "Death" && enemy_anim->m_animation_played )
+								{
+									m_combat_done = true;
 								}
 							}
-							if ( all_moved )
+							// enemy is the one attacking
+							else
 							{
-								m_playable_i = 0;
-								m_turn_order = TurnOrder::Enemy;
-								m_turn_changed = true;
-							}
-						}
-						break;
-					}
-					case ( TurnOrder::Enemy ):
-					{
-						// update enemies
-						if ( !m_updated_enemies )
-						{
-							for ( auto& enemy : m_enemies )
-							{
-								enemy.Update ( entt , engineResources , *this );
-							}
-							m_updated_enemies = true;
-						}
-						bool all_moved { true };
-						for ( auto& enemy : m_enemies )
-						{
-							if ( !enemy.m_moved )
-							{
-								all_moved = false;
-							}
-						}
+								Transform* combat_playable_transform = entt.GetEngineComponent<Transform> ( m_combat_playable->m_entity_id );
+								Transform* combat_enemy_transform = entt.GetEngineComponent<Transform> ( m_combat_enemy->m_entity_id );
 
-						// check if all moved
-						if ( all_moved )
-						{
-							m_updated_enemies = false;
-							m_turn_order = TurnOrder::Playable;
-							m_turn_changed = true;
+								if ( combat_playable_transform && combat_enemy_transform )
+								{
+									// continue updating camera position as midpoint of both
+									// set new camera pan
+									Camera& camera = engineResources.Get<Camera> ().get ();
+									glm::vec3 v1 = combat_enemy_transform->m_position - combat_playable_transform->m_position;
+									glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
+									camera.m_camera_move_speed = 3.0f;
+									camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
+									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
+
+									// move player away from enemy
+									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;
+									dir.y = 0;
+									glm::vec3 dst = combat_enemy_transform->m_position - glm::normalize ( dir ) * 1.0f;
+
+									combat_playable_transform->m_position.x = std::lerp ( combat_playable_transform->m_position.x , dst.x , 5.0f * dt );
+									combat_playable_transform->m_position.y = std::lerp ( combat_playable_transform->m_position.y , dst.y , 5.0f * dt );
+									combat_playable_transform->m_position.z = std::lerp ( combat_playable_transform->m_position.z , dst.z , 5.0f * dt );
+
+									// face each other
+									glm::vec3 norm_dir = glm::normalize ( dir );
+									float a1 = DegreeBetweenVec2 ( { 1,0 } , { norm_dir.x, norm_dir.z } );
+									float a2 = DegreeBetweenVec2 ( { 1,0 } , { -norm_dir.x, -norm_dir.z } );
+									combat_playable_transform->m_rotation.y = a1;
+									combat_enemy_transform->m_rotation.y = a2;
+								}
+
+								// update movement of enemies
+								for ( auto& enemy : m_enemies )
+								{
+									Transform* transform = entt.GetEngineComponent<Transform> ( enemy.m_entity_id );
+									if ( transform )
+									{
+										enemy.LerpPositionTo ( transform->m_position , 4.0f , dt );
+									}
+									enemy.UpdateCombatLerpTo ( 3.0f , dt , m_combat_area_offset );
+								}
+
+								SkeleAnim3D* playable_anim = entt.GetEngineComponent<SkeleAnim3D> ( entt.m_entities[ entt.m_entities[ m_combat_playable->m_entity_id ].m_children[ 0 ] ].m_children[ 0 ] );
+								SkeleAnim3D* enemy_anim = entt.GetEngineComponent<SkeleAnim3D> ( entt.m_entities[ entt.m_entities[ m_combat_enemy->m_entity_id ].m_children[ 0 ] ].m_children[ 0 ] );
+								if ( !m_combat_start_animation && enemy_anim )
+								{
+									enemy_anim->PlayAnimation ( "Headbutt" , false );
+									m_combat_start_animation = true;
+								}
+								if ( enemy_anim->m_current_sub_animation == "Headbutt" && enemy_anim->m_animation_played )
+								{
+									enemy_anim->PlayAnimation ( "Idle" , true );
+									if ( playable_anim )
+									{
+										playable_anim->PlayAnimation ( "Death" , false );
+									}
+								}
+								if ( playable_anim->m_current_sub_animation == "Death" && playable_anim->m_animation_played )
+								{
+									m_combat_done = true;
+								}
+
+								GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
+								if ( window.KeyPressed ( GLFW_KEY_I ) )
+								{
+									m_combat_done = true;
+								}
+							}
+
+							if ( m_combat_done )
+							{
+								if ( m_combat_end_lag_counter > 0.0f )
+								{
+									m_combat_end_lag_counter -= dt;
+								}
+								else
+								{
+									m_combat_paused = false;
+									m_combat_done = false;
+
+									// reset combat variables
+									m_combat_start_animation = false;
+									m_combat_prep_time_counter = m_combat_prep_time;
+									m_combat_end_lag_counter = m_combat_end_lag;
+
+									// create combat transtion, i.e. white screen
+									entt.InstancePrefab ( engineResources , "WhiteFade" );
+
+									// reset remaining entity
+									if ( m_combat_attacking )
+									{
+										Transform* transform = entt.GetEngineComponent<Transform> ( m_combat_playable->m_entity_id );
+										if ( transform )
+										{
+											transform->m_position -= m_combat_area_offset;
+										}
+										m_combat_playable->m_lerp_to -= m_combat_area_offset;
+									}
+									else
+									{
+										Transform* transform = entt.GetEngineComponent<Transform> ( m_combat_enemy->m_entity_id );
+										if ( transform )
+										{
+											transform->m_position -= m_combat_area_offset;
+										}
+										m_combat_playable->m_lerp_to -= m_combat_area_offset;
+									}
+
+									// reset camera
+									Camera& camera = engineResources.Get<Camera> ().get ();
+									camera.SetPosition ( m_pre_combat_camera_position );
+									camera.SetLookAt ( m_pre_combat_camera_lookat );
+
+									// set combat entities back
+									m_combat_enemy = nullptr;
+									m_combat_playable = nullptr;
+								}
+							}
 						}
-						break;
-					}
 					}
 				}
 				else
@@ -842,9 +1214,13 @@ namespace god
 					}
 
 					// if theres no enemies left, reset the level
-					if ( ( m_enemies.empty () || m_playables.empty () ) && m_initialized )
+					if ( m_playables.empty () && m_initialized )
 					{
 						m_to_restart = true;
+					}
+					if ( m_enemies.empty () && m_initialized )
+					{
+						m_won = true;
 					}
 
 					m_turn_changed = false;

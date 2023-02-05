@@ -166,6 +166,8 @@
     <ClInclude Include="EnttXSol\EngineComponents\Gam350\EC_350Level.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Gam350\ES_350Level.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_Renderable3D.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Gam350\EC_350LevelManager.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Gam350\ES_350LevelManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

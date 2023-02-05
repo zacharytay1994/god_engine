@@ -20,8 +20,12 @@ namespace god
 		std::unordered_map<std::string , std::tuple<float , float>> m_sub_animations;
 		std::string m_current_sub_animation { "" };
 		std::string m_new_sub_animation_name { "" };
+
+		std::string m_old_sub_animation { "" };
 		float m_start { 0.0f };
 		float m_end { 0.0f };
+		bool m_animation_played { false };
+		bool m_repeat { true };
 
 		bool m_initialized { false };
 
@@ -36,13 +40,21 @@ namespace god
 			( rhs );
 			return true;
 		}
+
+		void PlayAnimation ( std::string const& name , bool repeat )
+		{
+			m_current_sub_animation = name;
+			m_repeat = repeat;
+			m_animation_played = false;
+		}
 	};
 	template <>
 	inline void NewLuaType<SkeleAnim3D> ( sol::state& luaState , std::string const& name )
 	{
 		RegisterLuaType<SkeleAnim3D> ( luaState , name ,
 			"animation" , &SkeleAnim3D::m_animation ,
-			"visible" , &SkeleAnim3D::m_visible );
+			"visible" , &SkeleAnim3D::m_visible,
+			"played", &SkeleAnim3D::m_animation_played );
 	}
 	template<>
 	inline void ComponentInspector::operator() < SkeleAnim3D > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )

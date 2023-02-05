@@ -22,6 +22,7 @@ namespace god
 		"PhysicsController",
 		"PlayerController",
 		"SkeleAnim3D",
-		"_350Level"
+		"_350Level",
+		"_350LevelManager"
 	};
 }

@@ -25,6 +25,7 @@
 #include "GUI/EC_GUIText.h"
 
 #include "Gam350/EC_350Level.h"
+#include "Gam350/EC_350LevelManager.h"
 
 #include <tuple>
 #include <string>
@@ -52,7 +53,8 @@ namespace god
 			PhysicsController ,
 			PlayerController ,
 			SkeleAnim3D ,
-			_350Level
+			_350Level ,
+			_350LevelManager
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};

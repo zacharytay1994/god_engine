@@ -564,6 +564,24 @@ namespace god
 			}
 		);
 
+		// Cos(value)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "Cos" ,
+			[]( float value )->float
+			{
+				return glm::cos ( value );
+			}
+		);
+
+		// Normalize(value)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "Normalize" ,
+			[]( float x , float y , float z )->glm::vec3
+			{
+				return glm::normalize ( glm::vec3 ( x , y , z ) );
+			}
+		);
+
 		// Abs(value)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "Abs" ,
@@ -800,7 +818,7 @@ namespace god
 		// AddForce(e,x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "AddForce" ,
-			[&entt]( entt::entity e , float x, float y, float z )
+			[&entt]( entt::entity e , float x , float y , float z )
 			{
 				PhysicsController* physics_controller = entt.GetEngineComponent<PhysicsController> ( e );
 				if ( physics_controller )
@@ -809,6 +827,21 @@ namespace god
 					// calculate acceleration added by force
 					physics_controller->m_acceleration += force / physics_controller->m_mass;
 				}
+			}
+		);
+
+		// AddForce(e,x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "CurrentAnimationFrame" ,
+			[&entt, &engineResources]( entt::entity e )->float
+			{
+				SkeleAnim3D* skele_anim = entt.GetEngineComponent<SkeleAnim3D> ( e );
+				if ( skele_anim )
+				{
+					OpenGL& opengl = engineResources.Get<OpenGL> ().get ();
+					return opengl.m_animations[ skele_anim->m_animation ].m_animators[ skele_anim->m_animator_id ].m_CurrentTime;
+				}
+				return 0.0f;
 			}
 		);
 	}

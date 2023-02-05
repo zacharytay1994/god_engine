@@ -27,18 +27,31 @@ namespace god
 		{
 			// update animator on opengl side
 			auto& opengl = engineResources.Get<OpenGL> ().get ();
-			if ( opengl.m_animations.find ( skele_anim.m_animation ) != opengl.m_animations.end () )
+
+			// if not updated
+			if ( skele_anim.m_old_sub_animation != skele_anim.m_current_sub_animation )
 			{
-				auto& animator = opengl.m_animations[ skele_anim.m_animation ].m_animators[ skele_anim.m_animator_id ];
-				if ( skele_anim.m_sub_animations.find ( skele_anim.m_current_sub_animation ) != skele_anim.m_sub_animations.end () )
+				skele_anim.m_old_sub_animation = skele_anim.m_current_sub_animation;
+
+				if ( opengl.m_animations.find ( skele_anim.m_animation ) != opengl.m_animations.end () )
 				{
-					auto& [start , end] = skele_anim.m_sub_animations[ skele_anim.m_current_sub_animation ];
-					animator.m_startTime = start;
-					animator.m_endTime = end;
+					auto& animator = opengl.m_animations[ skele_anim.m_animation ].m_animators[ skele_anim.m_animator_id ];
+					if ( skele_anim.m_sub_animations.find ( skele_anim.m_current_sub_animation ) != skele_anim.m_sub_animations.end () )
+					{
+						auto& [start , end] = skele_anim.m_sub_animations[ skele_anim.m_current_sub_animation ];
+						animator.m_startTime = start;
+						animator.m_CurrentTime = start;
+						animator.m_endTime = end;
+						animator.m_repeat = skele_anim.m_repeat;
+						animator.m_played = false;
+					}
 				}
-				// let animator know entity is still alive
-				animator.m_alive = true;
 			}
+
+			// let animator know entity is still alive
+			auto& animator = opengl.m_animations[ skele_anim.m_animation ].m_animators[ skele_anim.m_animator_id ];
+			animator.m_alive = true;
+			skele_anim.m_animation_played = animator.m_played;
 		}
 
 		// return if not valid
