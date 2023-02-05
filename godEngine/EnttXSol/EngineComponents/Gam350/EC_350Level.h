@@ -602,6 +602,29 @@ namespace god
 				// add tiles, to ready state
 				if ( !m_ready && m_deserialized )
 				{
+					// set reset button inactive
+					uint32_t reset_button = entt.GetEntity ( "ResetButton" );
+					if ( reset_button != static_cast< uint32_t >( -1 ) )
+					{
+						entt.SetEntityActive ( reset_button , false );
+					}
+
+					// set skip button active
+					uint32_t skip_button = entt.GetEntity ( "SkipButton" );
+					if ( skip_button != static_cast< uint32_t >( -1 ) )
+					{
+						entt.SetEntityActive ( skip_button , true );
+
+						GUIObject* skip_gui = entt.GetEngineComponent<GUIObject> ( skip_button );
+						if ( skip_gui )
+						{
+							if ( skip_gui->m_released )
+							{
+								m_add_interval = 0.0f;
+							}
+						}
+					}
+
 					if ( m_nonset_tiles.size () > 0 )
 					{
 						if ( m_add_interval_timer < m_add_interval )
@@ -669,6 +692,20 @@ namespace god
 						if ( transform )
 						{
 							transform->m_position = m_combat_area_offset;
+						}
+
+						// set reset button active
+						uint32_t reset_button = entt.GetEntity ( "ResetButton" );
+						if ( reset_button != static_cast< uint32_t >( -1 ) )
+						{
+							entt.SetEntityActive ( reset_button , true );
+						}
+
+						// set skip button inactive
+						uint32_t skip_button = entt.GetEntity ( "SkipButton" );
+						if ( skip_button != static_cast< uint32_t >( -1 ) )
+						{
+							entt.SetEntityActive ( skip_button , false );
 						}
 
 						m_initialized = true;
@@ -795,6 +832,34 @@ namespace god
 										camera.m_camera_move_speed = 3.0f;
 										camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
 										camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
+
+										// set reset button inactive
+										uint32_t reset_button = entt.GetEntity ( "ResetButton" );
+										if ( reset_button != static_cast< uint32_t >( -1 ) )
+										{
+											entt.SetEntityActive ( reset_button , false );
+										}
+
+										// set skip button active
+										uint32_t skip_button = entt.GetEntity ( "SkipButton" );
+										if ( skip_button != static_cast< uint32_t >( -1 ) )
+										{
+											entt.SetEntityActive ( skip_button , true );
+										}
+
+										// deactivate tutorial gui
+										uint32_t tut_camera = entt.GetEntity ( "TutCamera" );
+										uint32_t tut_interact = entt.GetEntity ( "TutInteract" );
+										if ( tut_camera != static_cast< uint32_t >( -1 ) && tut_interact != static_cast< uint32_t >( -1 ) )
+										{
+											GUIObject* tut_cam_gui = entt.GetEngineComponent<GUIObject> ( tut_camera );
+											GUIObject* tut_int_gui = entt.GetEngineComponent<GUIObject> ( tut_interact );
+											if ( tut_cam_gui && tut_int_gui )
+											{
+												tut_cam_gui->m_active = false;
+												tut_int_gui->m_active = false;
+											}
+										}
 									}
 								}
 							}
@@ -939,6 +1004,20 @@ namespace god
 					// combat phase
 					else
 					{
+						// skip combat
+						uint32_t skip_button = entt.GetEntity ( "SkipButton" );
+						if ( skip_button != static_cast< uint32_t >( -1 ) )
+						{
+							GUIObject* skip_gui = entt.GetEngineComponent<GUIObject> ( skip_button );
+							if ( skip_gui )
+							{
+								if ( skip_gui->m_released )
+								{
+									m_combat_done = true;
+								}
+							}
+						}
+
 						if ( m_combat_prep_time_counter > 0.0f )
 						{
 							m_combat_prep_time_counter -= dt;
@@ -1090,6 +1169,13 @@ namespace god
 								}
 								else
 								{
+									// set reset button active
+									uint32_t reset_button = entt.GetEntity ( "ResetButton" );
+									if ( reset_button != static_cast< uint32_t >( -1 ) )
+									{
+										entt.SetEntityActive ( reset_button , true );
+									}
+
 									m_combat_paused = false;
 									m_combat_done = false;
 
@@ -1105,18 +1191,28 @@ namespace god
 									if ( m_combat_attacking )
 									{
 										Transform* transform = entt.GetEngineComponent<Transform> ( m_combat_playable->m_entity_id );
+										SkeleAnim3D* playable_anim = entt.GetEngineComponent<SkeleAnim3D> ( entt.m_entities[ entt.m_entities[ m_combat_playable->m_entity_id ].m_children[ 0 ] ].m_children[ 0 ] );
 										if ( transform )
 										{
 											transform->m_position -= m_combat_area_offset;
+										}
+										if ( playable_anim )
+										{
+											playable_anim->PlayAnimation ( "Idle" , true );
 										}
 										m_combat_playable->m_lerp_to -= m_combat_area_offset;
 									}
 									else
 									{
 										Transform* transform = entt.GetEngineComponent<Transform> ( m_combat_enemy->m_entity_id );
+										SkeleAnim3D* enemy_anim = entt.GetEngineComponent<SkeleAnim3D> ( entt.m_entities[ entt.m_entities[ m_combat_enemy->m_entity_id ].m_children[ 0 ] ].m_children[ 0 ] );
 										if ( transform )
 										{
 											transform->m_position -= m_combat_area_offset;
+										}
+										if ( enemy_anim )
+										{
+											enemy_anim->PlayAnimation ( "Idle" , true );
 										}
 										m_combat_playable->m_lerp_to -= m_combat_area_offset;
 									}

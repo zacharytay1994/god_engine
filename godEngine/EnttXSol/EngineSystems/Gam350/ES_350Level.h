@@ -30,25 +30,16 @@ namespace god
 		if ( level.m_focused )
 		{
 			level.m_grid.Update ( DeltaTimer::m_dt , entt , engineResources , entity_data , transform );
-			// restart the level
-			if ( level.m_grid.m_to_restart )
+			
+			EnttXSol::Entities::ID reset_button = entt.GetEntity ( "ResetButton" );
+			if ( reset_button != EnttXSol::Entities::Null )
 			{
-				/*entt.QueueDelete ( entity_data.m_id );
-				auto id = entt.AddPrefabToScene ( engineResources , entt.m_entities[ entity_data.m_id ].m_name );
-				EntityData* new_entity_data = entt.GetEngineComponent<EntityData> ( id );
-				_350Level* new_level = entt.GetEngineComponent<_350Level> ( id );
-				Transform* new_transform = entt.GetEngineComponent<Transform> ( id );
-				if ( new_entity_data && new_level && new_transform )
+				GUIObject* rb_gui = entt.GetEngineComponent<GUIObject> ( reset_button );
+				if ( rb_gui && rb_gui->m_released )
 				{
-					new_transform->m_position = transform.m_position;
-					new_level->m_grid.Initialize ( entt , engineResources , *new_entity_data , *new_transform ,
-						new_level->m_level_layout , new_level->m_enemy_layout , new_level->m_playable_layout );
-				}*/
-
-				// do some destroy lvl thing? dunno
+					level.m_grid.m_to_restart = true;
+				}
 			}
-
-			//level.m_grid.UpdateCameraControls ( DeltaTimer::m_dt , engineResources );
 		}
 	}
 
