@@ -245,7 +245,7 @@ function OnLoad_SplashScreen()
     InstancePrefab("SS_Logo", 0, 0, 0)
 
     -- instance background music
-    InstancePrefab("SplashScreen_BGM", 0, 0, 0)
+    --InstancePrefab("SplashScreen_BGM", 0, 0, 0)
 
     print("[SplashScreen.lua] OnLoad_SplashScreen")
 end
@@ -322,7 +322,7 @@ function S_SplashScreen(e)
 
     -- change scene
     if ((camera.position.z < -6)) then
-        ChangeScene("MainmenuScreen", true)
+        ChangeScene("350LevelScene", true)
     end
 
     -- scale the door
