@@ -747,6 +747,16 @@ namespace god
 			}
 		);
 
+		// ChildCount(e)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("ChildCount",
+			[&entt]( entt::entity e )->int
+			{
+				return entt.m_entities[entt.GetEngineComponent<EntityData>(e)->m_id].m_children.size();
+			}
+		);
+
+
 		// ChangeTexture(e, texture name)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "ChangeTexture" ,

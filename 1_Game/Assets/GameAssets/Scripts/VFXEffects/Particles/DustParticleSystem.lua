@@ -21,6 +21,9 @@ function S_DustParticleSystem(e)
     local dustEmitterComponent = GetComponent(e, "C_DustParticleSystem")
 
     if (dustEmitterComponent.dustEmitted) then
+        if (ChildCount(e) == 0) then
+            RemoveInstance(e)
+        end
         return
     end
 
