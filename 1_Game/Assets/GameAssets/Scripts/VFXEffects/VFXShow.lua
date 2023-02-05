@@ -50,9 +50,9 @@ end
 -- the position when using this function.
 function SpawnVFX(vfxName, posX, posY, posZ)
 
-    print("SPAWNVFX()")
-    print("vfxName:", vfxName)
-    print("position:", posX, posY, posZ)
+    -- print("SPAWNVFX()")
+    -- print("vfxName:", vfxName)
+    -- print("position:", posX, posY, posZ)
 
     local spawnedVFX = InstancePrefabNow(vfxName, posX, posY, posZ)
     return spawnedVFX

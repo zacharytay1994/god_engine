@@ -1,16 +1,11 @@
--- This script animates the vibration VFX.
+-- This script animates the on-hit VFX.
   -- Min Ye
 
 --[IsComponent]
-function C_VFXVibration()
+function C_VFXHit()
     local var = {
-        secondRingDelay = 0.128,
-        thirdRingDelay = 0.320,
-        timer = 0.0,
-
-        smallRing = nil,
-        mediumRing = nil,
-        largeRing = nil
+        particleCount = 8,
+        particleEmitted = false
     }
     return function()
         return var
@@ -18,59 +13,71 @@ function C_VFXVibration()
 end
 
 --[IsSystem]
-function S_VFXVibration(e)
+function S_VFXHit(e)
 
-    -- local smallRing = Child(e, 0)
+    local emitterComponent = GetComponent(e, "C_VFXHit")
 
-
-    local vibrationTransform = GetTransform(e)
-    local vibrationComponent = GetComponent(e, "C_VFXVibration")
-    
-    -- spawn the small ring first
-    if (vibrationComponent.smallRing == nil) then
-        vibrationComponent.smallRing = InstancePrefabParentedNow(e, "Ring", vibrationTransform.position.x, vibrationTransform.position.y - 0.1, vibrationTransform.position.z + 0.25)
-        GetTransform(vibrationComponent.smallRing).scale.x = 0.1
-        GetTransform(vibrationComponent.smallRing).scale.y = 0.1
-        GetTransform(vibrationComponent.smallRing).scale.z = 0.1
-        --print("spawned SMALL RING")
+    if (emitterComponent.dustEmitted) then
+        if (ChildCount(e) == 0) then
+            RemoveInstance(e)
+        end
+        return
     end
 
-    -- then spawn the second ring after a certain duration
-    if (vibrationComponent.timer > vibrationComponent.secondRingDelay and vibrationComponent.mediumRing == nil) then
-        vibrationComponent.mediumRing = InstancePrefabParentedNow(e, "Ring", vibrationTransform.position.x, vibrationTransform.position.y - 0.1, vibrationTransform.position.z + 0.25 + 0.01)
-        GetTransform(vibrationComponent.mediumRing).scale.x = 0.15
-        GetTransform(vibrationComponent.mediumRing).scale.y = 0.15
-        GetTransform(vibrationComponent.mediumRing).scale.z = 0.15
-        --print("spawned MEDIUM RING")
+    local emitterPosition = GetTransform(e).position
+
+    for i = 1, emitterComponent.particleCount do
+
+        
+        -- spawn hit particle, cycle between 2 particle shapes
+        local hitParticle
+        if (i % 2 == 0) then
+            hitParticle = InstancePrefabParentedNow(e, "HitParticle1", 0, -0.25, 0.35)
+        else
+            hitParticle = InstancePrefabParentedNow(e, "HitParticle2", 0, -0.25, 0.35)
+        end
+        
+        -- each particle spawned will face a different direction (evenly spread across 360 degrees)
+        GetTransform(hitParticle).rotation.z = 360 / emitterComponent.particleCount * i
+
+        local forwardVec = HitParticleForwardVector(hitParticle)
+        print(forwardVec.x, forwardVec.y, forwardVec.z)
+        print()
+        GetComponent(hitParticle, "C_HitParticle").forwardVector = forwardVec
+
+        -- for debugging
+        GetComponent(hitParticle, "C_HitParticle").forwardVectorX = forwardVec.x
+        GetComponent(hitParticle, "C_HitParticle").forwardVectorY = forwardVec.y
+        GetComponent(hitParticle, "C_HitParticle").forwardVectorZ = forwardVec.z
+        GetComponent(hitParticle, "C_HitParticle").spawnSequence = i
+        
     end
 
-    -- then spawn the third ring after a certain duration
-    if (vibrationComponent.timer > vibrationComponent.thirdRingDelay and vibrationComponent.largeRing == nil) then
-        vibrationComponent.largeRing = InstancePrefabParentedNow(e, "Ring", vibrationTransform.position.x, vibrationTransform.position.y - 0.1, vibrationTransform.position.z + 0.25 + 0.10)
-        GetTransform(vibrationComponent.largeRing).scale.x = 0.2
-        GetTransform(vibrationComponent.largeRing).scale.y = 0.2
-        GetTransform(vibrationComponent.largeRing).scale.z = 0.2
-        --print("spawned LARGE RING")
-    end
-
-    -- update timer
-    vibrationComponent.timer = vibrationComponent.timer + GetDeltaTime()
-    --print(vibrationComponent.timer)
-
-    MoveForward(vibrationComponent.smallRing, 0.1)
-    MoveForward(vibrationComponent.mediumRing, 0.25)
-    MoveForward(vibrationComponent.largeRing, 0.4)
+    emitterComponent.dustEmitted = true
 
 end
 
-function MoveForward(e, speed)
-
-    if (e == nil) then
-        return
-    end
+ -- returns a normalized vector in the direction that the entity is facing.
+ -- this function is modified for this case
+ function HitParticleForwardVector(entity)
     
-    local transform = GetTransform(e)
+    local entityTransform = GetTransform(entity)
+    --print("entity rotation is", entityTransform.rotation.x, entityTransform.rotation.y, entityTransform.rotation.z)
+    
+    local newX = Abs(Cos(RadianToDegree(entityTransform.rotation.z)))
+    -- print("sin90 = ", Sin(90))
+    -- print("RadianToDegree(90):", RadianToDegree(90))
+    local newY = Abs(Sin(RadianToDegree(entityTransform.rotation.z)))
 
-    transform.position.z = transform.position.z + (speed * GetDeltaTime())
+    if (entityTransform.rotation.z > 0 and entityTransform.rotation.z < 180) then
+        newY = newY * -1
+    end
+
+    if (entityTransform.rotation.z > 270 or entityTransform.rotation.z < 90) then
+        newX = newX * -1
+    end
+
+
+    return Normalize(newX, newY, 1)
 
 end

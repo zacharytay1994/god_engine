@@ -573,6 +573,15 @@ namespace god
 			}
 		);
 
+		// RadianToDegree(radianValue)
+		// ==============================================================================================
+		entt.RegisterLuaFunction("RadianToDegree",
+			[](float radianValue)->float
+			{
+				return radianValue * glm::pi<float>() / 180.0f;
+			}
+		);
+
 		// Normalize(value)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "Normalize" ,
