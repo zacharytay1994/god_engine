@@ -855,7 +855,7 @@ namespace god
 			[&entt, &engineResources]( entt::entity e )->float
 			{
 				SkeleAnim3D* skele_anim = entt.GetEngineComponent<SkeleAnim3D> ( e );
-				if ( skele_anim )
+				if ( skele_anim && skele_anim->m_initialized)
 				{
 					OpenGL& opengl = engineResources.Get<OpenGL> ().get ();
 					return opengl.m_animations[ skele_anim->m_animation ].m_animators[ skele_anim->m_animator_id ].m_CurrentTime;
