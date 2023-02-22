@@ -49,9 +49,12 @@ namespace god
 			}
 
 			// let animator know entity is still alive
-			auto& animator = opengl.m_animations[ skele_anim.m_animation ].m_animators[ skele_anim.m_animator_id ];
-			animator.m_alive = true;
-			skele_anim.m_animation_played = animator.m_played;
+			if ( skele_anim.m_animation_id != static_cast< uint32_t >( -1 ) )
+			{
+				auto& animator = opengl.m_animations[ skele_anim.m_animation ].m_animators[ skele_anim.m_animator_id ];
+				animator.m_alive = true;
+				skele_anim.m_animation_played = animator.m_played;
+			}
 		}
 
 		// return if not valid

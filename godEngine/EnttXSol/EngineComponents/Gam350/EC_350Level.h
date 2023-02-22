@@ -690,12 +690,12 @@ namespace god
 					else
 					{
 						// add black box at combat offset position
-						auto e = entt.InstancePrefab ( engineResources , "350BlackBox2" , level.m_id );
+						/*auto e = entt.InstancePrefab ( engineResources , "350BlackBox2" , level.m_id );
 						Transform* transform = entt.GetEngineComponent<Transform> ( e );
 						if ( transform )
 						{
 							transform->m_position = m_combat_area_offset;
-						}
+						}*/
 
 						// set reset button active
 						uint32_t reset_button = entt.GetEntity ( "ResetButton" );
