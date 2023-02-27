@@ -1,4 +1,5 @@
 -- This script checks Triton's animation frame to display VFX at the right time.
+-- Use this script to spawn VFX that is related to Triton's attacks.
 
 --[IsComponent]
 function C_VFXTriton()
@@ -39,6 +40,10 @@ function S_VFXTriton(e)
         print("SwirlyLightning animation played!!!")
         print("player ID:", GetEntityData(e).id)
         vfxComponent.playedOnce = true
+
+        -- attempt to insert VFXRock inside here
+        local rockVFX = SpawnVFX(e, "VFX_Rock", tritonPosition.x, tritonPosition.y + 50, tritonPosition.z + 100)
+        print("Rock spawned!!!")
 
         -- activate screenshake
         local screenShakeEntity = GetEntity("ScreenShake")
