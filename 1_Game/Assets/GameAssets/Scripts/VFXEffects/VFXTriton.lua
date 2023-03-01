@@ -34,12 +34,19 @@ function S_VFXTriton(e)
     end
 
     -- trigger various VFX by using triton's animation timing
+    
+    -- during Triton AOE Attack Animation (trident flies towards the ground)
     if (currentFrame > 137.0 and currentFrame < 140.0) then
+        
+        -- will not enter into this block of code while in cooldown
+        vfxComponent.playedOnce = true
+        
+        -- swirly lightning effect around the enemy
         local playerAOEVFX = SpawnVFX(e, "SwirlyLightning", tritonPosition.x, tritonPosition.y + 50, tritonPosition.z + 100)
+        print(GetTransform(playerAOEVFX).scale.x)
         print("SwirlyLightning animation played!!!")
         print("player ID:", GetEntityData(e).id)
-        vfxComponent.playedOnce = true
-
+        
         -- activate screenshake
         local screenShakeEntity = GetEntity("ScreenShake")
         if (screenShakeEntity ~= -1) then
@@ -47,6 +54,12 @@ function S_VFXTriton(e)
             screenShakeComponent.duration = 0.25
             screenShakeComponent.doScreenShake = true
         end
+
+        -- rock effect around enemy
+        local rockVFX = SpawnVFX(e, "VFX_Rock", tritonPosition.x - 100, tritonPosition.y + 50, tritonPosition.z + 100)
+        print(GetTransform(rockVFX).scale.x)
+        print("Rock animation played!!!")
+
     end
 
     -- for triggering on-hit vfx (when hit by enemy)
