@@ -2,6 +2,9 @@
 -- It also triggers the RockParticle effect.
   -- Min Ye
 
+-- TODO: may have to lengthen fadeDelay in VFXSHOW, must match with the explosion
+-- TODO: add code to trigger explosion vfx
+
 --[IsComponent]
 function C_VFXRock()
     local var = {
@@ -16,6 +19,12 @@ function C_VFXRock()
         -- -- this is for checking whether the caller is Triton or Dummish
         -- -- for some reason Triton is huge af, so need to scale up some properties
         -- parentObject = nil
+
+        timer = 0.0,
+
+        emissiveLimit = 25.0,
+
+        explosionTriggered = false
     }
     return function()
         return var
@@ -25,9 +34,29 @@ end
 --[IsSystem]
 function S_VFXRock(e)
 
-    
+    local vfxRockComponent = GetComponent(e, "C_VFXRock")
+    local vfxShowComponent = GetComponent(e, "C_VFXShow")
 
+    -- emissive will start increasing the moment the rocks are spawned
+    GetRenderable3D(Child(e, 0)).emissive = GetRenderable3D(Child(e, 0)).emissive + 1
+    GetRenderable3D(Child(e, 1)).emissive = GetRenderable3D(Child(e, 1)).emissive + 1
+    GetRenderable3D(Child(e, 2)).emissive = GetRenderable3D(Child(e, 2)).emissive + 1
     
+    -- if explosion already triggered then stop here
+    if (vfxRockComponent.explosionTriggered) then
+        return
+    end
 
+    -- Trigger an explosion vfx after emissive hits the emissiveLimit.
+    -- At around 3 frames before the rocks disappear, if emissive has not reached 
+    -- emissiveLimit yet, then just force an explosion.
+    local vfxRockComponent = GetComponent(e, "C_VFXRock")
+    if (GetRenderable3D(Child(e, 0)).emissive > vfxRockComponent.emissiveLimit) then
+        print("trigger natural explosion")    
+        vfxRockComponent.explosionTriggered = true
+    elseif (vfxShowComponent.fadeDelay - vfxRockComponent.timer < (3 * GetDeltaTime())) then
+        print("trigger backup explosion")
+        vfxRockComponent.explosionTriggered = true
+    end
 end
 
