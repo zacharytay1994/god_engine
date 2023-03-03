@@ -43,7 +43,7 @@
 #include <godUtility/Grid3D.h>
 
 // comment out this for no editor
-#define ENABLE_EDITOR
+//#define ENABLE_EDITOR
 
 namespace god
 {
@@ -135,7 +135,8 @@ namespace god
 		MainVariables main_variables = { "nil", false };
 #else
 		// starting scene for non editor mode
-		MainVariables main_variables = { "SplashScreen", true };
+		MainVariables main_variables = { "DigipenScreen", true }; 
+		AudioAPI::PlayBGM ();
 #endif
 		RegisterLuaCPP ( enttxsol , engine_resources , main_variables );
 
@@ -281,15 +282,21 @@ namespace god
 			// if fullscreen, render game over imgui
 			if ( window.m_fullscreen )
 			{
+				//extra_renderpass.Bind ();
 				opengl.RenderBlendTextures ( imgui_renderpass.GetTexture () , blur.GetTexture () );
 				opengl.RenderGUI ( scene , camera.GetOrthographicProjectionMatrix ( static_cast< float >( window.GetWindowWidth () ) , static_cast< float >( window.GetWindowHeight () ) ) , ogl_textures );
+				//extra_renderpass.UnBind ();
+
+				//opengl.RenderTexture ( extra_renderpass.GetTexture () );
 			}
+
 
 			SystemTimer::StartTimeSegment ( "Window Buffer Swap" );
 			window.SwapWindowBuffers ();
 			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
 
 			// free camera update
+#ifdef ENABLE_EDITOR
 			camera.FreeCamera ( 0.02f ,
 				true ,
 				window.KeyDown ( GLFW_KEY_W ) ,
@@ -307,6 +314,7 @@ namespace god
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );
+#endif
 
 			camera.InterpolateCameraState ( DeltaTimer::m_dt );
 

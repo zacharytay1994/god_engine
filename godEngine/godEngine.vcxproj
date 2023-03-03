@@ -147,6 +147,7 @@
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Gam350\ES_350Level.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Gam350\ES_350LevelManager.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\GUI\ES_GUISpriteSheet.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Input\ES_PlayerController.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_PhysicsController.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_FaceCamera.h" />

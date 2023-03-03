@@ -5,6 +5,7 @@
 
 -- ForwardVector(e)
     -- returns a normalized vector in the direction that the entity is facing.
+    -- THIS FUNCTION IGNORES THE Y-AXIS!!!
 
 -- NothingInGridAbove(entity) 
     -- checks if the grid cell above the input entity is empty.
@@ -35,12 +36,13 @@ function AllUnoccupiedFloorTiles()
 end
 
  -- returns a normalized vector in the direction that the entity is facing.
+ -- THIS FUNCTION IGNORES THE Y-AXIS!!!
  function ForwardVector(entity)
     local entityTransform = GetTransform(entity)
     -- print("entity y-rotation is", entityTransform.rotation.y)
     local newX = Sin(entityTransform.rotation.y)
-    local newY = Cos(entityTransform.rotation.y)
-    return Normalize(newX, 1, newY)
+    local newZ = Cos(entityTransform.rotation.y)
+    return Normalize(newX, 1, newZ)
 
 end
 

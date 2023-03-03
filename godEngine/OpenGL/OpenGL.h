@@ -89,12 +89,13 @@ namespace god
 		void SetLineWidth ( float size );
 
 		// shadow stuff
-		void UpdateAnimations (float dt);
+		void UpdateAnimations ( float dt );
 		void FirstPassRenderToDepthmap ( Scene const& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures );
 
 		// gaussian blur
 		OGLRenderPass<1>& BlurTexture ( unsigned int texture );
 		void RenderBlendTextures ( unsigned int texture1 , unsigned int texture2 );
+		void RenderTexture ( unsigned int texture );
 
 		std::vector<std::vector<OGLMesh>> getMesh () { return m_models; }
 

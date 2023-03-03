@@ -48,6 +48,8 @@ namespace god
 					// initialize next lvl
 					level_manager.m_initializing = false;
 					++level_manager.m_currently_initializing;
+					// transition sound
+					entt.QueueInstancePrefab ( "SFX_Wave" , 0.f , 0.f , 0.f );
 				}
 			}
 		}
@@ -57,6 +59,23 @@ namespace god
 			_350Level* level = entt.GetEngineComponent<_350Level> ( level_manager.m_level_ids[ level_manager.m_currently_playing ] );
 			if ( level && level->m_grid.m_ready )
 			{
+				// activate tutorial gui for first lvl
+				if ( level_manager.m_currently_playing == 0 && !level->m_grid.m_combat_paused )
+				{
+					EnttXSol::Entities::ID tut_camera = entt.GetEntity ( "TutCamera" );
+					EnttXSol::Entities::ID tut_interact = entt.GetEntity ( "TutInteract" );
+					if ( tut_camera != EnttXSol::Entities::Null && tut_interact != EnttXSol::Entities::Null )
+					{
+						GUIObject* tut_cam_gui = entt.GetEngineComponent<GUIObject> ( tut_camera );
+						GUIObject* tut_int_gui = entt.GetEngineComponent<GUIObject> ( tut_interact );
+						if ( tut_cam_gui && tut_int_gui )
+						{
+							tut_cam_gui->m_active = true;
+							tut_int_gui->m_active = true;
+						}
+					}
+				}
+
 				level->m_grid.m_start = true;
 				level->m_focused = true;
 
@@ -65,6 +84,23 @@ namespace god
 				{
 					level->m_focused = false;
 					++level_manager.m_currently_playing;
+
+					// transition sound
+					entt.QueueInstancePrefab ( "SFX_Wave" , 0.f , 0.f , 0.f );
+
+					// deactivate tutorial gui
+					EnttXSol::Entities::ID tut_camera = entt.GetEntity ( "TutCamera" );
+					EnttXSol::Entities::ID tut_interact = entt.GetEntity ( "TutInteract" );
+					if ( tut_camera != EnttXSol::Entities::Null && tut_interact != EnttXSol::Entities::Null )
+					{
+						GUIObject* tut_cam_gui = entt.GetEngineComponent<GUIObject> ( tut_camera );
+						GUIObject* tut_int_gui = entt.GetEngineComponent<GUIObject> ( tut_interact );
+						if ( tut_cam_gui && tut_int_gui )
+						{
+							tut_cam_gui->m_active = false;
+							tut_int_gui->m_active = false;
+						}
+					}
 				}
 				// if lose and needs to reset
 				if ( level->m_grid.m_to_restart )
@@ -86,6 +122,12 @@ namespace god
 					}
 				}
 			}
+		}
+		else
+		{
+			// change back to splash screen
+			level_manager.m_done = true;
+
 		}
 	}
 

@@ -80,6 +80,11 @@ namespace god
 		static void ResumeAll();
 		static void StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets);
 
+		static void PlayBGM();
+		static void PauseBGM();
+		static void ResumeBGM();
+		static void StopBGM();
+
 	public:
 		static void ToggleDSPEffects(bool toggle);
 		static void AddEcho(FMOD::Channel* channel);
@@ -120,5 +125,6 @@ namespace god
 		static std::unordered_map<int, FMOD::DSP*> m_dsp_effects;
 		static std::unordered_map<int, const char*> m_dsp_effects_names;
 
+		static Sound BGM;
 	};
 }

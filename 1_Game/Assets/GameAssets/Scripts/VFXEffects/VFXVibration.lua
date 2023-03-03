@@ -28,7 +28,7 @@ function S_VFXVibration(e)
     
     -- spawn the small ring first
     if (vibrationComponent.smallRing == nil) then
-        vibrationComponent.smallRing = InstancePrefabParentedNow(e, "Ring", vibrationTransform.position.x, vibrationTransform.position.y - 0.1, vibrationTransform.position.z + 0.25)
+        vibrationComponent.smallRing = InstancePrefabParentedNow(e, "Ring", vibrationTransform.position.x, vibrationTransform.position.y + 1.9, vibrationTransform.position.z + 0.25)
         GetTransform(vibrationComponent.smallRing).scale.x = 0.1
         GetTransform(vibrationComponent.smallRing).scale.y = 0.1
         GetTransform(vibrationComponent.smallRing).scale.z = 0.1
@@ -37,7 +37,7 @@ function S_VFXVibration(e)
 
     -- then spawn the second ring after a certain duration
     if (vibrationComponent.timer > vibrationComponent.secondRingDelay and vibrationComponent.mediumRing == nil) then
-        vibrationComponent.mediumRing = InstancePrefabParentedNow(e, "Ring", vibrationTransform.position.x, vibrationTransform.position.y - 0.1, vibrationTransform.position.z + 0.25 + 0.01)
+        vibrationComponent.mediumRing = InstancePrefabParentedNow(e, "Ring", vibrationTransform.position.x, vibrationTransform.position.y + 1.9, vibrationTransform.position.z + 0.25 + 0.01)
         GetTransform(vibrationComponent.mediumRing).scale.x = 0.15
         GetTransform(vibrationComponent.mediumRing).scale.y = 0.15
         GetTransform(vibrationComponent.mediumRing).scale.z = 0.15
@@ -46,7 +46,7 @@ function S_VFXVibration(e)
 
     -- then spawn the third ring after a certain duration
     if (vibrationComponent.timer > vibrationComponent.thirdRingDelay and vibrationComponent.largeRing == nil) then
-        vibrationComponent.largeRing = InstancePrefabParentedNow(e, "Ring", vibrationTransform.position.x, vibrationTransform.position.y - 0.1, vibrationTransform.position.z + 0.25 + 0.10)
+        vibrationComponent.largeRing = InstancePrefabParentedNow(e, "Ring", vibrationTransform.position.x, vibrationTransform.position.y + 1.9, vibrationTransform.position.z + 0.25 + 0.10)
         GetTransform(vibrationComponent.largeRing).scale.x = 0.2
         GetTransform(vibrationComponent.largeRing).scale.y = 0.2
         GetTransform(vibrationComponent.largeRing).scale.z = 0.2

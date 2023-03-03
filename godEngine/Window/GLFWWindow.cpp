@@ -123,7 +123,7 @@ namespace god
 			return;
 		}
 		glfwMakeContextCurrent ( m_window );
-		glfwSwapInterval ( 0 );
+		glfwSwapInterval ( 1 );
 
 		glfwSetWindowUserPointer ( m_window , this );
 		glfwSetFramebufferSizeCallback ( m_window , GLFWFramebufferSizeCallback );

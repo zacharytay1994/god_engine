@@ -38,6 +38,8 @@ namespace god
 		{ 1, "Echo" }, { 2, "Fade" }
 	};
 
+	Sound AudioAPI::BGM;
+
 	AudioAPI::AudioAPI()
 	{
 		ErrorCheck(FMOD::System_Create(&m_FMOD_system));
@@ -60,6 +62,9 @@ namespace god
 
 			ErrorCheck(m_FMOD_system->createDSPByType(FMOD_DSP_TYPE_HIGHPASS, &dsp_echo));
 		}
+
+		LoadSound("Assets/GameAssets/Sounds/MainMenu_Melody_v1_20221122.mp3", BGM);
+		SetLoop(BGM, true);
 
 		std::cerr << "AudioAPI created\n";
 	}
@@ -283,9 +288,24 @@ namespace god
 		( endPoint );
 	}
 
+	void AudioAPI::PauseAll()
+	{
+		m_master_channel_group->setPaused(true);
+	}
+
+	void AudioAPI::ResumeAll()
+	{
+		m_master_channel_group->setPaused(false);
+	}
+
 	void AudioAPI::StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
 	{
-		m_master_channel_group->stop();
+		//m_master_channel_group->stop();
+
+		for (auto& channel : m_channels)
+		{
+			channel->stop();
+		}
 
 		for (auto& asset : assets)
 		{
@@ -294,6 +314,35 @@ namespace god
 		}
 
 		m_channels.clear();
+	}
+
+	void AudioAPI::PlayBGM()
+	{
+		if (BGM.m_channel == nullptr)
+		{
+			m_FMOD_system->playSound(BGM.m_sound_sample, NULL, false, &BGM.m_channel);
+			SetVolume(BGM.m_channel, 0.2f);
+		}
+
+		BGM.m_played = true;
+	}
+
+	//void AudioAPI::PauseBGM()
+	//{
+
+	//}
+
+	//void AudioAPI::ResumeBGM()
+	//{
+	//}
+
+	void AudioAPI::StopBGM()
+	{
+		if (BGM.m_channel != nullptr)
+		{
+			BGM.m_channel->stop();
+			BGM.m_channel = nullptr;
+		}
 	}
 
 	void AudioAPI::ToggleDSPEffects(bool toggle)
@@ -367,16 +416,6 @@ namespace god
 		return dsp_clock;
 	}
 
-
-	void AudioAPI::PauseAll()
-	{
-		m_master_channel_group->setPaused(true);
-	}
-
-	void AudioAPI::ResumeAll()
-	{
-		m_master_channel_group->setPaused(false);
-	}
 
 
 	void AudioAPI::SetListenerAttributes(const FMOD_VECTOR* position, const FMOD_VECTOR* velocity, const FMOD_VECTOR* forward, const FMOD_VECTOR* up)

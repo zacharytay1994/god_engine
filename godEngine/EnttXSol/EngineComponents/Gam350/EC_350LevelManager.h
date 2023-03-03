@@ -17,6 +17,7 @@ namespace god
 		uint32_t m_currently_initializing { 0 };
 		uint32_t m_currently_playing { 0 };
 		bool m_initializing { false };
+		bool m_done { false };
 
 		bool operator==( _350LevelManager const& rhs )
 		{
@@ -24,14 +25,12 @@ namespace god
 			return true;
 		}
 	};
-	/*template <>
+	template <>
 	inline void NewLuaType<_350LevelManager> ( sol::state& luaState , std::string const& name )
 	{
 		RegisterLuaType<_350LevelManager> ( luaState , name ,
-			"i" , &_350LevelManager::i ,
-			"f" , &_350LevelManager::f ,
-			"s" , &_350LevelManager::s );
-	}*/
+			"done" , &_350LevelManager::m_done );
+	}
 	template<>
 	inline void ComponentInspector::operator() < _350LevelManager > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& editorResources )
 	{

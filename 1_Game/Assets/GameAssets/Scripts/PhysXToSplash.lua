@@ -22,7 +22,7 @@ function S_PhysXToSplash(e)
     end
 
     if(gui_object.pressed and screen.isSelected == false or screen.timer <= 0.0) then
-        ChangeScene("MainmenuScreen",true)
+        ChangeScene("SplashScreen",true)
         screen.isSelected = true
     end
 

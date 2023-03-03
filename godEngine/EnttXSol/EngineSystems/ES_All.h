@@ -27,6 +27,7 @@
 #include "Grid/ES_GridManipulate.h"
 
 #include "GUI/ES_GUIObject.h"
+#include "GUI/ES_GUISpriteSheet.h"
 
 #include "Gam350/ES_350Level.h"
 #include "Gam350/ES_350LevelManager.h"
@@ -73,6 +74,7 @@ namespace god
 		// gui
 		SystemTimer::StartTimeSegment ( "GUIObjectUpdate" );
 		enttxsol.RunEngineSystem ( engineResources , GUIObjectUpdate );
+		enttxsol.RunEngineSystem ( engineResources , GUISpriteSheetUpdate );
 		SystemTimer::EndTimeSegment ( "GUIObjectUpdate" );
 		SystemTimer::StartTimeSegment ( "GridSystem" );
 		enttxsol.RunEngineSystem ( engineResources , GridSystem );
