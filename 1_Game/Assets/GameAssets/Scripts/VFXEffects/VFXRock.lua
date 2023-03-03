@@ -52,11 +52,19 @@ function S_VFXRock(e)
     -- emissiveLimit yet, then just force an explosion.
     local vfxRockComponent = GetComponent(e, "C_VFXRock")
     if (GetRenderable3D(Child(e, 0)).emissive > vfxRockComponent.emissiveLimit) then
-        print("trigger natural explosion")    
+        print("spawning natural explosion")    
+        -- SPAWN EXPLOSION VFX HERE
+        local rockPosition = GetTransform(e).position
+        
+        --local vfxExplosion = SpawnVFX(GetEntity("350TritonModel"), "VFX_Explosion", rockPosition.x, rockPosition.y + 50, rockPosition.z + 100)
+        InstancePrefabNow("VFX_Explosion", rockPosition.x, rockPosition.y, rockPosition.z)
+
         vfxRockComponent.explosionTriggered = true
     elseif (vfxShowComponent.fadeDelay - vfxRockComponent.timer < (3 * GetDeltaTime())) then
         print("trigger backup explosion")
+        -- SPAWN EXPLOSION VFX HERE
+        -- local rockPosition = GetTransform(e).position
+        -- local vfxExplosion = SpawnVFX(e, "VFX_Explosion", rockPosition.x, rockPosition.y + 50, rockPosition.z + 100)
         vfxRockComponent.explosionTriggered = true
     end
 end
-
