@@ -8,21 +8,16 @@ function C_VFXExplosion()
         -- flag, for spawning the red sphere
         explosionInitialized = false,
 
-        -- reference to the red sphere entity
-        redBall = nil,
+        -- a list storing the scale of each child
+        childrenScales = { },
 
         -- timer for the animation
         timer = 0.0,
 
         -- duration of each expand / contract animation
-        expandContractTime = 0.05,
+        expandContractTime = 0.2,
 
-        -- number of times the explosion expands and contracts
-        -- e.g. 1 expand and 1 contract is 2 repetitions
-        repetitions = 4,
-
-        -- counts the number of repetitions done
-        repetitionCounter = 0,
+        shockwaveEntity = nil,
 
         -- current state of the red sphere
         expandState = true,
@@ -43,46 +38,93 @@ function S_VFXExplosion(e)
 
     -- play explosion animation (expand and contract, then maybe add particles)
     
-    -- start of animation: instantiate 
+    -- start of animation: store the ending size of each explosion child, then reduce their sizes 
     if (vfxExplosionComponent.explosionInitialized == false) then
-        local explosionPosition = GetTransform(e).position 
-        vfxExplosionComponent.redBall = InstancePrefabParentedNow(e, "RedBall", explosionPosition.x, explosionPosition.y, explosionPosition.z)
+        
+        local childCount = ChildCount(e)
+
+        for i = 0, childCount - 1 do
+            local childScale = GetTransform(Child(e, i)).scale
+            vfxExplosionComponent.childrenScales[i] = childScale.x -- no need Y or Z, because they are all equal
+            
+            childScale.x = childScale.x / 5
+            childScale.y = childScale.y / 5
+            childScale.z = childScale.z / 5
+        end
+
+        local parentPosition = GetTransform(e).position
+        vfxExplosionComponent.shockwaveEntity = InstancePrefabParentedNow(e, "Shockwave", parentPosition.x, parentPosition.y - 50, parentPosition.z)
+        local shockwaveScale = GetTransform(vfxExplosionComponent.shockwaveEntity).scale
+        shockwaveScale.x = 0.1
+        shockwaveScale.y = 0.1
+        shockwaveScale.z = 0.1
+
         vfxExplosionComponent.explosionInitialized = true
+        print("VFXExplosion initialized!")
     end
 
-    -- alternate between expand and contract states
+    -- -- for checking if scales were stored correctly
+    -- for i = 1, #vfxExplosionComponent.childrenScales do
+    --     print(vfxExplosionComponent.childrenScales[i])
+    -- end
+
     if (vfxExplosionComponent.timer < vfxExplosionComponent.expandContractTime) then
         vfxExplosionComponent.timer = vfxExplosionComponent.timer + GetDeltaTime()
     else
-        print("expandState before changing:", vfxExplosionComponent.expandState)
-        --vfxExplosionComponent.expandState = ~(vfxExplosionComponent.expandState)
-        if (vfxExplosionComponent.expandState) then
-            vfxExplosionComponent.expandState = false
-        else
-            vfxExplosionComponent.expandState = true
-        end
-        print("expandState after changing:", vfxExplosionComponent.expandState)
-        vfxExplosionComponent.repetitionCounter = vfxExplosionComponent.repetitionCounter + 1
-        vfxExplosionComponent.timer = 0.0
+        vfxExplosionComponent.expandState = false
+        --vfxExplosionComponent.timer = 0.0
+
+        -- -- activate screenshake
+        -- local screenShakeEntity = GetEntity("ScreenShake")
+        -- if (screenShakeEntity ~= -1) then
+        --     screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
+        --     screenShakeComponent.duration = 0.25
+        --     screenShakeComponent.doScreenShake = true
+        -- end
     end
+
+    
 
     if (vfxExplosionComponent.expandState) then
-        print("expanding")
-        GetTransform(e).scale.x = GetTransform(e).scale.x + 5
-        GetTransform(e).scale.y = GetTransform(e).scale.y + 5
-        GetTransform(e).scale.z = GetTransform(e).scale.z + 5
+
+        local childCount = ChildCount(e)
+
+        -- expand each child
+        for i = 0, childCount - 1 do
+
+            local maxScale = vfxExplosionComponent.childrenScales[i]            
+            local childScale = GetTransform(Child(e, i)).scale
+            
+            -- childScale.x = childScale.x + ((GetDeltaTime() / vfxExplosionComponent.expandContractTime) * maxScale * 2)
+            -- childScale.y = childScale.y + ((GetDeltaTime() / vfxExplosionComponent.expandContractTime) * maxScale * 2)
+            -- childScale.z = childScale.z + ((GetDeltaTime() / vfxExplosionComponent.expandContractTime) * maxScale * 2)
+
+            childScale.x = childScale.x + maxScale * 0.2
+            childScale.y = childScale.y + maxScale * 0.2
+            childScale.z = childScale.z + maxScale * 0.2
+        end
     else
-        print("contracting")
-        GetTransform(e).scale.x = GetTransform(e).scale.x - 5
-        GetTransform(e).scale.y = GetTransform(e).scale.y - 5
-        GetTransform(e).scale.z = GetTransform(e).scale.z - 5
-    end
+        
+        local shockwaveScale = GetTransform(vfxExplosionComponent.shockwaveEntity).scale
+        shockwaveScale.x = shockwaveScale.x + 50
+        --shockwaveScale.y = shockwaveScale.y + 50
+        shockwaveScale.z = shockwaveScale.z + 50
 
-    -- spawn particles once done with repetitions
-    if (vfxExplosionComponent.repetitionCounter == vfxExplosionComponent.repetitions) then
-        -- TODO: spawn particles here
+        -- contract each child
+        local childCount = ChildCount(e)
 
-        -- destroy this instance
-        RemoveInstance(e)
+        -- expand each child
+        for i = 0, childCount - 1 do
+
+            local maxScale = vfxExplosionComponent.childrenScales[i]            
+            local childScale = GetTransform(Child(e, i)).scale
+            
+            if (childScale.x > 0) then
+                childScale.x = childScale.x - maxScale * 0.1
+                childScale.y = childScale.y - maxScale * 0.1
+                childScale.z = childScale.z - maxScale * 0.1
+            end
+        end        
     end
+    print("please")
 end

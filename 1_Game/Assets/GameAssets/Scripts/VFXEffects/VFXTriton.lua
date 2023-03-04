@@ -47,9 +47,9 @@ function S_VFXTriton(e)
         
         -- swirly lightning effect around the enemy
         local playerAOEVFX = SpawnVFX(e, "SwirlyLightning", tritonPosition.x, tritonPosition.y + 50, tritonPosition.z + 100)
-        print(GetTransform(playerAOEVFX).scale.x)
-        print("SwirlyLightning animation played!!!")
-        print("player ID:", GetEntityData(e).id)
+        --print(GetTransform(playerAOEVFX).scale.x)
+        --print("SwirlyLightning animation played!!!")
+        --print("player ID:", GetEntityData(e).id)
         
         -- activate screenshake
         local screenShakeEntity = GetEntity("ScreenShake")
@@ -61,15 +61,15 @@ function S_VFXTriton(e)
 
         -- rock effect around enemy
         local rockVFX = SpawnVFX(e, "VFX_Rock", tritonPosition.x - 100, tritonPosition.y + 50, tritonPosition.z + 100)
-        print(GetTransform(rockVFX).scale.x)
-        print("Rock animation played!!!")
+        --print(GetTransform(rockVFX).scale.x)
+        --print("Rock animation played!!!")
 
     end
 
     -- play explosion vfx shortly after Triton AOE attack animation
     if (currentFrame > 147.0 and currentFrame < 150.0 and vfxComponent.explosionEffectsPlayed == false) then
         vfxComponent.explosionEffectsPlayed = true
-        local playerAOEVFX = SpawnVFX(e, "VFX_Explosion", tritonPosition.x, tritonPosition.y + 50, tritonPosition.z + 100)
+        local playerAOEVFX = SpawnVFX(e, "VFX_Explosion", tritonPosition.x, tritonPosition.y + 50, tritonPosition.z + 125)
 
     end
 
@@ -92,8 +92,8 @@ function S_VFXTriton(e)
         local playerDustVFX = SpawnVFX(e, "VFX_Dust", tritonPosition.x, tritonPosition.y, tritonPosition.z - 80)
         GetComponent(playerDustVFX, "C_DustParticleSystem").parentObject = e
 
-        print("playerDustVFX animation played!!!")
-        print("player ID:", GetEntityData(e).id)
+        --print("playerDustVFX animation played!!!")
+        --print("player ID:", GetEntityData(e).id)
         vfxComponent.dustEffectPlayed = true
     end
 

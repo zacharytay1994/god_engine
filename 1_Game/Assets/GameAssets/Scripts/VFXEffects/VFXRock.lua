@@ -41,14 +41,14 @@ function S_VFXRock(e)
 
     
 
-    if (vfxRockComponent.timer < vfxRockComponent.pauseTimer) then
-        vfxRockComponent.timer = vfxRockComponent.timer + GetDeltaTime()
-    else
-        -- emissive will start increasing the moment the rocks are spawned
-        GetRenderable3D(Child(e, 0)).emissive = GetRenderable3D(Child(e, 0)).emissive + 1
-        GetRenderable3D(Child(e, 1)).emissive = GetRenderable3D(Child(e, 1)).emissive + 1
-        GetRenderable3D(Child(e, 2)).emissive = GetRenderable3D(Child(e, 2)).emissive + 1
-    end
+    -- if (vfxRockComponent.timer < vfxRockComponent.pauseTimer) then
+    --     vfxRockComponent.timer = vfxRockComponent.timer + GetDeltaTime()
+    -- else
+    --     -- emissive will start increasing the moment the rocks are spawned
+    --     GetRenderable3D(Child(e, 0)).emissive = GetRenderable3D(Child(e, 0)).emissive + 1
+    --     GetRenderable3D(Child(e, 1)).emissive = GetRenderable3D(Child(e, 1)).emissive + 1
+    --     GetRenderable3D(Child(e, 2)).emissive = GetRenderable3D(Child(e, 2)).emissive + 1
+    -- end
     
     
     

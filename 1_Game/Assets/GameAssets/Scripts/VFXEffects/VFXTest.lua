@@ -29,7 +29,9 @@ function S_VFXTest(e)
         -- GetComponent(enemyDustVFX, "C_DustParticleSystem").parentObject = enemy
 
         -- play fissure vfx
-        local enemyRockVFX = SpawnVFX(enemy, "VFX_Rock", GetTransform(enemy).position.x, GetTransform(enemy).position.y + 1.5, GetTransform(enemy).position.z)
+        -- local enemyRockVFX = SpawnVFX(enemy, "VFX_Rock", GetTransform(enemy).position.x, GetTransform(enemy).position.y + 1.5, GetTransform(enemy).position.z)
+
+        
 
         
         
@@ -44,6 +46,9 @@ function S_VFXTest(e)
         -- GetComponent(playerDustVFX, "C_DustParticleSystem").parentObject = player
 
         -- local playerAOEVFX = SpawnVFX(player, "SwirlyLightning", GetTransform(player).position.x, GetTransform(player).position.y + 50, GetTransform(player).position.z + 150)
+
+        -- play explosion VFX
+        local explosionVFX = SpawnVFX(player, "VFX_Explosion", GetTransform(player).position.x, GetTransform(player).position.y, GetTransform(player).position.z + 500)
 
     end
 end
