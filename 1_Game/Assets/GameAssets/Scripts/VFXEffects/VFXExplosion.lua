@@ -15,11 +15,11 @@ function C_VFXExplosion()
         timer = 0.0,
 
         -- duration of each expand / contract animation
-        expandContractTime = 0.25,
+        expandContractTime = 0.05,
 
         -- number of times the explosion expands and contracts
         -- e.g. 1 expand and 1 contract is 2 repetitions
-        repetitions = 6,
+        repetitions = 4,
 
         -- counts the number of repetitions done
         repetitionCounter = 0,
@@ -54,8 +54,28 @@ function S_VFXExplosion(e)
     if (vfxExplosionComponent.timer < vfxExplosionComponent.expandContractTime) then
         vfxExplosionComponent.timer = vfxExplosionComponent.timer + GetDeltaTime()
     else
-        vfxExplosionComponent.expandState = ~vfxExplosionComponent.expandState
+        print("expandState before changing:", vfxExplosionComponent.expandState)
+        --vfxExplosionComponent.expandState = ~(vfxExplosionComponent.expandState)
+        if (vfxExplosionComponent.expandState) then
+            vfxExplosionComponent.expandState = false
+        else
+            vfxExplosionComponent.expandState = true
+        end
+        print("expandState after changing:", vfxExplosionComponent.expandState)
         vfxExplosionComponent.repetitionCounter = vfxExplosionComponent.repetitionCounter + 1
+        vfxExplosionComponent.timer = 0.0
+    end
+
+    if (vfxExplosionComponent.expandState) then
+        print("expanding")
+        GetTransform(e).scale.x = GetTransform(e).scale.x + 5
+        GetTransform(e).scale.y = GetTransform(e).scale.y + 5
+        GetTransform(e).scale.z = GetTransform(e).scale.z + 5
+    else
+        print("contracting")
+        GetTransform(e).scale.x = GetTransform(e).scale.x - 5
+        GetTransform(e).scale.y = GetTransform(e).scale.y - 5
+        GetTransform(e).scale.z = GetTransform(e).scale.z - 5
     end
 
     -- spawn particles once done with repetitions
