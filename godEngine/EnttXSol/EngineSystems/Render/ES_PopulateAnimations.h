@@ -33,7 +33,7 @@ namespace god
 			{
 				skele_anim.m_old_sub_animation = skele_anim.m_current_sub_animation;
 
-				if ( opengl.m_animations.find ( skele_anim.m_animation ) != opengl.m_animations.end () )
+				if ( opengl.m_animations.find ( skele_anim.m_animation ) != opengl.m_animations.end () && skele_anim.m_animator_id != static_cast< uint32_t >( -1 ) )
 				{
 					auto& animator = opengl.m_animations[ skele_anim.m_animation ].m_animators[ skele_anim.m_animator_id ];
 					if ( skele_anim.m_sub_animations.find ( skele_anim.m_current_sub_animation ) != skele_anim.m_sub_animations.end () )

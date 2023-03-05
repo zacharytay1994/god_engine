@@ -43,7 +43,7 @@
 #include <godUtility/Grid3D.h>
 
 // comment out this for no editor
-//#define ENABLE_EDITOR
+#define ENABLE_EDITOR
 
 namespace god
 {
