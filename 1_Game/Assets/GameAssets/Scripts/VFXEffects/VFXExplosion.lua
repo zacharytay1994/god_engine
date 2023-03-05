@@ -61,6 +61,8 @@ function S_VFXExplosion(e)
 
         vfxExplosionComponent.explosionInitialized = true
         print("VFXExplosion initialized!")
+
+        InstancePrefab("SFX_Explosion",0,0,0)
     end
 
     -- -- for checking if scales were stored correctly
