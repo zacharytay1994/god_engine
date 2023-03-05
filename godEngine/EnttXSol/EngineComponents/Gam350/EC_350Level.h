@@ -536,6 +536,9 @@ namespace god
 				glm::vec3 ( 0.5f, 0.0f, 0.0f ), // dark red
 				glm::vec3 ( 0.0f, 0.5f, 0.0f )  // dark green
 			};
+			float m_sfx_stone_drop{ 1.0 };
+			float m_cave_in_timer{ 0.0f };
+			float m_cave_in_counter{ 0.0f };
 
 			friend struct Enemy;
 
@@ -628,6 +631,17 @@ namespace god
 					{
 						renderable->m_tint = glm::vec4 ( m_colors[ tile.m_values[ 0 ] ] , 1.0f );
 					}
+				}
+
+				if ( m_sfx_stone_drop == 1 )
+				{
+					entt.QueueInstancePrefab( "SFX_StoneDrop1", 0.f, 0.f, 0.f );
+					m_sfx_stone_drop = 2;
+				}
+				else
+				{
+					entt.QueueInstancePrefab( "SFX_StoneDrop2", 0.f, 0.f, 0.f );
+					m_sfx_stone_drop = 1;
 				}
 			}
 
@@ -932,6 +946,18 @@ namespace god
 				// add tiles, to ready state
 				if ( !m_ready && m_deserialized )
 				{
+					// play cave in sound
+					if ( m_cave_in_counter < 0.0f )
+					{
+						m_cave_in_counter = std::rand() % 8 + 3;
+						entt.QueueInstancePrefab( "SFX_CaveIn", 0.f, 0.f, 0.f );
+					}
+					else
+					{
+						m_cave_in_counter -= dt;
+					}
+
+
 					// set reset button inactive
 					uint32_t reset_button = entt.GetEntity ( "ResetButton" );
 					if ( reset_button != static_cast< uint32_t >( -1 ) )
