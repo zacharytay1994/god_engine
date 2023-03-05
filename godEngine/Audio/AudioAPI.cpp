@@ -344,7 +344,8 @@ namespace god
 	{
 		if (BGM.m_channel != nullptr)
 		{
-			BGM.m_channel->stop();
+			AddFadeOut(BGM.m_channel, 2.f, BGM.m_fade);
+			//BGM.m_channel->stop();
 			BGM.m_channel = nullptr;
 		}
 	}
@@ -379,7 +380,8 @@ namespace god
 		( fade );
 		UINTLL dsp_clock = GetDSPClock(channel);
 
-		float volume = GetVolume(channel);
+		//float volume = GetVolume(channel);
+		float volume = 1.f;
 
 		ErrorCheck(channel->addFadePoint(dsp_clock, volume));
 		ErrorCheck(channel->addFadePoint(dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), 0.f));

@@ -20,6 +20,7 @@ namespace god
 		double m_length;	// in seconds
 
 		bool m_played{ false }; // moved to audio source
+		bool m_fade{ false };
 
 		FMOD::Channel* m_channel{ nullptr }; // moved to audio source
 	};
