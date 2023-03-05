@@ -863,5 +863,23 @@ namespace god
 				return 0.0f;
 			}
 		);
+
+		// PlayBGM()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("PlayBGM",
+			[&entt, &engineResources]()
+			{
+				AudioAPI::PlayBGM();
+			}
+		);
+
+		// StopBGM()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("StopBGM",
+			[&entt, &engineResources]()
+			{
+				AudioAPI::StopBGM();
+			}
+		);
 	}
 }

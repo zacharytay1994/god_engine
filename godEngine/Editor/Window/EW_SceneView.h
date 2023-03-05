@@ -149,7 +149,7 @@ namespace god
 		{
 			m_enttxsol.m_pause = false;
 			AudioAPI::ResumeAll();
-			AudioAPI::PlayBGM();
+			//AudioAPI::PlayBGM();
 		}
 		this->ToolTipOnHover ( "Objects will be updated." );
 		ImGui::SameLine ();

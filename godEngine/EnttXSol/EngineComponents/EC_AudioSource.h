@@ -182,6 +182,8 @@ namespace god
 		RapidJSON::JSONifyToValue(value, document, "pitch", component.m_pitch);
 		RapidJSON::JSONifyToValue(value, document, "min_distance", component.m_min_distance);
 		RapidJSON::JSONifyToValue(value, document, "max_distance", component.m_max_distance);
+		RapidJSON::JSONifyToValue(value, document, "fade_in", component.enable_fade_in);
+		RapidJSON::JSONifyToValue(value, document, "fade_out", component.enable_fade_out);
 		RapidJSON::JSONifyToValue(value, document, "fade_in_time", component.m_fade_in_time);
 		RapidJSON::JSONifyToValue(value, document, "fade_out_time", component.m_fade_out_time);
 	}
@@ -200,6 +202,8 @@ namespace god
 		AssignIfExist(jsonObj, component.m_pitch, "pitch");
 		AssignIfExist(jsonObj, component.m_min_distance, "min_distance");
 		AssignIfExist(jsonObj, component.m_max_distance, "max_distance");
+		AssignIfExist(jsonObj, component.enable_fade_in, "fade_in");
+		AssignIfExist(jsonObj, component.enable_fade_out, "fade_out");
 		AssignIfExist(jsonObj, component.m_fade_in_time, "fade_in_time");
 		AssignIfExist(jsonObj, component.m_fade_out_time, "fade_out_time");
 	}

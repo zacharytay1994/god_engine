@@ -324,6 +324,7 @@ function S_SplashScreen(e)
 
     -- change scene
     if ((camera.position.z < -6)) then
+        StopBGM()
         ChangeScene("350LevelScene", true)
     end
 
