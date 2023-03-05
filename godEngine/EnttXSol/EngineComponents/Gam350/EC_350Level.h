@@ -280,6 +280,10 @@ namespace god
 			float m_click_zoom_value { 0.0f };
 			float m_click_height_value { 0.0f };
 
+			float m_sfx_stone_drop{ 1.0 };
+			float m_cave_in_timer{ 0.0f };
+			float m_cave_in_counter{ 0.0f };
+
 			friend struct Enemy;
 
 			template <typename ENTT , typename ENGINE_RESOURCES>
@@ -351,6 +355,17 @@ namespace god
 				{
 					auto& [x , y , z] = tile.m_cell;
 					transform->m_position = { 2 * x,2 * y,2 * z };
+				}
+
+				if ( m_sfx_stone_drop == 1 )
+				{
+					entt.QueueInstancePrefab( "SFX_StoneDrop1", 0.f, 0.f, 0.f );
+					m_sfx_stone_drop = 2;
+				}
+				else
+				{
+					entt.QueueInstancePrefab( "SFX_StoneDrop2", 0.f, 0.f, 0.f );
+					m_sfx_stone_drop = 1;
 				}
 			}
 
@@ -605,6 +620,18 @@ namespace god
 				// add tiles, to ready state
 				if ( !m_ready && m_deserialized )
 				{
+					// play cave in sound
+					if ( m_cave_in_counter < 0.0f )
+					{
+						m_cave_in_counter = std::rand() % 8 + 3;
+						entt.QueueInstancePrefab( "SFX_CaveIn", 0.f, 0.f, 0.f );
+					}
+					else
+					{
+						m_cave_in_counter -= dt;
+					}
+
+
 					// set reset button inactive
 					uint32_t reset_button = entt.GetEntity ( "ResetButton" );
 					if ( reset_button != static_cast< uint32_t >( -1 ) )
