@@ -71,6 +71,14 @@ function S_VFXTriton(e)
         vfxComponent.explosionEffectsPlayed = true
         local playerAOEVFX = SpawnVFX(e, "VFX_Explosion", tritonPosition.x, tritonPosition.y + 50, tritonPosition.z + 125)
 
+        -- activate screenshake
+        local screenShakeEntity = GetEntity("ScreenShake")
+        if (screenShakeEntity ~= -1) then
+            screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
+            screenShakeComponent.duration = 0.50
+            screenShakeComponent.doScreenShake = true
+        end
+
     end
 
     -- for triggering on-hit vfx (when hit by enemy)

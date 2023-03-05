@@ -113,9 +113,10 @@ function S_VFXExplosion(e)
         -- contract each child
         local childCount = ChildCount(e)
 
-        -- expand each child
         for i = 0, childCount - 1 do
 
+            
+            
             local maxScale = vfxExplosionComponent.childrenScales[i]            
             local childScale = GetTransform(Child(e, i)).scale
             
@@ -124,7 +125,16 @@ function S_VFXExplosion(e)
                 childScale.y = childScale.y - maxScale * 0.1
                 childScale.z = childScale.z - maxScale * 0.1
             end
-        end        
+
+            local pointLightColour = GetPointLight(Child(e, i)).colour
+            if (pointLightColour.x > 2) then
+                pointLightColour.x = pointLightColour.x - 2
+            else
+                pointLightColour.x = 1
+            end
+        end    
+        
+        
     end
     print("please")
 end
