@@ -53,7 +53,7 @@ function S_VFXExplosion(e)
         end
 
         local parentPosition = GetTransform(e).position
-        vfxExplosionComponent.shockwaveEntity = InstancePrefabParentedNow(e, "Shockwave", parentPosition.x, parentPosition.y - 50, parentPosition.z)
+        vfxExplosionComponent.shockwaveEntity = InstancePrefabParentedNow(e, "Shockwave", parentPosition.x, parentPosition.y - 50, parentPosition.z - 125)
         local shockwaveScale = GetTransform(vfxExplosionComponent.shockwaveEntity).scale
         shockwaveScale.x = 0.1
         shockwaveScale.y = 0.1
@@ -73,14 +73,6 @@ function S_VFXExplosion(e)
     else
         vfxExplosionComponent.expandState = false
         --vfxExplosionComponent.timer = 0.0
-
-        -- -- activate screenshake
-        -- local screenShakeEntity = GetEntity("ScreenShake")
-        -- if (screenShakeEntity ~= -1) then
-        --     screenShakeComponent = GetComponent(screenShakeEntity, "C_ScreenShake")
-        --     screenShakeComponent.duration = 0.25
-        --     screenShakeComponent.doScreenShake = true
-        -- end
     end
 
     
@@ -106,9 +98,8 @@ function S_VFXExplosion(e)
     else
         
         local shockwaveScale = GetTransform(vfxExplosionComponent.shockwaveEntity).scale
-        shockwaveScale.x = shockwaveScale.x + 50
-        --shockwaveScale.y = shockwaveScale.y + 50
-        shockwaveScale.z = shockwaveScale.z + 50
+        shockwaveScale.x = shockwaveScale.x + 1
+        shockwaveScale.z = shockwaveScale.z + 1
 
         -- contract each child
         local childCount = ChildCount(e)
@@ -136,5 +127,4 @@ function S_VFXExplosion(e)
         
         
     end
-    print("please")
 end

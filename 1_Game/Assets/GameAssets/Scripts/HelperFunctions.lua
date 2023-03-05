@@ -7,6 +7,11 @@
     -- returns a normalized vector in the direction that the entity is facing.
     -- THIS FUNCTION IGNORES THE Y-AXIS!!!
 
+-- ParentEntity(e)
+    -- WARNING: NOT TESTED
+    -- returns parent to entity e.
+    -- return nil if e is an orphan.
+
 -- NothingInGridAbove(entity) 
     -- checks if the grid cell above the input entity is empty.
     -- returns true if empty, false if not empty (occupied by another entity).
@@ -44,6 +49,26 @@ end
     local newZ = Cos(entityTransform.rotation.y)
     return Normalize(newX, 1, newZ)
 
+end
+
+-- WARNING: NOT TESTED
+-- returns parent to entity e.
+-- return nil if e is an orphan.
+-- assumes parent entity has a Transform component.
+function ParentEntity(entity)
+    
+    local entityList = EntitiesWithEngineComponent("Transform")
+
+    for i = 1, #entityList do
+        if (ChildCount(entityList[i]) > 0) then
+            for j = 0, #ChildCount(entityList[i]) do
+                if (Child(entityList[i], j) == entity) then
+                    return entityList[i]
+                end
+            end
+        end
+    end
+    return nil
 end
 
 -- checks if the grid cell above the input entity is empty.
