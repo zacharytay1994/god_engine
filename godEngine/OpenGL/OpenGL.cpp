@@ -636,7 +636,7 @@ namespace god
 		{
 			auto& [first , second] = data;
 
-			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uSpritesheetData" , first.m_spritesheet_data );
+			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uSpritesheetData" , first.m_spritesheet_data );
 
 			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
 			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uAlpha" , first.m_shininess );
