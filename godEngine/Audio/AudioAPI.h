@@ -17,6 +17,7 @@ namespace god
 		FMOD::Sound* m_sound_sample{ nullptr };
 		std::string m_name;
 		std::string m_file_name;
+		double m_length;	// in seconds
 
 		bool m_played{ false }; // moved to audio source
 

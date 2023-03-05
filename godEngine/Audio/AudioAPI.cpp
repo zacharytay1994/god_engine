@@ -3,7 +3,7 @@
 
 namespace god
 {
-	Sound::Sound() : m_sound_sample{ nullptr }, m_name{}, m_file_name{}, m_channel{ nullptr }
+	Sound::Sound() : m_sound_sample{ nullptr }, m_name{}, m_file_name{}, m_channel{ nullptr }, m_length{ 0 }
 	{
 	}
 
@@ -11,6 +11,7 @@ namespace god
 	{
 		AudioAPI::LoadSound(soundPath.c_str(), *this);
 	}
+
 
 	// AudioAPI members
 	FMOD::System* AudioAPI::m_FMOD_system;
@@ -141,6 +142,9 @@ namespace god
 		{
 			ErrorCheck(m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample));
 		}
+		unsigned int sound_length;
+		sound.m_sound_sample->getLength(&sound_length, FMOD_TIMEUNIT_MS);
+		sound.m_length = static_cast<double>(sound_length) * 0.001; // convert milliseconds to seconds
 
 		std::string path{ filePath };
 		size_t last_slash = path.find_last_of('\\') + 1;
