@@ -109,10 +109,14 @@ function S_VFXExplosion(e)
             local maxScale = vfxExplosionComponent.childrenScales[i]            
             local childScale = GetTransform(Child(e, i)).scale
             
-            if (childScale.x > 0) then
+            if (childScale.x > 0.1) then
                 childScale.x = childScale.x - maxScale * 0.1
                 childScale.y = childScale.y - maxScale * 0.1
                 childScale.z = childScale.z - maxScale * 0.1
+            else
+                childScale.x = 0
+                childScale.y = 0
+                childScale.z = 0
             end
 
             local pointLightColour = GetPointLight(Child(e, i)).colour
@@ -121,13 +125,6 @@ function S_VFXExplosion(e)
             else
                 pointLightColour.x = 1
             end
-
-            if (childScale.x <= 0) then
-                RemoveInstance(e)
-            end
-            
         end    
-        
-        
     end
 end
