@@ -290,15 +290,6 @@ namespace god
 					// m_flags[0] means down, so !m_flags[0] means not down
 					if ( !m_flags[ 0 ] )
 					{
-						int new_orientation = static_cast< int >( m_orientation ) - 1;
-						m_orientation = static_cast< Orientation >( new_orientation < 0 ? 3 : new_orientation );
-						Transform* transform = entt.GetEngineComponent<Transform> ( m_entity_id );
-						if ( transform )
-						{
-							transform->m_rotation.y -= 90.0f;
-						}
-
-						// check if triton in line of sight
 						Cell triton_position = grid.GetTritonPosition ();
 						auto [x , y , z] = m_cell;
 						auto [tx , ty , tz] = triton_position;
@@ -326,20 +317,8 @@ namespace god
 							break;
 						}
 						}
-
-						//m_destination = static_cast< uint32_t >( -1 );
 						if ( in_los )
 						{
-							// previously not down
-							//if ( !m_flags[ 0 ] )
-							//{
-							//	//m_destination = grid.m_map[ {x , y - 1 , z} ];
-							//	grid.LerpEntityToCell ( entt , engineResources ,
-							//		*static_cast< Entity* >( this ) , { x , y - 1 , z } );
-							//	m_flags[ 0 ] = true;
-							//}
-
-							// destroy any enemy below
 							Entity* enemy = grid.GetEnemy ( x , y - 1 , z );
 							if ( enemy )
 							{
@@ -350,6 +329,71 @@ namespace god
 								*static_cast< Entity* >( this ) , { x , y - 1 , z } );
 							m_flags[ 0 ] = true;
 						}
+						else
+						{
+							int new_orientation = static_cast< int >( m_orientation ) - 1;
+							m_orientation = static_cast< Orientation >( new_orientation < 0 ? 3 : new_orientation );
+							Transform* transform = entt.GetEngineComponent<Transform> ( m_entity_id );
+							if ( transform )
+							{
+								transform->m_rotation.y -= 90.0f;
+							}
+
+							// check if triton in line of sight
+							/*Cell triton_position = grid.GetTritonPosition ();
+							auto [x , y , z] = m_cell;
+							auto [tx , ty , tz] = triton_position;*/
+							in_los = false;
+							switch ( m_orientation )
+							{
+							case ( Orientation::North ):
+							{
+								in_los = tz > z && tx == x;
+								break;
+							}
+							case ( Orientation::East ):
+							{
+								in_los = tx > x && tz == z;
+								break;
+							}
+							case ( Orientation::South ):
+							{
+								in_los = tz < z&& tx == x;
+								break;
+							}
+							case ( Orientation::West ):
+							{
+								in_los = tx < x&& tz == z;
+								break;
+							}
+							}
+
+							//m_destination = static_cast< uint32_t >( -1 );
+							if ( in_los )
+							{
+								// previously not down
+								//if ( !m_flags[ 0 ] )
+								//{
+								//	//m_destination = grid.m_map[ {x , y - 1 , z} ];
+								//	grid.LerpEntityToCell ( entt , engineResources ,
+								//		*static_cast< Entity* >( this ) , { x , y - 1 , z } );
+								//	m_flags[ 0 ] = true;
+								//}
+
+								// destroy any enemy below
+								Entity* enemy = grid.GetEnemy ( x , y - 1 , z );
+								if ( enemy )
+								{
+									enemy->m_to_destroy = true;
+								}
+
+								grid.LerpEntityToCell ( entt , engineResources ,
+									*static_cast< Entity* >( this ) , { x , y - 1 , z } );
+								m_flags[ 0 ] = true;
+							}
+						}
+
+
 						//else
 						//{
 						//	// move back up if previous los was true
@@ -536,9 +580,9 @@ namespace god
 				glm::vec3 ( 0.5f, 0.0f, 0.0f ), // dark red
 				glm::vec3 ( 0.0f, 0.5f, 0.0f )  // dark green
 			};
-			float m_sfx_stone_drop{ 1.0 };
-			float m_cave_in_timer{ 0.0f };
-			float m_cave_in_counter{ 0.0f };
+			float m_sfx_stone_drop { 1.0 };
+			float m_cave_in_timer { 0.0f };
+			float m_cave_in_counter { 0.0f };
 
 			friend struct Enemy;
 
@@ -635,12 +679,12 @@ namespace god
 
 				if ( m_sfx_stone_drop == 1 )
 				{
-					entt.QueueInstancePrefab( "SFX_StoneDrop1", 0.f, 0.f, 0.f );
+					entt.QueueInstancePrefab ( "SFX_StoneDrop1" , 0.f , 0.f , 0.f );
 					m_sfx_stone_drop = 2;
 				}
 				else
 				{
-					entt.QueueInstancePrefab( "SFX_StoneDrop2", 0.f, 0.f, 0.f );
+					entt.QueueInstancePrefab ( "SFX_StoneDrop2" , 0.f , 0.f , 0.f );
 					m_sfx_stone_drop = 1;
 				}
 			}
@@ -949,8 +993,8 @@ namespace god
 					// play cave in sound
 					if ( m_cave_in_counter < 0.0f )
 					{
-						m_cave_in_counter = std::rand() % 8 + 3;
-						entt.QueueInstancePrefab( "SFX_CaveIn", 0.f, 0.f, 0.f );
+						m_cave_in_counter = std::rand () % 8 + 3;
+						entt.QueueInstancePrefab ( "SFX_CaveIn" , 0.f , 0.f , 0.f );
 					}
 					else
 					{
