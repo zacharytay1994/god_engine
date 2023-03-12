@@ -115,7 +115,7 @@ namespace god
 				// potential area for optimization looking for entity of name
 				for ( uint32_t i = 0; i < entt.m_entities.Size (); ++i )
 				{
-					if ( entt.m_entities.Valid ( i ) && entt.m_entities[ i ].m_name == entityName )
+					if ( entt.m_entities.Valid ( i ) && entt.m_entities[ i ].m_name == entityName && !entt.m_entities[i].m_master )
 					{
 						return static_cast< int >( entt.m_entities[ i ].m_id );
 					}

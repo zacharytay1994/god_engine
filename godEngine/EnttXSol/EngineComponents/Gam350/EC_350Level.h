@@ -115,7 +115,7 @@ namespace god
 			template <typename ENTT , typename ENGINE_RESOURCES , typename GRID>
 			void Update ( ENTT& entt , ENGINE_RESOURCES& engineResources ,
 				GRID& grid ,
-				Enemy*& enemy ,
+				Enemy*& enemyout ,
 				Playable*& playable ,
 				bool& combatAttacking )
 			{
@@ -156,7 +156,7 @@ namespace god
 								triton->m_to_destroy = true;
 								// check if tile walked on has playable, if so eat it
 								playable = static_cast< Playable* >( triton );
-								enemy = this;
+								enemyout = this;
 								combatAttacking = false;
 							}
 
@@ -564,6 +564,10 @@ namespace god
 			float m_click_position_x , m_click_position_y;
 			float m_click_zoom_value { 0.0f };
 			float m_click_height_value { 0.0f };
+
+			std::string m_achievement { "" };
+
+			//uint32_t m_achievement { static_cast< uint32_t >( -1 ) };
 
 			std::array<glm::vec3 , 13> m_colors = {
 				glm::vec3 ( 0,0,0 ),
@@ -1253,6 +1257,22 @@ namespace god
 											entt.SetEntityActive ( skip_button , true );
 										}
 
+										// set skip button active
+										/*uint32_t a_button = entt.GetEntity ( "AchievementNextLevel" );
+										if ( a_button != static_cast< uint32_t >( -1 ) )
+										{
+											entt.SetEntityActive ( a_button , true );
+
+											GUIObject* a_gui = entt.GetEngineComponent<GUIObject> ( a_button );
+											if ( a_gui )
+											{
+												if ( a_gui->m_released )
+												{
+													std::cout << "agui released" << std::endl;
+												}
+											}
+										}*/
+
 										// deactivate tutorial gui
 										uint32_t tut_camera = entt.GetEntity ( "TutCamera" );
 										uint32_t tut_interact = entt.GetEntity ( "TutInteract" );
@@ -1822,14 +1842,55 @@ namespace god
 					// if theres no enemies left, reset the level
 					if ( m_playables.empty () && m_initialized )
 					{
-						m_to_restart = true;
+						if ( m_achievement.empty () )
+						{
+							m_achievement = "NoStarAchievement";
+							uint32_t gui_350 = entt.GetEntity ( "350GUI" );
+							if ( gui_350 != static_cast< uint32_t >( -1 ) )
+							{
+								entt.NonInstancePrefab ( engineResources , "NoStarAchievement" , gui_350 );
+							}
+						}
+						//m_to_restart = true;
 					}
 					if ( m_enemies.empty () && m_initialized )
 					{
-						m_won = true;
-					}
+						if ( m_achievement.empty() )
+						{
+							m_achievement = "3StarAchivement";
+							uint32_t gui_350 = entt.GetEntity ( "350GUI" );
+							if ( gui_350 != static_cast< uint32_t >( -1 ) )
+							{
+								entt.NonInstancePrefab ( engineResources , "3StarAchivement", gui_350 );
+							}
+						}
+						//else
+						//{
+						//	// check if next button is pressed
+						//	uint32_t next_button_id = entt.GetEntity ( "AchievementNextLevel" );
+						//	if ( next_button_id != static_cast< uint32_t >( -1 ) )
+						//	{
+						//		entt.SetEntityActive ( next_button_id , true );
+						//		GUIObject* next_button = entt.GetEngineComponent<GUIObject> ( next_button_id );
+						//		if ( next_button )
+						//		{
+						//			if ( next_button->m_released )
+						//			{
+						//				m_won = true;
 
-					m_turn_changed = false;
+						//				// destroy achievement
+						//				entt.QueueDelete ( m_achievement );
+						//				m_achievement = static_cast< uint32_t >( -1 );
+						//			}
+						//		}
+						//	}
+						//}
+						//m_won = true;
+					}
+					else
+					{
+						m_turn_changed = false;
+					}
 				}
 			}
 

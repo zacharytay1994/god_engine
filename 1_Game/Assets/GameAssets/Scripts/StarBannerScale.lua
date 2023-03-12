@@ -24,6 +24,8 @@ function S_StarBannerScale(e)
         -- start star
         local star = GetEntity(star_banner.Next.."star")
         if (star ~= -1) then
+            -- print(star)
+            -- print(star_banner.Next.."star")
             local star1_scale = GetComponent(star, "C_StarScale")
             star1_scale.Start = true
         end

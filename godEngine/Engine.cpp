@@ -43,7 +43,7 @@
 #include <godUtility/Grid3D.h>
 
 // comment out this for no editor
-#define ENABLE_EDITOR
+//#define ENABLE_EDITOR
 
 namespace god
 {
@@ -57,7 +57,8 @@ namespace god
 		//FreeConsole ();
 		std::cout << "godEngine Update." << std::endl;
 		// create window
-		GLFWWindow window ( 1920 , 1080 );
+		//GLFWWindow window ( 1920 , 1080 );
+		GLFWWindow window ( 1920/2 , 1080/2 );
 #ifndef ENABLE_EDITOR
 		window.m_fullscreen = true;
 #endif
