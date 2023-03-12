@@ -57,8 +57,8 @@ namespace god
 		//FreeConsole ();
 		std::cout << "godEngine Update." << std::endl;
 		// create window
-		//GLFWWindow window ( 1920 , 1080 );
-		GLFWWindow window ( 1920/2 , 1080/2 );
+		GLFWWindow window ( 1920 , 1080 );
+		//GLFWWindow window ( 1920/2 , 1080/2 );
 #ifndef ENABLE_EDITOR
 		window.m_fullscreen = true;
 #endif
