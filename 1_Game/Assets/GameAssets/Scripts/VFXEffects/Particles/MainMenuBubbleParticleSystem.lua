@@ -4,7 +4,7 @@
 function C_MainMenuBubbleParticleSystem()
     local var = {
         --[SerializeFloat]
-        emissionRate = 1.0,
+        emissionRate = 0.0,
 
         timer = 0.0
     }
@@ -37,13 +37,16 @@ function S_MainMenuBubbleParticleSystem(e)
     -- control bubble particle speed here
     local randomizeSpeed = GenerateRandomNumberInRange(0, 1)
     if (randomizeSpeed == 1) then
-        GetComponent(bubble_particle, "C_BubbleParticle").Speed = 2.0
+        GetComponent(bubble_particle, "C_BubbleParticle").Speed = 0.3
     else
-        GetComponent(bubble_particle, "C_BubbleParticle").Speed = 1.0
+        GetComponent(bubble_particle, "C_BubbleParticle").Speed = 0.1
     end
 
     -- control bubble particle scale here
-    GetTransform(bubble_particle).scale.x = 0.1
-    GetTransform(bubble_particle).scale.y = 0.1
+    local csalf = GenerateRandomNumberInRange(5, 15) / 300
+    GetTransform(bubble_particle).scale.x = csalf * 0.5
+    GetTransform(bubble_particle).scale.y = csalf 
     GetTransform(bubble_particle).scale.z = 0.1
+
+    GetComponent(bubble_particle, "C_BubbleParticle").Lifetime = 2.0
 end
