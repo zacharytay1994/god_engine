@@ -540,7 +540,7 @@ namespace god
 			Playable* m_combat_playable { nullptr };
 			Enemy* m_combat_enemy { nullptr };
 			glm::vec3 m_combat_area_offset { 10'000,10'000,10'000 };
-			float m_combat_trigger_distance { 2.f };
+			float m_combat_trigger_distance { 4.f };
 			float m_combat_prep_time { 1.5f };
 			float m_combat_prep_time_counter { m_combat_prep_time };
 			glm::vec3 m_pre_combat_camera_position { 0.0f };
