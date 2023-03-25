@@ -501,6 +501,15 @@ namespace god
 			}
 		);
 
+		// GetCameraPosition(x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "GetCameraPosition" ,
+			[&engineResources]()->glm::vec3
+			{
+				return engineResources.Get<Camera> ().get ().m_position;
+			}
+		);
+
 		// SetCameraLookAt(x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "SetCameraLookAt" ,
