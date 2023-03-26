@@ -58,7 +58,7 @@ function S_TrailParticleSystem(e)
     GetComponent(sparkle_particle, "C_TrailParticle").Speed = GenerateRandomNumberInRange(1, 20) / 20
 
     -- make sparkle particle look small
-    GetTransform(sparkle_particle).scale.x = 0.2
-    GetTransform(sparkle_particle).scale.y = 0.2
-    GetTransform(sparkle_particle).scale.z = 0.2
+    GetTransform(sparkle_particle).scale.x = 0.05
+    GetTransform(sparkle_particle).scale.y = 0.05
+    GetTransform(sparkle_particle).scale.z = 0.05
 end
