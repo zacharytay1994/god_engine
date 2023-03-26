@@ -387,6 +387,8 @@ namespace god
 									enemy->m_to_destroy = true;
 								}
 
+								entt.QueueInstancePrefab("SFX_PressurePlate", 0.f, 0.f, 0.f);
+
 								grid.LerpEntityToCell ( entt , engineResources ,
 									*static_cast< Entity* >( this ) , { x , y - 1 , z } );
 								m_flags[ 0 ] = true;
@@ -1386,6 +1388,7 @@ namespace god
 																// if walk onto pressure plate
 																if ( tile_above && tile_above->m_type == Tile::Type::PressurePlate )
 																{
+																	entt.QueueInstancePrefab("SFX_PressurePlate", 0.f, 0.f, 0.f);
 																	// find corresponding door
 																	for ( auto& find_door : m_tiles )
 																	{
