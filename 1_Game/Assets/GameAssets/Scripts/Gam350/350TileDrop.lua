@@ -3,7 +3,7 @@ function C_350TileDrop()
     local var = {
         --[SerializeFloat]
         DropSpeed = 5.0,
-        EmissionRate = 0.06
+        EmissionRate = 0.2
     }
     return function()
         return var
@@ -21,11 +21,11 @@ function S_350TileDrop(e)
         if (C_350TileDrop.EmissionRate > 0) then
             C_350TileDrop.EmissionRate = C_350TileDrop.EmissionRate - dt;
         else
-            C_350TileDrop.EmissionRate = 0.04
+            C_350TileDrop.EmissionRate = 0.2
             local bubble = InstancePrefabParentedNow(e, "BubbleParticle3D", 0, 0, 0)
             local bubble_particle = GetComponent(bubble, 'C_BubbleParticle')
             local bubble_transform = GetTransform(bubble)
-            local rand_size = GenerateRandomNumberInRange(2,8)/10.0
+            local rand_size = GenerateRandomNumberInRange(1,30)/100.0
             local rand_x = GenerateRandomNumberInRange(1,10)/10.0-0.5
             local rand_z = GenerateRandomNumberInRange(1,10)/10.0-0.5
             bubble_particle.initialHeight = transform.position.y

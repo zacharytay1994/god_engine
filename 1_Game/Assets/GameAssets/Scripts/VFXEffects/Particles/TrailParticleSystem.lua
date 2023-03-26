@@ -54,7 +54,7 @@ function S_TrailParticleSystem(e)
 
     
     -- generate a sparkle at emitter position
-    local emitterPos = GetTransform(e).position
+    local emitterPos = WorldPosition(e)
     local sparkle_particle = InstancePrefabNow("SparkleParticle", emitterPos.x, emitterPos.y, emitterPos.z)
     
     -- randomize sparkle particle direction
