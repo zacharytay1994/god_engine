@@ -324,7 +324,8 @@ function S_SplashScreen(e)
 
     -- change scene
     if ((camera.position.z < -6)) then
-        ChangeScene("350LevelScene", true)
+        StopBGM()
+        ChangeScene("MainmenuScreen", true)
     end
 
     -- scale the door

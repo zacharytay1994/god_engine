@@ -473,7 +473,7 @@ namespace god
 		// potential area for optimization looking for entity of name
 		for ( uint32_t i = 0; i < m_entities.Size (); ++i )
 		{
-			if ( m_entities.Valid ( i ) && m_entities[ i ].m_name == name )
+			if ( m_entities.Valid ( i ) && m_entities[ i ].m_name == name && !m_entities[ i ].m_master )
 			{
 				return  i;
 			}
@@ -1509,6 +1509,11 @@ namespace god
 		return InstancePrefabFromMaster ( name , parent );
 	}
 
+	EnttXSol::Entities::ID EnttXSol::NonInstancePrefab ( EngineResources& engineResources , std::string const& name , Entities::ID parent )
+	{
+		return LoadPrefabV2 ( engineResources , name , parent );
+	}
+
 	void EnttXSol::LoadSystem ( std::string const& name )
 	{
 		m_sol_functions.insert ( { name, m_lua[ name ] } );
@@ -1556,6 +1561,7 @@ namespace god
 		if ( m_entity_pool.find ( fileName ) == m_entity_pool.end () )
 		{
 			auto entity = AddPrefabToScene ( engineResources , fileName , Entities::Null , { 0,0,0 } , false );
+			m_entities[ entity ].m_master = true;
 			m_entity_pool[ fileName ] = entity;
 			SetEntityActive ( entity , false );
 		}

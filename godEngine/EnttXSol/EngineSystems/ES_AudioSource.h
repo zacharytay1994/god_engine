@@ -23,11 +23,11 @@ namespace god
 				//AudioAPI::GetCurrentPlayTime(audio_source.m_channel, &audio_source.m_current_playtime);
 				////std::cout << audio_source.m_current_playtime << "\n";
 
-				// Set Audio Source attributes
-				AudioAPI::SetLoop(audio_source.m_channel, audio_source.m_loop);
-				AudioAPI::SetMute(audio_source.m_channel, audio_source.m_mute);
-				AudioAPI::SetVolume(audio_source.m_channel, audio_source.m_volume);
-				AudioAPI::SetPitch(audio_source.m_channel, audio_source.m_pitch);
+				//// Set Audio Source attributes
+				//AudioAPI::SetLoop(audio_source.m_channel, audio_source.m_loop);
+				//AudioAPI::SetMute(audio_source.m_channel, audio_source.m_mute);
+				//AudioAPI::SetVolume(audio_source.m_channel, audio_source.m_volume);
+				//AudioAPI::SetPitch(audio_source.m_channel, audio_source.m_pitch);
 
 				// set min and max distance for attenuation
 				AudioAPI::SetMinMaxDistance(audio_source.m_channel, audio_source.m_min_distance, audio_source.m_max_distance);

@@ -37,6 +37,8 @@ namespace god
 			bool m_moused_over { false };
 			float m_tmin { 0.0f };
 			bool m_to_destroy { false };
+			std::array<int , 5> m_values { -1 };
+			std::array<bool , 5> m_flags { false };
 
 			// movement
 			bool m_moved { false };
@@ -71,16 +73,6 @@ namespace god
 			}
 		};
 
-		struct Tile : public Entity
-		{
-			enum class Type
-			{
-				Normal = 0 ,
-				Rock
-			} m_type = Type::Normal;
-			Tile ( Type type ) : m_type { type } {}
-		};
-
 		enum class Orientation
 		{
 			North = 0 ,
@@ -89,12 +81,26 @@ namespace god
 			West
 		};
 
+		struct Tile : public Entity
+		{
+			enum class Type
+			{
+				Normal = 0 ,
+				Rock ,
+				PressurePlate ,
+				Portal ,
+			} m_type = Type::Normal;
+			Orientation m_orientation = Orientation::North;
+			Tile ( Type type ) : m_type { type } {}
+		};
+
 		struct Playable;
 		struct Enemy : public Entity
 		{
 			enum class Type
 			{
-				Pawn = 0
+				Pawn = 0 ,
+				Sotong
 			} m_type = Type::Pawn;
 			Orientation m_orientation = Orientation::North;
 
@@ -109,10 +115,14 @@ namespace god
 			template <typename ENTT , typename ENGINE_RESOURCES , typename GRID>
 			void Update ( ENTT& entt , ENGINE_RESOURCES& engineResources ,
 				GRID& grid ,
-				Enemy*& enemy ,
+				Enemy*& enemyout ,
 				Playable*& playable ,
 				bool& combatAttacking )
 			{
+				if ( m_to_destroy )
+				{
+					return;
+				}
 				switch ( m_type )
 				{
 				case ( Enemy::Type::Pawn ):
@@ -120,51 +130,79 @@ namespace god
 					// move to previous decided
 					if ( m_destination != static_cast< uint32_t >( -1 ) )
 					{
-						/*grid.MoveEntityOnTopOf ( entt , engineResources ,
-							*static_cast< Entity* >( this ) , *static_cast< Entity* >( &grid.m_tiles[ m_destination ] ) );*/
-						grid.LerpEntityOnTopOf ( entt , engineResources ,
-							*static_cast< Entity* >( this ) , *static_cast< Entity* >( &grid.m_tiles[ m_destination ] ) );
-
-						// if position is triton
-						Tile& tile = grid.m_tiles[ m_destination ];
-						auto& [x , y , z] = tile.m_cell;
-						Entity* triton = grid.GetTriton ( x , y + 1 , z );
-						if ( triton )
+						auto [tx , ty , tz] = grid.m_tiles[ m_destination ].m_cell;
+						Entity* enemy = grid.GetEnemy ( tx , ty + 1 , tz );
+						if ( !enemy /*|| static_cast< Enemy* >( enemy )->m_type != Enemy::Type::Sotong*/ )
 						{
-							triton->m_to_destroy = true;
-							// check if tile walked on has playable, if so eat it
-							playable = static_cast< Playable* >( triton );
-							enemy = this;
-							combatAttacking = false;
-						}
+							/*grid.MoveEntityOnTopOf ( entt , engineResources ,
+								*static_cast< Entity* >( this ) , *static_cast< Entity* >( &grid.m_tiles[ m_destination ] ) );*/
+							if ( m_flags[ 1 ] )
+							{
+								grid.LerpEntityToCell ( entt , engineResources ,
+									*static_cast< Entity* >( this ) , { tx, ty + 1, tz } );
+							}
+							else
+							{
+								grid.LerpEntityOnTopOf ( entt , engineResources ,
+									*static_cast< Entity* >( this ) , *static_cast< Entity* >( &grid.m_tiles[ m_destination ] ) );
+							}
 
-						// walk sound
-						entt.QueueInstancePrefab ( "SFX_FootStep01" , 0.f , 0.f , 0.f );
+							// if position is triton
+							Tile& tile = grid.m_tiles[ m_destination ];
+							auto& [x , y , z] = tile.m_cell;
+							Entity* triton = grid.GetTriton ( x , y + 1 , z );
+							if ( triton )
+							{
+								triton->m_to_destroy = true;
+								// check if tile walked on has playable, if so eat it
+								playable = static_cast< Playable* >( triton );
+								enemyout = this;
+								combatAttacking = false;
+							}
+
+							// walk sound
+							entt.QueueInstancePrefab ( "SFX_FootStep01" , 0.f , 0.f , 0.f );
+						}
+						else
+						{
+							// rotate fish
+							m_orientation = static_cast< Orientation >( ( static_cast< int >( m_orientation ) + 2 ) % 4 );
+							Transform* transform = entt.GetEngineComponent<Transform> ( m_entity_id );
+							if ( transform )
+							{
+								transform->m_rotation.y += 180.0f;
+							}
+						}
 					}
 					// try searching for destination
 					for ( int i = 0; i < 2; ++i )
 					{
 						auto [x , y , z] = m_cell;
+						int dx { 0 } , dz { 0 };
 						switch ( m_orientation )
 						{
 						case ( Orientation::North ):
 						{
 							++z;
+							++dz;
 							break;
 						}
 						case ( Orientation::East ):
 						{
 							++x;
+							++dx;
 							break;
 						}
 						case ( Orientation::South ):
 						{
 							--z;
+							--dz;
 							break;
 						}
 						case ( Orientation::West ):
 						{
 							--x;
+							--dx;
 							break;
 						}
 						}
@@ -172,19 +210,65 @@ namespace god
 						m_destination = static_cast< uint32_t >( -1 );
 						// bottom step
 						Tile* bottom = grid.GetTile ( x , y - 2 , z );
-						if ( bottom != nullptr && bottom->m_type == Tile::Type::Normal && !grid.HasTile ( x , y - 1 , z ) )
+						Tile* on_top = grid.GetTile ( x , y - 1 , z );
+						if ( bottom != nullptr && bottom->m_type == Tile::Type::Normal && ( !on_top || ( on_top->m_type == Tile::Type::Portal && !on_top->m_flags[ 0 ] ) || on_top->m_type == Tile::Type::PressurePlate ) )
 						{
-							m_destination = grid.m_map[ {x , y - 2 , z} ];
+							if ( on_top && on_top->m_type == Tile::Type::Portal && on_top->m_flags[ 0 ] )
+							{
+								if ( !grid.HasEnemy ( x + dx , y - 2 , z + dz ) )
+								{
+									m_destination = grid.m_map[ {x + dx , y - 2 , z + dz} ];
+									m_flags[ 1 ] = true;
+								}
+							}
+							else
+							{
+								if ( !grid.HasEnemy ( x , y - 1 , z ) )
+								{
+									m_destination = grid.m_map[ {x , y - 2 , z} ];
+									m_flags[ 1 ] = false;
+								}
+							}
 						}
 						// same step
-						else if ( ( bottom = grid.GetTile ( x , y - 1 , z ) ) != nullptr && bottom->m_type == Tile::Type::Normal && !grid.HasTile ( x , y , z ) )
+						else if ( ( bottom = grid.GetTile ( x , y - 1 , z ) ) != nullptr && bottom->m_type == Tile::Type::Normal && ( !( on_top = grid.GetTile ( x , y , z ) ) || ( on_top->m_type == Tile::Type::Portal && on_top->m_flags[ 0 ] ) || on_top->m_type == Tile::Type::PressurePlate ) )
 						{
-							m_destination = grid.m_map[ {x , y - 1 , z} ];
+							if ( on_top && on_top->m_type == Tile::Type::Portal && on_top->m_flags[ 0 ] )
+							{
+								if ( !grid.HasEnemy ( x + dx , y - 1 , z + dz ) )
+								{
+									m_destination = grid.m_map[ {x + dx , y - 1 , z + dz} ];
+									m_flags[ 1 ] = true;
+								}
+							}
+							else
+							{
+								if ( !grid.HasEnemy ( x , y , z ) )
+								{
+									m_destination = grid.m_map[ {x , y - 1 , z} ];
+									m_flags[ 1 ] = false;
+								}
+							}
 						}
 						// top step
-						else if ( ( bottom = grid.GetTile ( x , y , z ) ) != nullptr && bottom->m_type == Tile::Type::Normal && !grid.HasTile ( x , y + 1 , z ) )
+						else if ( ( bottom = grid.GetTile ( x , y , z ) ) != nullptr && bottom->m_type == Tile::Type::Normal && ( !( on_top = grid.GetTile ( x , y + 1 , z ) ) || ( on_top->m_type == Tile::Type::Portal && on_top->m_flags[ 0 ] ) || on_top->m_type == Tile::Type::PressurePlate ) )
 						{
-							m_destination = grid.m_map[ {x , y , z} ];
+							if ( on_top && on_top->m_type == Tile::Type::Portal && on_top->m_flags[ 0 ] )
+							{
+								if ( !grid.HasEnemy ( x + dx , y , z + dz ) )
+								{
+									m_destination = grid.m_map[ {x + dx , y , z + dz} ];
+									m_flags[ 1 ] = true;
+								}
+							}
+							else
+							{
+								if ( !grid.HasEnemy ( x , y + 1 , z ) )
+								{
+									m_destination = grid.m_map[ {x , y , z} ];
+									m_flags[ 1 ] = false;
+								}
+							}
 						}
 
 						// if no destination and havent rotate
@@ -198,6 +282,207 @@ namespace god
 							}
 						}
 					}
+					break;
+				}
+				case ( Enemy::Type::Sotong ):
+				{
+					// rotate 90 every turn, if not up
+					// m_flags[0] means down, so !m_flags[0] means not down
+					if ( !m_flags[ 0 ] )
+					{
+						Cell triton_position = grid.GetTritonPosition ();
+						auto [x , y , z] = m_cell;
+						auto [tx , ty , tz] = triton_position;
+						bool in_los { false };
+						switch ( m_orientation )
+						{
+						case ( Orientation::North ):
+						{
+							in_los = tz > z && tx == x;
+							break;
+						}
+						case ( Orientation::East ):
+						{
+							in_los = tx > x && tz == z;
+							break;
+						}
+						case ( Orientation::South ):
+						{
+							in_los = tz < z&& tx == x;
+							break;
+						}
+						case ( Orientation::West ):
+						{
+							in_los = tx < x&& tz == z;
+							break;
+						}
+						}
+						if ( in_los )
+						{
+							Entity* enemy = grid.GetEnemy ( x , y - 1 , z );
+							if ( enemy )
+							{
+								enemy->m_to_destroy = true;
+							}
+
+							grid.LerpEntityToCell ( entt , engineResources ,
+								*static_cast< Entity* >( this ) , { x , y - 1 , z } );
+							m_flags[ 0 ] = true;
+						}
+						else
+						{
+							int new_orientation = static_cast< int >( m_orientation ) - 1;
+							m_orientation = static_cast< Orientation >( new_orientation < 0 ? 3 : new_orientation );
+							Transform* transform = entt.GetEngineComponent<Transform> ( m_entity_id );
+							if ( transform )
+							{
+								transform->m_rotation.y -= 90.0f;
+							}
+
+							// check if triton in line of sight
+							/*Cell triton_position = grid.GetTritonPosition ();
+							auto [x , y , z] = m_cell;
+							auto [tx , ty , tz] = triton_position;*/
+							in_los = false;
+							switch ( m_orientation )
+							{
+							case ( Orientation::North ):
+							{
+								in_los = tz > z && tx == x;
+								break;
+							}
+							case ( Orientation::East ):
+							{
+								in_los = tx > x && tz == z;
+								break;
+							}
+							case ( Orientation::South ):
+							{
+								in_los = tz < z&& tx == x;
+								break;
+							}
+							case ( Orientation::West ):
+							{
+								in_los = tx < x&& tz == z;
+								break;
+							}
+							}
+
+							//m_destination = static_cast< uint32_t >( -1 );
+							if ( in_los )
+							{
+								// previously not down
+								//if ( !m_flags[ 0 ] )
+								//{
+								//	//m_destination = grid.m_map[ {x , y - 1 , z} ];
+								//	grid.LerpEntityToCell ( entt , engineResources ,
+								//		*static_cast< Entity* >( this ) , { x , y - 1 , z } );
+								//	m_flags[ 0 ] = true;
+								//}
+
+								// destroy any enemy below
+								Entity* enemy = grid.GetEnemy ( x , y - 1 , z );
+								if ( enemy )
+								{
+									enemy->m_to_destroy = true;
+								}
+
+								grid.LerpEntityToCell ( entt , engineResources ,
+									*static_cast< Entity* >( this ) , { x , y - 1 , z } );
+								m_flags[ 0 ] = true;
+							}
+						}
+
+
+						//else
+						//{
+						//	// move back up if previous los was true
+						//	if ( m_flags[ 0 ] )
+						//	{
+						//		grid.LerpEntityToCell ( entt , engineResources ,
+						//			*static_cast< Entity* >( this ) , { x , y + 1 , z } );
+						//		/*m_destination = grid.m_map[ {x , y + 1 , z} ];
+						//		grid.LerpEntityOnTopOf ( entt , engineResources ,
+						//			*static_cast< Entity* >( this ) , *static_cast< Entity* >( &grid.m_tiles[ m_destination ] ) );*/
+						//	}
+						//}
+						//m_flags[ 0 ] = in_los;
+					}
+					else
+					{
+						// check if triton in line of sight
+						Cell triton_position = grid.GetTritonPosition ();
+						auto [x , y , z] = m_cell;
+						auto [tx , ty , tz] = triton_position;
+						bool in_los { false };
+						switch ( m_orientation )
+						{
+						case ( Orientation::North ):
+						{
+							in_los = tz > z && tx == x;
+							break;
+						}
+						case ( Orientation::East ):
+						{
+							in_los = tx > x && tz == z;
+							break;
+						}
+						case ( Orientation::South ):
+						{
+							in_los = tz < z&& tx == x;
+							break;
+						}
+						case ( Orientation::West ):
+						{
+							in_los = tx < x&& tz == z;
+							break;
+						}
+						}
+
+						if ( !in_los )
+						{
+							int new_orientation = static_cast< int >( m_orientation ) - 1;
+							m_orientation = static_cast< Orientation >( new_orientation < 0 ? 3 : new_orientation );
+							Transform* transform = entt.GetEngineComponent<Transform> ( m_entity_id );
+							if ( transform )
+							{
+								transform->m_rotation.y -= 90.0f;
+							}
+						}
+
+						in_los = false;
+						switch ( m_orientation )
+						{
+						case ( Orientation::North ):
+						{
+							in_los = tz > z && tx == x;
+							break;
+						}
+						case ( Orientation::East ):
+						{
+							in_los = tx > x && tz == z;
+							break;
+						}
+						case ( Orientation::South ):
+						{
+							in_los = tz < z&& tx == x;
+							break;
+						}
+						case ( Orientation::West ):
+						{
+							in_los = tx < x&& tz == z;
+							break;
+						}
+						}
+
+						if ( !in_los )
+						{
+							grid.LerpEntityToCell ( entt , engineResources ,
+								*static_cast< Entity* >( this ) , { x , y + 1 , z } );
+							m_flags[ 0 ] = false;
+						}
+					}
+					break;
 				}
 				}
 			}
@@ -255,8 +540,8 @@ namespace god
 			Playable* m_combat_playable { nullptr };
 			Enemy* m_combat_enemy { nullptr };
 			glm::vec3 m_combat_area_offset { 10'000,10'000,10'000 };
-			float m_combat_trigger_distance { 0.7f };
-			float m_combat_prep_time { 1.0f };
+			float m_combat_trigger_distance { 4.f };
+			float m_combat_prep_time { 1.5f };
 			float m_combat_prep_time_counter { m_combat_prep_time };
 			glm::vec3 m_pre_combat_camera_position { 0.0f };
 			glm::vec3 m_pre_combat_camera_lookat { 0.0f };
@@ -279,6 +564,29 @@ namespace god
 			float m_click_position_x , m_click_position_y;
 			float m_click_zoom_value { 0.0f };
 			float m_click_height_value { 0.0f };
+
+			std::string m_achievement { "" };
+
+			//uint32_t m_achievement { static_cast< uint32_t >( -1 ) };
+
+			std::array<glm::vec3 , 13> m_colors = {
+				glm::vec3 ( 0,0,0 ),
+				glm::vec3 ( 1.0f, 0.0f, 0.0f ), // pure red
+				glm::vec3 ( 0.0f, 1.0f, 0.0f ), // pure green
+				glm::vec3 ( 0.0f, 0.0f, 1.0f ), // pure blue
+				glm::vec3 ( 1.0f, 1.0f, 0.0f ), // yellow
+				glm::vec3 ( 1.0f, 0.0f, 1.0f ), // magenta
+				glm::vec3 ( 0.0f, 1.0f, 1.0f ), // cyan
+				glm::vec3 ( 0.5f, 0.25f, 0.0f ), // orange
+				glm::vec3 ( 0.25f, 0.0f, 0.5f ), // violet
+				glm::vec3 ( 0.25f, 0.5f, 0.0f ), // lime green
+				glm::vec3 ( 0.0f, 0.25f, 0.5f ), // sky blue
+				glm::vec3 ( 0.5f, 0.0f, 0.0f ), // dark red
+				glm::vec3 ( 0.0f, 0.5f, 0.0f )  // dark green
+			};
+			float m_sfx_stone_drop { 1.0 };
+			float m_cave_in_timer { 0.0f };
+			float m_cave_in_counter { 0.0f };
 
 			friend struct Enemy;
 
@@ -337,6 +645,16 @@ namespace god
 			}
 
 			template <typename ENTT , typename ENGINE_RESOURCES>
+			void LerpEntityToCell ( ENTT& entt , ENGINE_RESOURCES& engineResources ,
+				Entity& src , Cell cell )
+			{
+				auto [dx , dy , dz] = cell;
+				src.m_lerp_to = { 2 * dx, 2 * dy, 2 * dz };
+				src.m_cell = cell;
+				src.m_moved = false;
+			}
+
+			template <typename ENTT , typename ENGINE_RESOURCES>
 			void AddTile ( ENTT& entt , ENGINE_RESOURCES& engineResources , EntityData& level , Transform& level_transform ,
 				Tile const& tile )
 			{
@@ -351,6 +669,27 @@ namespace god
 				{
 					auto& [x , y , z] = tile.m_cell;
 					transform->m_position = { 2 * x,2 * y,2 * z };
+					transform->m_rotation.y = static_cast< int >( tile.m_orientation ) * 90.0f;
+				}
+
+				if ( tile.m_type == Tile::Type::Portal || tile.m_type == Tile::Type::PressurePlate )
+				{
+					Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ e ].m_children[ 0 ] );
+					if ( renderable )
+					{
+						renderable->m_tint = glm::vec4 ( m_colors[ tile.m_values[ 0 ] ] , 1.0f );
+					}
+				}
+
+				if ( m_sfx_stone_drop == 1 )
+				{
+					entt.QueueInstancePrefab ( "SFX_StoneDrop1" , 0.f , 0.f , 0.f );
+					m_sfx_stone_drop = 2;
+				}
+				else
+				{
+					entt.QueueInstancePrefab ( "SFX_StoneDrop2" , 0.f , 0.f , 0.f );
+					m_sfx_stone_drop = 1;
 				}
 			}
 
@@ -376,9 +715,24 @@ namespace god
 				Transform* transform = entt.GetEngineComponent<Transform> ( e );
 				if ( transform )
 				{
-					auto& [x , y , z] = entity.m_cell;
-					transform->m_position = { 2 * x,2 * y,2 * z };
-					transform->m_rotation.y = static_cast< int >( entity.m_orientation ) * 90.0f;
+					switch ( entity.m_type )
+					{
+					case Enemy::Type::Sotong:
+					{
+						// sotong position 1 tile above where its placed
+						auto& [x , y , z] = entity.m_cell;
+						transform->m_position = { 2 * x,2 * y,2 * z };
+						transform->m_rotation.y = static_cast< int >( entity.m_orientation ) * 90.0f;
+						break;
+					}
+					default:
+					{
+						auto& [x , y , z] = entity.m_cell;
+						transform->m_position = { 2 * x,2 * y,2 * z };
+						transform->m_rotation.y = static_cast< int >( entity.m_orientation ) * 90.0f;
+						break;
+					}
+					}
 				}
 			}
 
@@ -479,6 +833,18 @@ namespace god
 				return nullptr;
 			}
 
+			Cell GetTritonPosition ()
+			{
+				for ( auto p : m_playables )
+				{
+					if ( p.m_type == Playable::Type::Triton )
+					{
+						return p.m_cell;
+					}
+				}
+				return { -1000,-1000,-1000 };
+			}
+
 			template <typename ENTT , typename ENGINE_RESOURCES>
 			void Initialize ( ENTT& entt , ENGINE_RESOURCES& engineResources , EntityData& level , Transform& level_transform ,
 				std::string const& level_layout , std::string const& entity_layout , std::string const& playable_layout )
@@ -491,6 +857,29 @@ namespace god
 					Tile tile ( static_cast< Tile::Type >( type ) );
 					tile.m_cell = std::make_tuple ( x , y , z );
 					tile.m_parent_type = Entity::Type::Tile;
+
+					if ( type == static_cast< int >( Tile::Type::PressurePlate ) )
+					{
+						int id , up;
+						ss_level >> id >> up;
+						tile.m_values[ 0 ] = id;
+						tile.m_flags[ 0 ] = true;
+						if ( up == 0 )
+						{
+							tile.m_flags[ 0 ] = false;
+						}
+					}
+					if ( type == static_cast< int >( Tile::Type::Portal ) )
+					{
+						int id;
+						ss_level >> id;
+						tile.m_values[ 0 ] = id;
+						char orientation;
+						ss_level >> orientation;
+						tile.m_orientation = orientation_map[ orientation ];
+						tile.m_flags[ 0 ] = false;
+					}
+
 					m_nonset_tiles.push ( tile );
 				}
 
@@ -605,6 +994,18 @@ namespace god
 				// add tiles, to ready state
 				if ( !m_ready && m_deserialized )
 				{
+					// play cave in sound
+					if ( m_cave_in_counter < 0.0f )
+					{
+						m_cave_in_counter = std::rand () % 8 + 3;
+						entt.QueueInstancePrefab ( "SFX_CaveIn" , 0.f , 0.f , 0.f );
+					}
+					else
+					{
+						m_cave_in_counter -= dt;
+					}
+
+
 					// set reset button inactive
 					uint32_t reset_button = entt.GetEntity ( "ResetButton" );
 					if ( reset_button != static_cast< uint32_t >( -1 ) )
@@ -710,6 +1111,12 @@ namespace god
 						{
 							entt.SetEntityActive ( skip_button , false );
 						}
+
+						// sort enemies for turn order
+						std::sort ( m_enemies.begin () , m_enemies.end () , []( Enemy const& e1 , Enemy const& e2 )
+							{
+								return static_cast< int >( e1.m_type ) > static_cast< int >( e2.m_type );
+							} );
 
 						m_initialized = true;
 					}
@@ -850,6 +1257,22 @@ namespace god
 											entt.SetEntityActive ( skip_button , true );
 										}
 
+										// set skip button active
+										/*uint32_t a_button = entt.GetEntity ( "AchievementNextLevel" );
+										if ( a_button != static_cast< uint32_t >( -1 ) )
+										{
+											entt.SetEntityActive ( a_button , true );
+
+											GUIObject* a_gui = entt.GetEngineComponent<GUIObject> ( a_button );
+											if ( a_gui )
+											{
+												if ( a_gui->m_released )
+												{
+													std::cout << "agui released" << std::endl;
+												}
+											}
+										}*/
+
 										// deactivate tutorial gui
 										uint32_t tut_camera = entt.GetEntity ( "TutCamera" );
 										uint32_t tut_interact = entt.GetEntity ( "TutInteract" );
@@ -895,7 +1318,8 @@ namespace god
 												{
 													// check if tile has nothing on top
 													auto [x , y , z] = m_selected_entity->m_cell;
-													if ( !HasTile ( x , y + 1 , z ) )
+													Tile* tile_above = GetTile ( x , y + 1 , z );
+													if ( !HasTile ( x , y + 1 , z ) || ( tile_above && tile_above->m_type == Tile::Type::PressurePlate ) || ( tile_above && tile_above->m_type == Tile::Type::Portal && tile_above->m_flags[ 0 ] ) )
 													{
 														// move on top of clicked tile
 														GLFWWindow& window = engineResources.Get<GLFWWindow> ().get ();
@@ -914,25 +1338,63 @@ namespace god
 														{
 															if ( m_playable_walkable )
 															{
-																/*MoveEntityOnTopOf ( entt , engineResources ,
-																	m_playables.front () , *m_selected_entity );*/
-																LerpEntityOnTopOf ( entt , engineResources ,
-																	m_playables.front () , *m_selected_entity );
-
-																// check if tile walked on has enemy, if so eat it
-																m_combat_playable = &playable;
-																m_combat_enemy = static_cast< Enemy* >( GetEnemy ( x , y + 1 , z ) );
-																m_combat_attacking = true;
-																//Entity* enemy = GetEnemy ( x , y + 1 , z );
-																if ( m_combat_enemy )
+																if ( ( tile_above && tile_above->m_type == Tile::Type::Portal && tile_above->m_flags[ 0 ] ) )
 																{
-																	m_combat_enemy->m_to_destroy = true;
+																	auto [px , py , pz] = playable.m_cell;
+
+																	LerpEntityToCell ( entt , engineResources ,
+																		m_playables.front () , { x + ( x - px ) , y + 1 , z + ( z - pz ) } );
+
+																	// check if tile walked on has enemy, if so eat it
+																	m_combat_playable = &playable;
+																	m_combat_enemy = static_cast< Enemy* >( GetEnemy ( x + ( x - px ) , y + 1 , z + ( z - pz ) ) );
+																	m_combat_attacking = true;
+																	//Entity* enemy = GetEnemy ( x , y + 1 , z );
+																	if ( m_combat_enemy )
+																	{
+																		m_combat_enemy->m_to_destroy = true;
+																	}
+
+																	++m_playable_i;
+
+																	entt.QueueInstancePrefab ( "SFX_ButtonPress" , 0.f , 0.f , 0.f );
+																	entt.QueueInstancePrefab ( "SFX_FootStep03" , 0.f , 0.f , 0.f );
+																}
+																else
+																{
+																	/*MoveEntityOnTopOf ( entt , engineResources ,
+																		m_playables.front () , *m_selected_entity );*/
+																	LerpEntityOnTopOf ( entt , engineResources ,
+																		m_playables.front () , *m_selected_entity );
+
+																	// check if tile walked on has enemy, if so eat it
+																	m_combat_playable = &playable;
+																	m_combat_enemy = static_cast< Enemy* >( GetEnemy ( x , y + 1 , z ) );
+																	m_combat_attacking = true;
+																	//Entity* enemy = GetEnemy ( x , y + 1 , z );
+																	if ( m_combat_enemy )
+																	{
+																		m_combat_enemy->m_to_destroy = true;
+																	}
+
+																	++m_playable_i;
+
+																	entt.QueueInstancePrefab ( "SFX_ButtonPress" , 0.f , 0.f , 0.f );
+																	entt.QueueInstancePrefab ( "SFX_FootStep03" , 0.f , 0.f , 0.f );
 																}
 
-																++m_playable_i;
-
-																entt.QueueInstancePrefab ( "SFX_ButtonPress" , 0.f , 0.f , 0.f );
-																entt.QueueInstancePrefab ( "SFX_FootStep03" , 0.f , 0.f , 0.f );
+																// if walk onto pressure plate
+																if ( tile_above && tile_above->m_type == Tile::Type::PressurePlate )
+																{
+																	// find corresponding door
+																	for ( auto& find_door : m_tiles )
+																	{
+																		if ( find_door.m_type == Tile::Type::Portal && find_door.m_values[ 0 ] == tile_above->m_values[ 0 ] )
+																		{
+																			find_door.m_flags[ 0 ] = tile_above->m_flags[ 0 ];
+																		}
+																	}
+																}
 															}
 															else
 															{
@@ -1061,10 +1523,11 @@ namespace god
 									glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
 									camera.m_camera_move_speed = 3.0f;
 									camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
-									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
+									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , -1 , 0 ) ) ) * 5.0f , 1.0f ) );
 
 									// move enemy away from player, works no matter who is attacking
-									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;
+									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position ;
+									
 									dir.y = 0;
 									glm::vec3 dst = combat_playable_transform->m_position + glm::normalize ( dir ) * 1.0f;
 
@@ -1098,7 +1561,7 @@ namespace god
 								{
 									playable_anim->PlayAnimation ( "AOE" , false );
 									// will be moved to lua script 
-									entt.QueueInstancePrefab ( "SFX_AnimGroundSmash" , 0.f , 0.f , 0.f );
+									entt.QueueInstancePrefab ( "SFX_CutScene1Attack" , 0.f , 0.f , 0.f );
 									m_combat_start_animation = true;
 								}
 								if ( playable_anim->m_current_sub_animation == "AOE" && playable_anim->m_animation_played )
@@ -1131,7 +1594,7 @@ namespace god
 									glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
 									camera.m_camera_move_speed = 3.0f;
 									camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
-									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
+									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , -1 , 0 ) ) ) * 5.0f , 1.0f ) );
 
 									// move player away from enemy
 									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;
@@ -1167,7 +1630,7 @@ namespace god
 								{
 									enemy_anim->PlayAnimation ( "Headbutt" , false );
 									// will be moved to lua script 
-									entt.QueueInstancePrefab ( "SFX_EnemyCharge" , 0.f , 0.f , 0.f );
+									entt.QueueInstancePrefab ( "SFX_CutScene2" , 0.f , 0.f , 0.f );
 									m_combat_start_animation = true;
 								}
 								if ( enemy_anim->m_current_sub_animation == "Headbutt" && enemy_anim->m_animation_played )
@@ -1177,7 +1640,7 @@ namespace god
 									{
 										playable_anim->PlayAnimation ( "Death" , false );
 										// will be moved to lua script 
-										entt.QueueInstancePrefab ( "SFX_PlayerDeath" , 0.f , 0.f , 0.f );
+										//entt.QueueInstancePrefab ( "SFX_PlayerDeath" , 0.f , 0.f , 0.f );
 									}
 								}
 								if ( playable_anim->m_current_sub_animation == "Death" && playable_anim->m_animation_played )
@@ -1256,6 +1719,43 @@ namespace god
 									// set combat entities back
 									m_combat_enemy = nullptr;
 									m_combat_playable = nullptr;
+								}
+							}
+						}
+					}
+
+					// set emissiveness of doors based on open/close
+					std::unordered_map<int , bool> portal_ids;
+					for ( auto& tile : m_tiles )
+					{
+						// check if anyting on pressure plate
+						if ( tile.m_type == Tile::Type::PressurePlate )
+						{
+							auto [px , py , pz] = tile.m_cell;
+							if ( HasEnemy ( px , py , pz ) )
+							{
+								portal_ids[ tile.m_values[ 0 ] ] = tile.m_flags[ 0 ];
+							}
+						}
+					}
+					for ( auto& tile : m_tiles )
+					{
+						if ( tile.m_type == Tile::Type::Portal )
+						{
+							if ( portal_ids.find ( tile.m_values[ 0 ] ) != portal_ids.end () )
+							{
+								tile.m_flags[ 0 ] = portal_ids[ tile.m_values[ 0 ] ];
+							}
+							Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ tile.m_entity_id ].m_children[ 1 ] );
+							if ( renderable )
+							{
+								if ( tile.m_flags[ 0 ] )
+								{
+									renderable->m_emissive = 50.0f;
+								}
+								else
+								{
+									renderable->m_emissive = 1.0f;
 								}
 							}
 						}
@@ -1343,14 +1843,57 @@ namespace god
 					// if theres no enemies left, reset the level
 					if ( m_playables.empty () && m_initialized )
 					{
-						m_to_restart = true;
+						if ( m_achievement.empty () )
+						{
+							m_achievement = "NoStarAchievement";
+							uint32_t gui_350 = entt.GetEntity ( "350GUI" );
+							if ( gui_350 != static_cast< uint32_t >( -1 ) )
+							{
+								entt.NonInstancePrefab ( engineResources , "NoStarAchievement" , gui_350 );
+								entt.QueueInstancePrefab ( "SFX_WinAchievement" , 0.f , 0.f , 0.f );
+							}
+						}
+						//m_to_restart = true;
 					}
 					if ( m_enemies.empty () && m_initialized )
 					{
-						m_won = true;
-					}
+						if ( m_achievement.empty() )
+						{
+							m_achievement = "3StarAchivement";
+							uint32_t gui_350 = entt.GetEntity ( "350GUI" );
+							if ( gui_350 != static_cast< uint32_t >( -1 ) )
+							{
+								entt.NonInstancePrefab ( engineResources , "3StarAchivement", gui_350 );
+								entt.QueueInstancePrefab ( "SFX_WinAchievement" , 0.f , 0.f , 0.f );
+							}
+						}
+						//else
+						//{
+						//	// check if next button is pressed
+						//	uint32_t next_button_id = entt.GetEntity ( "AchievementNextLevel" );
+						//	if ( next_button_id != static_cast< uint32_t >( -1 ) )
+						//	{
+						//		entt.SetEntityActive ( next_button_id , true );
+						//		GUIObject* next_button = entt.GetEngineComponent<GUIObject> ( next_button_id );
+						//		if ( next_button )
+						//		{
+						//			if ( next_button->m_released )
+						//			{
+						//				m_won = true;
 
-					m_turn_changed = false;
+						//				// destroy achievement
+						//				entt.QueueDelete ( m_achievement );
+						//				m_achievement = static_cast< uint32_t >( -1 );
+						//			}
+						//		}
+						//	}
+						//}
+						//m_won = true;
+					}
+					else
+					{
+						m_turn_changed = false;
+					}
 				}
 			}
 
@@ -1366,8 +1909,8 @@ namespace god
 			float m_add_interval_timer { m_add_interval };
 
 			// names
-			std::vector<std::string> m_tile_names { "350NormalTile", "350Rock" };
-			std::vector<std::string> m_enemy_names { "350Pawn" };
+			std::vector<std::string> m_tile_names { "350NormalTile", "350Rock", "350PPTile", "350PortalTile" };
+			std::vector<std::string> m_enemy_names { "350Pawn", "350Sotong" };
 			std::vector<std::string> m_player_names { "350Triton" };
 
 			// orientation definition

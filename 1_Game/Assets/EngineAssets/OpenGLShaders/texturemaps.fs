@@ -244,9 +244,11 @@ void main( )
 
     // calculate directional lights
     vec3 directional_lights_value = vec3( 0 , 0 , 0 );
+    float dli = max(0.0,min(1.0,(vWorldPos.y-(-200.0))/(0.0-(-200.0))));
+    dli = pow(dli,10);
     for ( int i = 0; i < 1; ++i )
     {
-        directional_lights_value += DirectLight( i , shadow , diffuse_color , specular_color );
+        directional_lights_value += DirectLight( i , shadow , diffuse_color , specular_color ) * dli;
     }
 
     output_color = vec4( ( point_lights_value + directional_lights_value ) , 1.0 );
@@ -266,7 +268,7 @@ void main( )
     {
         float fogCoordinate = abs( vEyeSpacePosition.z / vEyeSpacePosition.w );
         // output_color = mix( output_color , vec4( uFogParams.color , 1.0 ) , getFogFactor( uFogParams , fogCoordinate ) );
-        output_color = mix( output_color , vec4( uFogParams.color , 1.0 ) , getFogFactor( uFogParams , fogCoordinate ) );
+        output_color = mix( output_color , vec4( uFogParams.color , 1.0 ) * dli , getFogFactor( uFogParams , fogCoordinate ) );
     }
 
     // bind caustic 
@@ -275,9 +277,10 @@ void main( )
     // 8.0 frequecy || 12.0 amplitude || 0.8 speed
     c_x += sin( c_z * 8.0 + uDT * 0.8 ) / 12.0;
     c_x = sin( c_x + uDT * 0.01 );
-    vec3 caustic_color = vec3( texture( uCausticMap , vec2( c_x , c_z ) ).rgb ) * (0.1 + max(0,dot(normalize(vNormal),vec3(0,1,0))) * 0.9);
+    vec3 caustic_color = vec3( texture( uCausticMap , vec2( c_x , c_z ) ).rgb ) * (0.1 + max(0,dot(normalize(vNormal),vec3(0,1,0))) * 0.9) * dli;
 
     output_color += vec4( caustic_color , 1.0 );
+    output_color *= uTint;
 
     fFragColor = vec4(output_color.rgb,diffuse_color.a);
 }

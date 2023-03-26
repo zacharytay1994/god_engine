@@ -157,6 +157,7 @@ namespace god
 
 		void QueueInstancePrefab ( std::string const& name , float x = 0.0f , float y = 0.0f , float z = 0.0f , Entities::ID parent = Entities::Null , bool grid = false );
 		EnttXSol::Entities::ID InstancePrefab ( EngineResources& engineResources , std::string const& name , Entities::ID parent = Entities::Null );
+		EnttXSol::Entities::ID NonInstancePrefab ( EngineResources& engineResources , std::string const& name , Entities::ID parent = Entities::Null );
 
 		template<typename...COMPONENTS>
 		auto GetView ();

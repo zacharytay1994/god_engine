@@ -42,6 +42,13 @@ namespace god
 				//	audio_source.m_stop = false;
 				//}
 
+				// Set Audio Source attributes
+				AudioAPI::SetLoop(audio_source.m_channel, audio_source.m_loop);
+				AudioAPI::SetMute(audio_source.m_channel, audio_source.m_mute);
+				AudioAPI::SetVolume(audio_source.m_channel, audio_source.m_volume);
+				AudioAPI::SetPitch(audio_source.m_channel, audio_source.m_pitch);
+
+
 				if (audio_source.update_playtime)
 				{
 					AudioAPI::SetCurrentPlayTime(audio_source.m_channel, audio_source.m_new_playtime);

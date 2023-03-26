@@ -40,6 +40,46 @@ namespace god
 					level.m_grid.m_to_restart = true;
 				}
 			}
+
+			EnttXSol::Entities::ID next_level_button_id = entt.GetEntity ( "AchievementNextLevel" );
+			if ( next_level_button_id != EnttXSol::Entities::Null )
+			{
+				GUIObject* next_level_button = entt.GetEngineComponent<GUIObject> ( next_level_button_id );
+				if ( next_level_button && next_level_button->m_released )
+				{
+					level.m_grid.m_won = true;
+					// delete 3 star achievement
+					if ( !level.m_grid.m_achievement.empty () )
+					{
+						EnttXSol::Entities::ID achievement_id = entt.GetEntity ( level.m_grid.m_achievement );
+						if ( achievement_id != EnttXSol::Entities::Null )
+						{
+							entt.QueueDelete ( achievement_id );
+						}
+						level.m_grid.m_achievement = "";
+					}
+				}
+			}
+
+			EnttXSol::Entities::ID try_again_button_id = entt.GetEntity ( "AchievementTryAgain" );
+			if ( try_again_button_id != EnttXSol::Entities::Null )
+			{
+				GUIObject* try_again_button = entt.GetEngineComponent<GUIObject> ( try_again_button_id );
+				if ( try_again_button && try_again_button->m_released )
+				{
+					level.m_grid.m_to_restart = true;
+					// delete 3 star achievement
+					if ( !level.m_grid.m_achievement.empty () )
+					{
+						EnttXSol::Entities::ID achievement_id = entt.GetEntity ( level.m_grid.m_achievement );
+						if ( achievement_id != EnttXSol::Entities::Null )
+						{
+							entt.QueueDelete ( achievement_id );
+						}
+						level.m_grid.m_achievement = "";
+					}
+				}
+			}
 		}
 	}
 

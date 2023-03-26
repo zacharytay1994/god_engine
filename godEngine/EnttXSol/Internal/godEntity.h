@@ -30,6 +30,8 @@ namespace god
 		bool m_parent_changed { true };
 		glm::mat4 m_parent_transform { 1.0f };
 
+		bool m_master { false };
+
 		Entity_ () = default;
 		Entity_ ( entt::registry& registry , std::string const& name , ContainerID parent , Type type = Type::Default );
 

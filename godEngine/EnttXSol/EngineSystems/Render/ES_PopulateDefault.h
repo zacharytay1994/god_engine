@@ -55,6 +55,7 @@ namespace god
 				renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive };
 			render_data.m_outlined = renderable.m_outlined;
 			render_data.m_spritesheet_data = renderable.m_spritesheet_data;
+			render_data.m_tint = renderable.m_tint;
 			scene.AddInstancedObject ( render_data , transform.m_world_transform );
 		}
 

@@ -391,7 +391,7 @@ namespace god
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.isEnabled" , true );
 
 			// Set Tint
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uTint" , glm::vec4 ( 0.0f ) );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uTint" , data.first.m_tint );
 
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uEmissive" , data.first.m_emissive );
 
@@ -636,7 +636,7 @@ namespace god
 		{
 			auto& [first , second] = data;
 
-			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uSpritesheetData" , first.m_spritesheet_data );
+			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uSpritesheetData" , first.m_spritesheet_data );
 
 			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uMaterial.diffuse_map" , 0 );
 			OGLShader::SetUniform ( m_2D_shader.GetShaderID () , "uAlpha" , first.m_shininess );
@@ -785,7 +785,7 @@ namespace god
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.isEnabled" , true );
 
 			// Set Tint
-			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uTint" , glm::vec4 ( 0.0f ) );
+			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uTint" , glm::vec4 ( 1.0f ) );
 
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uEmissive" , data.first.m_emissive );
 
@@ -1083,7 +1083,7 @@ namespace god
 
 		// Set Tint
 		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uIsTint" , false );
-		//OGLShader::SetUniform( m_animation_shader.GetShaderID(), "uTint", glm::vec4( 0.8f, 0.8f, 0.8f, 1.0f ) );
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uTint" , glm::vec4 ( 1.0f ) );
 
 		for ( auto const& data : scene.m_animation_data )
 		{

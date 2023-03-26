@@ -68,7 +68,7 @@ function S_ScreenShake(e)
             cameraShakeComponent.duration = cameraShakeComponent.duration - GetDeltaTime()
 
             -- change the camera position
-            cameraObject.position.y = cameraObject.position.y + Sin(cameraShakeComponent.duration * cameraShakeComponent.amplitude)
+            cameraObject.position.y = cameraObject.position.y + Sin(cameraShakeComponent.duration * cameraShakeComponent.amplitude) * 1.5
         else
                         
             -- reset camera's position

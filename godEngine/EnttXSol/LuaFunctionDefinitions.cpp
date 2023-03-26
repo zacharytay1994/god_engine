@@ -115,7 +115,7 @@ namespace god
 				// potential area for optimization looking for entity of name
 				for ( uint32_t i = 0; i < entt.m_entities.Size (); ++i )
 				{
-					if ( entt.m_entities.Valid ( i ) && entt.m_entities[ i ].m_name == entityName )
+					if ( entt.m_entities.Valid ( i ) && entt.m_entities[ i ].m_name == entityName && !entt.m_entities[i].m_master )
 					{
 						return static_cast< int >( entt.m_entities[ i ].m_id );
 					}
@@ -501,6 +501,15 @@ namespace god
 			}
 		);
 
+		// GetCameraPosition(x,y,z)
+		// ==============================================================================================
+		entt.RegisterLuaFunction ( "GetCameraPosition" ,
+			[&engineResources]()->glm::vec3
+			{
+				return engineResources.Get<Camera> ().get ().m_position;
+			}
+		);
+
 		// SetCameraLookAt(x,y,z)
 		// ==============================================================================================
 		entt.RegisterLuaFunction ( "SetCameraLookAt" ,
@@ -861,6 +870,24 @@ namespace god
 					return opengl.m_animations[ skele_anim->m_animation ].m_animators[ skele_anim->m_animator_id ].m_CurrentTime;
 				}
 				return 0.0f;
+			}
+		);
+
+		// PlayBGM()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("PlayBGM",
+			[&entt, &engineResources]()
+			{
+				AudioAPI::PlayBGM();
+			}
+		);
+
+		// StopBGM()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("StopBGM",
+			[&entt, &engineResources]()
+			{
+				AudioAPI::StopBGM();
 			}
 		);
 	}
