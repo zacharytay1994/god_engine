@@ -1850,7 +1850,7 @@ namespace god
 							if ( gui_350 != static_cast< uint32_t >( -1 ) )
 							{
 								entt.NonInstancePrefab ( engineResources , "NoStarAchievement" , gui_350 );
-								entt.QueueInstancePrefab ( "SFX_WinAchievement" , 0.f , 0.f , 0.f );
+								entt.QueueInstancePrefab ( "SFX_Lose" , 0.f , 0.f , 0.f );
 							}
 						}
 						//m_to_restart = true;
@@ -1864,7 +1864,7 @@ namespace god
 							if ( gui_350 != static_cast< uint32_t >( -1 ) )
 							{
 								entt.NonInstancePrefab ( engineResources , "3StarAchivement", gui_350 );
-								entt.QueueInstancePrefab ( "SFX_WinAchievement" , 0.f , 0.f , 0.f );
+								entt.QueueInstancePrefab ( "SFX_Win3Stars" , 0.f , 0.f , 0.f );
 							}
 						}
 						//else
