@@ -34,7 +34,7 @@ function S_350TileDrop(e)
             bubble_transform.scale.z = rand_size
             bubble_transform.position.x = rand_x
             bubble_transform.position.z = rand_z
-            bubble_particle.Speed = rand_size * 20.0
+            bubble_particle.Speed = rand_size * 30.0
             bubble_particle.Lifetime = 6.0
         end
     end
