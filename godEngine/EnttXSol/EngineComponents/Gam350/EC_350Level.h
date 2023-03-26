@@ -1565,7 +1565,7 @@ namespace god
 								{
 									playable_anim->PlayAnimation ( "AOE" , false );
 									// will be moved to lua script 
-									entt.QueueInstancePrefab ( "SFX_CutScene1Attack" , 0.f , 0.f , 0.f );
+									entt.QueueInstancePrefab ( "SFX_SquidCutscene" , 0.f , 0.f , 0.f );
 									m_combat_start_animation = true;
 								}
 								if ( playable_anim->m_current_sub_animation == "AOE" && playable_anim->m_animation_played )
@@ -1575,7 +1575,7 @@ namespace god
 									{
 										enemy_anim->PlayAnimation ( "Death" , false );
 										// will be moved to lua script 
-										entt.QueueInstancePrefab ( "SFX_EnemyDeath" , 0.f , 0.f , 0.f );
+										//entt.QueueInstancePrefab ( "SFX_EnemyDeath" , 0.f , 0.f , 0.f );
 									}
 								}
 								if ( enemy_anim->m_current_sub_animation == "Death" && enemy_anim->m_animation_played )
