@@ -540,8 +540,8 @@ namespace god
 			Playable* m_combat_playable { nullptr };
 			Enemy* m_combat_enemy { nullptr };
 			glm::vec3 m_combat_area_offset { 10'000,10'000,10'000 };
-			float m_combat_trigger_distance { 0.7f };
-			float m_combat_prep_time { 1.0f };
+			float m_combat_trigger_distance { 4.f };
+			float m_combat_prep_time { 1.5f };
 			float m_combat_prep_time_counter { m_combat_prep_time };
 			glm::vec3 m_pre_combat_camera_position { 0.0f };
 			glm::vec3 m_pre_combat_camera_lookat { 0.0f };
@@ -1523,10 +1523,11 @@ namespace god
 									glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
 									camera.m_camera_move_speed = 3.0f;
 									camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
-									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
+									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , -1 , 0 ) ) ) * 5.0f , 1.0f ) );
 
 									// move enemy away from player, works no matter who is attacking
-									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;
+									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position ;
+									
 									dir.y = 0;
 									glm::vec3 dst = combat_playable_transform->m_position + glm::normalize ( dir ) * 1.0f;
 
@@ -1593,7 +1594,7 @@ namespace god
 									glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
 									camera.m_camera_move_speed = 3.0f;
 									camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
-									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
+									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , -1 , 0 ) ) ) * 5.0f , 1.0f ) );
 
 									// move player away from enemy
 									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;
