@@ -19,22 +19,32 @@ function S_TrailParticleSystem(e)
     --print("dt", dt)
     local trailEmitter = GetComponent(e, "C_TrailParticleSystem")
 
-    -- movement using I J K L
-    local emitterPosition = GetTransform(e).position
-    local movementMagnitude = 1.0
-    if (CheckKeyPress(73)) then
-        emitterPosition.x = emitterPosition.x - movementMagnitude
-    end
-    if (CheckKeyPress(74)) then
-        emitterPosition.z = emitterPosition.z + movementMagnitude
-    end
-    if (CheckKeyPress(75)) then
-        emitterPosition.x = emitterPosition.x + movementMagnitude
-    end
-    if (CheckKeyPress(76)) then
-        emitterPosition.z = emitterPosition.z - movementMagnitude
-    end
+    -- movement using I J K L ------------------------------------------------------------------
+    -- local emitterPosition = GetTransform(e).position
+    -- local movementMagnitude = 1.0
+    -- if (CheckKeyPress(73)) then
+    --     emitterPosition.x = emitterPosition.x - movementMagnitude
+    -- end
+    -- if (CheckKeyPress(74)) then
+    --     emitterPosition.z = emitterPosition.z + movementMagnitude
+    -- end
+    -- if (CheckKeyPress(75)) then
+    --     emitterPosition.x = emitterPosition.x + movementMagnitude
+    -- end
+    -- if (CheckKeyPress(76)) then
+    --     emitterPosition.z = emitterPosition.z - movementMagnitude
+    -- end
+    --------------------------------------------------------------------------------------------
 
+    -- for debugging door open vfx -------------------------------------------------------------
+    -- -- press I
+    -- if (CheckKeyPress(73)) then
+    --     print("instancing door open vfx")
+    --     InstancePrefabNow("VFXDoorOpen", emitterPos.x + 1, emitterPos.y + 1, emitterPos.z + 1)
+    -- end
+    --------------------------------------------------------------------------------------------
+    
+    
     -- if (trailEmitter.emissionTimer < trailEmitter.emissionRate) then
     --     trailEmitter.emissionTimer = trailEmitter.emissionTimer + dt
     --     return
