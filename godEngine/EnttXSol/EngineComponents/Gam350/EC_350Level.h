@@ -227,6 +227,8 @@ namespace god
 								{
 									m_destination = grid.m_map[ {x , y - 2 , z} ];
 									m_flags[ 1 ] = false;
+
+
 								}
 							}
 						}
@@ -387,6 +389,9 @@ namespace god
 									enemy->m_to_destroy = true;
 								}
 
+								entt.QueueInstancePrefab ( "SFX_PressurePlate" , 0.f , 0.f , 0.f );
+								entt.QueueInstancePrefab ( "SFX_Door" , 0.f , 0.f , 0.f );
+
 								grid.LerpEntityToCell ( entt , engineResources ,
 									*static_cast< Entity* >( this ) , { x , y - 1 , z } );
 								m_flags[ 0 ] = true;
@@ -533,6 +538,7 @@ namespace god
 			std::vector<Tile> m_tiles;
 			std::vector<Enemy> m_enemies;
 			std::vector<Playable> m_playables;
+			std::vector<std::tuple<uint32_t , uint32_t , Tile& , Tile&>> m_sparkle_trail_emitters;
 
 			bool m_combat_paused { false };
 			bool m_combat_attacking { true };
@@ -570,19 +576,19 @@ namespace god
 			//uint32_t m_achievement { static_cast< uint32_t >( -1 ) };
 
 			std::array<glm::vec3 , 13> m_colors = {
-				glm::vec3 ( 0,0,0 ),
-				glm::vec3 ( 1.0f, 0.0f, 0.0f ), // pure red
-				glm::vec3 ( 0.0f, 1.0f, 0.0f ), // pure green
-				glm::vec3 ( 0.0f, 0.0f, 1.0f ), // pure blue
-				glm::vec3 ( 1.0f, 1.0f, 0.0f ), // yellow
-				glm::vec3 ( 1.0f, 0.0f, 1.0f ), // magenta
-				glm::vec3 ( 0.0f, 1.0f, 1.0f ), // cyan
-				glm::vec3 ( 0.5f, 0.25f, 0.0f ), // orange
-				glm::vec3 ( 0.25f, 0.0f, 0.5f ), // violet
-				glm::vec3 ( 0.25f, 0.5f, 0.0f ), // lime green
-				glm::vec3 ( 0.0f, 0.25f, 0.5f ), // sky blue
-				glm::vec3 ( 0.5f, 0.0f, 0.0f ), // dark red
-				glm::vec3 ( 0.0f, 0.5f, 0.0f )  // dark green
+				glm::vec3 ( 1,1,1 ),
+				glm::vec3 ( 1.0f, 0.05f, 0.05f ), // pure red
+				glm::vec3 ( 0.05f, 1.0f, 0.05f ), // pure green
+				glm::vec3 ( 0.05f, 0.05f, 1.0f ), // pure blue
+				glm::vec3 ( 1.0f, 1.0f, 0.05f ), // yellow
+				glm::vec3 ( 1.0f, 0.05f, 1.0f ), // magenta
+				glm::vec3 ( 0.05f, 1.0f, 1.0f ), // cyan
+				glm::vec3 ( 0.5f, 0.25f, 0.05f ), // orange
+				glm::vec3 ( 0.25f, 0.05f, 0.5f ), // violet
+				glm::vec3 ( 0.25f, 0.5f, 0.05f ), // lime green
+				glm::vec3 ( 0.05f, 0.25f, 0.5f ), // sky blue
+				glm::vec3 ( 0.5f, 0.05f, 0.05f ), // dark red
+				glm::vec3 ( 0.05f, 0.5f, 0.05f )  // dark green
 			};
 			float m_sfx_stone_drop { 1.0 };
 			float m_cave_in_timer { 0.0f };
@@ -678,6 +684,18 @@ namespace god
 					if ( renderable )
 					{
 						renderable->m_tint = glm::vec4 ( m_colors[ tile.m_values[ 0 ] ] , 1.0f );
+
+						if ( tile.m_type == Tile::Type::PressurePlate )
+						{
+							if ( tile.m_flags[ 0 ] )
+							{
+								renderable->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( "pp_open_inactive" );
+							}
+							else
+							{
+								renderable->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( "pp_close_inactive" );
+							}
+						}
 					}
 				}
 
@@ -1386,12 +1404,37 @@ namespace god
 																// if walk onto pressure plate
 																if ( tile_above && tile_above->m_type == Tile::Type::PressurePlate )
 																{
+																	// create plate step vfx and trail
+																	entt.QueueInstancePrefab ( "VFX_PlateStep" , 0.f , 0.f , 0.f , tile_above->m_entity_id );
+																	auto sparkle = entt.InstancePrefab ( engineResources , "SparkleTrailEmitter" , level.m_id );
+																	Transform* sparkle_transform = entt.GetEngineComponent<Transform> ( sparkle );
+																	Transform* plate_transform = entt.GetEngineComponent<Transform> ( tile_above->m_entity_id );
+																	if ( sparkle_transform && plate_transform )
+																	{
+																		sparkle_transform->m_position = plate_transform->m_position;
+																	}
+
+																	entt.QueueInstancePrefab ( "SFX_PressurePlate" , 0.f , 0.f , 0.f );
 																	// find corresponding door
 																	for ( auto& find_door : m_tiles )
 																	{
 																		if ( find_door.m_type == Tile::Type::Portal && find_door.m_values[ 0 ] == tile_above->m_values[ 0 ] )
 																		{
-																			find_door.m_flags[ 0 ] = tile_above->m_flags[ 0 ];
+																			//find_door.m_flags[ 0 ] = tile_above->m_flags[ 0 ];
+																			m_sparkle_trail_emitters.push_back ( { sparkle, find_door.m_entity_id, *tile_above, find_door } );
+																		}
+																	}
+
+																	Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ tile_above->m_entity_id ].m_children[ 0 ] );
+																	if ( renderable )
+																	{
+																		if ( tile_above->m_flags[ 0 ] )
+																		{
+																			renderable->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( "pp_open_active" );
+																		}
+																		else
+																		{
+																			renderable->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( "pp_close_active" );
 																		}
 																	}
 																}
@@ -1526,8 +1569,8 @@ namespace god
 									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , -1 , 0 ) ) ) * 5.0f , 1.0f ) );
 
 									// move enemy away from player, works no matter who is attacking
-									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position ;
-									
+									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;
+
 									dir.y = 0;
 									glm::vec3 dst = combat_playable_transform->m_position + glm::normalize ( dir ) * 1.0f;
 
@@ -1561,7 +1604,7 @@ namespace god
 								{
 									playable_anim->PlayAnimation ( "AOE" , false );
 									// will be moved to lua script 
-									entt.QueueInstancePrefab ( "SFX_CutScene1Attack" , 0.f , 0.f , 0.f );
+									entt.QueueInstancePrefab ( "SFX_SquidCutscene" , 0.f , 0.f , 0.f );
 									m_combat_start_animation = true;
 								}
 								if ( playable_anim->m_current_sub_animation == "AOE" && playable_anim->m_animation_played )
@@ -1571,7 +1614,7 @@ namespace god
 									{
 										enemy_anim->PlayAnimation ( "Death" , false );
 										// will be moved to lua script 
-										entt.QueueInstancePrefab ( "SFX_EnemyDeath" , 0.f , 0.f , 0.f );
+										//entt.QueueInstancePrefab ( "SFX_EnemyDeath" , 0.f , 0.f , 0.f );
 									}
 								}
 								if ( enemy_anim->m_current_sub_animation == "Death" && enemy_anim->m_animation_played )
@@ -1724,6 +1767,50 @@ namespace god
 						}
 					}
 
+					// update sparkle trail
+					/*for ( auto& sparkletrail : m_sparkle_trail_emitters )
+					{
+						auto [src , dst] = sparkletrail;
+						Transform* src_transform = entt.GetEngineComponent<Transform> ( src );
+						Transform* dst_transform = entt.GetEngineComponent<Transform> ( dst );
+						if ( src_transform && dst_transform )
+						{
+							if ( glm::length2 ( dst_transform->m_position - src_transform->m_position ) > 0.05 )
+							{
+								src_transform->m_position.x = std::lerp ( src_transform->m_position.x , dst_transform->m_position.x , dt );
+								src_transform->m_position.y = std::lerp ( src_transform->m_position.y , dst_transform->m_position.y , dt );
+								src_transform->m_position.z = std::lerp ( src_transform->m_position.z , dst_transform->m_position.z , dt );
+							}
+							else
+							{
+								entt.QueueDelete ( src );
+							}
+						}
+					}*/
+					for ( auto it = m_sparkle_trail_emitters.begin (); it != m_sparkle_trail_emitters.end (); )
+					{
+						auto& [src , dst , plate , door] = *it;
+						Transform* src_transform = entt.GetEngineComponent<Transform> ( src );
+						Transform* dst_transform = entt.GetEngineComponent<Transform> ( dst );
+						if ( src_transform && dst_transform )
+						{
+							if ( glm::length2 ( dst_transform->m_position - src_transform->m_position ) > 0.1 )
+							{
+								src_transform->m_position.x = std::lerp ( src_transform->m_position.x , dst_transform->m_position.x , dt );
+								src_transform->m_position.y = std::lerp ( src_transform->m_position.y , dst_transform->m_position.y , dt );
+								src_transform->m_position.z = std::lerp ( src_transform->m_position.z , dst_transform->m_position.z , dt );
+							}
+							else
+							{
+								entt.QueueDelete ( src );
+								it = m_sparkle_trail_emitters.erase ( it );
+								door.m_flags[ 0 ] = plate.m_flags[ 0 ];
+								continue;
+							}
+						}
+						++it;
+					}
+
 					// set emissiveness of doors based on open/close
 					std::unordered_map<int , bool> portal_ids;
 					for ( auto& tile : m_tiles )
@@ -1734,7 +1821,69 @@ namespace god
 							auto [px , py , pz] = tile.m_cell;
 							if ( HasEnemy ( px , py , pz ) )
 							{
+								if ( portal_ids[ tile.m_values[ 0 ] ] != tile.m_flags[ 0 ] )
+								{
+									Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ tile.m_entity_id ].m_children[ 0 ] );
+									if ( renderable )
+									{
+										if ( tile.m_flags[ 0 ] )
+										{
+											renderable->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( "pp_open_active" );
+										}
+										else
+										{
+											renderable->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( "pp_close_active" );
+										}
+									}
+								}
+								//m_sparkle_trail_emitters.push_back ( { sparkle, find_door.m_entity_id, tile, portal_ids[ tile.m_values[ 0 ] ] } );
 								portal_ids[ tile.m_values[ 0 ] ] = tile.m_flags[ 0 ];
+								//for ( auto& find_door : m_tiles )
+								//{
+								//	if ( find_door.m_type == Tile::Type::Portal && find_door.m_values[ 0 ] == tile.m_values[ 0 ] )
+								//	{
+								//		if ( find_door.m_flags[ 0 ] != tile.m_flags[ 0 ] )
+								//		{
+								//			entt.QueueInstancePrefab ( "VFX_PlateStep" , 0.f , 0.f , 0.f , tile.m_entity_id );
+								//			auto sparkle = entt.InstancePrefab ( engineResources , "SparkleTrailEmitter" , level.m_id );
+								//			Transform* sparkle_transform = entt.GetEngineComponent<Transform> ( sparkle );
+								//			Transform* plate_transform = entt.GetEngineComponent<Transform> ( tile.m_entity_id );
+								//			if ( sparkle_transform && plate_transform )
+								//			{
+								//				sparkle_transform->m_position = plate_transform->m_position;
+								//			}
+
+								//			//find_door.m_flags[ 0 ] = tile_above->m_flags[ 0 ];
+								//			m_sparkle_trail_emitters.push_back ( { sparkle, find_door.m_entity_id, tile, find_door } );
+								//		}
+								//	}
+								//}
+								//entt.QueueInstancePrefab ( "VFX_PlateStep" , 0.f , 0.f , 0.f , tile.m_entity_id );
+								//auto sparkle = entt.InstancePrefab ( engineResources , "SparkleTrailEmitter" , level.m_id );
+								//Transform* sparkle_transform = entt.GetEngineComponent<Transform> ( sparkle );
+								//Transform* plate_transform = entt.GetEngineComponent<Transform> ( tile.m_entity_id );
+								//if ( sparkle_transform && plate_transform )
+								//{
+								//	sparkle_transform->m_position = plate_transform->m_position;
+								//}
+
+								////find_door.m_flags[ 0 ] = tile_above->m_flags[ 0 ];
+								//m_sparkle_trail_emitters.push_back ( { sparkle, find_door.m_entity_id, tile, find_door } );
+							}
+							else if ( !HasTriton ( px , py , pz ) )
+							{
+								Renderable3D* renderable = entt.GetEngineComponent<Renderable3D> ( entt.m_entities[ tile.m_entity_id ].m_children[ 0 ] );
+								if ( renderable )
+								{
+									if ( tile.m_flags[ 0 ] )
+									{
+										renderable->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( "pp_open_inactive" );
+									}
+									else
+									{
+										renderable->m_diffuse_id = engineResources.Get<OGLTextureManager> ().get ().GetID ( "pp_close_inactive" );
+									}
+								}
 							}
 						}
 					}
@@ -1751,10 +1900,38 @@ namespace god
 							{
 								if ( tile.m_flags[ 0 ] )
 								{
+									if ( renderable->m_emissive != 50.0f )
+									{
+										auto door_vfx = entt.InstancePrefab ( engineResources , "VFX_DoorOpen" , entt.m_entities[ tile.m_entity_id ].m_children[ 1 ] );
+										Transform* door_vfx_transform = entt.GetEngineComponent<Transform> ( door_vfx );
+										/*Transform* door_transform = entt.GetEngineComponent<Transform> ( tile.m_entity_id );
+										if ( door_transform && door_vfx_transform )
+										{
+											door_vfx_transform->m_position = door_transform->m_position + glm::vec3 ( 0 , 1 , 0 );
+										}*/
+										if ( door_vfx_transform )
+										{
+											door_vfx_transform->m_position.y += 1.0f;
+										}
+									}
 									renderable->m_emissive = 50.0f;
 								}
 								else
 								{
+									if ( renderable->m_emissive != 1.0f )
+									{
+										auto door_vfx = entt.InstancePrefab ( engineResources , "VFX_DoorClose" , entt.m_entities[ tile.m_entity_id ].m_children[ 1 ] );
+										Transform* door_vfx_transform = entt.GetEngineComponent<Transform> ( door_vfx );
+										if ( door_vfx_transform )
+										{
+											door_vfx_transform->m_position.y += 1.0f;
+										}
+										/*Transform* door_transform = entt.GetEngineComponent<Transform> ( tile.m_entity_id );
+										if ( door_transform && door_vfx_transform )
+										{
+											door_vfx_transform->m_position = door_transform->m_position + glm::vec3 ( 0 , 1 , 0 );
+										}*/
+									}
 									renderable->m_emissive = 1.0f;
 								}
 							}
@@ -1850,21 +2027,21 @@ namespace god
 							if ( gui_350 != static_cast< uint32_t >( -1 ) )
 							{
 								entt.NonInstancePrefab ( engineResources , "NoStarAchievement" , gui_350 );
-								entt.QueueInstancePrefab ( "SFX_WinAchievement" , 0.f , 0.f , 0.f );
+								entt.QueueInstancePrefab ( "SFX_Lose" , 0.f , 0.f , 0.f );
 							}
 						}
 						//m_to_restart = true;
 					}
 					if ( m_enemies.empty () && m_initialized )
 					{
-						if ( m_achievement.empty() )
+						if ( m_achievement.empty () )
 						{
 							m_achievement = "3StarAchivement";
 							uint32_t gui_350 = entt.GetEntity ( "350GUI" );
 							if ( gui_350 != static_cast< uint32_t >( -1 ) )
 							{
-								entt.NonInstancePrefab ( engineResources , "3StarAchivement", gui_350 );
-								entt.QueueInstancePrefab ( "SFX_WinAchievement" , 0.f , 0.f , 0.f );
+								entt.NonInstancePrefab ( engineResources , "3StarAchivement" , gui_350 );
+								entt.QueueInstancePrefab ( "SFX_Win3Stars" , 0.f , 0.f , 0.f );
 							}
 						}
 						//else
