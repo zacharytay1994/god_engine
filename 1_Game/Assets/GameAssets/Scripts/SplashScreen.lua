@@ -149,7 +149,7 @@ function GenerateSeahorse(vel_x, vel_y, vel_z, pos_x, pos_y, pos_z, index)
         if vel_x < 0 then
             seahorse_transform.rotation.y = -80
         end
-        local rng_scale = GenerateRandomNumberInRange(5, 10) / 10.0
+        local rng_scale = GenerateRandomNumberInRange(5, 10) / 1000.0
         seahorse_transform.scale.x = rng_scale
         seahorse_transform.scale.y = rng_scale
         seahorse_transform.scale.z = rng_scale
