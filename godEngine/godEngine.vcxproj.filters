@@ -44,12 +44,12 @@
     <ClCompile Include="OpenGL\Animation\Animator.cpp" />
     <ClCompile Include="OpenGL\Animation\Animation.cpp" />
     <ClCompile Include="OpenGL\Animation\Bone.cpp" />
-    <ClCompile Include="Physics\SnippetUtils.cpp" />
     <ClCompile Include="OpenGL\Font\Font.cpp" />
     <ClCompile Include="OpenGL\Font\FontRenderer.cpp" />
     <ClCompile Include="Physics\PhysicsInterface.cpp" />
     <ClCompile Include="Physics\Callbacks.cpp" />
     <ClCompile Include="Physics\DiceCallBack.cpp" />
+    <ClCompile Include="Physics\PhysicsController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio\AudioAPI.h" />
@@ -142,7 +142,6 @@
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineSystems\GUI\ES_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_Raycast.h" />
-    <ClInclude Include="Physics\SnippetUtils.h" />
     <ClInclude Include="OpenGL\Font\Font.h" />
     <ClInclude Include="OpenGL\Font\FontRenderer.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIText.h" />
@@ -157,6 +156,19 @@
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateTransparent.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateDefault.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateOnlyTransform.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_PhysicsController.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_PhysicsController.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Input\ES_PlayerController.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Input\EC_PlayerController.h" />
+    <ClInclude Include="Physics\PhysicsController.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Render\EC_Animation3D.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateAnimations.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Gam350\EC_350Level.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Gam350\ES_350Level.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_Renderable3D.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Gam350\EC_350LevelManager.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Gam350\ES_350LevelManager.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\GUI\ES_GUISpriteSheet.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

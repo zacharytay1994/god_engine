@@ -7,12 +7,12 @@
 
 namespace god
 {
-	void PopulateTransparent ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , Renderable3D& , Transparent& , ActiveComponent&> components )
+	void PopulateTransparent ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , Renderable3D& , Transparent&> components )
 	{
 		( entt );
 		( components );
 
-		auto& [entity_data , transform , renderable , transparent , active] = components;
+		auto& [entity_data , transform , renderable , transparent] = components;
 
 		// return if not valid
 		if ( !entt.m_entities.Valid ( entity_data.m_id ) )
@@ -51,8 +51,20 @@ namespace god
 		// add to scene
 		if ( renderable.m_model_id != -1 && renderable.m_visible )
 		{
-			scene.AddBillboard ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-					renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive } , transform.m_world_transform );
+			if ( transparent.m_lighting )
+			{
+				Scene::InstancedRenderData render_data { static_cast< uint32_t >( renderable.m_model_id ) ,
+						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive };
+				render_data.m_spritesheet_data = renderable.m_spritesheet_data;
+				scene.AddBillboard ( render_data , transform.m_world_transform );
+			}
+			else
+			{
+				Scene::InstancedRenderData render_data { static_cast< uint32_t >( renderable.m_model_id ) ,
+						renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive , renderable.m_tint };
+				render_data.m_spritesheet_data = renderable.m_spritesheet_data;
+				scene.AddBillboardNoLighting ( render_data , transform.m_world_transform );
+			}
 		}
 
 		// set children variables

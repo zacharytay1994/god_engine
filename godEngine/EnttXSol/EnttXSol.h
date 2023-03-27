@@ -157,9 +157,13 @@ namespace god
 
 		void QueueInstancePrefab ( std::string const& name , float x = 0.0f , float y = 0.0f , float z = 0.0f , Entities::ID parent = Entities::Null , bool grid = false );
 		EnttXSol::Entities::ID InstancePrefab ( EngineResources& engineResources , std::string const& name , Entities::ID parent = Entities::Null );
+		EnttXSol::Entities::ID NonInstancePrefab ( EngineResources& engineResources , std::string const& name , Entities::ID parent = Entities::Null );
 
 		template<typename...COMPONENTS>
 		auto GetView ();
+
+		template<typename...COMPONENTS, typename...EXCLUDE>
+		auto GetView ( std::tuple< COMPONENTS...> const& include , std::tuple<EXCLUDE...> const& exclude );
 
 		friend void RegisterLuaCPP ( EnttXSol& entt , EngineResources& engineResources , MainVariables& name );
 
@@ -374,12 +378,19 @@ namespace god
 	template<typename ...T , typename ...E>
 	inline void EnttXSol::RunEngineSystem ( EngineResources& engineResources , void( *system )( EnttXSol& , EngineResources& , std::tuple<T...> ) , std::tuple<E...> const& exclude )
 	{
-		auto view = m_registry.view<std::remove_reference<T>::type...> ( entt::exclude<E...> );
+		( exclude );
+		/*entt::runtime_view view {};
+		view.iterate ( m_registry.storage<ActiveComponent> () )
+			.iterate ( m_registry.storage<std::remove_reference<T>::type...> () )
+			.exclude ( m_registry.storage<E...> () );*/
+		auto view = m_registry.view<std::remove_reference<T>::type..., ActiveComponent> ( entt::exclude<E...> );
+		//auto view = GetView ( std::make_tuple<T...> () , exclude );
+		//auto view = GetView<T...> ();
 		//view.each ( system );
 
 		for ( auto entity : view )
 		{
-			system ( *this , engineResources , view.get ( entity ) );
+			system ( *this , engineResources , view.get<std::remove_reference<T>::type...> ( entity ) );
 		}
 	}
 
@@ -513,6 +524,8 @@ namespace god
 	template<typename S , typename T , typename R , typename F>
 	inline void EnttXSol::PopulateScene ( S& scene , F& fonts , glm::vec3 const& cameraPosition )
 	{
+		( fonts );
+		( cameraPosition );
 		// add objects to scene
 		/*scene.ClearInstancedScene ();
 		for ( uint32_t i = 0; i < m_entities.Size (); ++i )
@@ -776,6 +789,40 @@ namespace god
 				RecursivePopulateScene<S , T , R> ( scene , fonts , child , world_changed , transform.m_world_transform , cameraPosition );
 			}
 		}
+		else if ( m_registry.all_of<T , SkeleAnim3D> ( m_entities[ e ].m_id ) )
+		{
+			auto [transform , skele_anim] = m_registry.get<T , R> ( m_entities[ e ].m_id );
+
+			bool world_changed { false };
+			if ( changed )
+			{
+				transform.m_parent_transform = parentTransform;
+				world_changed = true;
+			}
+			if ( transform.m_changed )
+			{
+				glm::mat4 model_transform = BuildModelMatrixRotDegrees ( transform.m_position , transform.m_rotation , transform.m_scale );
+				transform.m_local_transform = model_transform;
+				world_changed = true;
+			}
+			if ( world_changed )
+			{
+				transform.m_world_transform = transform.m_parent_transform * transform.m_local_transform;
+			}
+
+			// add to scene
+			if ( skele_anim.m_animation_id != static_cast< uint32_t >( -1 ) )
+			{
+				scene.AddAnimation ( { skele_anim.m_animation_id ,
+						skele_anim.m_diffuse_id , skele_anim.m_specular_id , skele_anim.m_shininess , skele_anim.m_emissive } , transform.m_world_transform );
+			}
+
+			// populate scene with children
+			for ( auto const& child : m_entities[ e ].m_children )
+			{
+				RecursivePopulateScene<S , T , R> ( scene , fonts , child , world_changed , transform.m_world_transform , cameraPosition );
+			}
+		}
 		// if only transform component
 		else if ( m_registry.all_of<T> ( m_entities[ e ].m_id ) )
 		{
@@ -819,6 +866,12 @@ namespace god
 	inline auto EnttXSol::GetView ()
 	{
 		return m_registry.view<ActiveComponent , COMPONENTS...> ();
+	}
+
+	template<typename ...COMPONENTS , typename ...EXCLUDE>
+	inline auto EnttXSol::GetView ( std::tuple<COMPONENTS...> const& include , std::tuple<EXCLUDE...> const& exclude )
+	{
+		return m_registry.view<ActiveComponent , COMPONENTS...> ( entt::exclude<EXCLUDE...> );
 	}
 
 	template<typename T>

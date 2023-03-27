@@ -19,6 +19,7 @@ namespace god
 
 		bool operator==( GridManipulate const& rhs )
 		{
+			( rhs );
 			return true;
 		}
 	};

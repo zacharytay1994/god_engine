@@ -17,8 +17,10 @@ namespace god
 		FMOD::Sound* m_sound_sample{ nullptr };
 		std::string m_name;
 		std::string m_file_name;
+		double m_length;	// in seconds
 
 		bool m_played{ false }; // moved to audio source
+		bool m_fade{ false };
 
 		FMOD::Channel* m_channel{ nullptr }; // moved to audio source
 	};
@@ -51,6 +53,7 @@ namespace god
 		static void UnloadSound(Sound& sound);
 
 		static void SetLoop(Sound& sound, bool loop);
+		static void SetLoop(FMOD::Channel* channel, bool loop);
 		static void SetMute(FMOD::Channel* channel, bool mute);
 		static void SetVolume(FMOD::Channel* channel, float volume);
 		static void SetPitch(FMOD::Channel* channel, float pitch);
@@ -68,7 +71,7 @@ namespace god
 
 		static FMOD_RESULT CheckSoundPlayback(FMOD::Channel* channel, bool* isPlaying);
 
-		static unsigned int GetCurrentPlayTime(FMOD::Channel* channel);
+		static void GetCurrentPlayTime(FMOD::Channel* channel, unsigned int* timeStamp);
 		static void SetCurrentPlayTime(FMOD::Channel* channel, unsigned int timeStamp);
 
 		static void PlaySoundFromTime(FMOD::Channel* channel, float startPoint);
@@ -79,6 +82,11 @@ namespace god
 		static void ResumeAll();
 		static void StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets);
 
+		static void PlayBGM();
+		static void PauseBGM();
+		static void ResumeBGM();
+		static void StopBGM();
+
 	public:
 		static void ToggleDSPEffects(bool toggle);
 		static void AddEcho(FMOD::Channel* channel);
@@ -86,7 +94,7 @@ namespace god
 		static void AddFadeOut(FMOD::Channel* channel, float fadeOutTime, bool& fade);
 
 		static void RemoveFadeIn(FMOD::Channel* channel, float fadeInTime);
-		static void RemoveFadeOut(FMOD::Channel* channel, float fadeOutPoint);
+		static void RemoveFadeOut(FMOD::Channel* channel, float fadeOutTime);
 
 		static void GetFadePoints(FMOD::Channel* channel, unsigned int* points);
 		static int GetSampleRate();
@@ -119,5 +127,6 @@ namespace god
 		static std::unordered_map<int, FMOD::DSP*> m_dsp_effects;
 		static std::unordered_map<int, const char*> m_dsp_effects_names;
 
+		static Sound BGM;
 	};
 }

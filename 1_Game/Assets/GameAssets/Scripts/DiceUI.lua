@@ -76,6 +76,9 @@ function S_DiceUI(e)
 					GetComponent(GetEntity("Level1GUI"), "C_UIManager").actionButtonList = {}
 					
 					GetComponent(GetEntity("Player"), "C_Character").currentStamina = GetComponent(GetEntity("Player"), "C_Character").currentStamina - 2
+					
+					-- trigger sound effect
+					InstancePrefab("SFX_Reroll",0,0,0)
 				end
 				
 			elseif c_dicemanager.button_name == "Ready" then
@@ -88,6 +91,9 @@ function S_DiceUI(e)
 				for i = 1, #diceList do
 					DiceScript_DisableDice(diceList[i], GetComponent(diceList[i], "C_DiceScript"))
 				end
+				
+				-- trigger sound effect
+				InstancePrefab("SFX_EndTurn",0,0,0)
 			end
 		end
 	end

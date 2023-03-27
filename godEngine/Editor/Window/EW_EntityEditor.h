@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <string>
+#include <cctype>
 
 namespace god
 {
@@ -241,6 +242,17 @@ namespace god
 		{
 			LoadScripts ();
 		}
+		this->ToolTipOnHover ( "Refresh script names from folder." );
+		if ( ImGui::Button ( "Reload All" , ImVec2 ( ImGui::GetWindowWidth () , 0 ) ) )
+		{
+			for ( auto const& script : m_scripts )
+			{
+				m_enttxsol.ReloadScript ( script );
+			}
+			scene_tree->ResetScene ( editorResources );
+		}
+		this->ToolTipOnHover ( "Reload all scripts." );
+
 		ImGui::SetNextItemWidth ( ImGui::GetWindowWidth () );
 
 		if ( ImGui::BeginPopup ( "DeleteScript" ) )
@@ -250,6 +262,7 @@ namespace god
 			{
 				m_enttxsol.DeleteScript ( m_script_to_delete_temp );
 				scene_tree->ResetScene ( editorResources );
+				LoadScripts ();
 				ImGui::CloseCurrentPopup ();
 			}
 			ImGui::EndPopup ();
@@ -261,14 +274,25 @@ namespace god
 			ImGui::OpenPopup ( "DeleteScript" );
 		}
 
-		if ( ImGui::BeginListBox ( "##scripts" , ImVec2 ( ImGui::GetWindowWidth () , 0 ) ) )
+		if ( ImGui::BeginListBox ( "##scripts" , ImVec2 ( ImGui::GetWindowWidth () , ImGui::GetWindowHeight () * 0.66f ) ) )
 		{
 			int i { 0 };
+			char first_alphabet { 'z' };
 			for ( auto const& script : m_scripts )
 			{
 				auto last_dash = script.find_last_of ( '/' );
 				auto last_dot = script.find_last_of ( '.' );
 				std::string name = script.substr ( last_dash + 1 , last_dot - ( last_dash + 1 ) );
+
+				if ( std::toupper ( name[ 0 ] ) != first_alphabet )
+				{
+					first_alphabet = std::toupper ( name[ 0 ] );
+					ImGui::Separator ();
+					ImGui::SameLine ( ImGui::GetWindowWidth () - 50.0f );
+					ImGui::Text ( "[%c]" , first_alphabet );
+					ImGui::Separator ();
+				}
+
 				if ( ImGui::Selectable ( name.c_str () , m_selected_script_id == i ) )
 				{
 					m_selected_script_id = i;
@@ -303,6 +327,7 @@ namespace god
 				m_enttxsol.NewScriptTemplate ( m_new_script_name );
 				m_enttxsol.LoadScript ( std::string ( "Assets/GameAssets/Scripts/" ) + m_new_script_name + ".lua" );
 				m_new_script_name = { "new_script" };
+				LoadScripts ();
 				ImGui::CloseCurrentPopup ();
 			}
 			ImGui::EndPopup ();

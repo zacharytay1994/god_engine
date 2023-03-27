@@ -69,7 +69,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;fmod_vc.lib;PhysXTask_static_64.lib;SceneQuery_static_64.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;PhysXFoundation_64.lib;LowLevelDynamics_static_64.lib;SimulationController_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysX_64.lib;PhysXExtensions_static_64.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;fmod_vc.lib;assimp-vc142-mtd.lib;SnippetUtils_static_64.lib;SnippetRender_static_64.lib;SimulationController_static_64.lib;SceneQuery_static_64.lib;PVDRuntime_64.lib;PhysXVehicle2_static_64.lib;PhysXVehicle_static_64.lib;PhysXTask_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXFoundation_64.lib;PhysXExtensions_static_64.lib;PhysXCooking_64.lib;PhysXCommon_64.lib;PhysXCharacterKinematic_static_64.lib;PhysX_64.lib;LowLevelDynamics_static_64.lib;LowLevelAABB_static_64.lib;LowLevel_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\0_InternalDependencies\lua;$(SolutionDir)\0_InternalDependencies\fmod;$(SolutionDir)0_InternalDependencies\PhysX\lib\physxdebug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -93,7 +93,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;fmod_vc.lib;PhysXTask_static_64.lib;SceneQuery_static_64.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;PhysXFoundation_64.lib;LowLevelDynamics_static_64.lib;SimulationController_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXVehicle_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysX_64.lib;PhysXExtensions_static_64.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>godCamera.lib;godUtility.lib;lua.lib;fmod_vc.lib;assimp-vc142-mt.lib;SnippetUtils_static_64.lib;SnippetRender_static_64.lib;SimulationController_static_64.lib;SceneQuery_static_64.lib;PVDRuntime_64.lib;PhysXVehicle2_static_64.lib;PhysXVehicle_static_64.lib;PhysXTask_static_64.lib;PhysXPvdSDK_static_64.lib;PhysXFoundation_64.lib;PhysXExtensions_static_64.lib;PhysXCooking_64.lib;PhysXCommon_64.lib;PhysXCharacterKinematic_static_64.lib;PhysX_64.lib;LowLevelDynamics_static_64.lib;LowLevelAABB_static_64.lib;LowLevel_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\0_InternalDependencies\lua;$(SolutionDir)\0_InternalDependencies\fmod;$(SolutionDir)0_InternalDependencies\PhysX\lib\physxrelease;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -128,11 +128,16 @@
     <ClInclude Include="EnttXSol\EngineComponents\EC_All.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Example.h" />
     <ClInclude Include="EnttXSol\EngineComponents\EC_Transform.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Gam350\EC_350Level.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Gam350\EC_350LevelManager.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Grid\EC_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIObject.h" />
     <ClInclude Include="EnttXSol\EngineComponents\GUI\EC_GUIText.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Input\EC_PlayerController.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Dynamic.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_PhysicsController.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Physics\EC_Static.h" />
+    <ClInclude Include="EnttXSol\EngineComponents\Render\EC_Animation3D.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_Transparent.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_DirectionalLight.h" />
     <ClInclude Include="EnttXSol\EngineComponents\Render\EC_PointLight.h" />
@@ -140,11 +145,18 @@
     <ClInclude Include="EnttXSol\EngineSystems\ES_AudioListener.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Example.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_Grid.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Gam350\ES_350Level.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Gam350\ES_350LevelManager.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\GUI\ES_GUISpriteSheet.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Input\ES_PlayerController.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Physics\ES_PhysicsController.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_FaceCamera.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateAnimations.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateDefault.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateGUI.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateOnlyTransform.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_PopulateTransparent.h" />
+    <ClInclude Include="EnttXSol\EngineSystems\Render\ES_Renderable3D.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Render\ES_Transform.h" />
     <ClInclude Include="EnttXSol\EngineSystems\Grid\ES_GridManipulate.h" />
     <ClInclude Include="EnttXSol\EngineSystems\ES_AudioSource.h" />
@@ -192,9 +204,9 @@
     <ClInclude Include="Physics\Callbacks.h" />
     <ClInclude Include="Physics\DiceCallBack.h" />
     <ClInclude Include="Physics\godPhysics.h" />
+    <ClInclude Include="Physics\PhysicsController.h" />
     <ClInclude Include="Physics\PhysicsInterface.h" />
     <ClInclude Include="Physics\PhysicUtils.h" />
-    <ClInclude Include="Physics\SnippetUtils.h" />
     <ClInclude Include="Physics\Types.h" />
     <ClInclude Include="Window\GLFWWindow.h" />
     <ClInclude Include="Window\DeltaTimer.h" />
@@ -351,15 +363,15 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Physics\PhysicsController.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="Physics\PhysicsInterface.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Physics\PhysicUtils.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Physics\SnippetUtils.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../pch.h</PrecompiledHeaderFile>
     </ClCompile>

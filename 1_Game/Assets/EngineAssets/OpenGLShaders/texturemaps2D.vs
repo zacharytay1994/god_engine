@@ -9,9 +9,11 @@ layout (location = 5) in mat4 aModel;
 
 out vec2 vUV;
 uniform mat4 uProjection;
+uniform vec2 uSpritesheetData = vec2(0,1);
 
 void main() 
 {
-	vUV = aUV;
+	// vUV = aUV;
+	vUV = vec2( ( uSpritesheetData.x * 1.0 + aUV.x ) / uSpritesheetData.y , aUV.y );
 	gl_Position = uProjection * aModel * vec4(aPos, 1.0);
 }

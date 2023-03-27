@@ -7,12 +7,12 @@
 
 namespace god
 {
-	void PopulateDefault ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , Renderable3D& , ActiveComponent&> components )
+	void PopulateDefault ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , Renderable3D&> components )
 	{
 		( entt );
 		( components );
 
-		auto& [entity_data , transform , renderable  , active] = components;
+		auto& [entity_data , transform , renderable] = components;
 
 		// return if not valid
 		if ( !entt.m_entities.Valid ( entity_data.m_id ) )
@@ -51,8 +51,12 @@ namespace god
 		// add to scene
 		if ( renderable.m_model_id != -1 && renderable.m_visible )
 		{
-			scene.AddInstancedObject ( { static_cast< uint32_t >( renderable.m_model_id ) ,
-				renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive } , transform.m_world_transform );
+			Scene::InstancedRenderData render_data { static_cast< uint32_t >( renderable.m_model_id ) ,
+				renderable.m_diffuse_id , renderable.m_specular_id , renderable.m_shininess , renderable.m_emissive };
+			render_data.m_outlined = renderable.m_outlined;
+			render_data.m_spritesheet_data = renderable.m_spritesheet_data;
+			render_data.m_tint = renderable.m_tint;
+			scene.AddInstancedObject ( render_data , transform.m_world_transform );
 		}
 
 		// populate scene with children

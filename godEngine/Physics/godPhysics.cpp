@@ -31,7 +31,6 @@ namespace god
 		// generate contacts for all that were not filtered above
 		pairFlags = PxPairFlag::eCONTACT_DEFAULT;
 
-			
 		// all initial and persisting reports for everything, with per-point data
 		pairFlags = PxPairFlag::eSOLVE_CONTACT | PxPairFlag::eDETECT_DISCRETE_CONTACT
 			| PxPairFlag::eNOTIFY_TOUCH_FOUND
@@ -43,12 +42,13 @@ namespace god
 	PhysicsSystem::PhysicsSystem() 
 
 	{
-
+		scratchbuffer = new char[scratchBufferSize];//16kb
+		mCudaContextManager = nullptr;
 		RayCastid = Null;
 		mRunning = false;
 		mCamera = nullptr;
 		mWindow = nullptr;
-		mDispatcher = nullptr;
+		
 		mFoundation = nullptr;
 		mCooking = nullptr;
 		mPhysics = nullptr;
@@ -66,12 +66,15 @@ namespace god
 		while (mRunning)
 			;
 
+		
 		callbackFinishTask.free();
 		mRayCastMouse = nullptr;
 		mScene->flushSimulation(false);
 		mScene->release();
 		mDispatcher->release();
-		//PxCloseExtensions();
+		
+		
+		
 		mPhysics->release();
 		mCooking->release();
 		if (mPvd)
@@ -82,8 +85,11 @@ namespace god
 			transport->release();
 		}
 		
+		mCudaContextManager->release();
+
+		//PxCloseExtensions();	 only call if extensions used. can cause mem leak otherwise
 		mFoundation->release();
-		
+		delete[] scratchbuffer;
 	}
 
 	void PhysicsSystem::Init(GLFWWindow* window, Camera* cam)
@@ -108,21 +114,35 @@ namespace god
 		else
 		{
 			mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, physx::PxCookingParams(mToleranceScale));
+
 			if (!mCooking)
 				std::cerr << "PxCreateCooking failed!" << std::endl;
 			
 			physx::PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-			sceneDesc.gravity = physx::PxVec3(0.0f, -98.1, 0.0f);
+			sceneDesc.gravity = physx::PxVec3(0.0f, -98.1f, 0.0f);
 			mDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
-			if (!mDispatcher)
+			sceneDesc.cpuDispatcher = mDispatcher;
+			
+			if (!sceneDesc.cpuDispatcher)
 				std::cerr << "PxDefaultCpuDispatcherCreate failed!" << std::endl;
 
-			
-			sceneDesc.cpuDispatcher = mDispatcher;
+			PxCudaContextManagerDesc cudaContextManagerDesc;
+
+			mCudaContextManager = PxCreateCudaContextManager(*mFoundation, cudaContextManagerDesc, PxGetProfilerCallback());
+		
+	
+			//sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
+			//sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eSAP;
+
 			sceneDesc.filterShader = contactReportFilterShader;
-			sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eABP;//Automatic box pruning
+
+			if (!sceneDesc.isValid())
+					std::cerr << "sceneDesc is not valid!" << std::endl;
 
 			mScene = mPhysics->createScene(sceneDesc);
+			if(!mScene)
+				std::cerr << "PxScene creation failed!" << std::endl;
+
 			mScene->setSimulationEventCallback(&gContactReportCallback);
 			
 
@@ -170,7 +190,7 @@ namespace god
 		{
 			mAccumulator -= mStepSize;
 			mRunning = true;
-			mScene->simulate(mStepSize);
+			mScene->simulate(mStepSize, NULL, scratchbuffer, (physx::PxU32)scratchBufferSize, true);
 
 			//Call fetchResultsStart. Get the set of pair headers
 			const physx::PxContactPairHeader* pairHeader;
@@ -232,12 +252,13 @@ namespace god
 		if (hit.hasBlock)
 		{
 			mRayCastMouse = hit.block.actor;
-			//SetRCMid(reinterpret_cast<EntityData*>(mRayCastMouse->userData)->m_id);
+			//PhysicsSystem::setRCMid(reinterpret_cast<EntityData*>(mRayCastMouse->userData)->m_id);
 		}
 		else
 		{
 			mRayCastMouse = nullptr;
-			//SetRCMid(Null);
+			//setRCMid(Null);
+			
 		}
 	}
 
@@ -280,6 +301,11 @@ namespace god
 	}
 
 	physx::PxScene* const PhysicsSystem::GetPhysicsScene() const
+	{
+		return mScene;
+	}
+
+	physx::PxScene* PhysicsSystem::GetPhysicsScene ()
 	{
 		return mScene;
 	}

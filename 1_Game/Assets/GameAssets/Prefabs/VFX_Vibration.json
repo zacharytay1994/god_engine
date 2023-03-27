@@ -1,0 +1,1 @@
+{"VFX_Vibration":{"Type":"Default","Script Components":{"C_VFXShow":{"fadeDelay":0.5},"C_VFXVibration":{}},"Engine Components":{"Transform":{"position_x":0.0,"position_y":-0.20000000298023224,"position_z":0.5,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":2.0,"scale_y":2.0,"scale_z":2.0}},"Children":{}}}

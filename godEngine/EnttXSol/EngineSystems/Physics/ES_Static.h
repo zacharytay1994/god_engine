@@ -24,7 +24,10 @@ namespace god
 
 		if (rigidstatic.p_RigidStatic)
 		{
-			rigidstatic.p_RigidStatic->setGlobalPose(ConvertToPhysXTransform(transform.m_position, transform.m_rotation));
+			auto posnoffset = glm::vec3(transform.m_position.x + rigidstatic.Offset.x,
+				transform.m_position.y + rigidstatic.Offset.y, transform.m_position.z + rigidstatic.Offset.z);
+
+			rigidstatic.p_RigidStatic->setGlobalPose(ConvertToPhysXTransform(posnoffset, transform.m_rotation));
 		}
 	}
 
@@ -37,12 +40,14 @@ namespace god
 	 */
 	void RigidStaticUpdate(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
-		EntityData& edata = std::get<0>(component);
-		Transform& transform = std::get<1>(component);
+		( entt );
+		( engineResources );
+		//EntityData& edata = std::get<0>(component);
+		//Transform& transform = std::get<1>(component);
 		RigidStatic& rigidstatic = std::get<2>(component);
 
-		physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
-		physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
+		//physx::PxPhysics* mPhysics = engineResources.Get<PhysicsSystem>().get().GetPhysics();
+		//physx::PxScene* mScene = engineResources.Get<PhysicsSystem>().get().GetPhysicsScene();
 	
 		//Setting flags
 		if (rigidstatic.Active != rigidstatic.Activeflag)
@@ -70,7 +75,8 @@ namespace god
 
 	void RigidStaticInit(EnttXSol& entt, EngineResources& engineResources, std::tuple< EntityData&, Transform&, RigidStatic& > component)
 	{
-		EntityData& edata = std::get<0>(component);
+		( entt );
+		//EntityData& edata = std::get<0>(component);
 		Transform& transform = std::get<1>(component);
 		RigidStatic& rigidstatic = std::get<2>(component);
 
@@ -86,6 +92,7 @@ namespace god
 			if (rigidstatic.p_shape == nullptr)
 			{
 				//exclusive shape (can be modified)
+				rigidstatic.extents = transform.m_scale;
 				switch (rigidstatic.Shapeid)
 				{
 				case PhysicsTypes::Cube:
@@ -104,8 +111,10 @@ namespace god
 			}
 			if (rigidstatic.p_RigidStatic == nullptr)
 			{
-				rigidstatic.p_RigidStatic = mPhysics->createRigidStatic(physx::PxTransform(transform.m_position.x + rigidstatic.Offset.x,
-					transform.m_position.y + rigidstatic.Offset.y, transform.m_position.z + rigidstatic.Offset.z));
+				auto posnoffset = glm::vec3(transform.m_position.x + rigidstatic.Offset.x,
+					transform.m_position.y + rigidstatic.Offset.y, transform.m_position.z + rigidstatic.Offset.z);
+
+				rigidstatic.p_RigidStatic = mPhysics->createRigidStatic(ConvertToPhysXTransform(posnoffset, transform.m_rotation) );
 				rigidstatic.mScene = mScene;
 				rigidstatic.p_RigidStatic->attachShape(*rigidstatic.p_shape);
 				mScene->addActor(*rigidstatic.p_RigidStatic);

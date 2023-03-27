@@ -68,4 +68,50 @@ namespace god
 		}
 		return glm::degrees ( acos ( norm_position.z ) );
 	}
+
+	glm::vec2 RotateVector ( glm::vec2 const& v , float degree )
+	{
+		degree = glm::radians ( degree );
+		return { v.x * cos ( degree ) - v.y * sin ( degree ), v.x * sin ( degree ) + v.y * cos ( degree ) };
+	}
+
+	float DegreeBetweenVec2 ( glm::vec2 const& v1 , glm::vec2 const& v2 )
+	{
+		auto v1_ = glm::normalize ( v1 );
+		auto v2_ = glm::normalize ( v2 );
+		float degree = glm::degrees ( atan2 ( glm::dot ( v1_ , v2_ ) , ( v1_.x * v2_.y - v1_.y * v2_.x ) ) );
+		if ( degree < 0.0f )
+		{
+			return 360.0f + degree;
+		}
+		return degree;
+	}
+
+	std::tuple<bool , float> RayIntersectAABB ( glm::vec3 const& rayOrigin , glm::vec3 const& rayDirection , glm::vec3 const& aabbMin , glm::vec3 const& aabbMax )
+	{
+		float tmin { 0.0f };
+		float tmax = std::numeric_limits<float>::max ();
+
+		for ( int i = 0; i < 3; ++i )
+		{
+			float invD = 1.0f / rayDirection[ i ];
+			float t0 = ( aabbMin[ i ] - rayOrigin[ i ] ) * invD;
+			float t1 = ( aabbMax[ i ] - rayOrigin[ i ] ) * invD;
+
+			if ( invD < 0.0f )
+			{
+				std::swap ( t0 , t1 );
+			}
+
+			tmin = std::max ( tmin , t0 );
+			tmax = std::min ( tmax , t1 );
+
+			if ( tmax < tmin )
+			{
+				return { false,std::numeric_limits<float>::max () };
+			}
+		}
+
+		return { true,tmin };
+	}
 }

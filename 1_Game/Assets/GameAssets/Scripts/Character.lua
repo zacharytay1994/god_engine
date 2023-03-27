@@ -79,6 +79,9 @@ function S_Character(e)
         GetTransform(e).position.y = -100
         GetGridCell(e).y = -100
         
+		-- trigger sound effect
+		InstancePrefab("SFX_EnemyDeath",0,0,0)
+		
         -- set character to dead
         characterComponent.isDead = true
 

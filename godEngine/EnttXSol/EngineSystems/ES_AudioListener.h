@@ -22,7 +22,7 @@ namespace god
 				auto& resource = sound_manager.Get(audio_source.m_sound_id);
 				Sound& sound = std::get<1>(resource);
 
-				AudioAPI::SetLoop(sound, audio_source.m_loop);
+				//AudioAPI::SetLoop(sound, audio_source.m_loop);
 
 				if (audio_source.m_play_on_awake && !audio_source.m_awake_played)
 				{
@@ -41,6 +41,25 @@ namespace god
 				//	audio_source.enable_fade_in = true;
 				//	audio_source.m_stop = false;
 				//}
+
+				// Set Audio Source attributes
+				AudioAPI::SetLoop(audio_source.m_channel, audio_source.m_loop);
+				AudioAPI::SetMute(audio_source.m_channel, audio_source.m_mute);
+				AudioAPI::SetVolume(audio_source.m_channel, audio_source.m_volume);
+				AudioAPI::SetPitch(audio_source.m_channel, audio_source.m_pitch);
+
+
+				if (audio_source.update_playtime)
+				{
+					AudioAPI::SetCurrentPlayTime(audio_source.m_channel, audio_source.m_new_playtime);
+					audio_source.update_playtime = false;
+				}
+				else
+				{
+					// Get current playtime
+					AudioAPI::GetCurrentPlayTime(audio_source.m_channel, &audio_source.m_current_playtime);
+					//std::cout << audio_source.m_current_playtime << "\n";
+				}
 
 				// Fading Control --------------------------------------------------------------------
 				if (audio_source.enable_fade_in)

@@ -3,7 +3,7 @@
 
 namespace god
 {
-	Sound::Sound() : m_sound_sample{ nullptr }, m_name{}, m_file_name{}, m_channel{ nullptr }
+	Sound::Sound() : m_sound_sample{ nullptr }, m_name{}, m_file_name{}, m_channel{ nullptr }, m_length{ 0 }
 	{
 	}
 
@@ -11,6 +11,7 @@ namespace god
 	{
 		AudioAPI::LoadSound(soundPath.c_str(), *this);
 	}
+
 
 	// AudioAPI members
 	FMOD::System* AudioAPI::m_FMOD_system;
@@ -38,6 +39,8 @@ namespace god
 		{ 1, "Echo" }, { 2, "Fade" }
 	};
 
+	Sound AudioAPI::BGM;
+
 	AudioAPI::AudioAPI()
 	{
 		ErrorCheck(FMOD::System_Create(&m_FMOD_system));
@@ -60,6 +63,9 @@ namespace god
 
 			ErrorCheck(m_FMOD_system->createDSPByType(FMOD_DSP_TYPE_HIGHPASS, &dsp_echo));
 		}
+
+		LoadSound("Assets/GameAssets/Sounds/MainMenu_Melody_v1_20221122.mp3", BGM);
+		SetLoop(BGM, true);
 
 		std::cerr << "AudioAPI created\n";
 	}
@@ -136,6 +142,9 @@ namespace god
 		{
 			ErrorCheck(m_FMOD_system->createSound(filePath, mode, 0, &sound.m_sound_sample));
 		}
+		unsigned int sound_length;
+		sound.m_sound_sample->getLength(&sound_length, FMOD_TIMEUNIT_MS);
+		sound.m_length = static_cast<double>(sound_length) * 0.001; // convert milliseconds to seconds
 
 		std::string path{ filePath };
 		size_t last_slash = path.find_last_of('\\') + 1;
@@ -155,6 +164,12 @@ namespace god
 	{
 		ErrorCheck(sound.m_sound_sample->setMode(loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF));
 		ErrorCheck(sound.m_sound_sample->setLoopCount(loop ? -1 : 0));
+	}
+
+	void AudioAPI::SetLoop(FMOD::Channel* channel, bool loop)
+	{
+		ErrorCheck(channel->setMode(loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF));
+		ErrorCheck(channel->setLoopCount(loop ? -1 : 0));
 	}
 
 	void AudioAPI::SetMute(FMOD::Channel* channel, bool mute)
@@ -242,12 +257,9 @@ namespace god
 		return FMOD_OK;
 	}
 
-	unsigned int AudioAPI::GetCurrentPlayTime(FMOD::Channel* channel)
+	void AudioAPI::GetCurrentPlayTime(FMOD::Channel* channel, unsigned int* timeStamp)
 	{
-		unsigned int time_stamp;
-		channel->getPosition(&time_stamp, FMOD_TIMEUNIT_PCM);
-
-		return time_stamp;
+		channel->getPosition(timeStamp, FMOD_TIMEUNIT_PCM);
 	}
 
 	void AudioAPI::SetCurrentPlayTime(FMOD::Channel* channel, unsigned int timeStamp)
@@ -275,11 +287,29 @@ namespace god
 
 	void AudioAPI::PlaySoundBetweenTimes(FMOD::Channel* channel, float startPoint, float endPoint)
 	{
+		( channel );
+		( startPoint );
+		( endPoint );
+	}
+
+	void AudioAPI::PauseAll()
+	{
+		m_master_channel_group->setPaused(true);
+	}
+
+	void AudioAPI::ResumeAll()
+	{
+		m_master_channel_group->setPaused(false);
 	}
 
 	void AudioAPI::StopAndResetAll(std::vector<std::tuple<uint32_t, Sound>> const& assets)
 	{
-		m_master_channel_group->stop();
+		//m_master_channel_group->stop();
+
+		for (auto& channel : m_channels)
+		{
+			channel->stop();
+		}
 
 		for (auto& asset : assets)
 		{
@@ -288,6 +318,36 @@ namespace god
 		}
 
 		m_channels.clear();
+	}
+
+	void AudioAPI::PlayBGM()
+	{
+		if (BGM.m_channel == nullptr)
+		{
+			m_FMOD_system->playSound(BGM.m_sound_sample, NULL, false, &BGM.m_channel);
+			SetVolume(BGM.m_channel, 0.2f);
+		}
+
+		BGM.m_played = true;
+	}
+
+	//void AudioAPI::PauseBGM()
+	//{
+
+	//}
+
+	//void AudioAPI::ResumeBGM()
+	//{
+	//}
+
+	void AudioAPI::StopBGM()
+	{
+		if (BGM.m_channel != nullptr)
+		{
+			AddFadeOut(BGM.m_channel, 2.f, BGM.m_fade);
+			//BGM.m_channel->stop();
+			BGM.m_channel = nullptr;
+		}
 	}
 
 	void AudioAPI::ToggleDSPEffects(bool toggle)
@@ -302,6 +362,7 @@ namespace god
 
 	void AudioAPI::AddFadeIn(FMOD::Channel* channel, float fadeInTime, bool& fade)
 	{
+		( fade );
 		UINTLL dsp_clock = GetDSPClock(channel);
 
 		channel->setPaused(true);
@@ -316,9 +377,11 @@ namespace god
 
 	void AudioAPI::AddFadeOut(FMOD::Channel* channel, float fadeOutTime, bool& fade)
 	{
+		( fade );
 		UINTLL dsp_clock = GetDSPClock(channel);
 
-		float volume = GetVolume(channel);
+		//float volume = GetVolume(channel);
+		float volume = 1.f;
 
 		ErrorCheck(channel->addFadePoint(dsp_clock, volume));
 		ErrorCheck(channel->addFadePoint(dsp_clock + static_cast<UINTLL>((m_sample_rate * fadeOutTime)), 0.f));
@@ -359,16 +422,6 @@ namespace god
 		return dsp_clock;
 	}
 
-
-	void AudioAPI::PauseAll()
-	{
-		m_master_channel_group->setPaused(true);
-	}
-
-	void AudioAPI::ResumeAll()
-	{
-		m_master_channel_group->setPaused(false);
-	}
 
 
 	void AudioAPI::SetListenerAttributes(const FMOD_VECTOR* position, const FMOD_VECTOR* velocity, const FMOD_VECTOR* forward, const FMOD_VECTOR* up)

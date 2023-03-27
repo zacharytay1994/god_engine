@@ -7,12 +7,13 @@
 
 namespace god
 {
-	void PopulateTransformOnly ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform& , ActiveComponent&> components )
+	void PopulateTransformOnly ( EnttXSol& entt , EngineResources& engineResources , std::tuple<EntityData& , Transform&> components )
 	{
 		( entt );
 		( components );
+		( engineResources );
 
-		auto& [entity_data , transform , active] = components;
+		auto& [entity_data , transform] = components;
 
 		// return if not valid
 		if ( !entt.m_entities.Valid ( entity_data.m_id ) )
@@ -20,7 +21,7 @@ namespace god
 			return;
 		}
 
-		Scene& scene = engineResources.Get<Scene> ().get ();
+		//Scene& scene = engineResources.Get<Scene> ().get ();
 
 		bool changed { false };
 		glm::mat4 parentTransform { 1.0f };

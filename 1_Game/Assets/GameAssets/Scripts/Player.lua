@@ -120,6 +120,59 @@ function S_Player(e)
                         "Special property:", playerAttackComponent.selectedAttack[3], "\n")
         UnselectAllButtons()
     end
+
+    -- -- temporary cheats for rotation
+    -- -- press W
+    -- if (CheckKeyPress(87)) then 
+    --     print("Setting Player model rotation to 0!")
+    --     local child_model = Child(e,0)
+    --     local child_model_transform = GetTransform(child_model)
+    --     child_model_transform.rotation.y = 0
+        
+    --     -- print("Setting Player rotation to 0!")
+    --     -- GetTransform(e).rotation.y = 0
+    -- end
+    -- -- press A
+    -- if (CheckKeyPress(65)) then 
+    --     print("Setting Player model rotation to 90!")
+    --     local child_model = Child(e,0)
+    --     local child_model_transform = GetTransform(child_model)
+    --     child_model_transform.rotation.y = 90
+        
+    --     -- print("Setting Player rotation to 90!")
+    --     -- GetTransform(e).rotation.y = 90
+    -- end
+    -- -- press S
+    -- if (CheckKeyPress(83)) then 
+    --     print("Setting Player model rotation to 180!")
+    --     local child_model = Child(e,0)
+    --     local child_model_transform = GetTransform(child_model)
+    --     child_model_transform.rotation.y = 180
+        
+    --     -- print("Setting Player rotation to 180!")
+    --     -- GetTransform(e).rotation.y = 180
+    -- end
+    -- -- press D
+    -- if (CheckKeyPress(68)) then 
+    --     print("Setting Player model rotation to 270!")
+    --     local child_model = Child(e,0)
+    --     local child_model_transform = GetTransform(child_model)
+    --     child_model_transform.rotation.y = 270
+        
+    --     -- print("Setting Player rotation to 270!")
+    --     -- GetTransform(e).rotation.y = 270
+    -- end
+    -- -- press E
+    -- if (CheckKeyPress(69)) then 
+    --     print()
+    --     -- print("Player's y-rotation:", GetTransform(e).rotation.y)
+    --     -- print("Player's world rotation:", WorldRotation(e).y)
+        
+    --     print("Player model's y-rotation:", GetTransform(Child(e,0)).rotation.y)
+    --     -- print("Player model's world rotation:", WorldRotation(Child(e,0)).y)
+    --     -- print("Player model's parent rotation:", ParentRotation(Child(e,0)).y)
+    --     print()
+    -- end
 end
 
 -- this is to prevent Action Buttons from resetting due to using attacks through hotkeys

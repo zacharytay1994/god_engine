@@ -4,6 +4,8 @@
 #include <godUtility/FileIO.h>
 #include <godUtility/Internal/RapidJSONWrapper.h>
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace god
 {
 	/* ENGINE COMPONENTS */
@@ -15,6 +17,11 @@ namespace god
 		float m_shininess { 32.0f };
 		float m_emissive { 0.0f };
 		bool m_visible { true };
+		glm::vec4 m_tint { 1.0f,1.0f,1.0f,1.0f };
+		bool m_outlined { false };
+		glm::ivec2 m_spritesheet_data { 0,1 };
+		float m_framerate { 1.0f };
+		float m_framerate_counter { 0.0f };
 
 		bool operator==( Renderable3D const& rhs )
 		{
@@ -23,7 +30,8 @@ namespace god
 				m_diffuse_id == rhs.m_diffuse_id &&
 				m_specular_id == rhs.m_specular_id &&
 				m_shininess == rhs.m_shininess &&
-				m_emissive == rhs.m_emissive;
+				m_emissive == rhs.m_emissive &&
+				m_tint == rhs.m_tint;
 		}
 	};
 	template <>
@@ -31,7 +39,9 @@ namespace god
 	{
 		RegisterLuaType<Renderable3D> ( luaState , name ,
 			"model_id" , &Renderable3D::m_model_id ,
-			"visible" , &Renderable3D::m_visible );
+			"visible" , &Renderable3D::m_visible ,
+			"tint" , &Renderable3D::m_tint,
+			"emissive", &Renderable3D::m_emissive);
 	}
 	template<>
 	inline void ComponentInspector::operator() < Renderable3D > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& engineResources )
@@ -121,6 +131,18 @@ namespace god
 
 				ImGui::Text ( "- Emissive :" );
 				ImGui::DragFloat ( "##Emissive" , &component.m_emissive );
+
+				ImGui::DragFloat ( "TintR" , &component.m_tint.x , 0.01f , 0.0f , 1.0f );
+				ImGui::DragFloat ( "TintG" , &component.m_tint.y , 0.01f , 0.0f , 1.0f );
+				ImGui::DragFloat ( "TintB" , &component.m_tint.z , 0.01f , 0.0f , 1.0f );
+				ImGui::DragFloat ( "TintA" , &component.m_tint.w , 0.01f , 0.0f , 1.0f );
+
+				ImGui::Checkbox ( "Outline" , &component.m_outlined );
+
+				// sprite sheet
+				ImGui::Separator ();
+				ImGui::InputInt2 ( "[Frame][Columns]" , glm::value_ptr ( component.m_spritesheet_data ) );
+				ImGui::DragFloat ( "FrameRate" , &component.m_framerate , 0.01f , 0.01f , 10.0f );
 			} );
 	}
 
@@ -170,6 +192,9 @@ namespace god
 		// serialize emissive
 		RapidJSON::JSONifyToValue ( value , document , "emissive" , component.m_emissive );
 		RapidJSON::JSONifyToValue ( value , document , "visible" , component.m_visible );
+		RapidJSON::JSONifyToValue ( value , document , "spritesheetframe" , component.m_spritesheet_data.x );
+		RapidJSON::JSONifyToValue ( value , document , "spritesheetcolumns" , component.m_spritesheet_data.y );
+		RapidJSON::JSONifyToValue ( value , document , "framerate" , component.m_framerate );
 	}
 
 	template<>
@@ -211,5 +236,8 @@ namespace god
 
 		AssignIfExist ( jsonObj , component.m_emissive , "emissive" );
 		AssignIfExist ( jsonObj , component.m_visible , "visible" );
+		AssignIfExist ( jsonObj , component.m_spritesheet_data.x , "spritesheetframe" );
+		AssignIfExist ( jsonObj , component.m_spritesheet_data.y , "spritesheetcolumns" );
+		AssignIfExist ( jsonObj , component.m_framerate , "framerate" );
 	}
 }

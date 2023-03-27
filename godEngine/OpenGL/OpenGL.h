@@ -11,6 +11,7 @@
 #include "Font/FontRenderer.h"
 
 #include "../godUtility/Utility.h"
+#include <godUtility/Internal/RecycleVector.h>
 
 #include "Animation/AnimationModel3D.h"
 #include "Animation/Animator.h"
@@ -29,6 +30,19 @@
 namespace god
 {
 	using OGLModelID = uint32_t;
+
+	struct AnimationWrap
+	{
+		Animation3D::Model m_model;
+		Animation3D::Animation m_animation;
+		std::vector<std::vector<glm::mat4>> m_cached_node_transforms;
+		RecycleVector<Animation3D::Animator> m_animators;
+
+		void Initialize ( std::string const& path );
+		uint32_t AddInstance ();
+		void PreCalculateBoneTransform ( uint32_t frame , float currentTime , const Animation3D::AssimpNodeData* node ,
+			glm::mat4 parentTransform );
+	};
 
 	struct Scene;
 	struct AssimpMesh;
@@ -75,17 +89,24 @@ namespace god
 		void SetLineWidth ( float size );
 
 		// shadow stuff
+		void UpdateAnimations ( float dt );
 		void FirstPassRenderToDepthmap ( Scene const& scene , glm::mat4 const& projection , glm::mat4 const& view , glm::vec3 const& camera_position , OGLTextureManager& textures );
 
 		// gaussian blur
 		OGLRenderPass<1>& BlurTexture ( unsigned int texture );
 		void RenderBlendTextures ( unsigned int texture1 , unsigned int texture2 );
+		void RenderTexture ( unsigned int texture );
 
 		std::vector<std::vector<OGLMesh>> getMesh () { return m_models; }
+
+		// animation interface
+		std::tuple<uint32_t , uint32_t> AddAnimationInstance ( std::string const& name );
 
 		// blur 
 		OGLRenderPass<1> m_blur_pingpong_1;
 		OGLRenderPass<1> m_blur_pingpong_2;
+
+		std::unordered_map<std::string , AnimationWrap> m_animations;
 
 	private:
 		int m_screen_width { 0 } , m_screen_height { 0 };
@@ -98,9 +119,11 @@ namespace god
 		OGLShader m_flat_shader;
 		OGLShader m_textured_shader;
 		OGLShader m_textured_discard_shader;
+		OGLShader m_textured_discard_shader_no_lighting;
 		OGLShader m_single_colour_outline_shader;
 		OGLShader m_cubemap_shader;
 		OGLShader m_depthmap_shader;
+		OGLShader m_anim_depthmap_shader;
 		OGLShader m_hdr_shader;
 		OGLShader m_blur_shader;
 		OGLShader m_blend_shader;
@@ -129,6 +152,14 @@ namespace god
 		glm::mat4 m_light_space_matrix;
 		OGLShadowMap m_shadowmap;
 
+		std::vector<std::string> m_animation_names;
+		void LoadAllAnimations ();
+		void RenderAnimations ( Scene& scene ,
+			glm::mat4 const& projection ,
+			glm::mat4 const& view ,
+			glm::vec3 const& camera_position ,
+			OGLTextureManager& textures ,
+			glm::vec3 const& camera_front );
 
 		OGLShader m_animation_shader;
 		Animation3D::Model m_animation_model;
@@ -138,8 +169,8 @@ namespace god
 		//Temperory hard coded 
 		/* May god forgive my sin !*/
 		// To change the speed go to constructor OpenGL() , line 200
-		float shark_temp_x{  };
-		bool shark_start{ false };
+		float shark_temp_x {  };
+		bool shark_start { false };
 
 		// font
 		FontRenderer m_font_renderer;

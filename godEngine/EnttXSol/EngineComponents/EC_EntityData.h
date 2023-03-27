@@ -12,6 +12,7 @@ namespace god
 
 		bool operator==( EntityData const& rhs )
 		{
+			( rhs );
 			return true;
 		}
 	};

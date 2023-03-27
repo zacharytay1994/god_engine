@@ -19,8 +19,9 @@ function S_MainmenuToGame(e)
     local gui_object = GetGUIObject(e)
 
     if(gui_object.pressed and screen.isSelected == false) then
-        ChangeScene("Level_1",true)
-        SceneName = "Level_1"
+        StopBGM()
+        ChangeScene("350LevelScene",true)
+        SceneName = "350LevelScene"
         screen.isSelected = true
     end
 end

@@ -162,6 +162,9 @@ function DiceScript_RollDice(e, c_dice)
 		ChangeTexture(e, "Pixel_Blue")
 	end
 	SetTransformPosition(e, c_dice.start_position_x, c_dice.start_position_y, c_dice.start_position_z)
+	
+	-- trigger sound effect
+	InstancePrefab("SFX_Reroll",0,0,0)
 end
 
 function DiceScript_DisableDice(e, c_dice)

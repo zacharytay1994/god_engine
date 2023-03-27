@@ -24,4 +24,10 @@ namespace god
 	std::ostream& operator<<(std::ostream& os, const physx::PxVec2& v2);
 	std::ostream& operator<<(std::ostream& os, const physx::PxVec3& v3);
 	std::ostream& operator<<(std::ostream& os, const physx::PxVec4& v3);
+
+
+	std::ostream& operator<<(std::ostream& os, const glm::vec2& v2);
+	std::ostream& operator<<(std::ostream& os, const glm::vec3& v3);
+	std::ostream& operator<<(std::ostream& os, const glm::vec4& v4);
+
 }

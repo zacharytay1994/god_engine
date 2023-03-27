@@ -41,7 +41,7 @@ namespace god
 			Assimp::Importer importer;
 			//const aiScene* scene = importer.ReadFile( path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace );
 
-			const aiScene* scene = importer.ReadFile( path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs ); //--
+			const aiScene* scene = importer.ReadFile( path, aiProcess_Triangulate | aiProcess_GenSmoothNormals /*| aiProcess_FlipUVs*/ ); //--
 
 			// check for errors
 			if ( !scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode ) // if is Not Zero
@@ -96,7 +96,10 @@ namespace god
 				Vertex vertex;
 				SetVertexBoneDataToDefault( vertex );
 				vertex.Position = AssimpGLMHelpers::GetGLMVec( mesh->mVertices[i] );
-				vertex.Normal = AssimpGLMHelpers::GetGLMVec( mesh->mNormals[i] );
+				if ( mesh->mNormals )
+				{
+					vertex.Normal = AssimpGLMHelpers::GetGLMVec( mesh->mNormals[i] );
+				}
 
 				if ( mesh->mTextureCoords[0] )
 				{

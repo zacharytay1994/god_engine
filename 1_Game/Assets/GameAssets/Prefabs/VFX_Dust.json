@@ -1,0 +1,1 @@
+{"VFX_Dust":{"Type":"Default","Script Components":{"C_DustParticleSystem":{"particleCount":7.0}},"Engine Components":{"Transform":{"position_x":8.115032196044922,"position_y":2.0426204204559326,"position_z":-0.7367047071456909,"rotation_x":0.0,"rotation_y":-0.0,"rotation_z":0.0,"scale_x":1.0,"scale_y":1.0,"scale_z":1.0}},"Children":{}}}

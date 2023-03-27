@@ -30,6 +30,16 @@ namespace god
 		m_billboard_sprites[ data ].push_back ( transform );
 	}
 
+	void Scene::AddBillboardNoLighting ( InstancedRenderData const& data , glm::mat4 const& transform )
+	{
+		m_billboard_sprites_no_lighting[ data ].push_back ( transform );
+	}
+
+	void Scene::AddAnimation ( InstancedRenderData const& data , glm::mat4 const& transform )
+	{
+		m_animation_data.push_back ( { data, transform } );
+	}
+
 	void Scene::ClearInstancedScene ()
 	{
 		for ( auto& instance : m_instanced_render_data )
@@ -48,6 +58,11 @@ namespace god
 		{
 			instance.second.clear ();
 		}
+		for ( auto& instance : m_billboard_sprites_no_lighting )
+		{
+			instance.second.clear ();
+		}
+		m_animation_data.clear ();
 	}
 
 	void Scene::AddPointLight ( PointLightData const& pld )
@@ -68,6 +83,13 @@ namespace god
 		HashCombine ( seed , data.m_specular_id );
 		HashCombine ( seed , data.m_shininess );
 		HashCombine	( seed , data.m_emissive );
+		HashCombine ( seed , data.m_tint.x );
+		HashCombine ( seed , data.m_tint.y );
+		HashCombine ( seed , data.m_tint.z );
+		HashCombine ( seed , data.m_tint.w );
+		HashCombine ( seed , data.m_outlined );
+		HashCombine ( seed , data.m_spritesheet_data.x );
+		HashCombine ( seed , data.m_spritesheet_data.y );
 		return seed;
 	}
 
@@ -77,7 +99,9 @@ namespace god
 			m_diffuse_id == rhs.m_diffuse_id &&
 			m_specular_id == rhs.m_specular_id &&
 			m_shininess == rhs.m_shininess &&
-			m_emissive == rhs.m_emissive;
+			m_emissive == rhs.m_emissive &&
+			m_tint == rhs.m_tint &&
+			m_outlined == rhs.m_outlined;
 	}
 
 	Scene::PointLightData& Scene::PointLightData::operator=( PointLightData const& rhs )

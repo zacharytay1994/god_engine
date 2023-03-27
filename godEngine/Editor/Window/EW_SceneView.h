@@ -149,6 +149,7 @@ namespace god
 		{
 			m_enttxsol.m_pause = false;
 			AudioAPI::ResumeAll();
+			//AudioAPI::PlayBGM();
 		}
 		this->ToolTipOnHover ( "Objects will be updated." );
 		ImGui::SameLine ();
@@ -162,11 +163,12 @@ namespace god
 		if ( ImGui::Button ( "RESET" ) )
 		{
 			this->Get<EW_SceneTree> ()->ResetScene ( engineResources );
+			AudioAPI::StopBGM();
 
-			// stopping and resetting all the sounds 
-			SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
-			auto& sounds = sound_manager.GetResources();
-			AudioAPI::StopAndResetAll(sounds);
+			//// stopping and resetting all the sounds 
+			//SoundManager& sound_manager = engineResources.Get<SoundManager>().get();
+			//auto& sounds = sound_manager.GetResources();
+			//AudioAPI::StopAndResetAll(sounds);
 		}
 		this->ToolTipOnHover ( "Resets the scene to its original state." );
 

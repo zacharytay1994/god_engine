@@ -11,7 +11,7 @@ namespace god
 
 	void ContactReportCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
 	{
-		for (int i = 0; i < count; i++)
+		for (unsigned int i = 0; i < count; i++)
 		{
 			for (auto const& [ptypeid, fp] : TriggerCallBack)
 			{
@@ -42,33 +42,41 @@ namespace god
 
 	void ContactReportCallback::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 	{
-		
+		( pairs );
+		( nbPairs );
+
+		int type0 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[0]->userData)->PhysicsTypeid;
+		int type1 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[1]->userData)->PhysicsTypeid;
+
+		auto* rd0 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[0]->userData);
+		auto* rd1 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[1]->userData);
+
+
 		for (auto const& [ptypeid,fp] : ContactCallBack)
 		{
-			int type0 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[0]->userData)->PhysicsTypeid;
-			int type1 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[1]->userData)->PhysicsTypeid;
+
+
 			if (type0 == ptypeid)
 			{
-				fp( ConvertToGlmVector( ( pairHeader.actors[0]->getGlobalPose().p ) ) );
+				fp(ConvertToGlmVector( rd0->p_RigidDynamic->getGlobalPose().p )	);
 			}
 			if (type1 == ptypeid)
 			{
-				fp(ConvertToGlmVector((pairHeader.actors[1]->getGlobalPose().p)));
+				fp(ConvertToGlmVector( rd1->p_RigidDynamic->getGlobalPose().p ) );
 			}
 
 		}
 
 		for (auto const& [ptypeid0, ptypeid1, fp] : ContactCallBackPair)
 		{
-			int type0 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[0]->userData)->PhysicsTypeid;
-			int type1 = reinterpret_cast<RigidDynamic*>(pairHeader.actors[1]->userData)->PhysicsTypeid;
+
 			if (type0 == ptypeid0 && type1== ptypeid1)
 			{
-				fp( ConvertToGlmVector( pairHeader.actors[0]->getGlobalPose().p ), ConvertToGlmVector(pairHeader.actors[1]->getGlobalPose().p ) );
+				fp( ConvertToGlmVector( rd0->p_RigidDynamic->getGlobalPose().p ), ConvertToGlmVector(rd1->p_RigidDynamic->getGlobalPose().p ) );
 			}
 			if (type0 == ptypeid1 && type1 == ptypeid0)
 			{
-				fp(ConvertToGlmVector(pairHeader.actors[1]->getGlobalPose().p), ConvertToGlmVector(pairHeader.actors[0]->getGlobalPose().p));
+				fp(ConvertToGlmVector( rd1->p_RigidDynamic->getGlobalPose().p ), ConvertToGlmVector( rd0->p_RigidDynamic->getGlobalPose().p ));
 			}
 
 		}

@@ -23,6 +23,14 @@ function C_Pathfind()
     end
 end
 
+function GenerateRandomFootStepSFX()
+	local sfx = { "SFX_FootStep01", "SFX_FootStep02", "SFX_FootStep03",
+				  "SFX_FootStep04", "SFX_FootStep05"}
+	
+	local rng = GenerateRandomNumberInRange(1, 5)
+	InstancePrefab(sfx[rng],0,0,0)
+end
+
 --[IsSystem]
 function S_Pathfind(e)
     local pathfind = GetComponent(e, "C_Pathfind")
@@ -153,6 +161,7 @@ function S_Pathfind(e)
                             -- child_model_transform.position.x = (current_cell.x - path[2].x)*2.0
                             -- child_model_transform.position.y = (current_cell.y - path[2].y)*2.0
                             child_model_transform.position.z = (current_cell.z - path[2].z)*2.0
+							GenerateRandomFootStepSFX()
                         else
                             local characterTransform = GetTransform(e)
                             
@@ -212,6 +221,18 @@ function S_Pathfind(e)
                 else
                     pathfind.Path = false
                     pathfind.Timer = 0.0 
+
+                    local entity = e
+                    if (EntityName(entity) == "Dummee") then
+                        print("[Pathfind.lua] Resetting Dummee move variables after failing to find path!")
+                        local moveComponent = GetComponent(entity, "C_EnemyMoveDummee")
+                        moveComponent.Time = 0.0
+                        moveComponent.startedPathfind = false
+                        moveComponent.executeMove = false
+                        GetComponent(entity, "C_EnemyController").movementForecast = false
+                        GetComponent(entity, "C_EnemyController").attackForecast = true
+                    end
+
                     -- print("#path <= 1, path not found")
                 end
             else

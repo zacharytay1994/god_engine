@@ -21,7 +21,7 @@ function C_UIManager()
         iconList = {},
 		
 		-- Size of healthbar
-		healthbar_size = 0.7,
+		healthbar_size = 0.0,
 		
 		-- Health record, used to optimize the healthbar UI
 		health_record = 0.0

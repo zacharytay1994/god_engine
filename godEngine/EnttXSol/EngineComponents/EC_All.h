@@ -11,14 +11,21 @@
 #include "Render/EC_PointLight.h"
 #include "Render/EC_DirectionalLight.h"
 #include "Render/EC_Transparent.h"
+#include "Render/EC_Animation3D.h"
 
 #include "Physics/EC_Static.h"
 #include "Physics/EC_Dynamic.h"
+#include "Physics/EC_PhysicsController.h"
+
+#include "Input/EC_PlayerController.h"
 
 #include "Grid/EC_GridManipulate.h"
 
 #include "GUI/EC_GUIObject.h"
 #include "GUI/EC_GUIText.h"
+
+#include "Gam350/EC_350Level.h"
+#include "Gam350/EC_350LevelManager.h"
 
 #include <tuple>
 #include <string>
@@ -42,7 +49,12 @@ namespace god
 			GridManipulate ,
 			GUIObject ,
 			GUIText ,
-			Transparent
+			Transparent ,
+			PhysicsController ,
+			PlayerController ,
+			SkeleAnim3D ,
+			_350Level ,
+			_350LevelManager
 		>;
 		static std::array<std::string , std::tuple_size_v<Components>> m_component_names;
 	};

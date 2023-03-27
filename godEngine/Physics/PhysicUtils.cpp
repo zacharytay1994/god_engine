@@ -13,8 +13,12 @@ namespace god
 	 */
 	physx::PxTransform ConvertToPhysXTransform(const glm::vec3& translation, const glm::vec3& rotation)
 	{
-		return physx::PxTransform(ConvertToPhysXVector(translation), ConvertToPhysXQuat(glm::quat(rotation)));
+		glm::vec3 radianRotation = rotation * (glm::pi<float>() / 180.0f);
+		glm::quat quaternion = glm::quat(radianRotation);
+		physx::PxTransform result(physx::PxVec3(translation.x, translation.y, translation.z), physx::PxQuat(quaternion.x, quaternion.y, quaternion.z, quaternion.w));
+		return result;
 	}
+
 
 
 	physx::PxVec3 ConvertToPhysXVector(const glm::vec3& vector)
@@ -83,6 +87,24 @@ namespace god
 	std::ostream& operator<<(std::ostream& os, const physx::PxVec4& v3)
 	{
 		os << v3.x << ',' << v3.y << ',' << v3.z << ','<<v3.w;
+		return os;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const glm::vec2& v2)
+	{
+		os << v2.x << ',' << v2.y;
+		return os;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const glm::vec3& v3)
+	{
+		os << v3.x << ',' << v3.y << ',' << v3.z;
+		return os;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const glm::vec4& v4)
+	{
+		os << v4.x << ',' << v4.y << ',' << v4.z << ',' << v4.w;
 		return os;
 	}
 

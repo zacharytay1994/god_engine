@@ -24,22 +24,28 @@ namespace god
 		class Animator
 		{
 		public:
-			Animator() = default;
+			Animator () = default;
 
-			Animator( Animation* animation );
+			Animator ( Animation* animation );
 
-			void UpdateAnimation( float dt );
+			void UpdateAnimation ( float dt , std::vector<std::vector<glm::mat4>> const& cachedTransforms );
 
-			void PlayAnimation( Animation* pAnimation );
+			void PlayAnimation ( Animation* pAnimation );
 
-			void CalculateBoneTransform( const AssimpNodeData* node, glm::mat4 parentTransform );
+			void CalculateBoneTransform ( uint32_t frame , const AssimpNodeData* node , std::vector<std::vector<glm::mat4>> const& cachedTransforms );
 
-			std::vector<glm::mat4> GetFinalBoneMatrices();
+			std::vector<glm::mat4> GetFinalBoneMatrices ();
+
+			float m_startTime { 0.0f };
+			float m_endTime { 1.0f };
+			bool m_repeat { true };
+			bool m_played { false };
+			bool m_alive { true };
+			float m_CurrentTime;
 
 		private:
 			std::vector<glm::mat4> m_FinalBoneMatrices;
 			Animation* m_CurrentAnimation;
-			float m_CurrentTime;
 			float m_DeltaTime;
 		};
 	}

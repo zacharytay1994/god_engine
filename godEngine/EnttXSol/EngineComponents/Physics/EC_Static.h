@@ -52,6 +52,7 @@ namespace god
 
 		bool operator==( RigidStatic const& rhs )
 		{
+			( rhs );
 			/*return StaticFriction == rhs.StaticFriction &&
 				DynamicFriction == rhs.DynamicFriction &&
 				Restitution == rhs.Restitution &&

@@ -75,7 +75,7 @@ namespace god
 				for (std::size_t Level = 0; Level < Texture.levels(); ++Level)
 				{
 					GLsizei const LayerGL = static_cast<GLsizei>(Layer);
-					glm::tvec3<GLsizei> Dimensions(Texture.extent(Level));
+					glm::tvec3<GLsizei> Dimensions_(Texture.extent(Level));
 					if (gli::is_target_cube(Texture.target()))
 						Target = static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face);
 					switch (Texture.target())
@@ -83,12 +83,12 @@ namespace god
 					case gli::TARGET_1D:
 						if (gli::is_compressed(Texture.format()))
 							glCompressedTexSubImage1D(
-								Target, static_cast<GLint>(Level), 0, Dimensions.x,
+								Target, static_cast<GLint>(Level), 0, Dimensions_.x,
 								Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
 								Texture.data(Layer, Face, Level));
 						else
 							glTexSubImage1D(
-								Target, static_cast<GLint>(Level), 0, Dimensions.x, Format.External, Format.Type,
+								Target, static_cast<GLint>(Level), 0, Dimensions_.x, Format.External, Format.Type,
 								Texture.data(Layer, Face, Level));
 						break;
 					case gli::TARGET_1D_ARRAY:
@@ -97,13 +97,13 @@ namespace god
 						if (gli::is_compressed(Texture.format()))
 							glCompressedTexSubImage2D(
 								Target, static_cast<GLint>(Level), 0, 0,
-								Dimensions.x, Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Dimensions.y,
+								Dimensions_.x, Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Dimensions_.y,
 								Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
 								Texture.data(Layer, Face, Level));
 						else
 							glTexSubImage2D(
 								Target, static_cast<GLint>(Level), 0, 0,
-								Dimensions.x, Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Dimensions.y,
+								Dimensions_.x, Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Dimensions_.y,
 								Format.External, Format.Type, Texture.data(Layer, Face, Level));
 						break;
 					case gli::TARGET_2D_ARRAY:
@@ -112,13 +112,13 @@ namespace god
 						if (gli::is_compressed(Texture.format()))
 							glCompressedTexSubImage3D(
 								Target, static_cast<GLint>(Level), 0, 0, 0,
-								Dimensions.x, Dimensions.y, Texture.target() == gli::TARGET_3D ? Dimensions.z : LayerGL,
+								Dimensions_.x, Dimensions_.y, Texture.target() == gli::TARGET_3D ? Dimensions_.z : LayerGL,
 								Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
 								Texture.data(Layer, Face, Level));
 						else
 							glTexSubImage3D(
 								Target, static_cast<GLint>(Level), 0, 0, 0,
-								Dimensions.x, Dimensions.y, Texture.target() == gli::TARGET_3D ? Dimensions.z : LayerGL,
+								Dimensions_.x, Dimensions_.y, Texture.target() == gli::TARGET_3D ? Dimensions_.z : LayerGL,
 								Format.External, Format.Type, Texture.data(Layer, Face, Level));
 						break;
 					default: assert(0); break;

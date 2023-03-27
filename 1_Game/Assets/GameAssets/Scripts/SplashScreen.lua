@@ -170,6 +170,8 @@ end
 -- initialization of data before play button is trigged
 function OnLoad_SplashScreen()
 
+    InstancePrefabNow("BlackScreen", 0,0,0)
+
     -- new array
     local objs_placement = {}
     for row = minRows, maxRows, 1 do
@@ -245,7 +247,7 @@ function OnLoad_SplashScreen()
     InstancePrefab("SS_Logo", 0, 0, 0)
 
     -- instance background music
-    InstancePrefab("BGM1", 0, 0, 0)
+    --InstancePrefab("SplashScreen_BGM", 0, 0, 0)
 
     print("[SplashScreen.lua] OnLoad_SplashScreen")
 end
@@ -322,6 +324,7 @@ function S_SplashScreen(e)
 
     -- change scene
     if ((camera.position.z < -6)) then
+        StopBGM()
         ChangeScene("MainmenuScreen", true)
     end
 

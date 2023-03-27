@@ -11,6 +11,8 @@ function C_BlackScreenFade()
     end
 end
 
+local sfxPlayed = false
+
 --[IsSystem]
 function S_BlackScreenFade(e)
     local fade = GetComponent(e,"C_BlackScreenFade")
@@ -19,7 +21,13 @@ function S_BlackScreenFade(e)
     if fade.FadeIn then
         if gui_object.alpha > 0 then
             gui_object.alpha = gui_object.alpha - fade.FadeSpeed * dt
+
+            if sfxPlayed == false then
+                InstancePrefab("SFX_FadeIn",0,0,0)
+                sfxPlayed = true
+            end
         else
+            sfxPlayed = false
             RemoveInstance(e)
         end
     else

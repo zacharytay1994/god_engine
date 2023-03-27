@@ -15,6 +15,7 @@
 #include "EnttXSol/EnttXSol.h"
 
 #include "Physics/godPhysics.h"
+#include "Physics/PhysicsController.h"
 
 #include "Audio/AudioAPI.h"
 #include "Audio/Internal/SoundManager.h"
@@ -53,10 +54,11 @@ namespace god
 
 	void godEngine::Update ()
 	{
-		FreeConsole ();
+		//FreeConsole ();
 		std::cout << "godEngine Update." << std::endl;
 		// create window
-		GLFWWindow window ( 1920 , 1080 );
+		//GLFWWindow window ( 1920 , 1080 );
+		GLFWWindow window ( 1920/2 , 1080/2 );
 #ifndef ENABLE_EDITOR
 		window.m_fullscreen = true;
 #endif
@@ -71,6 +73,7 @@ namespace god
 		glfwWindowHint ( GLFW_OPENGL_DEBUG_CONTEXT , true );
 
 		PhysicsSystem godPhysicsSystem {};
+		PX::PhysicsController godPhysicsController;
 
 		// setup camera
 		Camera camera;
@@ -123,6 +126,7 @@ namespace god
 			grid ,
 			sound_assets ,
 			godPhysicsSystem ,
+			godPhysicsController ,
 			scene ,
 			fonts
 		);
@@ -132,7 +136,8 @@ namespace god
 		MainVariables main_variables = { "nil", false };
 #else
 		// starting scene for non editor mode
-		MainVariables main_variables = { "SplashScreen", true };
+		MainVariables main_variables = { "DigipenScreen", true }; 
+		AudioAPI::PlayBGM ();
 #endif
 		RegisterLuaCPP ( enttxsol , engine_resources , main_variables );
 
@@ -151,6 +156,7 @@ namespace god
 #endif
 
 		godPhysicsSystem.Init ( &window , &camera );
+		godPhysicsController.CreateControllerManager ( godPhysicsSystem.GetPhysicsScene () );
 
 		while ( !window.WindowShouldClose () )
 		{
@@ -196,6 +202,7 @@ namespace god
 #endif
 
 			// depth map pass
+			opengl.UpdateAnimations ( DeltaTimer::m_dt );
 			opengl.FirstPassRenderToDepthmap (
 				scene ,
 				camera.GetPerpectiveProjectionMatrix () ,
@@ -276,15 +283,21 @@ namespace god
 			// if fullscreen, render game over imgui
 			if ( window.m_fullscreen )
 			{
+				//extra_renderpass.Bind ();
 				opengl.RenderBlendTextures ( imgui_renderpass.GetTexture () , blur.GetTexture () );
 				opengl.RenderGUI ( scene , camera.GetOrthographicProjectionMatrix ( static_cast< float >( window.GetWindowWidth () ) , static_cast< float >( window.GetWindowHeight () ) ) , ogl_textures );
+				//extra_renderpass.UnBind ();
+
+				//opengl.RenderTexture ( extra_renderpass.GetTexture () );
 			}
+
 
 			SystemTimer::StartTimeSegment ( "Window Buffer Swap" );
 			window.SwapWindowBuffers ();
 			SystemTimer::EndTimeSegment ( "Window Buffer Swap" );
 
 			// free camera update
+#ifdef ENABLE_EDITOR
 			camera.FreeCamera ( 0.02f ,
 				true ,
 				window.KeyDown ( GLFW_KEY_W ) ,
@@ -302,6 +315,7 @@ namespace god
 				window.KeyDown ( GLFW_KEY_LEFT_CONTROL ) ,
 				window.MouseScrollUp () ,
 				window.MouseScrollDown () );
+#endif
 
 			camera.InterpolateCameraState ( DeltaTimer::m_dt );
 
@@ -309,6 +323,9 @@ namespace god
 
 			// update FMOD system
 			AudioAPI::Update ();
+
+			// update physics controllers state
+			//godPhysicsController.FreeControllers ();
 
 			// change scene if any
 			auto& [scene_to_change , play_on_change] = main_variables;
@@ -325,7 +342,7 @@ namespace god
 				scene_tree->SetSelectedScene ( scene_to_change );
 #endif
 
-				EntityGrid& grid = engine_resources.Get<EntityGrid> ().get ();
+				//EntityGrid& grid = engine_resources.Get<EntityGrid> ().get ();
 				grid = EntityGrid ();
 
 				enttxsol.ClearEntt ( engine_resources );
