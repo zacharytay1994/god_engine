@@ -227,7 +227,7 @@ function OnLoad_SplashScreen()
     -- create seahorse batch #2
     GenerateSeahorse(-1, 0, 0, 16, 2, -2, 3)
 
-    GeneratePointLight()
+    -- GeneratePointLight()
 
     -- create seahorse on top of the pathway
     InstancePrefab("SS_Starfish", centerX, 0.2, 4.0)
