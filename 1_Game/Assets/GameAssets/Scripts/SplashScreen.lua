@@ -167,6 +167,7 @@ function GeneratePointLight()
     end
 end
 
+-- DONT SAVE THE SCENE IF THIS ENTIRE CODE IS HERE 
 -- initialization of data before play button is trigged
 function OnLoad_SplashScreen()
 
