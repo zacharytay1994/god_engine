@@ -167,10 +167,10 @@ function GeneratePointLight()
     end
 end
 
+-- DONT SAVE THE SCENE IF THIS ENTIRE CODE IS HERE 
 -- initialization of data before play button is trigged
 function OnLoad_SplashScreen()
-
-    InstancePrefabNow("BlackScreen", 0,0,0)
+ InstancePrefabNow("BlackScreen", 0,0,0)
 
     -- new array
     local objs_placement = {}
@@ -188,13 +188,13 @@ function OnLoad_SplashScreen()
     GenerateRandomRocks(objs_placement)
 
     -- create random seaweeds in the scene
-    GenerateRandomSeaweeds(objs_placement)
+    --GenerateRandomSeaweeds(objs_placement)
 
     -- create random corals in the scene
-    GenerateRandomCorals(objs_placement)
+    --GenerateRandomCorals(objs_placement)
 
     -- create yellow bubbles around the scene
-    PlantBubbleEmitter(objs_placement)
+    --PlantBubbleEmitter(objs_placement)
 
     -- create directional light at the door
     InstancePrefab("SS_DirectionalLight", centerX - 13, 30, 3)
@@ -210,15 +210,17 @@ function OnLoad_SplashScreen()
     -- create terrain floor and change blue tint to 5.0
     local terrain = InstancePrefabNow("SS_Terrain", centerX, 0, -38)
     local terrainTint = GetRenderable3D(terrain).tint
-    terrainTint.z = 5.0
+    terrainTint.x = 0.83
+    terrainTint.y = 0.56
+    terrainTint.z = 0.65
 
     -- create rectagular plain floor / using precreated prefab
     InstancePrefab("FloorPrefab", centerX, 0, 0)
 
     -- create large kelp
-    InstancePrefab("SS_Kelp", 13, 0.5, -2.8)
+    --InstancePrefab("SS_Kelp", 13, 0.5, -2.8)
 
-    InstancePrefab("SS_TreeBranch", 7.5, 1.5, 5.0)
+    --InstancePrefab("SS_TreeBranch", 7.5, 1.5, 5.0)
 
     -- create stone pathway to the door
     GenerateStonePathway()
@@ -240,7 +242,7 @@ function OnLoad_SplashScreen()
     SetCameraMoveSpeed(0.0)
     SetCameraNextPosition(10, 2, 4.5)
 
-    InstancePrefab("SS_TreeBranch", 7.5, 1.5, 5.0)
+    --InstancePrefab("SS_TreeBranch", 7.5, 1.5, 5.0)
 
     -- "ENTER + LEFT CLICK to SKIP" text on screen
     InstancePrefab("SS_Text", 0, 0, 0)
@@ -252,6 +254,43 @@ function OnLoad_SplashScreen()
     --InstancePrefab("SplashScreen_BGM", 0, 0, 0)
 
     print("[SplashScreen.lua] OnLoad_SplashScreen")
+
+    local allEntities = EntitiesWithEngineComponent("Transform")
+    local yourTintRock = { {0.170, 0.240, 0.2770}, {0.04, 0.08, 0.08}, {0.09,0.11,0.08} } 
+    local yourTintSeaweed = { {1, 1, 1}, {0.11, 0.4, 0.47}, {0.5,0.7,0.7} } 
+    local yourTintCoral = { {1, 0.34, 0.11}, {0.09, 1, 0.2}, {0.36,0.08,0.02} , {0.02,0.15,0.03} , {0.02,0.15,0.03}} 
+    -- babyPink lightBlue pinkish red pink?
+
+    for i = 1, #allEntities do        
+        if (EntityName(allEntities[i]) == "SS_Rock") then
+       
+            local rockTint = GetRenderable3D(allEntities[i]).tint
+            local rand = GenerateRandomNumberInRange(1, 3)
+     
+            rockTint.x = yourTintRock[rand][1]
+            rockTint.y = yourTintRock[rand][2]
+            rockTint.z = yourTintRock[rand][3]   
+       
+        elseif (EntityName(allEntities[i]) == "SS_Seaweed") then
+
+            local seaweedTint = GetRenderable3D(allEntities[i]).tint
+            local rand2 = GenerateRandomNumberInRange(1, 3)
+     
+            seaweedTint.x = yourTintSeaweed[rand2][1]
+            seaweedTint.y = yourTintSeaweed[rand2][2]
+            seaweedTint.z = yourTintSeaweed[rand2][3]   
+
+        elseif (EntityName(allEntities[i]) == "SS_Coral") then
+            local coralTint = GetRenderable3D(allEntities[i]).tint
+            local rand3 = GenerateRandomNumberInRange(1, 5)
+
+            coralTint.x = yourTintCoral[rand3][1]
+            coralTint.y = yourTintCoral[rand3][2]
+            coralTint.z = yourTintCoral[rand3][3] 
+
+
+        end
+    end
 end
 
 --[IsSystem]
