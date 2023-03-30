@@ -41,7 +41,8 @@ namespace god
 			"model_id" , &Renderable3D::m_model_id ,
 			"visible" , &Renderable3D::m_visible ,
 			"tint" , &Renderable3D::m_tint,
-			"emissive", &Renderable3D::m_emissive);
+			"emissive", &Renderable3D::m_emissive,
+			"diffuse", &Renderable3D::m_diffuse_id);
 	}
 	template<>
 	inline void ComponentInspector::operator() < Renderable3D > ( entt::entity entity , entt::registry& registry , int& imguiUniqueID , EngineResources& engineResources )
