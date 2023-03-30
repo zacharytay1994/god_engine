@@ -19,7 +19,7 @@ function S_VFXTest(e)
     if (CheckKeyPress(90)) then
         
         
-        local enemy = GetEntity("350DummishModel")
+        -- local enemy = GetEntity("350DummishModel")
         -- local vfx = SpawnVFX(enemy, "VFX_Vibration", GetTransform(enemy).position.x, GetTransform(enemy).position.y, GetTransform(enemy).position.z)
 
         -- local enemyHitVFX = SpawnVFX(enemy, "VFX_Hit", GetTransform(enemy).position.x, GetTransform(enemy).position.y, GetTransform(enemy).position.z)
@@ -38,7 +38,7 @@ function S_VFXTest(e)
         
         
         
-        local player = GetEntity("350TritonModel")
+        -- local player = GetEntity("350TritonModel")
         -- local playerHitVFX = SpawnVFX(player, "VFX_Hit", GetTransform(player).position.x, GetTransform(player).position.y, GetTransform(player).position.z)
         -- GetComponent(playerHitVFX, "C_VFXHit").parentObject = player
         
@@ -48,7 +48,15 @@ function S_VFXTest(e)
         -- local playerAOEVFX = SpawnVFX(player, "SwirlyLightning", GetTransform(player).position.x, GetTransform(player).position.y + 50, GetTransform(player).position.z + 150)
 
         -- play explosion VFX
-        local explosionVFX = SpawnVFX(player, "VFX_Explosion", GetTransform(player).position.x, GetTransform(player).position.y, GetTransform(player).position.z + 500)
+        -- local explosionVFX = SpawnVFX(player, "VFX_Explosion", GetTransform(player).position.x, GetTransform(player).position.y, GetTransform(player).position.z + 500)
 
+
+        InstancePrefabNow("ExclamationMark2", 8, 5, -1)
     end
+
+    if (CheckKeyPress(88)) then
+        InstancePrefabNow("ExclamationMark", 8, 5, -1)
+    end
+
+
 end
