@@ -1566,7 +1566,7 @@ namespace god
 									glm::vec3 midpoint = combat_playable_transform->m_position + v1 / 2.0f + glm::vec3 ( 0 , 1 , 0 );
 									camera.m_camera_move_speed = 3.0f;
 									camera.SetNextLookAt ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint , 1.0f ) );
-									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , -1 , 0 ) ) ) * 5.0f , 1.0f ) );
+									camera.SetNextPosition ( level_transform.m_parent_transform * level_transform.m_local_transform * glm::vec4 ( midpoint + glm::normalize ( glm::cross ( v1 , glm::vec3 ( 0 , 1 , 0 ) ) ) * 5.0f , 1.0f ) );
 
 									// move enemy away from player, works no matter who is attacking
 									glm::vec3 dir = combat_enemy_transform->m_position - combat_playable_transform->m_position;

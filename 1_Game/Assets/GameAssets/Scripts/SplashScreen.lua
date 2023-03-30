@@ -149,7 +149,7 @@ function GenerateSeahorse(vel_x, vel_y, vel_z, pos_x, pos_y, pos_z, index)
         if vel_x < 0 then
             seahorse_transform.rotation.y = -80
         end
-        local rng_scale = GenerateRandomNumberInRange(5, 10) / 10.0
+        local rng_scale = GenerateRandomNumberInRange(5, 10) / 1000.0
         seahorse_transform.scale.x = rng_scale
         seahorse_transform.scale.y = rng_scale
         seahorse_transform.scale.z = rng_scale
@@ -167,6 +167,7 @@ function GeneratePointLight()
     end
 end
 
+-- DONT SAVE THE SCENE IF THIS ENTIRE CODE IS HERE 
 -- initialization of data before play button is trigged
 function OnLoad_SplashScreen()
 
@@ -197,7 +198,7 @@ function OnLoad_SplashScreen()
     PlantBubbleEmitter(objs_placement)
 
     -- create directional light at the door
-    InstancePrefab("SS_DirectionalLight", centerX, 10, -10)
+    InstancePrefab("SS_DirectionalLight", centerX - 13, 30, 3)
 
     -- create rock below the door
     InstancePrefab("SS_RockFlat", centerX, 0, -7)
@@ -207,8 +208,10 @@ function OnLoad_SplashScreen()
     local door_transform = GetTransform(door)
     door_transform.position.y = door_transform.scale.y
 
-    -- create terrain floor
-    InstancePrefab("SS_Terrain", centerX, 0, -38)
+    -- create terrain floor and change blue tint to 5.0
+    local terrain = InstancePrefabNow("SS_Terrain", centerX, 0, -38)
+    local terrainTint = GetRenderable3D(terrain).tint
+    terrainTint.z = 5.0
 
     -- create rectagular plain floor / using precreated prefab
     InstancePrefab("FloorPrefab", centerX, 0, 0)
@@ -324,7 +327,7 @@ function S_SplashScreen(e)
 
     -- change scene
     if ((camera.position.z < -6)) then
-        StopBGM()
+        --StopBGM()
         ChangeScene("MainmenuScreen", true)
     end
 
