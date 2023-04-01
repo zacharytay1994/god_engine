@@ -376,7 +376,7 @@ namespace god
 					glm::ortho ( -20.0f , 20.0f , -20.0f , 20.0f , 1.0f , 20.0f ) *
 					glm::lookAt (
 						glm::vec3 ( light.m_position ) ,
-						glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
+						glm::vec3 ( light.m_specular ) ,
 						glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
 
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
@@ -770,7 +770,7 @@ namespace god
 					glm::ortho ( -20.0f , 20.0f , -20.0f , 20.0f , 1.0f , 20.0f ) *
 					glm::lookAt (
 						glm::vec3 ( light.m_position ) ,
-						glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
+						glm::vec3 ( light.m_specular ) ,
 						glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
 
 				OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
@@ -1067,7 +1067,7 @@ namespace god
 				glm::ortho ( -20.0f , 20.0f , -20.0f , 20.0f , 1.0f , 20.0f ) *
 				glm::lookAt (
 					glm::vec3 ( light.m_position ) ,
-					glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
+					glm::vec3 ( light.m_specular ) ,
 					glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
 
 			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );

@@ -1916,6 +1916,7 @@ namespace god
 										}
 									}
 									renderable->m_emissive = 50.0f;
+									renderable->m_tint = glm::vec4 ( 1.0f , 1.0f , 1.0f , 0.12f );
 								}
 								else
 								{
@@ -1934,6 +1935,7 @@ namespace god
 										}*/
 									}
 									renderable->m_emissive = 1.0f;
+									renderable->m_tint = glm::vec4 ( 1.0f , 1.0f , 1.0f , 1.0f );
 								}
 							}
 						}
