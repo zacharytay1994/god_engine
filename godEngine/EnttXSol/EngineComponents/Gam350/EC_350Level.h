@@ -373,6 +373,8 @@ namespace god
 							//m_destination = static_cast< uint32_t >( -1 );
 							if ( in_los )
 							{
+								entt.InstancePrefab(engineResources, "ExclamationMark", entt.m_entities[m_entity_id].m_children[0]);
+								
 								// previously not down
 								//if ( !m_flags[ 0 ] )
 								//{
