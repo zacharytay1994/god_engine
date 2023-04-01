@@ -390,7 +390,6 @@ namespace god
 								}
 
 								entt.QueueInstancePrefab ( "SFX_PressurePlate" , 0.f , 0.f , 0.f );
-								entt.QueueInstancePrefab ( "SFX_Door" , 0.f , 0.f , 0.f );
 
 								grid.LerpEntityToCell ( entt , engineResources ,
 									*static_cast< Entity* >( this ) , { x , y - 1 , z } );
