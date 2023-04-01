@@ -383,7 +383,7 @@ namespace god
 			}
 
 			// Set Fog
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.color" , m_fog_color );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.linearStart" , 150.0f );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.linearEnd" , 300.0f );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.density" , 0.03f );
@@ -777,7 +777,7 @@ namespace god
 			}
 
 			// Set Fog
-			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
+			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.color" , m_fog_color );
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.linearStart" , 10.0f );
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.density" , 0.03f );
@@ -1074,7 +1074,7 @@ namespace god
 		}
 
 		// Set Fog
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.color" , m_fog_color );
 		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.linearStart" , 10.0f );
 		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
 		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.density" , 0.03f );
