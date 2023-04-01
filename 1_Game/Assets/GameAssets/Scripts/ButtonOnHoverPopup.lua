@@ -15,13 +15,9 @@ function C_ButtonOnHoverPopup()
 end
 
 function GenerateRandomHoverSFX()
-	local sfx = 
-	{ 
-		"SFX_Hover01", "SFX_Hover02", "SFX_Hover03", "SFX_Hover04", "SFX_Hover05",
-		"SFX_Hover06", "SFX_Hover07", "SFX_Hover08", "SFX_Hover09", "SFX_Hover10"
-	}
+	local sfx = { "SFX_Hover01", "SFX_Hover02" }
 	
-	local rng = GenerateRandomNumberInRange(1, 10)
+	local rng = GenerateRandomNumberInRange(1, 2)
 	InstancePrefab(sfx[rng],0,0,0)
 end
 
