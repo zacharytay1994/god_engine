@@ -89,8 +89,8 @@ function S_VFXTriton(e)
             
             local playerHitVFX = SpawnVFX(e, "VFX_Hit", tritonPosition.x, tritonPosition.y - 50, tritonPosition.z)
             GetComponent(playerHitVFX, "C_VFXHit").parentObject = e
-            print("playerHitVFX animation played!!!")
-            print("player ID:", GetEntityData(e).id)
+            -- print("playerHitVFX animation played!!!")
+            -- print("player ID:", GetEntityData(e).id)
             vfxComponent.onHitEffectsPlayed = true
         end
     end
