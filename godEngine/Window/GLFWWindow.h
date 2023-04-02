@@ -8,6 +8,8 @@ namespace god
 {
 	struct GLFWWindow
 	{
+		bool m_exit { false };
+
 		bool m_fullscreen { false };
 
 		GLFWWindow ( uint32_t width , uint32_t height );

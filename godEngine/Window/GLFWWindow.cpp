@@ -147,7 +147,7 @@ namespace god
 
 	bool GLFWWindow::WindowShouldClose ()
 	{
-		return glfwWindowShouldClose ( m_window );
+		return glfwWindowShouldClose ( m_window ) || m_exit;
 	}
 
 	bool GLFWWindow::WindowsMinimized()

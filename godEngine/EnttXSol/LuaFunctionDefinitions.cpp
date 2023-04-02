@@ -896,7 +896,8 @@ namespace god
 		entt.RegisterLuaFunction("QuitGame",
 			[&entt, &engineResources]()
 			{
-				ExitProcess(0);
+				engineResources.Get<GLFWWindow> ().get ().m_exit = true;
+				//ExitProcess(0);
 			}
 		);
 	}
