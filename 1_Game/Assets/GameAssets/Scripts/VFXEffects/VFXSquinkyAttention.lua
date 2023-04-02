@@ -30,6 +30,9 @@ function S_VFXSquinkyAttention(e)
     --print("vfxComponent.accumTime:", vfxComponent.accumTime)
     
     if (vfxComponent.accumTime < vfxComponent.fixedFrameTime) then
+        -- play sound effect
+        InstancePrefab("SFX_SquidAlert", 0, 0, 0)
+
         --print("vfxComponent.accumTime < vfxComponent.fixedFrameTime")
         return
     else
