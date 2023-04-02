@@ -279,8 +279,9 @@ void main( )
     c_x = sin( c_x + uDT * 0.01 );
     vec3 caustic_color = vec3( texture( uCausticMap , vec2( c_x , c_z ) ).rgb ) * (0.1 + max(0,dot(normalize(vNormal),vec3(0,1,0))) * 0.9) * dli;
 
-    output_color += vec4( caustic_color , 1.0 );
+    output_color += vec4( caustic_color , 0.0 );
     output_color *= uTint;
 
     fFragColor = vec4(output_color.rgb,diffuse_color.a);
+    // fFragColor = output_color;
 }

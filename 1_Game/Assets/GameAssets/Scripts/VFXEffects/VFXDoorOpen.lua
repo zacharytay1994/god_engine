@@ -67,6 +67,8 @@ function S_VFXDoorOpen(e)
 
         GetRenderable3D(doorParticle).emissive = 20
         
+        -- play sound effect
+        InstancePrefab("SFX_Door", 0, 0, 0)
     end
 
     emitterComponent.particleEmitted = true

@@ -373,6 +373,8 @@ namespace god
 							//m_destination = static_cast< uint32_t >( -1 );
 							if ( in_los )
 							{
+								entt.InstancePrefab(engineResources, "ExclamationMark", entt.m_entities[m_entity_id].m_children[0]);
+								
 								// previously not down
 								//if ( !m_flags[ 0 ] )
 								//{
@@ -390,7 +392,6 @@ namespace god
 								}
 
 								entt.QueueInstancePrefab ( "SFX_PressurePlate" , 0.f , 0.f , 0.f );
-								entt.QueueInstancePrefab ( "SFX_Door" , 0.f , 0.f , 0.f );
 
 								grid.LerpEntityToCell ( entt , engineResources ,
 									*static_cast< Entity* >( this ) , { x , y - 1 , z } );
@@ -1915,6 +1916,7 @@ namespace god
 										}
 									}
 									renderable->m_emissive = 50.0f;
+									renderable->m_tint = glm::vec4 ( 1.0f , 1.0f , 1.0f , 0.12f );
 								}
 								else
 								{
@@ -1933,6 +1935,7 @@ namespace god
 										}*/
 									}
 									renderable->m_emissive = 1.0f;
+									renderable->m_tint = glm::vec4 ( 1.0f , 1.0f , 1.0f , 1.0f );
 								}
 							}
 						}

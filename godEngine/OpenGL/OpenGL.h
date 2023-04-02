@@ -174,6 +174,8 @@ namespace god
 
 		// font
 		FontRenderer m_font_renderer;
+
+		glm::vec3 m_fog_color { 0.0,0.05,0.5 };
 	};
 
 	template<size_t N>

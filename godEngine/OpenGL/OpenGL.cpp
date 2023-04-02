@@ -376,14 +376,14 @@ namespace god
 					glm::ortho ( -20.0f , 20.0f , -20.0f , 20.0f , 1.0f , 20.0f ) *
 					glm::lookAt (
 						glm::vec3 ( light.m_position ) ,
-						glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
+						glm::vec3 ( light.m_specular ) ,
 						glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
 
 				OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
 			}
 
 			// Set Fog
-			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
+			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.color" , m_fog_color );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.linearStart" , 150.0f );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.linearEnd" , 300.0f );
 			OGLShader::SetUniform ( m_textured_shader.GetShaderID () , "uFogParams.density" , 0.03f );
@@ -770,14 +770,14 @@ namespace god
 					glm::ortho ( -20.0f , 20.0f , -20.0f , 20.0f , 1.0f , 20.0f ) *
 					glm::lookAt (
 						glm::vec3 ( light.m_position ) ,
-						glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
+						glm::vec3 ( light.m_specular ) ,
 						glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
 
 				OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
 			}
 
 			// Set Fog
-			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
+			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.color" , m_fog_color );
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.linearStart" , 10.0f );
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
 			OGLShader::SetUniform ( m_textured_discard_shader.GetShaderID () , "uFogParams.density" , 0.03f );
@@ -1067,14 +1067,14 @@ namespace god
 				glm::ortho ( -20.0f , 20.0f , -20.0f , 20.0f , 1.0f , 20.0f ) *
 				glm::lookAt (
 					glm::vec3 ( light.m_position ) ,
-					glm::vec3 ( 0.0f , 0.0f , 0.0f ) ,
+					glm::vec3 ( light.m_specular ) ,
 					glm::vec3 ( 0.0f , 1.0f , 0.0f ) );
 
 			OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uLightSpaceMatrix" , m_light_space_matrix );
 		}
 
 		// Set Fog
-		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.color" , { 0.45f,0.65f,0.90f } );
+		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.color" , m_fog_color );
 		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.linearStart" , 10.0f );
 		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.linearEnd" , 100.0f );
 		OGLShader::SetUniform ( m_animation_shader.GetShaderID () , "uFogParams.density" , 0.03f );
