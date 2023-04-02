@@ -13,6 +13,7 @@ function C_VFXSquinkyAttention()
         fixedFrameTime = 1/60,
         accumTime = 0.0,
         yOffset = 0.7,
+        playSFX = false,
     }
     return function()
         return var
@@ -30,9 +31,11 @@ function S_VFXSquinkyAttention(e)
     --print("vfxComponent.accumTime:", vfxComponent.accumTime)
     
     if (vfxComponent.accumTime < vfxComponent.fixedFrameTime) then
-        -- play sound effect
-        InstancePrefab("SFX_SquidAlert", 0, 0, 0)
-
+        if (playSFX == false) then
+            -- play sound effect
+            InstancePrefab("SFX_SquidAlert", 0, 0, 0)
+            playSFX = true
+        end
         --print("vfxComponent.accumTime < vfxComponent.fixedFrameTime")
         return
     else
@@ -62,6 +65,7 @@ function S_VFXSquinkyAttention(e)
 
     if (vfxComponent.timer > vfxComponent.staystillTime) then
         --print("removing instance")
+        playSFX = false;
         RemoveInstance(e)
     end
 end
