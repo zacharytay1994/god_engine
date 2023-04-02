@@ -116,6 +116,7 @@ namespace god
 		glfwWindowHint ( GLFW_OPENGL_PROFILE , GLFW_OPENGL_CORE_PROFILE );
 
 		m_window = glfwCreateWindow ( m_width , m_height , "Heart Of The Trident" , NULL , NULL );
+		//m_window = glfwCreateWindow ( m_width , m_height , "Heart Of The Trident" , glfwGetPrimaryMonitor() , NULL );
 		if ( m_window == NULL )
 		{
 			std::cerr << "Failed to create GLFW window" << std::endl;
