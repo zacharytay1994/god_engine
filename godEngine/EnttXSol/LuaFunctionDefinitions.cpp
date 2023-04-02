@@ -890,5 +890,14 @@ namespace god
 				AudioAPI::StopBGM();
 			}
 		);
+
+		// StopBGM()
+		// ==============================================================================================
+		entt.RegisterLuaFunction("QuitGame",
+			[&entt, &engineResources]()
+			{
+				ExitProcess(0);
+			}
+		);
 	}
 }
